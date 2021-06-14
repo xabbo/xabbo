@@ -1,0 +1,11 @@
+﻿<Application x:Class="b7.Xabbo.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:b7.Xabbo"
+             xmlns:converter="clr-namespace:b7.Xabbo.WPF.Converters">
+    <Application.Resources>
+        <converter:BoolToOpacityConverter x:Key="BoolToOpacityConverter" />
+        <converter:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <converter:BooleanNotConverter x:Key="NotConverter" />
+    </Application.Resources>
+</Application>

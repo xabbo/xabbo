@@ -1,0 +1,70 @@
+﻿<Window x:Class="b7.Xabbo.View.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:view="clr-namespace:b7.Xabbo.View"
+        xmlns:viewModel="clr-namespace:b7.Xabbo.ViewModel"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type={x:Type viewModel:MainViewManager}}"
+        Title="{Binding Title}" Height="500" Width="450"
+        Topmost="{Binding IsChecked, ElementName=checkBoxTopmost}">
+    <Grid>
+        <CheckBox x:Name="checkBoxTopmost"
+            Panel.ZIndex="9999"
+            Margin="6"
+            HorizontalAlignment="Right" VerticalAlignment="Top"
+            VerticalContentAlignment="Center"
+            Opacity="0.33"
+            IsChecked="True"
+            Content="Topmost"
+        />
+        <TabControl Margin="4">
+            <TabItem Header="General">
+                <view:GeneralView DataContext="{Binding General}" />
+            </TabItem>
+            <TabItem Header="Chat">
+                <view:ChatView DataContext="{Binding Chat}" />
+            </TabItem>
+            <TabItem Header="Figure">
+                <TabControl Margin="2">
+                    <TabItem Header="Wardrobe">
+                        <view:WardrobeView DataContext="{Binding Wardrobe}" />
+                    </TabItem>
+                    <TabItem Header="Randomizer">
+                        <view:FigureRandomizerView DataContext="{Binding FigureRandomizer}" />
+                    </TabItem>
+                </TabControl>
+            </TabItem>
+            <TabItem Header="Room">
+                <TabControl Margin="2">
+                    <TabItem Header="Info">
+                        <view:RoomInfoView DataContext="{Binding RoomInfo}" />
+                    </TabItem>
+                    <TabItem Header="Users">
+                        <view:RoomEntitiesView DataContext="{Binding Entities}" />
+                    </TabItem>
+                    <TabItem Header="Visitors">
+                        <view:RoomVisitorsView DataContext="{Binding Visitors}" />
+                    </TabItem>
+                    <TabItem Header="Banlist">
+                        <view:BanListView DataContext="{Binding BanList}" />
+                    </TabItem>
+                    <TabItem Header="Furni">
+                        <view:RoomFurniView DataContext="{Binding Furni}" />
+                    </TabItem>
+                </TabControl>
+            </TabItem>
+            <TabItem Header="Tools">
+                <TabControl Margin="2">
+                    <TabItem Header="Aligner">
+                        <view:AlignerView DataContext="{Binding Aligner}" />
+                    </TabItem>
+                    <TabItem Header="Mimic">
+                        <view:MimicView DataContext="{Binding Mimic}" />
+                    </TabItem>
+                </TabControl>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>

@@ -1,0 +1,91 @@
+﻿<UserControl x:Class="b7.Xabbo.View.AlignerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:b7.Xabbo"
+             xmlns:viewModel="clr-namespace:b7.Xabbo.ViewModel"
+             xmlns:controls="clr-namespace:b7.Xabbo.WPF.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="200" d:DesignWidth="400"
+             d:DataContext="{d:DesignInstance Type={x:Type viewModel:AlignerViewManager}}"
+             Background="White"
+             FontFamily="Consolas">
+    <Grid Margin="6" IsEnabled="{Binding IsInRoom}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Column="0" Margin="2" VerticalAlignment="Center" HorizontalAlignment="Right" Text="ID" />
+        <TextBox Grid.Column="1" Grid.ColumnSpan="3" Margin="2"
+                 IsReadOnly="True" BorderThickness="0"
+                 Text="{Binding CurrentId}">
+            <TextBox.Style>
+                <Style TargetType="{x:Type TextBox}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding CurrentId}" Value="-1">
+                            <Setter Property="Visibility" Value="Hidden" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBox.Style>
+        </TextBox>
+                 
+        <CheckBox Grid.Column="4" Grid.ColumnSpan="2"
+                  HorizontalAlignment="Right"
+                  VerticalAlignment="Center" VerticalContentAlignment="Center"
+                  Content="Capture" IsChecked="{Binding IsCapturing}"  />
+
+        <TextBlock Grid.Column="0" Grid.Row="1" Margin="2" VerticalAlignment="Center" HorizontalAlignment="Right" Text="Location" />
+        <TextBox Grid.Column="1" Grid.ColumnSpan="5" Grid.Row="1" Margin="2" Padding="0,1"
+                 Text="{Binding LocationString, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}"
+                 IsEnabled="{Binding CanMoveLocation}" />
+
+        <controls:NumericUpDown Grid.Column="1" Grid.Row="2" Margin="2" Value="{Binding WallX}" IsEnabled="{Binding HasCapturedItem}" />
+        <controls:NumericUpDown Grid.Column="2" Grid.Row="2" Margin="2" Value="{Binding WallY}" IsEnabled="{Binding HasCapturedItem}" />
+        <controls:NumericUpDown Grid.Column="3" Grid.Row="2" Margin="2" Value="{Binding LocationX}" IsEnabled="{Binding CanMoveLocation}" />
+        <controls:NumericUpDown Grid.Column="4" Grid.Row="2" Margin="2" Value="{Binding LocationY}" IsEnabled="{Binding CanMoveLocation}" />
+        <Button Grid.Column="5" Grid.Row="2" Margin="2" Width="16"
+                HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                Command="{Binding ToggleOrientationCommand}"
+                IsEnabled="{Binding HasCapturedItem}">
+            <TextBlock>
+                <TextBlock.Style>
+                    <Style TargetType="{x:Type TextBlock}">
+                        <Setter Property="Text" Value="r" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsLeft}" Value="True">
+                                <Setter Property="Text" Value="l" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+        </Button>
+
+        <Button Grid.Row="2" Margin="2" Content="Reset"
+                IsEnabled="{Binding HasCapturedItem}"
+                Command="{Binding ResetCommand}" />
+
+        <CheckBox Grid.Row="3" Grid.Column="3" Grid.ColumnSpan="2"
+                  Margin="2" VerticalAlignment="Center" VerticalContentAlignment="Center"
+                  Content="Lock location"
+                  IsEnabled="{Binding HasCapturedItem}"
+                  IsChecked="{Binding LockLocation}" />
+
+    </Grid>
+</UserControl>

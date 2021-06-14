@@ -1,0 +1,35 @@
+﻿<UserControl x:Class="b7.Xabbo.WPF.Controls.NumericUpDown"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:b7.Xabbo.WPF.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="22" d:DesignWidth="150"
+             x:Name="root">
+    <Grid DataContext="{Binding ElementName=root}">
+        <TextBox x:Name="textBoxValue" Grid.RowSpan="2" Grid.ColumnSpan="2"
+                 Padding="0,2"
+                 VerticalAlignment="Stretch" VerticalContentAlignment="Center"
+                 Text="{Binding Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                 PreviewKeyDown="TextBoxValue_PreviewKeyDown" />
+        <Grid HorizontalAlignment="Right" Width="16">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <RepeatButton Margin="0,2,2,0"
+                      Interval="{Binding Interval}" Delay="500" Click="OnIncrement">
+                <Canvas>
+                    <Polygon Points="-2,1 0,-1 2,1" Fill="Black" />
+                </Canvas>
+            </RepeatButton>
+            <RepeatButton Grid.Row="1" Margin="0,0,2,2"
+                      Interval="{Binding Interval}" Delay="500" Click="OnDecrement">
+                <Canvas>
+                    <Polygon Points="-2,-1 0,1 2,-1" Fill="Black" />
+                </Canvas>
+            </RepeatButton>
+        </Grid>
+    </Grid>
+</UserControl>

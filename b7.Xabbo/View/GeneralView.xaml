@@ -1,0 +1,165 @@
+﻿<UserControl x:Class="b7.Xabbo.View.GeneralView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:b7.Xabbo.View"
+             xmlns:viewModel="clr-namespace:b7.Xabbo.ViewModel"
+             mc:Ignorable="d" 
+             d:DesignWidth="400"
+             d:DataContext="{d:DesignInstance Type={x:Type viewModel:GeneralViewManager}}"
+             Background="White"
+             FontFamily="Consolas" FontSize="12">
+    <UserControl.Resources>
+        <Style TargetType="{x:Type GroupBox}">
+            <Setter Property="Margin" Value="2" />
+            <Setter Property="Padding" Value="2" />
+        </Style>
+        <Style TargetType="{x:Type StackPanel}">
+            <Setter Property="Margin" Value="0" />
+        </Style>
+        <Style TargetType="{x:Type WrapPanel}">
+            <Setter Property="Margin" Value="0" />
+        </Style>
+        <Style TargetType="{x:Type CheckBox}">
+            <Setter Property="Margin" Value="2" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+        <Style TargetType="{x:Type RadioButton}">
+            <Setter Property="Margin" Value="2" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+    </UserControl.Resources>
+    <ScrollViewer>
+        <StackPanel Margin="2">
+            <GroupBox Header="Room">
+                <StackPanel>
+                    <WrapPanel>
+                        <CheckBox DataContext="{Binding AntiKick}"
+                                  IsEnabled="{Binding IsAvailable}"
+                                  IsChecked="{Binding IsActive}"
+                                  Opacity="{Binding IsReady, Converter={StaticResource BoolToOpacityConverter}, ConverterParameter='1;0.5'}"
+                                  Content="Anti kick" />
+                        <CheckBox DataContext="{Binding AntiIdle}"
+                                  IsChecked="{Binding IsActive}"
+                                  Content="Anti idle" />
+                        <CheckBox DataContext="{Binding AntiIdle}"
+                                  IsChecked="{Binding IsAntiIdleOutActive}"
+                                 Content="Anti idle-out" />
+                    </WrapPanel>
+                    <GroupBox Header="Movement">
+                        <StackPanel>
+                            <StackPanel DataContext="{Binding AntiTurn}" Margin="0">
+                                <CheckBox IsChecked="{Binding IsActive}" Content="No turn"
+                                          ToolTip="Prevent turning when selecting a user" />
+                                <CheckBox Margin="20,0,0,0"
+                                          IsChecked="{Binding TurnOnReselect}"
+                                          Content="Except when re-selecting user" />
+                            </StackPanel>
+                            <StackPanel DataContext="{Binding AntiWalk}">
+                                <CheckBox IsChecked="{Binding IsActive}" 
+                                          Content="No walk" />
+                                <CheckBox Margin="20,0,0,0" Content="Turn towards tile clicked" IsChecked="{Binding FaceDirection}" />
+                            </StackPanel>
+                            <CheckBox Content="Click through users"
+                                      IsChecked="{Binding ClickThrough.IsActive}" />
+                        </StackPanel>
+                    </GroupBox>
+                    <GroupBox DataContext="{Binding ClickTo}" IsEnabled="{Binding IsAvailable}">
+                        <GroupBox.Header>
+                            <CheckBox Content="Click to"
+                                      IsEnabled="{Binding IsAvailable}"
+                                      IsChecked="{Binding IsActive}" />
+                        </GroupBox.Header>
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <RadioButton GroupName="ClickTo" Content="Mute for" IsChecked="{Binding Mute}" />
+                                <TextBox Margin="2" Width="60" Text="{Binding MuteValue, UpdateSourceTrigger=PropertyChanged}" />
+                                <RadioButton GroupName="ClickToMute" Content="min" IsChecked="{Binding MuteInMinutes}" />
+                                <RadioButton GroupName="ClickToMute" Content="hr" IsChecked="{Binding MuteInHours}" />
+                            </StackPanel>
+                            <RadioButton GroupName="ClickTo" Content="Kick" IsChecked="{Binding Kick}" />
+                            <RadioButton GroupName="ClickTo" Content="Ban" IsChecked="{Binding Ban}" />
+                            <StackPanel Margin="20,0,0,0">
+                                <RadioButton GroupName="ClickToBan" Content="For an hour" IsChecked="{Binding BanHour}" />
+                                <RadioButton GroupName="ClickToBan" Content="For a day" IsChecked="{Binding BanDay}" />
+                                <RadioButton GroupName="ClickToBan" Content="Permanently" IsChecked="{Binding BanPerm}" />
+                            </StackPanel>
+                            <RadioButton GroupName="ClickTo" Content="Bounce" IsChecked="{Binding Bounce}" />
+                        </StackPanel>
+                    </GroupBox>
+                    <GroupBox DataContext="{Binding Escape}" IsEnabled="{Binding IsAvailable}" Header="Escape from">
+                        <WrapPanel Orientation="Horizontal">
+                            <CheckBox Content="Staff"
+                                      IsEnabled="{Binding CanEscapeStaff}"
+                                      IsChecked="{Binding EscapeStaff}" />
+                            <CheckBox Content="Ambassadors"
+                                      IsEnabled="{Binding CanEscapeAmbassadors}"
+                                      IsChecked="{Binding EscapeAmbassadors}" />
+                        </WrapPanel>
+                    </GroupBox>
+                    <GroupBox Header="Entry">
+                        <StackPanel>
+                            <StackPanel DataContext="{Binding RoomEntry}" IsEnabled="{Binding IsAvailable}">
+                                <CheckBox Content="Remember room passwords"
+                                          IsChecked="{Binding RememberPasswords}" />
+                            </StackPanel>
+                            <CheckBox DataContext="{Binding Doorbell}"
+                                      IsEnabled="{Binding IsAvailable}"
+                                      IsChecked="{Binding AcceptFriends}"
+                                      Content="Auto accept friends at doorbell" />
+                        </StackPanel>
+                    </GroupBox>
+                    <CheckBox DataContext="{Binding FlattenRoom}"
+                              IsEnabled="{Binding IsAvailable}"
+                              IsChecked="{Binding IsActive}"
+                              Content="Flatten floor plan"
+                              ToolTip="Flattens out the floor plan client-side. Must be active before entering a room." />
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Header="Chat">
+                <StackPanel>
+                    <StackPanel DataContext="{Binding AntiBobba}">
+                        <CheckBox Content="Anti-bobba" IsChecked="{Binding IsActive}" />
+                        <StackPanel Margin="20,0,0,0">
+                            <CheckBox Content="Localized" ToolTip="Only apply anti-bobba to text between [square brackets]."
+                                      IsChecked="{Binding IsLocalized}" />
+                        </StackPanel>
+                    </StackPanel>
+                    <CheckBox Content="No typing indicator" DataContext="{Binding AntiTyping}"
+                              IsChecked="{Binding IsActive}" IsEnabled="{Binding IsAvailable}" />
+                    <GroupBox Header="Mute" DataContext="{Binding Chat}" IsEnabled="{Binding IsAvailable}">
+                        <WrapPanel>
+                            <CheckBox Content="Bots" IsChecked="{Binding MuteBots}" />
+                            <CheckBox Content="Pets" IsChecked="{Binding MutePets}" />
+                            <CheckBox Content="Pet commands" IsChecked="{Binding MutePetCommands}" />
+                            <CheckBox Content="Wired messages" IsChecked="{Binding MuteWired}" />
+                            <CheckBox Content="Respects" IsChecked="{Binding MuteRespects}" />
+                            <CheckBox Content="Scratches" IsChecked="{Binding MuteScratches}" />
+                        </WrapPanel>
+                    </GroupBox>
+                    <StackPanel DataContext="{Binding Respected}" IsEnabled="{Binding IsAvailable}">
+                        <CheckBox Content="Show who respected" IsChecked="{Binding ShowWhoRespected}" />
+                        <CheckBox Content="Show total respect count" IsChecked="{Binding ShowTotalRespects}" />
+                    </StackPanel>
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Header="Furni">
+                <StackPanel DataContext="{Binding FurniActions}" IsEnabled="{Binding IsAvailable}">
+                    <CheckBox Content="Prevent using furni" IsChecked="{Binding PreventUse}" />
+                    <CheckBox Content="Double-click to show info" IsChecked="{Binding UseToShowInfo}" />
+                    <CheckBox Content="Double-click to hide" IsChecked="{Binding UseToHide}" />
+                    <CheckBox Content="Double-click tele to find link" IsChecked="{Binding UseToFindLink}" />
+                </StackPanel>
+            </GroupBox>
+            <StackPanel DataContext="{Binding HandItem}" IsEnabled="{Binding IsAvailable}">
+                <CheckBox Content="Drop received hand item" IsChecked="{Binding DropHandItem}" />
+                <CheckBox Content="Return received hand item" IsChecked="{Binding ReturnHandItem}" />
+                <CheckBox Content="Maintain direction when given hand item"
+                          IsEnabled="{Binding CanMaintainDirection}" IsChecked="{Binding MaintainDirection}" />
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

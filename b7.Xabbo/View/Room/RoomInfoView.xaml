@@ -1,0 +1,127 @@
+﻿<UserControl x:Class="b7.Xabbo.View.RoomInfoView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:b7.Xabbo"
+             xmlns:viewModel="clr-namespace:b7.Xabbo.ViewModel"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800"
+             d:DataContext="{d:DesignInstance Type={x:Type viewModel:RoomInfoViewManager}}"
+             x:Name="root">
+    <UserControl.Resources>
+        <Style TargetType="TextBlock">
+            <Style.Setters>
+                <Setter Property="Margin" Value="4" />
+                <Setter Property="FontWeight" Value="Bold" />
+                <Setter Property="HorizontalAlignment" Value="Right" />
+            </Style.Setters>
+        </Style>
+        <Style TargetType="TextBox">
+            <Style.Setters>
+                <Setter Property="Margin" Value="4" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="IsReadOnly" Value="True" />
+                <Setter Property="FontFamily" Value="Consolas" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+                <Setter Property="TextWrapping" Value="Wrap" />
+            </Style.Setters>
+        </Style>
+    </UserControl.Resources>
+    <ScrollViewer x:Name="layoutRoot" DataContext="{Binding Data}">
+        <Grid x:Name="gridInfo" HorizontalAlignment="Stretch">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="1*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- Room name -->
+            <TextBlock Text="Room name" />
+            <TextBox Grid.Column="1" Text="{Binding Name, Mode=OneWay}" TextWrapping="Wrap" />
+
+            <!-- Room ID -->
+            <TextBlock Grid.Row="1" Text="Room ID" />
+            <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding Id, Mode=OneWay}" TextWrapping="Wrap" />
+
+            <!-- Owner name -->
+            <TextBlock Grid.Row="2" Text="Owner name" />
+            <TextBox Grid.Column="1" Grid.Row="2" Text="{Binding OwnerName, Mode=OneWay}" TextWrapping="Wrap" />
+
+            <!-- Owner ID -->
+            <TextBlock Grid.Row="3" Text="Owner ID" />
+            <TextBox Grid.Column="1" Grid.Row="3" Text="{Binding OwnerId, Mode=OneWay}" TextWrapping="Wrap" />
+
+            <!-- Category -->
+            <TextBlock Grid.Row="4" Text="Category" />
+            <TextBox Grid.Column="1" Grid.Row="4" Text="{Binding Category, Mode=OneWay}" TextWrapping="Wrap" />
+
+            <!-- Description -->
+            <TextBlock Grid.Row="5" Text="Description" />
+            <TextBox Grid.Column="1" Grid.Row="5" Text="{Binding Description, Mode=OneWay}" TextWrapping="Wrap" />
+
+            <!-- Room access -->
+            <TextBlock Grid.Row="6" Text="Room access" />
+            <TextBox Grid.Column="1" Grid.Row="6" Text="{Binding Access, Mode=OneWay}" TextWrapping="Wrap" />
+
+            <!-- Maximum visitors -->
+            <TextBlock Grid.Row="7" Text="Maximum visitors" />
+            <TextBox Grid.Column="1" Grid.Row="7" Text="{Binding MaxUsers, Mode=OneWay}" TextWrapping="Wrap" />
+
+            <!-- Trading -->
+            <TextBlock Grid.Row="8" Text="Trading" />
+            <TextBox Grid.Column="1" Grid.Row="8" Text="{Binding Trading, Mode=OneWay}" TextWrapping="Wrap" />
+
+            <!-- Moderation Settings -->
+            <TextBlock Grid.Row="9" HorizontalAlignment="Center" Text="Moderation settings" />
+
+            <TextBlock Grid.Row="10" Text="Who can mute" />
+            <TextBox Grid.Column="1" Grid.Row="10" Text="{Binding Moderation.WhoCanMute, Mode=OneWay}" TextWrapping="Wrap" />
+
+            <TextBlock Grid.Row="11" Text="Who can kick" />
+            <TextBox Grid.Column="1" Grid.Row="11" Text="{Binding Moderation.WhoCanKick, Mode=OneWay}" TextWrapping="Wrap" />
+
+            <TextBlock Grid.Row="12" Text="Who can ban" />
+            <TextBox Grid.Column="1" Grid.Row="12" Text="{Binding Moderation.WhoCanBan, Mode=OneWay}" TextWrapping="Wrap" />
+
+            <!-- Chat settings -->
+            <TextBlock Grid.Row="13" Text="Chat settings" />
+
+            <TextBlock Grid.Row="14" Text="Flow" />
+            <TextBox Grid.Column="1" Grid.Row="14" Text="{Binding ChatSettings.Flow, Mode=OneWay}" TextWrapping="Wrap" />
+            
+            <TextBlock Grid.Row="15" Text="Bubble width"  />
+            <TextBox Grid.Column="1" Grid.Row="15" Text="{Binding ChatSettings.BubbleWidth, Mode=OneWay}" TextWrapping="Wrap" />
+            
+            <TextBlock Grid.Row="16" Text="Scroll speed" />
+            <TextBox Grid.Column="1" Grid.Row="16" Text="{Binding ChatSettings.ScrollSpeed, Mode=OneWay}" TextWrapping="Wrap" />
+            
+            <TextBlock Grid.Row="17" Text="Talk hearing distance" />
+            <TextBox Grid.Column="1" Grid.Row="17" Text="{Binding ChatSettings.TalkHearingDistance, Mode=OneWay}" TextWrapping="Wrap" />
+            
+            <TextBlock Grid.Row="18" Text="Flood protection" />
+            <TextBox Grid.Column="1" Grid.Row="18" Text="{Binding ChatSettings.FloodProtection, Mode=OneWay}" TextWrapping="Wrap" />
+        </Grid>
+    </ScrollViewer>
+</UserControl>
