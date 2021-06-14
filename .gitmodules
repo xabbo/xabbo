@@ -1,9 +1,9 @@
 [submodule "Xabbo.Common"]
 	path = Xabbo.Common
-	url = ./Xabbo.Common
+	url = https://github.com/b7c/Xabbo.Common
 [submodule "Xabbo.Core"]
 	path = Xabbo.Core
-	url = ./Xabbo.Core
+	url = https://github.com/b7c/Xabbo.Core
 [submodule "Xabbo.GEarth"]
 	path = Xabbo.GEarth
-	url = ./Xabbo.GEarth
+	url = https://github.com/b7c/Xabbo.GEarth
