@@ -1,0 +1,9 @@
+[submodule "Xabbo.Common"]
+	path = Xabbo.Common
+	url = ./Xabbo.Common
+[submodule "Xabbo.Core"]
+	path = Xabbo.Core
+	url = ./Xabbo.Core
+[submodule "Xabbo.GEarth"]
+	path = Xabbo.GEarth
+	url = ./Xabbo.GEarth
