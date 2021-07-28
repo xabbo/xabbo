@@ -28,7 +28,7 @@ namespace b7.Xabbo.ViewModel
 
         private void Interceptor_Connected(object? sender, GameConnectedEventArgs e)
         {
-            Interceptor.Dispatcher.Bind(this);
+            Interceptor.Dispatcher.Bind(this, Interceptor.ClientType);
         }
     }
 }

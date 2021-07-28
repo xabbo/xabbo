@@ -39,7 +39,7 @@ namespace b7.Xabbo.Commands
             }
 
             var captureTask = ReceiveAsync(new[] { In.RoomForward, In.FollowFriendFailed }, timeout: 15000, block: true);
-            Send(Out.FollowFriend, friend.Id);
+            Send(Out.FollowFriend, (LegacyLong)friend.Id);
             var packet = await captureTask;
 
             if (packet.Header == In.RoomForward)

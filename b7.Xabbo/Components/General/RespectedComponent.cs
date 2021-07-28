@@ -49,9 +49,9 @@ namespace b7.Xabbo.Components
                 return;
 
             int index = packet.ReadInt();
-            Expressions action = (Expressions)packet.ReadInt();
+            Actions action = (Actions)packet.ReadInt();
 
-            if (action == Expressions.ThumbsUp)
+            if (action == Actions.ThumbsUp)
             {
                 _lastRespect = DateTime.Now;
                 _lastRespecterIndex = index;

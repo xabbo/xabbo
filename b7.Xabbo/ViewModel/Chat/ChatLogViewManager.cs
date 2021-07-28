@@ -1,12 +1,10 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using System;
 using System.Text;
-
 using Xabbo.Core;
-using Xabbo.Core.Game;
 using Xabbo.Core.Events;
+using Xabbo.Core.Game;
 using Xabbo.Interceptor;
-
-using Microsoft.Extensions.Configuration;
 
 namespace b7.Xabbo.ViewModel
 {
@@ -96,13 +94,13 @@ namespace b7.Xabbo.ViewModel
                 _stringBuffer.AppendLine();
                 _stringBuffer.AppendFormat(
                     "---------- {0} (id:{1}) ----------",
-                    H.FormatText(room.Data?.Name ?? "?"),
+                    H.RenderText(room.Data?.Name ?? "?"),
                     room.Id
                 );
                 _stringBuffer.AppendLine();
             }
 
-            string message = H.FormatText(e.Message);
+            string message = H.RenderText(e.Message);
             if (!string.IsNullOrWhiteSpace(_antiBobba))
                 message = message.Replace(_antiBobba, "");
 

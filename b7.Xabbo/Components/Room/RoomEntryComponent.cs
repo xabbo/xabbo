@@ -87,7 +87,7 @@ namespace b7.Xabbo.Components
                 if (_passwords.ContainsKey(_lastRequestedRoom))
                 {
                     password = _passwords[_lastRequestedRoom];
-                    e.Packet.ReplaceString(password, 4);
+                    e.Packet.ReplaceAt(4, password);
                 }
             }
         }

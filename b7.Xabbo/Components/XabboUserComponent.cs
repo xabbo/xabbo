@@ -40,7 +40,7 @@ namespace b7.Xabbo.Components
                 Figure = "hr-100.hd-185-14.ch-805-71.lg-281-75.sh-305-80.ea-1406.cc-260-80"
             };
 
-            Send(In.RoomUsers, (LegacyShort)1, bot);
+            Send(In.UsersInRoom, (LegacyShort)1, bot);
         }
     }
 }

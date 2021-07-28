@@ -39,7 +39,7 @@ namespace b7.Xabbo.Components
         {
             if (!Interceptor.Dispatcher.IsBound(this))
             {
-                Interceptor.Dispatcher.Bind(this);
+                Interceptor.Dispatcher.Bind(this, Interceptor.ClientType);
             }
         }
 

@@ -88,7 +88,7 @@ namespace b7.Xabbo.Components
                 message = sb.ToString();
             }
 
-            e.Packet.ReplaceString(message, 0);
+            e.Packet.ReplaceAt(0, message);
         }
     }
 }

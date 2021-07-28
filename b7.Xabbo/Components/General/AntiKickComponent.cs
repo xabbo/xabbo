@@ -90,7 +90,7 @@ namespace b7.Xabbo.Components
                 Send(Out.FlatOpc, roomId, string.Empty, -1);
                 SendInfoMessage("You were kicked from the room!");
 
-                if (_profileManager.UserData is not null && Out.Move >= 0)
+                if (_profileManager.UserData is not null)
                 {
                     if (_roomManager.Room is not null &&
                         _roomManager.Room.TryGetUserById(_profileManager.UserData.Id, out IRoomUser? self))
@@ -125,8 +125,7 @@ namespace b7.Xabbo.Components
 
         private void SendInfoMessage(string message)
         {
-            if (In.Whisper >= 0)
-                Send(In.Whisper, -1, message, 0, 34, 0, 0);
+            Send(In.Whisper, -1, message, 0, 34, 0, 0);
         }
     }
 }

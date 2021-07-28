@@ -90,18 +90,18 @@ namespace b7.Xabbo.Components
                     if (floorPlan.GetHeight(x, y) >= 0)
                         floorPlan.SetHeight(x, y, 0);
 
-            e.Packet.ReplaceString(floorPlan.ToString(), 5);
+            e.Packet.ReplaceAt(5, floorPlan.ToString());
 
             // Modify the heightmap
             for (int y = 0; y < _heightmap.Length; y++)
             {
                 for (int x = 0; x < _heightmap.Width; x++)
                 {
-                    if (_heightmap.IsFree(x, y))
+                    if (_heightmap[x, y].IsFree)
                     {
-                        double height = _heightmap.GetHeight(x, y) - GetOffset(x, y);
+                        double height = _heightmap[x, y].Height - GetOffset(x, y);
                         if (height >= 0)
-                            _heightmap.SetHeight(x, y, height);
+                            _heightmap[x, y].Height = height;
                     }
                 }
             }
@@ -138,7 +138,7 @@ namespace b7.Xabbo.Components
             }
         }
 
-        [InterceptIn(nameof(Incoming.RoomUsers))]
+        [InterceptIn(nameof(Incoming.UsersInRoom))]
         private void HandleRoomUsers(InterceptArgs e)
         {
             if (!_isActivated) return;
