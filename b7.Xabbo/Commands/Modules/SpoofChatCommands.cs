@@ -17,11 +17,6 @@ namespace b7.Xabbo.Commands
             _roomManager = roomManager;
         }
 
-        protected override void OnInitialize()
-        {
-
-        }
-
         [Command("spoof", Usage = "<userName> <message>")]
         protected async Task OnSpoof(CommandArgs args)
         {

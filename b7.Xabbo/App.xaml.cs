@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Windows;
@@ -89,6 +90,15 @@ namespace b7.Xabbo
 
             // Commands
             services.AddSingleton<CommandManager>();
+            foreach (var type in executingAssemblyTypes
+                .Where(x =>
+                    x.Namespace == "b7.Xabbo.Commands" &&
+                    x.IsAssignableTo(typeof(CommandModule)) &&
+                    !x.IsAbstract
+                ))
+            {
+                services.AddSingleton(typeof(CommandModule), type);
+            }
 
             // Components
             foreach (Type type in executingAssemblyTypes)

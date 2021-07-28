@@ -36,22 +36,30 @@ namespace b7.Xabbo.Commands
         private Outgoing Out => Messages.Out;
 
         public CommandManager(IInterceptor interceptor,
-            //CommandModule[] modules,
+            IEnumerable<CommandModule> modules,
             ProfileManager profileManager,
             RoomManager roomManager)
         {
             _bindings = new Dictionary<string, CommandBinding>(StringComparer.OrdinalIgnoreCase);
 
             Interceptor = interceptor;
-            _modules = Array.Empty<CommandModule>(); //modules;
+            _modules = modules.ToArray();
             _profileManager = profileManager;
             _roomManager = roomManager;
+
+            Interceptor.Connected += OnConnected;
+        }
+
+        private void OnConnected(object? sender, GameConnectedEventArgs e)
+        {
+            Initialize();
         }
 
         public void Initialize()
         {
             if (_isInitialized)
-                throw new InvalidOperationException("The command manager is already initialized");
+                return;
+                // throw new InvalidOperationException("The command manager is already initialized");
 
             _isInitialized = true;
             OnInitialize();
@@ -59,12 +67,9 @@ namespace b7.Xabbo.Commands
 
         protected void OnInitialize()
         {
-            Register(OnHelp, "help");
+            Interceptor.Dispatcher.Bind(this, Interceptor.ClientType);
 
-            var commandModuleTypes = Assembly
-                .GetExecutingAssembly()
-                .GetTypes()
-                .Where(x => x.IsSubclassOf(typeof(CommandModule)));
+            Register(OnHelp, "help");
 
             BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
 
@@ -77,7 +82,7 @@ namespace b7.Xabbo.Commands
                 {
                     try
                     {
-                        Dispatcher.Bind(module);
+                        Dispatcher.Bind(module, Interceptor.ClientType);
                         isAttached = true;
                     }
                     catch { }
@@ -151,13 +156,7 @@ namespace b7.Xabbo.Commands
         [RequiredIn(nameof(Incoming.Whisper))]
         public void ShowMessage(string message)
         {
-            if (_roomManager.Room is null) return;
-
-            int index = -1;
-            if (_roomManager.Room.TryGetUserById(_profileManager.UserData?.Id ?? -1, out IRoomUser? user))
-                index = user.Index;
-
-            Interceptor.Send(In.Whisper, index, message, 0, 1, 0, 0);
+            Interceptor.Send(In.Whisper, -0xb7, message, 0, 30, 0, 0);
         }
 
         [InterceptOut(
@@ -204,11 +203,7 @@ namespace b7.Xabbo.Commands
 
             if (string.IsNullOrWhiteSpace(command)) return;
 
-            if (!_bindings.TryGetValue(command, out CommandBinding? binding))
-            {
-                ShowMessage($"Command '{command}' does not exist");
-                return;
-            }
+            if (!_bindings.TryGetValue(command, out CommandBinding? binding)) return;
 
             if (binding.Module != null && !binding.Module.IsAvailable)
             {

@@ -9,7 +9,7 @@ using Xabbo.Core.Tasks;
 
 namespace b7.Xabbo.Commands
 {
-    [RequiredOut(nameof(Outgoing.FlatOpc), nameof(Outgoing.GetRoomEntryData))] // RequestHeightmap
+    [RequiredOut(nameof(Outgoing.FlatOpc), nameof(Outgoing.GetRoomEntryData))]
     public class RoomCommands : CommandModule
     {
         private readonly RoomManager roomManager;
@@ -17,11 +17,6 @@ namespace b7.Xabbo.Commands
         public RoomCommands(RoomManager roomManager)
         {
             this.roomManager = roomManager;
-        }
-
-        protected override void OnInitialize()
-        {
-
         }
 
         [Command("go")]
@@ -82,7 +77,7 @@ namespace b7.Xabbo.Commands
                 Send(In.RoomForward, roomManager.CurrentRoomId);
         }
 
-        [Command("trigger"), RequiredOut(nameof(Outgoing.GetRoomEntryData))] // RequestHeightmap
+        [Command("trigger"), RequiredOut(nameof(Outgoing.GetRoomEntryData))]
         protected async Task TriggerEntryWiredCommandHandler(CommandArgs args) => Send(Out.GetRoomEntryData);
     }
 }
