@@ -80,7 +80,7 @@
                           HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center"
                           IsChecked="{Binding DelaySpeech}"
                           Content="Delay speech" />
-                <TextBox Margin="4" Width="60" Text="{Binding SpeechDelay}" />
+                <TextBox Margin="4" Width="60" Text="{Binding SpeechDelay, UpdateSourceTrigger=PropertyChanged}" />
                 <TextBlock VerticalAlignment="Center" Text="ms" />
             </StackPanel>
 
