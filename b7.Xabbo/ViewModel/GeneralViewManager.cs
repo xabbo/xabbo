@@ -30,6 +30,8 @@ namespace b7.Xabbo.ViewModel
 
         public AntiHandItemComponent HandItem { get; }
 
+        public AntiHcGiftNotificationComponent AntiHcGiftNotification { get; }
+
         /* 
          public DoorbellComponent Doorbell { get; set; }
 
@@ -52,7 +54,8 @@ namespace b7.Xabbo.ViewModel
             FurniActionsComponent furniActions,
             RoomEntryComponent roomEntry,
             FlattenRoomComponent flattenRoom,
-            AntiHandItemComponent handItem)
+            AntiHandItemComponent handItem,
+            AntiHcGiftNotificationComponent antiHcGiftNotification)
         {
             AntiKick = antiKick;
             AntiIdle = antiIdle;
@@ -69,6 +72,7 @@ namespace b7.Xabbo.ViewModel
             RoomEntry = roomEntry;
             FlattenRoom = flattenRoom;
             HandItem = handItem;
+            AntiHcGiftNotification = antiHcGiftNotification;
         }
     }
 }

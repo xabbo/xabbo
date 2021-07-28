@@ -154,12 +154,19 @@
                     <CheckBox Content="Double-click tele to find link" IsChecked="{Binding UseToFindLink}" />
                 </StackPanel>
             </GroupBox>
-            <StackPanel DataContext="{Binding HandItem}" IsEnabled="{Binding IsAvailable}">
-                <CheckBox Content="Drop received hand item" IsChecked="{Binding DropHandItem}" />
-                <CheckBox Content="Return received hand item" IsChecked="{Binding ReturnHandItem}" />
-                <CheckBox Content="Maintain direction when given hand item"
+            <GroupBox Header="Hand item">
+                <StackPanel DataContext="{Binding HandItem}" IsEnabled="{Binding IsAvailable}">
+                    <CheckBox Content="Drop received hand item" IsChecked="{Binding DropHandItem}" />
+                    <CheckBox Content="Return received hand item" IsChecked="{Binding ReturnHandItem}" />
+                    <CheckBox Content="Maintain direction when given hand item"
                           IsEnabled="{Binding CanMaintainDirection}" IsChecked="{Binding MaintainDirection}" />
-            </StackPanel>
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Header="Misc">
+                <CheckBox DataContext="{Binding AntiHcGiftNotification}"
+                          IsChecked="{Binding IsActive}"
+                          Content="Block HC gift notification" />
+            </GroupBox>
         </StackPanel>
     </ScrollViewer>
 </UserControl>
