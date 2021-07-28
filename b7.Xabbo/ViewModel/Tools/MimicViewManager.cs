@@ -3,21 +3,22 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
+using Microsoft.Extensions.Hosting;
+
 using GalaSoft.MvvmLight.Command;
 
 using Xabbo.Messages;
+using Xabbo.Interceptor;
 
 using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.Events;
-using Xabbo.Interceptor;
-using Microsoft.Extensions.Hosting;
 
 namespace b7.Xabbo.ViewModel
 {
     public class MimicViewManager : ComponentViewModel
     {
-        private ProfileManager profileManager;
+        private ProfileManager _profileManager;
         private RoomManager _roomManager;
 
         enum State { Initializing, Inactive, SelectingTarget, Active }
@@ -161,8 +162,8 @@ namespace b7.Xabbo.ViewModel
             RoomManager roomManager)
             : base(interceptor)
         {
-            this.profileManager = profileManager;
-            this._roomManager = roomManager;
+            _profileManager = profileManager;
+            _roomManager = roomManager;
 
             EnableDisableCommand = new RelayCommand(OnEnableDisable);
 
@@ -174,7 +175,7 @@ namespace b7.Xabbo.ViewModel
             try
             {
                 StatusText = "loading user data...";
-                await profileManager.GetUserDataAsync();
+                await _profileManager.GetUserDataAsync();
             }
             catch
             {
@@ -182,14 +183,14 @@ namespace b7.Xabbo.ViewModel
                 return;
             }
 
-            selfId = profileManager.UserData?.Id ?? -1;
+            selfId = _profileManager.UserData?.Id ?? -1;
             StatusText = "(re-)enter room to initialize";
 
             _roomManager.Entering += RoomManager_Entering;
             _roomManager.EntitiesAdded += EntityManager_EntitiesAdded;
             _roomManager.EntityRemoved += EntityManager_EntityRemoved;
             _roomManager.UserDataUpdated += EntityManager_UserDataUpdated;
-            _roomManager.EntityExpression += EntityManager_EntityAction;
+            _roomManager.EntityAction += EntityManager_EntityAction;
             _roomManager.EntityIdle += EntityManager_EntityIdle;
             _roomManager.EntityDance += EntityManager_EntityDance;
             _roomManager.EntityEffect += EntityManager_EntityEffect;
@@ -364,10 +365,10 @@ namespace b7.Xabbo.ViewModel
             }
         }
 
-        private async void EntityManager_EntityAction(object? sender, EntityExpressionEventArgs e)
+        private async void EntityManager_EntityAction(object? sender, EntityActionEventArgs e)
         {
-            if (e.Entity.Id == targetId && e.Expression != Expressions.Idle)
-                await DoActionAsync((int)e.Expression);
+            if (e.Entity.Id == targetId && e.Action != Actions.Idle)
+                await DoActionAsync((int)e.Action);
         }
 
         private async void EntityManager_EntityIdle(object? sender, EntityIdleEventArgs e)
