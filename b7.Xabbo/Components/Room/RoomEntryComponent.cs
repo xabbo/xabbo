@@ -64,7 +64,7 @@ namespace b7.Xabbo.Components
             if ((RememberPasswords && roomData.Access == RoomAccess.Password && _passwords.ContainsKey(roomData.Id)) ||
                 (DontAskToRingDoorbell && roomData.Access == RoomAccess.Doorbell))
             {
-                roomData.BypassAccess = true;
+                roomData.IsGroupMember = true;
                 e.Packet = Packet.Compose(ClientType, e.Packet.Header, roomData);
             }
         }

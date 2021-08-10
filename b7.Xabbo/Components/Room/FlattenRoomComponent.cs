@@ -156,7 +156,7 @@ namespace b7.Xabbo.Components
         {
             if (!_isActivated) return;
 
-            var updates = EntityStatusUpdate.ParseAll(e.Packet);
+            var updates = EntityStatusUpdate.ParseMany(e.Packet);
             foreach (var update in updates)
             {
                 update.Location = AdjustTile(update.Location);
