@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+
+using Xabbo.Interceptor;
+using Xabbo.Messages;
+
 using Xabbo.Core;
 using Xabbo.Core.Events;
 using Xabbo.Core.Game;
-using Xabbo.Interceptor;
-using Xabbo.Messages;
 
 namespace b7.Xabbo.Components
 {
@@ -15,7 +14,6 @@ namespace b7.Xabbo.Components
     {
         private const int ERROR_KICKED = 4008;
 
-        private long _currentRoomId = -1;
         private bool _blockHotelView = false;
         private bool _preventRoomRefresh = false;
 
@@ -64,46 +62,62 @@ namespace b7.Xabbo.Components
 
         private void OnEnteredRoom(object? sender, RoomEventArgs e)
         {
-            _currentRoomId = e.Room.Id;
             _blockHotelView = false;
             IsReady = true;
         }
 
+        async Task HandleKickAsync(string msg)
+        {
+            _blockHotelView = true;
+            _preventRoomRefresh = true;
+            _lastKick = DateTime.Now;
+
+            Send(Out.FlatOpc, (LegacyLong)_roomManager.CurrentRoomId, string.Empty, -1);
+            SendInfoMessage(msg);
+
+            if (_profileManager.UserData is not null)
+            {
+                if (_roomManager.Room is not null &&
+                    _roomManager.Room.TryGetUserById(_profileManager.UserData.Id, out IRoomUser? self))
+                {
+                    await Task.Delay(500);
+                    Send(Out.Move, self.X, self.Y);
+                }
+            }
+        }
+
+        [InterceptIn(nameof(Incoming.Notification))]
+        public async void HandleNotification(InterceptArgs e)
+        {
+            if (_roomManager.CurrentRoomId <= 0) return;
+
+            if (e.Packet.ReadString().Contains("room.kick.cannonball"))
+            {
+                e.Block();
+                await HandleKickAsync("You were kicked by a cannon!");
+            }
+        }
+
         [InterceptIn(nameof(Incoming.Error))]
-        public async void InGenericErrorMessages(InterceptArgs e)
+        public async void HandleError(InterceptArgs e)
         {
             if (!IsActive)
                 return;
 
             long roomId = _roomManager.CurrentRoomId;
-            if (roomId < 0)
+            if (roomId <= 0)
                 return;
 
             int errorCode = e.Packet.ReadInt();
             if (errorCode == ERROR_KICKED)
             {
                 e.Block();
-                _blockHotelView = true;
-                _preventRoomRefresh = true;
-                _lastKick = DateTime.Now;
-
-                Send(Out.FlatOpc, roomId, string.Empty, -1);
-                SendInfoMessage("You were kicked from the room!");
-
-                if (_profileManager.UserData is not null)
-                {
-                    if (_roomManager.Room is not null &&
-                        _roomManager.Room.TryGetUserById(_profileManager.UserData.Id, out IRoomUser? self))
-                    {
-                        await Task.Delay(500);
-                        Send(Out.Move, self.X, self.Y);
-                    }
-                }
+                await HandleKickAsync("You were kicked from the room!");
             }
         }
 
         [InterceptIn(nameof(Incoming.CloseConnection))]
-        public void InHotelView(InterceptArgs e)
+        public void HandleCloseConnection(InterceptArgs e)
         {
             if (_blockHotelView)
             {
@@ -114,7 +128,7 @@ namespace b7.Xabbo.Components
         }
 
         [InterceptIn(nameof(Incoming.RoomEntryInfo))]
-        public void InRoomOwner(InterceptArgs e)
+        public void HandleRoomEntryInfo(InterceptArgs e)
         {
             if (_preventRoomRefresh)
             {
@@ -125,7 +139,7 @@ namespace b7.Xabbo.Components
 
         private void SendInfoMessage(string message)
         {
-            Send(In.Whisper, -1, message, 0, 34, 0, 0);
+            Send(In.Whisper, -0xb7, message, 0, 30, 0, 0);
         }
     }
 }
