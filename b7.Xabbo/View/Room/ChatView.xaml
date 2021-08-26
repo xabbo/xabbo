@@ -5,6 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:b7.Xabbo"
              xmlns:svc="clr-namespace:b7.Xabbo.Services"
+             TextElement.Foreground="{StaticResource MaterialDesignBody}"
+             TextElement.FontFamily="{StaticResource MaterialDesignFont}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              x:Name="root">
@@ -15,18 +17,18 @@
         </Grid.RowDefinitions>
         <TextBox x:Name="textBoxLog"
                  VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto"
-                 IsReadOnly="True" FontFamily="Consolas" FontSize="12"
-                 Background="White" Foreground="DarkSlateGray" 
+                 IsReadOnly="True" FontFamily="Consolas" FontSize="14"
                  BorderThickness="0"
                  TextWrapping="Wrap"
+                 Padding="4"
                  Text="{Binding LogText}">
         </TextBox>
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
-            <CheckBox Margin="2"
+            <CheckBox Margin="8"
                       VerticalContentAlignment="Center" 
                       Content="Autoscroll"
                       IsChecked="{Binding ElementName=root, Path=AutoScroll}" />
-            <CheckBox Margin="2"
+            <CheckBox Margin="8"
                       VerticalContentAlignment="Center"
                       Content="Log to file"
                       IsChecked="{Binding LogToFile}"

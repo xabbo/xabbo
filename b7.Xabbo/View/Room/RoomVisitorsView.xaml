@@ -8,8 +8,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance Type={x:Type viewModel:VisitorsViewManager}}"
-             FontFamily="Consolas"
-             Background="White">
+             TextElement.Foreground="{StaticResource MaterialDesignBody}">
     <Grid x:Name="layoutRoot">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -21,14 +20,23 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="1*" />
             </Grid.ColumnDefinitions>
-            <TextBlock Margin="2" VerticalAlignment="Center" Text="Filter" />
-            <TextBox Grid.Column="1" 
-                     Margin="2" Padding="2"
-                     IsEnabled="{Binding IsAvailable}"
-                     Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}" />
+            <TextBlock
+                Margin="4"
+                VerticalAlignment="Center"
+                Text="Filter"
+                Style="{StaticResource MaterialDesignBody1TextBlock}"
+            />
+            <TextBox
+                Grid.Column="1" 
+                Margin="4" Padding="0"
+                Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}"
+                Style="{StaticResource MaterialDesignTextBox}"
+                VerticalContentAlignment="Center"
+                FontSize="14"
+            />
         </Grid>
-        <ListView Grid.Row="1" x:Name="listViewVisitors" Margin="2" Foreground="DarkSlateGray"
-                  TextSearch.TextPath="Name" IsEnabled="{Binding IsAvailable}"
+        <ListView Grid.Row="1" x:Name="listViewVisitors" Margin="2"
+                  TextSearch.TextPath="Name"
                   ItemsSource="{Binding Visitors}">
             <ListView.View>
                 <GridView>
@@ -56,7 +64,7 @@
                                                 <Setter Property="Text" Value="{Binding Entered, StringFormat='HH:mm:ss'}" />
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding Entered}" Value="{x:Null}">
-                                                        <Setter Property="Foreground" Value="LightSlateGray" />
+                                                        <Setter Property="Foreground" Value="{StaticResource MaterialDesignLightBackground}" />
                                                         <Setter Property="Text" Value="unknown" />
                                                     </DataTrigger>
                                                 </Style.Triggers>
@@ -85,7 +93,7 @@
             </ListView.View>
         </ListView>
         <DockPanel Grid.Row="2">
-            <TextBlock DockPanel.Dock="Left" Margin="2">
+            <TextBlock DockPanel.Dock="Left" Margin="4" Style="{StaticResource MaterialDesignBody1TextBlock}">
                 Unique visitors: <Run Text="{Binding Items.Count, ElementName=listViewVisitors, Mode=OneWay}" />
             </TextBlock>
             <CheckBox DockPanel.Dock="Right" Margin="2" HorizontalAlignment="Right" Content="Log to file"

@@ -37,6 +37,8 @@ namespace b7.Xabbo.ViewModel
         // Tools
         public AlignerViewManager Aligner { get; }
         public MimicViewManager Mimic { get; }
+        // Info
+        public FurniDataViewManager FurniData { get; }
 
         public MainViewManager(IRemoteInterceptor interceptor,
             GeneralViewManager general,
@@ -49,7 +51,8 @@ namespace b7.Xabbo.ViewModel
             BanListViewManager banList,
             FurniViewManager furni,
             AlignerViewManager aligner,
-            MimicViewManager mimic)
+            MimicViewManager mimic,
+            FurniDataViewManager furniData)
         {
             _interceptor = interceptor;
 
@@ -70,6 +73,7 @@ namespace b7.Xabbo.ViewModel
             Furni = furni;
             Aligner = aligner;
             Mimic = mimic;
+            FurniData = furniData;
         }
 
         public Task InitializeAsync()

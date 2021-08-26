@@ -152,6 +152,13 @@ namespace b7.Xabbo.ViewModel
             set => Set(ref isIdle, value);
         }
 
+        private bool _isTrading;
+        public bool IsTrading
+        {
+            get => _isTrading;
+            set => Set(ref _isTrading, value);
+        }
+
         public string AvatarImageUrl
         {
             get

@@ -5,25 +5,25 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:b7.Xabbo"
              xmlns:viewModel="clr-namespace:b7.Xabbo.ViewModel"
+             TextElement.Foreground="{StaticResource MaterialDesignBody}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance Type={x:Type viewModel:RoomInfoViewManager}}"
              x:Name="root">
     <UserControl.Resources>
-        <Style TargetType="TextBlock">
+        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource MaterialDesignBody1TextBlock}">
             <Style.Setters>
                 <Setter Property="Margin" Value="4" />
                 <Setter Property="FontWeight" Value="Bold" />
                 <Setter Property="HorizontalAlignment" Value="Right" />
             </Style.Setters>
         </Style>
-        <Style TargetType="TextBox">
+        <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource MaterialDesignDataGridComboBoxEditableTextBox}">
             <Style.Setters>
                 <Setter Property="Margin" Value="4" />
                 <Setter Property="Background" Value="Transparent" />
                 <Setter Property="BorderThickness" Value="0" />
                 <Setter Property="IsReadOnly" Value="True" />
-                <Setter Property="FontFamily" Value="Consolas" />
                 <Setter Property="VerticalContentAlignment" Value="Center" />
                 <Setter Property="TextWrapping" Value="Wrap" />
             </Style.Setters>

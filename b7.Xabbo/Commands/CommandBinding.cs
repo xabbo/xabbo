@@ -15,7 +15,6 @@ namespace b7.Xabbo.Commands
         public string? Usage { get; }
         public CommandHandler Handler { get; }
 
-        public bool IsAvailable { get; set; }
         public IReadOnlyList<Type> UnavailableDependencies { get; set; }
         public Identifiers UnresolvedHeaders { get; set; }
 

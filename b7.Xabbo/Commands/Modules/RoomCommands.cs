@@ -70,7 +70,7 @@ namespace b7.Xabbo.Commands
         [Command("exit"), RequiredOut(nameof(Outgoing.FlatOpc))]
         protected async Task ExitCommandHandler(CommandArgs args) => Send(Out.FlatOpc, 0, "", -1);
 
-        [Command("reload"), RequiredOut(nameof(Incoming.RoomForward))]
+        [Command("reload"), RequiredIn(nameof(Incoming.RoomForward))]
         protected async Task ReloadCommandHandler(CommandArgs args)
         {
             if (roomManager.IsInRoom)

@@ -4,15 +4,17 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:b7.Xabbo"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:mde="clr-namespace:MaterialDesignExtensions.Controls;assembly=MaterialDesignExtensions"
              xmlns:converters="clr-namespace:b7.Xabbo.WPF.Converters"
-             mc:Ignorable="d" d:DesignHeight="450" d:DesignWidth="800"
-             FontFamily="Consolas">
+             mc:Ignorable="d" d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibility" />
     </UserControl.Resources>
-    <Grid x:Name="layoutRoot" Margin="2">
-        <ListView x:Name="listViewUsers" Foreground="DarkSlateGray" TextSearch.TextPath="Name"
-                  ItemsSource="{Binding Entities}" SelectedItem="{Binding SelectedEntity, Mode=TwoWay}">
+    <Grid x:Name="layoutRoot">
+        <ListView x:Name="listViewUsers" TextSearch.TextPath="Name"
+                  ItemsSource="{Binding Entities}" SelectedItem="{Binding SelectedEntity, Mode=TwoWay}"
+                  VirtualizingPanel.IsVirtualizingWhenGrouping="True">
             <ListView.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Find"
@@ -47,7 +49,7 @@
                     </MenuItem>
                     <MenuItem Header="Moderate" IsEnabled="{Binding IsSelectedEntityUser}">
                         <MenuItem.Style>
-                            <Style TargetType="{x:Type MenuItem}">
+                            <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource MaterialDesignMenuItem}">
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding Moderation.HasRights}" Value="False">
                                         <Setter Property="IsEnabled" Value="False" />
@@ -118,22 +120,22 @@
                         <GridViewColumn Header="index" Width="80">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding Index}" />
+                                    <TextBlock TextTrimming="CharacterEllipsis" Text="{Binding Index}" />
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
                         <GridViewColumn Header="id" Width="100">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding Id}" />
+                                    <TextBlock TextTrimming="CharacterEllipsis" Text="{Binding Id}" />
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
                         <GridViewColumn Header="name" Width="150">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <StackPanel Orientation="Horizontal" ToolTipService.ShowDuration="10000">
-                                        <StackPanel.ToolTip>
+                                    <DockPanel ToolTipService.ShowDuration="10000">
+                                        <DockPanel.ToolTip>
                                             <ToolTip MaxWidth="300">
                                                 <Grid Margin="2">
                                                     <Grid.ColumnDefinitions>
@@ -157,12 +159,32 @@
                                                     </StackPanel>
                                                 </Grid>
                                             </ToolTip>
-                                        </StackPanel.ToolTip>
-                                        <TextBlock Text="{Binding Name}" />
-                                        <Image Source="/b7-xabbo;component/Resources/Images/idle.png" Margin="4,0,0,0"
-                                               Opacity="0.5"
-                                               Visibility="{Binding IsIdle, Converter={StaticResource BoolToVisibility}, ConverterParameter=1}" />
-                                    </StackPanel>
+                                        </DockPanel.ToolTip>
+                                        <TextBlock
+                                            DockPanel.Dock="Left"
+                                            TextTrimming="CharacterEllipsis" Text="{Binding Name}"
+                                        />
+                                        <Image 
+                                            Stretch="None"
+                                            DockPanel.Dock="Left"
+                                            HorizontalAlignment="Left"
+                                            SnapsToDevicePixels="True"
+                                            UseLayoutRounding="True"
+                                            Source="/b7.Xabbo;component/Resources/Images/idle.png" Margin="4,0,0,0"
+                                            Opacity="0.75"
+                                            Visibility="{Binding IsIdle, Converter={StaticResource BoolToVisibility}, ConverterParameter=1}"
+                                        />
+                                        <Image 
+                                            Stretch="None"
+                                            DockPanel.Dock="Left"
+                                            HorizontalAlignment="Left"
+                                            SnapsToDevicePixels="True"
+                                            UseLayoutRounding="True"
+                                            Source="/b7.Xabbo;component/Resources/Images/trading.png" Margin="4,0,0,0"
+                                            Opacity="0.75"
+                                            Visibility="{Binding IsTrading, Converter={StaticResource BoolToVisibility}, ConverterParameter=1}"
+                                        />
+                                    </DockPanel>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
@@ -178,25 +200,14 @@
                                     <SolidColorBrush Color="{Binding Items[0].HeaderColor}" Opacity="0.1" />
                                 </Grid.Background>
                                 <Grid>
-                                    <Grid.Background>
-                                        <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
-                                            <LinearGradientBrush.GradientStops>
-                                                <GradientStop Color="DarkSlateGray" Offset="-0.5" />
-                                                <GradientStop Color="Transparent" Offset="0.25" />
-                                                <GradientStop Color="Transparent" Offset="0.75" />
-                                                <GradientStop Color="DarkSlateGray" Offset="1.5" />
-                                            </LinearGradientBrush.GradientStops>
-                                        </LinearGradientBrush>
-                                    </Grid.Background>
                                     <StackPanel Margin="4" Orientation="Vertical">
                                         <Image
                                             Source="{Binding Items[0].ImageSource}" SnapsToDevicePixels="True"
                                             RenderOptions.BitmapScalingMode="HighQuality"
                                             HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                        <TextBlock Foreground="DarkSlateGray" FontWeight="Bold" FontSize="12"
-                                                    Text="{Binding Items[0].VisualGroupName}" HorizontalAlignment="Center">
+                                        <TextBlock Text="{Binding Items[0].VisualGroupName}" HorizontalAlignment="Center">
                                             <TextBlock.Style>
-                                                <Style TargetType="TextBlock">
+                                                <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignBody1TextBlock}">
                                                     <Style.Triggers>
                                                         <DataTrigger Binding="{Binding Items[0].VisualGroupName}" Value="">
                                                             <Setter Property="Visibility" Value="Collapsed" />
@@ -215,9 +226,9 @@
                                                     </Style.Triggers>
                                                 </Style>
                                             </StackPanel.Style>
-                                            <TextBlock Foreground="DarkSlateGray" FontWeight="Bold" FontSize="12" Text="(" />
-                                            <TextBlock Foreground="DarkSlateGray" FontWeight="Bold" FontSize="12" Text="{Binding ItemCount}" />
-                                            <TextBlock Foreground="DarkSlateGray" FontWeight="Bold" FontSize="12" Text=")" />
+                                            <TextBlock FontWeight="Bold" FontSize="12" Text="(" />
+                                            <TextBlock FontWeight="Bold" FontSize="12" Text="{Binding ItemCount}" />
+                                            <TextBlock FontWeight="Bold" FontSize="12" Text=")" />
                                         </StackPanel>
                                     </StackPanel>
                                 </Grid>

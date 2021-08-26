@@ -109,5 +109,13 @@ namespace b7.Xabbo.Commands
             EnableMatchingEffect(args, false);
             return Task.CompletedTask;
         }
+
+        [Command("dropfx")]
+        protected Task OnDropEffect(CommandArgs args)
+        {
+            Send(Out.Chat, ":yyxxabxa", 0, -1);
+            Send(Out.Shout, ":yyxxabxa", 0);
+            return Task.CompletedTask;
+        }
     }
 }

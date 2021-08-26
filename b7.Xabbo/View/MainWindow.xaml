@@ -1,16 +1,28 @@
-﻿<Window x:Class="b7.Xabbo.View.MainWindow"
+﻿<mde:MaterialWindow x:Class="b7.Xabbo.View.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:view="clr-namespace:b7.Xabbo.View"
         xmlns:viewModel="clr-namespace:b7.Xabbo.ViewModel"
+        xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:mde="clr-namespace:MaterialDesignExtensions.Controls;assembly=MaterialDesignExtensions"
+        TextElement.Foreground="{StaticResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="Auto"
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{DynamicResource MaterialDesignFont}"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type={x:Type viewModel:MainViewManager}}"
-        Title="{Binding Title}" Height="500" Width="450"
-        Topmost="{Binding IsChecked, ElementName=checkBoxTopmost}">
+        Height="500" Width="450"
+        Title="{Binding Title}"
+        Topmost="{Binding IsChecked, ElementName=checkBoxTopmost}"
+        UseLayoutRounding="True" SnapsToDevicePixels="True"
+        RenderOptions.BitmapScalingMode="NearestNeighbor">
     <Grid>
-        <CheckBox x:Name="checkBoxTopmost"
+        <!--<CheckBox x:Name="checkBoxTopmost"
             Panel.ZIndex="9999"
             Margin="6"
             HorizontalAlignment="Right" VerticalAlignment="Top"
@@ -18,53 +30,66 @@
             Opacity="0.33"
             IsChecked="True"
             Content="Topmost"
-        />
-        <TabControl Margin="4">
-            <TabItem Header="General">
+        />-->
+        <TabControl Style="{StaticResource MaterialDesignAppBarTabControl}"
+                    mde:TabControlAssist.TabHeaderFontSize="12"
+                    mde:TabControlAssist.TabHeaderMargin="0">
+            <TabControl.Resources>
+                <Style TargetType="{x:Type TabControl}" BasedOn="{StaticResource MaterialDesignTabControl}" />
+            </TabControl.Resources>
+            <TabItem Header="GENERAL">
                 <view:GeneralView DataContext="{Binding General}" />
             </TabItem>
-            <TabItem Header="Chat">
+            <TabItem Header="CHAT">
                 <view:ChatView DataContext="{Binding Chat}" />
             </TabItem>
-            <TabItem Header="Figure">
-                <TabControl Margin="2">
-                    <TabItem Header="Wardrobe">
+            <TabItem Header="FIGURE">
+                <TabControl Margin="2" mde:TabControlAssist.TabHeaderMargin="0"
+                            Style="{StaticResource MaterialDesignTabControl}">
+                    <TabItem Header="WARDROBE">
                         <view:WardrobeView DataContext="{Binding Wardrobe}" />
                     </TabItem>
-                    <TabItem Header="Randomizer">
+                    <TabItem Header="RANDOMIZER">
                         <view:FigureRandomizerView DataContext="{Binding FigureRandomizer}" />
                     </TabItem>
                 </TabControl>
             </TabItem>
-            <TabItem Header="Room">
+            <TabItem Header="ROOM">
                 <TabControl Margin="2">
-                    <TabItem Header="Info">
+                    <TabItem Header="INFO">
                         <view:RoomInfoView DataContext="{Binding RoomInfo}" />
                     </TabItem>
-                    <TabItem Header="Users">
+                    <TabItem Header="USERS">
                         <view:RoomEntitiesView DataContext="{Binding Entities}" />
                     </TabItem>
-                    <TabItem Header="Visitors">
+                    <TabItem Header="VISITORS">
                         <view:RoomVisitorsView DataContext="{Binding Visitors}" />
                     </TabItem>
-                    <TabItem Header="Banlist">
+                    <TabItem Header="BANLIST">
                         <view:BanListView DataContext="{Binding BanList}" />
                     </TabItem>
-                    <TabItem Header="Furni">
+                    <TabItem Header="FURNI">
                         <view:RoomFurniView DataContext="{Binding Furni}" />
                     </TabItem>
                 </TabControl>
             </TabItem>
-            <TabItem Header="Tools">
+            <TabItem Header="TOOLS">
                 <TabControl Margin="2">
-                    <TabItem Header="Aligner">
+                    <TabItem Header="ALIGNER">
                         <view:AlignerView DataContext="{Binding Aligner}" />
                     </TabItem>
-                    <TabItem Header="Mimic">
+                    <TabItem Header="MIMIC">
                         <view:MimicView DataContext="{Binding Mimic}" />
+                    </TabItem>
+                </TabControl>
+            </TabItem>
+            <TabItem Header="INFO">
+                <TabControl Margin="2">
+                    <TabItem Header="FURNI">
+                        <view:FurniDataView DataContext="{Binding FurniData}" />
                     </TabItem>
                 </TabControl>
             </TabItem>
         </TabControl>
     </Grid>
-</Window>
+</mde:MaterialWindow>

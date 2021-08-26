@@ -5,9 +5,12 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:b7.Xabbo.View"
              xmlns:svc="clr-namespace:b7.Xabbo.Services"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:mde="clr-namespace:MaterialDesignExtensions.Controls;assembly=MaterialDesignExtensions"
+             TextElement.Foreground="{StaticResource MaterialDesignBody}"
+             TextElement.FontFamily="{StaticResource MaterialDesignFont}"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="400"
-             Background="White" FontFamily="Consolas">
+             d:DesignHeight="450" d:DesignWidth="400">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -20,16 +23,22 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <TextBlock Margin="2" VerticalAlignment="Center" Text="Filter" />
-            <TextBox Grid.Column="1" Margin="2" Padding="2" Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}" />
+            <TextBlock
+                Margin="4"
+                VerticalAlignment="Center"
+                Text="Filter"
+                Style="{StaticResource MaterialDesignBody1TextBlock}"
+            />
+            <TextBox
+                Grid.Column="1"
+                Margin="4" Padding="0"
+                VerticalContentAlignment="Center"
+                FontSize="14"
+                Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}"
+            />
         </Grid>
 
         <ListView x:Name="listViewUsers" Grid.Row="1" Margin="2" ItemsSource="{Binding Users}">
-            <ListView.Style>
-                <Style TargetType="{x:Type ListView}">
-                    <Setter Property="Foreground" Value="DarkSlateGray" />
-                </Style>
-            </ListView.Style>
             <ListView.View>
                 <GridView>
                     <GridView.Columns>
@@ -52,11 +61,11 @@
             </ListView.View>
         </ListView>
 
-        <DockPanel Grid.Row="2">
-            <Button DockPanel.Dock="Right" Margin="2" Padding="8,2"
+        <DockPanel Grid.Row="2" Margin="4">
+            <Button DockPanel.Dock="Right" Margin="4"
                     Command="{Binding LoadCommand}">
                 <Button.Style>
-                    <Style TargetType="{x:Type Button}">
+                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignRaisedButton}">
                         <Setter Property="Content" Value="Load" />
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding IsInRoom}" Value="False">
@@ -72,10 +81,10 @@
                     </Style>
                 </Button.Style>
             </Button>
-            <Button DockPanel.Dock="Right" Margin="2" Padding="8,2"
+            <Button DockPanel.Dock="Right" Margin="4"
                     CommandParameter="{Binding Source={x:Reference listViewUsers}, Path=SelectedItems}">
                 <Button.Style>
-                    <Style TargetType="{x:Type Button}">
+                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignRaisedButton}">
                         <Setter Property="Command" Value="{Binding UnbanCommand}" />
                         <Setter Property="Content" Value="Unban" />
                         <Style.Triggers>
@@ -97,8 +106,14 @@
                     </Style>
                 </Button.Style>
             </Button>
-            <TextBlock DockPanel.Dock="Left" Margin="2" VerticalAlignment="Center"
+            <TextBlock DockPanel.Dock="Left" Margin="4"
+                       VerticalAlignment="Center"
                        Text="{Binding StatusText}" />
         </DockPanel>
+
+        <mde:BusyOverlay
+            Grid.RowSpan="3"
+            IsBusy="{Binding IsWorking}"
+        />
     </Grid>
 </UserControl>

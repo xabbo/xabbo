@@ -33,7 +33,10 @@ namespace b7.Xabbo
 
         private static readonly Dictionary<string, string> _switchMappings = new()
         {
-            ["-p"] = "Interceptor:Port"
+            ["-s"] = "Xabbo:Interceptor:Service",
+            ["-p"] = "Xabbo:Interceptor:Port",
+            ["-c"] = "Xabbo:Interceptor:Cookie",
+            ["-f"] = "Xabbo:Interceptor:File"
         };
 
         public App() { }
@@ -49,18 +52,18 @@ namespace b7.Xabbo
 
             // Application
             services.AddSingleton<Application>(this);
-            services.AddSingleton<IHostLifetime, WpfLifetime>();
+            services.AddSingleton<IHostLifetime, GEarthWpfExtensionLifetime>();
             services.AddSingleton(Dispatcher);
             services.AddSingleton<IUiContext, DispatcherContext>();
 
             // Interceptor
-            services.AddSingleton(new GEarthOptions
-            {
-                Title = "xabbo",
-                Author = "b7",
-                Description = "enhanced habbo",
-                Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "?"
-            });
+            services.AddSingleton(GEarthOptions.Default
+                .WithTitle("xabbo")
+                .WithDescription("enhanced habbo")
+                .WithAuthor("b7")
+                .WithPort(9092) // default port for now
+                .WithConfiguration(context.Configuration)
+            );
 
             services.AddSingleton<IMessageManager, UnifiedMessageManager>();
 

@@ -189,7 +189,7 @@ namespace b7.Xabbo.ViewModel
             _roomManager.Entering += RoomManager_Entering;
             _roomManager.EntitiesAdded += EntityManager_EntitiesAdded;
             _roomManager.EntityRemoved += EntityManager_EntityRemoved;
-            _roomManager.UserDataUpdated += EntityManager_UserDataUpdated;
+            _roomManager.EntityDataUpdated += EntityManager_EntityDataUpdated;
             _roomManager.EntityAction += EntityManager_EntityAction;
             _roomManager.EntityIdle += EntityManager_EntityIdle;
             _roomManager.EntityDance += EntityManager_EntityDance;
@@ -352,9 +352,9 @@ namespace b7.Xabbo.ViewModel
                 e.Block();
         }
 
-        private async void EntityManager_UserDataUpdated(object? sender, UserDataUpdatedEventArgs e)
+        private async void EntityManager_EntityDataUpdated(object? sender, EntityDataUpdatedEventArgs e)
         {
-            var user = e.User;
+            if (e.Entity is not IRoomUser user) return;
 
             if (user.Id == targetId)
             {

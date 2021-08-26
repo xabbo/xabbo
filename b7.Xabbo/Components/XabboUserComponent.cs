@@ -15,12 +15,17 @@ namespace b7.Xabbo.Components
 {
     public class XabboUserComponent : Component, IHostedService
     {
+        private readonly ProfileManager _profileManager;
         private readonly RoomManager _roomManager;
 
+        public long UserId { get; private set; } = 0xb7;
+        public int UserIndex { get; private set; } = -0xb7;
+
         public XabboUserComponent(IInterceptor interceptor,
-            RoomManager roomManager)
+            ProfileManager profileManager, RoomManager roomManager)
             : base(interceptor)
         {
+            _profileManager = profileManager;
             _roomManager = roomManager;
             _roomManager.Entered += OnEnteredRoom;
         }
@@ -31,7 +36,7 @@ namespace b7.Xabbo.Components
 
         private void OnEnteredRoom(object? sender, RoomEventArgs e)
         {
-            Bot bot = new(EntityType.PublicBot, 0xb7, -0xb7)
+            Bot bot = new(EntityType.PublicBot, UserId, UserIndex)
             {
                 Name = "xabbo",
                 Motto = "enhanced habbo",
@@ -41,6 +46,34 @@ namespace b7.Xabbo.Components
             };
 
             Send(In.UsersInRoom, (LegacyShort)1, bot);
+        }
+
+        public void ShowMessage(string message)
+        {
+            (int X, int Y) location = (0, 0);
+
+            IUserData? userData = _profileManager.UserData;
+            IRoom? room = _roomManager.Room;
+
+            if (userData is not null && room is not null &&
+                room.TryGetUserById(userData.Id, out IRoomUser? user))
+            {
+                location = user.Location;
+            }
+
+            ShowMessage(message, location);
+        }
+
+        public void ShowMessage(string message, (int X, int Y) location)
+        {
+            Send(In.Status, 1, new EntityStatusUpdate
+            {
+                Index = UserIndex,
+                Location = new Tile(location.X, location.Y, -1000),
+                Direction = 4,
+                HeadDirection = 4
+            });
+            Send(In.Whisper, UserIndex, message, 0, 30, 0, 0);
         }
     }
 }

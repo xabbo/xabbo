@@ -7,24 +7,27 @@
              xmlns:svc="clr-namespace:b7.Xabbo.Services"
              xmlns:converters="clr-namespace:b7.Xabbo.WPF.Converters"
              xmlns:viewModel="clr-namespace:b7.Xabbo.ViewModel"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:mde="clr-namespace:MaterialDesignExtensions.Controls;assembly=MaterialDesignExtensions"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="400"
              d:DataContext="{d:DesignInstance Type={x:Type viewModel:FigureRandomizerViewManager}}"
-             Background="White"
-             FontFamily="Consolas"
-             x:Name="root">
+             x:Name="root"
+             TextElement.Foreground="{StaticResource MaterialDesignBody}"
+             TextElement.FontFamily="{StaticResource MaterialDesignFont}"
+             TextElement.FontSize="14">
     <UserControl.Resources>
-        <Style TargetType="{x:Type TextBox}">
+        <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource MaterialDesignTextBox}">
+            <Setter Property="Margin" Value="4" />
+        </Style>
+        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource MaterialDesignBody1TextBlock}">
+            <Setter Property="Margin" Value="4" />
+        </Style>
+        <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource MaterialDesignCheckBox}">
             <Setter Property="Margin" Value="2" />
         </Style>
-        <Style TargetType="{x:Type TextBlock}">
-            <Setter Property="Margin" Value="2" />
-        </Style>
-        <Style TargetType="{x:Type CheckBox}">
-            <Setter Property="Margin" Value="2" />
-        </Style>
-        <Style TargetType="{x:Type Button}">
-            <Setter Property="Margin" Value="2" />
+        <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignRaisedButton}">
+            <Setter Property="Margin" Value="4" />
         </Style>
         <ControlTemplate x:Key="ColorCheckBoxTemplate" TargetType="{x:Type CheckBox}">
             <Grid x:Name="templateRoot" Background="Transparent" SnapsToDevicePixels="True">
@@ -104,10 +107,16 @@
                 </Grid.RowDefinitions>
                 <CheckBox Margin="2" VerticalContentAlignment="Center" VerticalAlignment="Center"
                           Content="Use base" IsChecked="{Binding UseBaseFigure}" />
-                <TextBox Grid.Column="1" Margin="2" VerticalContentAlignment="Center" Text="{Binding BaseFigureString, UpdateSourceTrigger=PropertyChanged}"  />
-                <ComboBox Grid.Column="2" Margin="2"
+                <TextBox
+                    Grid.Column="1" Margin="4" Padding="0"
+                    VerticalContentAlignment="Center"
+                    FontSize="14"
+                    Text="{Binding BaseFigureString, UpdateSourceTrigger=PropertyChanged}"
+                />
+                <ComboBox Grid.Column="2" Margin="4"
                           ItemsSource="{Binding Genders}"
-                          SelectedItem="{Binding BaseFigureGender, Mode=TwoWay}" />
+                          SelectedItem="{Binding BaseFigureGender, Mode=TwoWay}"
+                />
                 <Button Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"
                         Padding="8,2"
                         Content="Get current figure"
@@ -173,14 +182,20 @@
                                         </ItemsControl.ItemsPanel>
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate DataType="{x:Type viewModel:FigurePartColorViewModel}">
-                                                <CheckBox 
-                                                    Template="{StaticResource ColorCheckBoxTemplate}"
-                                                    HorizontalAlignment="Center" VerticalAlignment="Center"
-                                                    Visibility="{Binding IsVisible, Converter={StaticResource BoolToVisibilityConverter}}"
-                                                    IsChecked="{Binding IsLocked}"
-                                                    IsEnabled="{Binding ElementName=root, Path=DataContext.UseBaseFigure}"
-                                                    Foreground="{Binding Foreground}"
-                                                    Background="{Binding Background}" />
+                                                <Grid>
+                                                    <CheckBox
+                                                        Style="{StaticResource MaterialDesignUserForegroundCheckBox}"
+                                                        Margin="0" Padding="0"
+                                                        HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                        Visibility="{Binding IsVisible, Converter={StaticResource BoolToVisibilityConverter}}"
+                                                        IsChecked="{Binding IsLocked}"
+                                                        IsEnabled="{Binding ElementName=root, Path=DataContext.UseBaseFigure}"
+                                                        Foreground="{Binding Foreground}"
+                                                        Background="{Binding Background}"
+                                                        
+                                                    >
+                                                    </CheckBox>
+                                                </Grid>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>
@@ -219,7 +234,8 @@
                                 IsIndeterminate="True"
                                 HorizontalAlignment="Stretch"
                                 VerticalAlignment="Stretch"
-                                Opacity="0.5" />
+                                Opacity="0.5"
+                            />
                             <TextBlock Margin="2" HorizontalAlignment="Center" VerticalAlignment="Center">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">

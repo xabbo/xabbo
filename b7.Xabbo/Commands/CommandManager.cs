@@ -12,6 +12,8 @@ using Xabbo.Interceptor.Dispatcher;
 using Xabbo.Core;
 using Xabbo.Core.Game;
 
+using b7.Xabbo.Components;
+
 namespace b7.Xabbo.Commands
 {
     public class CommandManager
@@ -26,6 +28,7 @@ namespace b7.Xabbo.Commands
 
         private readonly ProfileManager _profileManager;
         private readonly RoomManager _roomManager;
+        private readonly XabboUserComponent _xabboUser;
 
         public bool IsAvailable { get; private set; }
 
@@ -38,7 +41,8 @@ namespace b7.Xabbo.Commands
         public CommandManager(IInterceptor interceptor,
             IEnumerable<CommandModule> modules,
             ProfileManager profileManager,
-            RoomManager roomManager)
+            RoomManager roomManager,
+            XabboUserComponent xabboUser)
         {
             _bindings = new Dictionary<string, CommandBinding>(StringComparer.OrdinalIgnoreCase);
 
@@ -46,6 +50,7 @@ namespace b7.Xabbo.Commands
             _modules = modules.ToArray();
             _profileManager = profileManager;
             _roomManager = roomManager;
+            _xabboUser = xabboUser;
 
             Interceptor.Connected += OnConnected;
         }
@@ -53,40 +58,41 @@ namespace b7.Xabbo.Commands
         private void OnConnected(object? sender, GameConnectedEventArgs e)
         {
             Initialize();
+
+            Interceptor.Dispatcher.Bind(this, Interceptor.ClientType);
+
+            foreach (CommandModule module in _modules)
+            {
+                try
+                {
+                    Dispatcher.Bind(module, Interceptor.ClientType);
+                    module.IsAvailable = true;
+                }
+                catch
+                {
+                    module.IsAvailable = false;
+                }
+            }
         }
 
         public void Initialize()
         {
-            if (_isInitialized)
-                return;
-                // throw new InvalidOperationException("The command manager is already initialized");
-
-            _isInitialized = true;
-            OnInitialize();
+            if (!_isInitialized)
+            {
+                InitializeModules();
+                _isInitialized = true;
+            }
         }
 
-        protected void OnInitialize()
+        protected void InitializeModules()
         {
-            Interceptor.Dispatcher.Bind(this, Interceptor.ClientType);
-
             Register(OnHelp, "help");
 
             BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
 
             foreach (CommandModule module in _modules)
             {
-                bool isAttached = false;
-
                 Type type = module.GetType();
-                if (type.GetMethods(bindingFlags).Any(x => x.GetCustomAttributes<InterceptAttribute>().Any()))
-                {
-                    try
-                    {
-                        Dispatcher.Bind(module, Interceptor.ClientType);
-                        isAttached = true;
-                    }
-                    catch { }
-                }
 
                 foreach (var method in type.GetMethods(bindingFlags))
                 {
@@ -102,18 +108,15 @@ namespace b7.Xabbo.Commands
                         handler
                     );
 
-                    // Verify command names are unbound
                     foreach (string commandName in new[] { commandAttribute.CommandName }.Concat(commandAttribute.Aliases))
                     {
                         if (_bindings.ContainsKey(commandName))
                             throw new InvalidOperationException($"The command '{commandName}' is already registered");
                         _bindings.Add(commandName, binding);
                     }
-                    
-                    binding.IsAvailable = true;
                 }
 
-                module.Initialize(this, isAttached);
+                module.Initialize(this);
             }
         }
 
@@ -149,14 +152,12 @@ namespace b7.Xabbo.Commands
 
             foreach (string name in commandNames)
                 _bindings.Add(name, binding);
-
-            binding.IsAvailable = true;
         }
 
         [RequiredIn(nameof(Incoming.Whisper))]
         public void ShowMessage(string message)
         {
-            Interceptor.Send(In.Whisper, -0xb7, message, 0, 30, 0, 0);
+            _xabboUser.ShowMessage(message);
         }
 
         [InterceptOut(
@@ -211,16 +212,6 @@ namespace b7.Xabbo.Commands
                 return;
             }
             
-            if (!binding.IsAvailable)
-            {
-                if (binding.UnresolvedHeaders != null && binding.UnresolvedHeaders.Any())
-                    ShowMessage($"Command is unavailable due to unresolved headers. {binding.UnresolvedHeaders}");
-                else
-                    ShowMessage($"Command is unavailable");
-
-                return;
-            }
-            
             try
             {
                 await binding.Handler.Invoke(new CommandArgs(command, args, chatType, bubbleStyle, whisperTarget));
@@ -242,6 +233,5 @@ namespace b7.Xabbo.Commands
                     $"{ex.Message}\r\n{ex.StackTrace}");
             }
         }
-
     }
 }

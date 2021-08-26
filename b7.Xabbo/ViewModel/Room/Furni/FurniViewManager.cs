@@ -94,6 +94,20 @@ namespace b7.Xabbo.ViewModel
             set => Set(ref _isAvailable, value);
         }
 
+        private bool _isLoading;
+        public bool IsLoading
+        {
+            get => _isLoading;
+            set => Set(ref _isLoading, value);
+        }
+
+        private string _errorText = string.Empty;
+        public string ErrorText
+        {
+            get => _errorText;
+            set => Set(ref _errorText, value);
+        }
+
         private string _filterText = string.Empty;
         public string FilterText
         {
@@ -295,16 +309,19 @@ namespace b7.Xabbo.ViewModel
 
         private async Task InitializeAsync()
         {
+            IsLoading = true;
+
             try
             {
-                await Task.WhenAll(
-                    _profileManager.GetUserDataAsync(),
-                    _gameDataManager.GetFurniDataAsync(),
-                    _gameDataManager.GetExternalTextsAsync()
-                );
+                await _gameDataManager.GetFurniDataAsync();
+                await _gameDataManager.GetExternalTextsAsync();
+
+                IsLoading = false;
+                await _profileManager.GetUserDataAsync();
             }
-            catch
+            catch (Exception ex)
             {
+                ErrorText = $"Failed to initialize: {ex.Message}";
                 return;
             }
 

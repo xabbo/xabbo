@@ -21,7 +21,7 @@ namespace b7.Xabbo.Services
             foreach (IConfigurationSection endpointSection in endpoints.GetChildren())
             {
                 string host = endpointSection.GetValue<string>("Host");
-                Uri baseUri = new Uri(host.Replace("$domain", Domain));
+                Uri baseUri = new(host.Replace("$domain", Domain));
 
                 foreach (IConfigurationSection pathSection in endpointSection.GetSection("Paths").GetChildren())
                 {

@@ -18,7 +18,7 @@ namespace b7.Xabbo.Commands
             _roomManager = roomManager;
         }
 
-        [Command("turn", "look", "face"), RequiredOut("RoomUserLookAtPoint")]
+        [Command("turn", "look", "face"), RequiredOut(nameof(Outgoing.LookTo))]
         protected async Task HandleLookCommand(CommandArgs args)
         {
             if (args.Count == 0) return;

@@ -7,6 +7,7 @@ using Xabbo.Messages;
 using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.Tasks;
+using b7.Xabbo.Components;
 
 namespace b7.Xabbo.Commands
 {
@@ -47,7 +48,7 @@ namespace b7.Xabbo.Commands
                 int roomId = packet.ReadInt();
                 var roomData = await new GetRoomDataTask(Interceptor, roomId)
                     .ExecuteAsync(5000, CancellationToken.None);
-                ShowMessage($"{friend.Name} is in room '{roomData.Name}' by {roomData.OwnerName} (id:{roomData.Id})");
+                ShowMessage($"{friend.Name} is in room '{roomData.Name}' by {roomData.OwnerName} (id:{roomData.Id}){(roomData.IsInvisible ? "*" : "")}");
             }
             else
             {

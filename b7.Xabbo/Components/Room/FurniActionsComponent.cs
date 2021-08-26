@@ -16,6 +16,7 @@ namespace b7.Xabbo.Components
     {
         private readonly IGameDataManager _gameDataManager;
         private readonly RoomManager _roomManager;
+        private readonly XabboUserComponent _xabboUser;
 
         private FurniData? FurniData => _gameDataManager.FurniData;
         private ExternalTexts? Texts => _gameDataManager.ExternalTexts;
@@ -58,11 +59,13 @@ namespace b7.Xabbo.Components
         private readonly Task _initialization;
 
         public FurniActionsComponent(IInterceptor interceptor,
-            IGameDataManager gameDataManager, RoomManager roomManager)
+            IGameDataManager gameDataManager, RoomManager roomManager,
+            XabboUserComponent xabboUser)
             : base(interceptor)
         {
             _gameDataManager = gameDataManager;
             _roomManager = roomManager;
+            _xabboUser = xabboUser;
 
             _initialization = InitializeAsync();
         }
@@ -111,12 +114,7 @@ namespace b7.Xabbo.Components
                     if (string.IsNullOrWhiteSpace(name))
                         name = info.Identifier;
 
-                    Send(
-                        In.Whisper,
-                        -0xb7,
-                        $"{name} [{info.Identifier}] (id:{item.Id}) {item.Location} {item.Direction}",
-                        0, 1, 0, 0
-                    );
+                    _xabboUser.ShowMessage($"{name} [{info.Identifier}] (id:{item.Id}) {item.Location} {item.Direction}", item.Location);
                 }
             }
 
@@ -167,7 +165,7 @@ namespace b7.Xabbo.Components
                 {
                     e.Block();
 
-                    string name = info.Name;
+                    string? name = info.Name;
 
                     if (info.Identifier == "poster")
                         Texts?.TryGetValue($"poster_{item.Data}_name", out name);
@@ -175,12 +173,7 @@ namespace b7.Xabbo.Components
                     if (string.IsNullOrWhiteSpace(name))
                         name = info.Identifier;
 
-                    Send(
-                        In.Whisper,
-                        -0xb7,
-                        $"{name} [{info.Identifier}] (id:{item.Id}) {item.Location}",
-                        0, 1, 0, 0
-                    );
+                    _xabboUser.ShowMessage($"{name} [{info.Identifier}] (id:{item.Id}) {item.Location}");
                 }
             }
         }

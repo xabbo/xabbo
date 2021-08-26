@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Windows;
 
+using MaterialDesignExtensions.Controls;
+
 using b7.Xabbo.ViewModel;
 
 namespace b7.Xabbo.View
 {
-    public partial class MainWindow : Window
+    public partial class MainWindow : MaterialWindow
     {
         private readonly MainViewManager _viewModel;
 

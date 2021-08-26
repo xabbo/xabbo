@@ -48,7 +48,7 @@ namespace b7.Xabbo.ViewModel
 
         private readonly ObservableCollection<EntityViewModel> _entities = new();
         private readonly ConcurrentDictionary<int, EntityViewModel> _entitiesByIndex = new();
-        private readonly ConcurrentDictionary<long, EntityViewModel> _usersById = new();
+        private readonly ConcurrentDictionary<long, EntityViewModel> _entitiesById = new();
 
         public ICollectionView Entities { get; }
 
@@ -137,7 +137,7 @@ namespace b7.Xabbo.ViewModel
             _roomManager.EntitiesAdded += OnEntitiesAdded;
             _roomManager.EntityRemoved += OnEntityRemoved;
             _roomManager.EntitiesUpdated += OnEntitiesUpdated;
-            _roomManager.UserDataUpdated += OnUserDataUpdated;
+            _roomManager.EntityDataUpdated += OnUserDataUpdated;
             _roomManager.EntityNameChanged += OnEntityNameChanged;
             _roomManager.EntityIdle += OnEntityIdle;
         }
@@ -167,8 +167,7 @@ namespace b7.Xabbo.ViewModel
 
             _entities.Add(entityViewModel);
             _entitiesByIndex.TryAdd(entityViewModel.Index, entityViewModel);
-            if (entityViewModel.Entity.Type == EntityType.User)
-                _usersById.TryAdd(entityViewModel.Id, entityViewModel);
+            _entitiesById.TryAdd(entityViewModel.Id, entityViewModel);
         }
 
         private void AddEntities(IEnumerable<EntityViewModel> entityViewModels)
@@ -193,8 +192,7 @@ namespace b7.Xabbo.ViewModel
 
             _entities.Remove(entityViewModel);
             _entitiesByIndex.TryRemove(entityViewModel.Index, out _);
-            if (entityViewModel.Entity.Type == EntityType.User)
-                _usersById.TryRemove(entityViewModel.Id, out _);
+            _entitiesById.TryRemove(entityViewModel.Id, out _);
         }
 
         private void ClearEntities()
@@ -207,7 +205,7 @@ namespace b7.Xabbo.ViewModel
 
             _entities.Clear();
             _entitiesByIndex.Clear();
-            _usersById.Clear();
+            _entitiesById.Clear();
         }
 
         private void RefreshList()
@@ -225,7 +223,7 @@ namespace b7.Xabbo.ViewModel
         #region - Events -
         private void RoomManager_RoomDataUpdated(object? sender, RoomDataEventArgs e)
         {
-            if (_usersById.TryGetValue(e.Data.OwnerId, out EntityViewModel? user))
+            if (_entitiesById.TryGetValue(e.Data.OwnerId, out EntityViewModel? user))
             {
                 if (!user.IsRoomOwner)
                 {
@@ -248,6 +246,8 @@ namespace b7.Xabbo.ViewModel
                 if (!_roomManager.IsLoadingRoom && !_roomManager.IsInRoom)
                     return;
 
+                bool refreshList = false;
+
                 var entityViewModels = e.Entities.Select(x => new EntityViewModel(x)).ToArray();
                 foreach (var vm in entityViewModels)
                 {
@@ -258,21 +258,24 @@ namespace b7.Xabbo.ViewModel
                         continue;
                     }
 
-                    if (vm.Id == _roomManager.Data?.OwnerId)
+                    if (vm.Id == _roomManager.Room?.OwnerId)
                     {
                         _logger.LogTrace("Room owner detected: {owner}", vm.Entity);
                         vm.IsRoomOwner = true;
+                        refreshList = true;
                     }
 
                     if (vm.IsStaff = _staffList.Contains(vm.Name))
                     {
                         vm.ImageSource = IMAGE_STAFF;
                         vm.HeaderColor = COLOR_STAFF;
+                        refreshList = true;
                     }
                     else if (vm.IsAmbassador = _ambassadorList.Contains(vm.Name))
                     {
                         vm.ImageSource = IMAGE_AMB;
                         vm.HeaderColor = COLOR_AMB;
+                        refreshList = true;
                     }
                     else
                     {
@@ -282,6 +285,9 @@ namespace b7.Xabbo.ViewModel
                 }
 
                 AddEntities(entityViewModels);
+
+                if (refreshList)
+                    RefreshList();
             }
             catch (Exception ex)
             {
@@ -298,15 +304,18 @@ namespace b7.Xabbo.ViewModel
         private void OnEntitiesUpdated(object? sender, EntitiesEventArgs e)
         {
             bool refresh = false;
+
             foreach (var user in e.Entities.OfType<IRoomUser>())
             {
-                if (!_usersById.TryGetValue(user.Id, out EntityViewModel? vm))
+                if (!_entitiesById.TryGetValue(user.Id, out EntityViewModel? vm))
                     continue;
 
-                // TODO trade status
-
                 IEntityStatusUpdate? update = user.CurrentUpdate;
-                if (update is not null && update.IsController != vm.HasRights)
+                if (update is null) continue;
+
+                vm.IsTrading = update.IsTrading;
+
+                if (update.IsController != vm.HasRights)
                 {
                     vm.HasRights = update.IsController;
                     _logger.LogTrace("Updating rights for {user} = {hasRights} (level:level)", vm.Entity, vm.HasRights, update.ControlLevel);
@@ -321,15 +330,13 @@ namespace b7.Xabbo.ViewModel
             }
         }
 
-        private void OnUserDataUpdated(object? sender, UserDataUpdatedEventArgs e)
+        private void OnUserDataUpdated(object? sender, EntityDataUpdatedEventArgs e)
         {
-            if (!_usersById.TryGetValue(e.User.Id, out EntityViewModel? vm))
+            if (!_entitiesById.TryGetValue(e.Entity.Id, out EntityViewModel? vm))
                 return;
 
-            if (e.FigureUpdated)
-                vm.Figure = e.User.Figure;
-            if (e.MottoUpdated)
-                vm.Motto = e.User.Motto;
+            if (e.FigureUpdated) vm.Figure = e.Entity.Figure;
+            if (e.MottoUpdated) vm.Motto = e.Entity.Motto;
         }
 
         private void OnEntityNameChanged(object? sender, EntityNameChangedEventArgs e)

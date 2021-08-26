@@ -2,10 +2,60 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:b7.Xabbo"
-             xmlns:converter="clr-namespace:b7.Xabbo.WPF.Converters">
+             xmlns:converter="clr-namespace:b7.Xabbo.WPF.Converters"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:controls="clr-namespace:MaterialDesignExtensions.Controls;assembly=MaterialDesignExtensions">
     <Application.Resources>
-        <converter:BoolToOpacityConverter x:Key="BoolToOpacityConverter" />
-        <converter:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
-        <converter:BooleanNotConverter x:Key="NotConverter" />
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!--<materialDesign:BundledTheme BaseTheme="Light" PrimaryColor="DeepPurple" SecondaryColor="Lime" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />-->
+
+                <!-- material design styles -->
+
+                <materialDesign:BundledTheme
+                    BaseTheme="Dark"
+                    PrimaryColor="Purple"
+                    SecondaryColor="Yellow"
+                />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
+
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignExtensions;component/Themes/Generic.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignExtensions;component/Themes/MaterialDesignDarkTheme.xaml" />
+
+
+                <!--<ResourceDictionary>
+                    <SolidColorBrush x:Key="MaterialDesignBackground" Color="{Binding Color, Source={StaticResource MaterialDesignPaper}}" />
+                </ResourceDictionary>-->
+
+                <!--<ResourceDictionary>
+                    <Style TargetType="ScrollViewer" BasedOn="{StaticResource MaterialDesignScrollViewer}">
+                        <Setter Property="md:ScrollViewerAssist.IgnorePadding" Value="False" />
+                    </Style>
+                </ResourceDictionary>-->
+
+            </ResourceDictionary.MergedDictionaries>
+
+            <Style TargetType="{x:Type ListView}" BasedOn="{StaticResource MaterialDesignListView}">
+                <Style.Resources>
+                    <Style TargetType="{x:Type GridViewColumnHeader}" BasedOn="{StaticResource {x:Type GridViewColumnHeader}}">
+                        <Style.Resources>
+                            <Style TargetType="{x:Type Border}">
+                                <Setter Property="BorderBrush" Value="{StaticResource MaterialDesignLightSeparatorBackground}" />
+                            </Style>
+                        </Style.Resources>
+                        <Setter Property="BorderThickness" Value="0,0,1,0" />
+                        <Setter Property="HorizontalContentAlignment" Value="Center" />
+                    </Style>
+                </Style.Resources>
+                <Setter Property="materialDesign:DataGridAssist.ColumnHeaderPadding" Value="2" />
+                <Setter Property="materialDesign:ListViewAssist.ListViewItemPadding" Value="4" />
+            </Style>
+
+
+            <converter:BoolToOpacityConverter x:Key="BoolToOpacityConverter" />
+            <converter:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+            <converter:BooleanNotConverter x:Key="NotConverter" />
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -13,10 +13,7 @@ namespace b7.Xabbo.Commands
 {
     public abstract class CommandModule
     {
-        private bool isInitialized = false;
-
-        public bool IsAttached { get; protected set; }
-        public bool IsAvailable { get; protected set; }
+        public bool IsAvailable { get; set; }
         public CommandManager Commands { get; private set; } = null!;
 
         protected IInterceptor Interceptor => Commands.Interceptor;
@@ -30,13 +27,9 @@ namespace b7.Xabbo.Commands
 
         public CommandModule() { }
 
-        public void Initialize(CommandManager manager, bool isAttached)
+        public void Initialize(CommandManager manager)
         {
-            if (isInitialized)
-                throw new InvalidOperationException($"This command module has already been initialized");
-
             Commands = manager;
-            IsAttached = isAttached;
 
             OnInitialize();
         }

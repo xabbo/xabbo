@@ -6,11 +6,25 @@
              xmlns:local="clr-namespace:b7.Xabbo"
              xmlns:viewModel="clr-namespace:b7.Xabbo.ViewModel"
              xmlns:controls="clr-namespace:b7.Xabbo.WPF.Controls"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:mde="clr-namespace:MaterialDesignExtensions.Controls;assembly=MaterialDesignExtensions"
              mc:Ignorable="d" 
              d:DesignHeight="200" d:DesignWidth="400"
              d:DataContext="{d:DesignInstance Type={x:Type viewModel:AlignerViewManager}}"
-             Background="White"
-             FontFamily="Consolas">
+             TextElement.Foreground="{StaticResource MaterialDesignBody}"
+             TextElement.FontSize="14">
+    <UserControl.Resources>
+        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource MaterialDesignBody1TextBlock}">
+            <Setter Property="Margin" Value="4" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource MaterialDesignCheckBox}">
+            <Setter Property="Margin" Value="4" />
+        </Style>
+        <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource MaterialDesignTextBox}">
+            <Setter Property="Margin" Value="4" />
+        </Style>
+    </UserControl.Resources>
     <Grid Margin="6" IsEnabled="{Binding IsInRoom}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
@@ -30,12 +44,17 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Column="0" Margin="2" VerticalAlignment="Center" HorizontalAlignment="Right" Text="ID" />
-        <TextBox Grid.Column="1" Grid.ColumnSpan="3" Margin="2"
+        <TextBlock
+            Grid.Column="0"
+            HorizontalAlignment="Right"
+            Text="ID"
+        />
+        <TextBox Grid.Column="1" Grid.ColumnSpan="3"
+                 Margin="4"
                  IsReadOnly="True" BorderThickness="0"
                  Text="{Binding CurrentId}">
             <TextBox.Style>
-                <Style TargetType="{x:Type TextBox}">
+                <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource MaterialDesignTextBox}">
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding CurrentId}" Value="-1">
                             <Setter Property="Visibility" Value="Hidden" />
@@ -55,10 +74,18 @@
                  Text="{Binding LocationString, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}"
                  IsEnabled="{Binding CanMoveLocation}" />
 
-        <controls:NumericUpDown Grid.Column="1" Grid.Row="2" Margin="2" Value="{Binding WallX}" IsEnabled="{Binding HasCapturedItem}" />
-        <controls:NumericUpDown Grid.Column="2" Grid.Row="2" Margin="2" Value="{Binding WallY}" IsEnabled="{Binding HasCapturedItem}" />
-        <controls:NumericUpDown Grid.Column="3" Grid.Row="2" Margin="2" Value="{Binding LocationX}" IsEnabled="{Binding CanMoveLocation}" />
-        <controls:NumericUpDown Grid.Column="4" Grid.Row="2" Margin="2" Value="{Binding LocationY}" IsEnabled="{Binding CanMoveLocation}" />
+        <controls:NumericUpDown Grid.Column="1" Grid.Row="2" Margin="2"
+                                Value="{Binding WallX}"
+                                IsEnabled="{Binding HasCapturedItem}" />
+        <controls:NumericUpDown Grid.Column="2" Grid.Row="2" Margin="2"
+                                Value="{Binding WallY}"
+                                IsEnabled="{Binding HasCapturedItem}" />
+        <controls:NumericUpDown Grid.Column="3" Grid.Row="2" Margin="2"
+                                Value="{Binding LocationX}"
+                                IsEnabled="{Binding CanMoveLocation}" />
+        <controls:NumericUpDown Grid.Column="4" Grid.Row="2" Margin="2"
+                                Value="{Binding LocationY}"
+                                IsEnabled="{Binding CanMoveLocation}" />
         <Button Grid.Column="5" Grid.Row="2" Margin="2" Width="16"
                 HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
                 Command="{Binding ToggleOrientationCommand}"

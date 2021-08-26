@@ -5,8 +5,18 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:b7.Xabbo"
              xmlns:svc="clr-namespace:b7.Xabbo.Services"
+             TextElement.Foreground="{StaticResource MaterialDesignBody}"
+             TextElement.FontSize="14"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource MaterialDesignCheckBox}">
+            <Setter Property="Margin" Value="8" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+    </UserControl.Resources>
     <Grid IsEnabled="{Binding IsAvailable}">
         <Grid HorizontalAlignment="Left">
             <Grid.ColumnDefinitions>
@@ -23,63 +33,71 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <CheckBox Margin="4" Padding="2"
-                                  HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center"
-                                  IsChecked="{Binding MimicFigure}"
-                                  Content="Figure" />
-            <CheckBox Grid.Column="1" Margin="4" Padding="2"
-                                  HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center"
-                                  IsChecked="{Binding MimicSign}"
-                                  Content="Signs" />
-            <CheckBox Grid.Column="2" Margin="4" Padding="2"
-                                  HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center"
-                                  IsChecked="{Binding MimicTyping}"
-                                  Content="Typing" />
-
-            <CheckBox Grid.Row="1" Margin="4" Padding="2"
-                                  HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center"
-                                  IsChecked="{Binding MimicMotto}"
-                                  Content="Motto" />
-            <CheckBox Grid.Row="1" Grid.Column="1" Margin="4" Padding="2"
-                                  HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center"
-                                  IsChecked="{Binding MimicEffect}"
-                                  Content="Effect" />
-            <CheckBox Grid.Row="1" Grid.Column="2" Margin="4" Padding="2"
-                                  HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center"
-                                  IsChecked="{Binding MimicTalk}"
-                                  Content="Talk" />
-
-            <CheckBox Grid.Row="2" Margin="4" Padding="2"
-                                  HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center"
-                                  IsChecked="{Binding MimicAction}"
-                                  Content="Actions" />
-            <CheckBox Grid.Row="2" Grid.Column="1" Margin="4" Padding="2"
-                                  HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center"
-                                  IsChecked="{Binding MimicSit}"
-                                  Content="Sit" />
-            <CheckBox Grid.Row="2" Grid.Column="2" Margin="4" Padding="2"
-                                  HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center"
-                                  IsChecked="{Binding MimicShout}"
-                                  Content="Shout" />
-
-            <CheckBox Grid.Row="3" Margin="4" Padding="2"
-                                  HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center"
-                                  IsChecked="{Binding MimicDance}"
-                                  Content="Dance" />
-            <CheckBox Grid.Row="3" Grid.Column="1" Margin="4" Padding="2"
-                                  HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center"
-                                  IsChecked="{Binding FollowTarget}"
-                                  Content="Follow" />
-            <CheckBox Grid.Row="3" Grid.Column="2" Margin="4" Padding="2"
-                                  HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center"
-                                  IsChecked="{Binding MimicWhisper}"
-                                  Content="Whisper" />
-
+            <CheckBox
+                HorizontalAlignment="Left"
+                IsChecked="{Binding MimicFigure}"
+                Content="Figure"
+            />
+            <CheckBox
+                Grid.Column="1"
+                IsChecked="{Binding MimicSign}"
+                Content="Signs"
+            />
+            <CheckBox
+                Grid.Column="2"
+                IsChecked="{Binding MimicTyping}"
+                Content="Typing"
+            />
+            <CheckBox
+                Grid.Row="1"
+                IsChecked="{Binding MimicMotto}"
+                Content="Motto"
+            />
+            <CheckBox
+                Grid.Row="1" Grid.Column="1"
+                IsChecked="{Binding MimicEffect}"
+                Content="Effect"
+            />
+            <CheckBox
+                Grid.Row="1" Grid.Column="2"
+                IsChecked="{Binding MimicTalk}"
+                Content="Talk"
+            />
+            <CheckBox
+                Grid.Row="2"
+                IsChecked="{Binding MimicAction}"
+                Content="Actions"
+            />
+            <CheckBox
+                Grid.Row="2" Grid.Column="1"
+                IsChecked="{Binding MimicSit}"
+                Content="Sit"
+            />
+            <CheckBox
+                Grid.Row="2" Grid.Column="2"
+                IsChecked="{Binding MimicShout}"
+                Content="Shout"
+            />
+            <CheckBox
+                Grid.Row="3"
+                IsChecked="{Binding MimicDance}"
+                Content="Dance"
+            />
+            <CheckBox
+                Grid.Row="3" Grid.Column="1"
+                IsChecked="{Binding FollowTarget}"
+                Content="Follow"
+            />
+            <CheckBox
+                Grid.Row="3" Grid.Column="2"
+                IsChecked="{Binding MimicWhisper}"
+                Content="Whisper"
+            />
             <StackPanel Grid.Row="4" Grid.ColumnSpan="3" Orientation="Horizontal">
-                <CheckBox Margin="4" Padding="2"
-                          HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center"
-                          IsChecked="{Binding DelaySpeech}"
-                          Content="Delay speech" />
+                <CheckBox 
+                    IsChecked="{Binding DelaySpeech}"
+                    Content="Delay speech"
+                />
                 <TextBox Margin="4" Width="60" Text="{Binding SpeechDelay, UpdateSourceTrigger=PropertyChanged}" />
                 <TextBlock VerticalAlignment="Center" Text="ms" />
             </StackPanel>

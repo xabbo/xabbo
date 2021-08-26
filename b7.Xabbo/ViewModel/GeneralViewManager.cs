@@ -2,9 +2,6 @@
 
 using GalaSoft.MvvmLight;
 
-using Xabbo.Interceptor;
-using Xabbo.Core;
-
 using b7.Xabbo.Components;
 
 namespace b7.Xabbo.ViewModel
@@ -17,6 +14,8 @@ namespace b7.Xabbo.ViewModel
         public AntiTypingComponent AntiTyping { get; }
         public AntiTurnComponent AntiTurn { get; }
         public AntiWalkComponent AntiWalk { get; }
+        public AntiTradeComponent AntiTrade { get; }
+
         public ClickThroughComponent ClickThrough { get; }
         public ClickToComponent ClickTo { get; }
 
@@ -32,6 +31,8 @@ namespace b7.Xabbo.ViewModel
 
         public AntiHcGiftNotificationComponent AntiHcGiftNotification { get; }
 
+        public EntityOverlayComponent Overlay { get; }
+
         /* 
          public DoorbellComponent Doorbell { get; set; }
 
@@ -46,6 +47,7 @@ namespace b7.Xabbo.ViewModel
             AntiTypingComponent antiTyping,
             AntiTurnComponent antiTurn,
             AntiWalkComponent antiWalk,
+            AntiTradeComponent antiTrade,
             ClickThroughComponent clickThrough,
             ClickToComponent clickTo,
             EscapeComponent escape,
@@ -55,7 +57,8 @@ namespace b7.Xabbo.ViewModel
             RoomEntryComponent roomEntry,
             FlattenRoomComponent flattenRoom,
             AntiHandItemComponent handItem,
-            AntiHcGiftNotificationComponent antiHcGiftNotification)
+            AntiHcGiftNotificationComponent antiHcGiftNotification,
+            EntityOverlayComponent overlay)
         {
             AntiKick = antiKick;
             AntiIdle = antiIdle;
@@ -63,6 +66,7 @@ namespace b7.Xabbo.ViewModel
             AntiTyping = antiTyping;
             AntiTurn = antiTurn;
             AntiWalk = antiWalk;
+            AntiTrade = antiTrade;
             ClickThrough = clickThrough;
             ClickTo = clickTo;
             Escape = escape;
@@ -73,6 +77,7 @@ namespace b7.Xabbo.ViewModel
             FlattenRoom = flattenRoom;
             HandItem = handItem;
             AntiHcGiftNotification = antiHcGiftNotification;
+            Overlay = overlay;
         }
     }
 }

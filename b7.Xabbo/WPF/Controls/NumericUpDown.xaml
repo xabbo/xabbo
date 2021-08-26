@@ -18,14 +18,18 @@
                 <RowDefinition Height="*" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <RepeatButton Margin="0,2,2,0"
-                      Interval="{Binding Interval}" Delay="500" Click="OnIncrement">
+            <RepeatButton Margin="0" Padding="0"
+                          VerticalAlignment="Stretch"
+                          Interval="{Binding Interval}" Delay="500" Click="OnIncrement"
+                          Style="{x:Null}">
                 <Canvas>
                     <Polygon Points="-2,1 0,-1 2,1" Fill="Black" />
                 </Canvas>
             </RepeatButton>
-            <RepeatButton Grid.Row="1" Margin="0,0,2,2"
-                      Interval="{Binding Interval}" Delay="500" Click="OnDecrement">
+            <RepeatButton Grid.Row="1" Margin="0" Padding="0"
+                          VerticalAlignment="Stretch"
+                          Style="{x:Null}"
+                          Interval="{Binding Interval}" Delay="500" Click="OnDecrement">
                 <Canvas>
                     <Polygon Points="-2,-1 0,1 2,-1" Fill="Black" />
                 </Canvas>

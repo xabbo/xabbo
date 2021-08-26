@@ -5,9 +5,13 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:b7.Xabbo"
              xmlns:svc="clr-namespace:b7.Xabbo.Services"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:mde="clr-namespace:MaterialDesignExtensions.Controls;assembly=MaterialDesignExtensions"
+             TextElement.Foreground="{StaticResource MaterialDesignBody}"
+             TextElement.FontFamily="{StaticResource MaterialDesignFont}"
+             TextElement.FontSize="14"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800"
-             FontFamily="Consolas">
+             d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -16,14 +20,26 @@
         </Grid.RowDefinitions>
         <Grid>
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <TextBox x:Name="textBoxFilter" Margin="2" Padding="2,1"
-                 Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}">
+            <TextBlock
+                Margin="4"
+                VerticalAlignment="Center"
+                Text="Filter"
+                Style="{StaticResource MaterialDesignBody1TextBlock}"
+            />
+            <TextBox x:Name="textBoxFilter" Grid.Column="1"
+                     Margin="4" Padding="0"
+                     VerticalContentAlignment="Center"
+                     md:ValidationAssist.PopupPlacement="Bottom"
+                     md:ValidationAssist.UsePopup="True"
+                     md:ValidationAssist.OnlyShowOnFocus="True"
+                     md:ValidationAssist.FontSize="14"
+                     Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}">
                 <TextBox.Style>
-                    <Style TargetType="{x:Type TextBox}">
-                        <Setter Property="Foreground" Value="Black" />
+                    <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource MaterialDesignTextBox}">
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding FilterNeedsUpdate}" Value="True">
                                 <Setter Property="Foreground" Value="Gray" />
@@ -35,8 +51,8 @@
                     <KeyBinding Key="Return" Command="{Binding RefreshFilterCommand}" />
                 </TextBox.InputBindings>
             </TextBox>
-            <CheckBox Grid.Column="1"
-                      Margin="2"
+            <CheckBox Grid.Column="2"
+                      Margin="4"
                       VerticalAlignment="Center" VerticalContentAlignment="Center"
                       Content="Query"
                       IsChecked="{Binding IsQuery}" />
@@ -138,9 +154,32 @@
                 </GridView>
             </ListView.View>
         </ListView>
-        <StackPanel Margin="2" Grid.Row="2" Orientation="Horizontal">
-            <TextBlock Text="{Binding Items.Count, ElementName=listViewFurni}" />
-            <TextBlock Text=" furni" />
+        <StackPanel Margin="4" Grid.Row="2" Orientation="Horizontal">
+            <TextBlock Style="{StaticResource MaterialDesignBody1TextBlock}">
+                <Run Text="{Binding Items.Count, ElementName=listViewFurni, Mode=OneWay}" />
+                furni
+            </TextBlock>
         </StackPanel>
+        <Grid Grid.RowSpan="3">
+            <Grid.Background>
+                <SolidColorBrush Color="Black" Opacity="0.8" />
+            </Grid.Background>
+            <Grid.Style>
+                <Style TargetType="{x:Type Grid}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding ErrorText}" Value="">
+                            <Setter Property="IsHitTestVisible" Value="False" />
+                            <Setter Property="Opacity" Value="0" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+            <TextBlock
+                HorizontalAlignment="Center" VerticalAlignment="Center"
+                FontSize="14" Foreground="{StaticResource MaterialDesignValidationErrorBrush}"
+                Text="{Binding ErrorText}"
+            />
+        </Grid>
+        <mde:BusyOverlay IsBusy="{Binding IsLoading}" />
     </Grid>
 </UserControl>
