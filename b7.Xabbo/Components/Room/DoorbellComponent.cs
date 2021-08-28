@@ -1,5 +1,6 @@
 ﻿using System;
 
+using Xabbo;
 using Xabbo.Interceptor;
 using Xabbo.Messages;
 
@@ -28,7 +29,7 @@ namespace b7.Xabbo.Components
         [InterceptIn(nameof(Incoming.DoorbellRinging))]
         protected void HandleDoorbellRinging(InterceptArgs e)
         {
-            if (ClientType != global::Xabbo.ClientType.Flash)
+            if (Client != ClientType.Flash)
                 return;
 
             string name = e.Packet.ReadString();

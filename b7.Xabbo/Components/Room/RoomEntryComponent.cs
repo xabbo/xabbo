@@ -65,7 +65,7 @@ namespace b7.Xabbo.Components
                 (DontAskToRingDoorbell && roomData.Access == RoomAccess.Doorbell))
             {
                 roomData.IsGroupMember = true;
-                e.Packet = Packet.Compose(ClientType, e.Packet.Header, roomData);
+                e.Packet = Packet.Compose(Client, e.Packet.Header, roomData);
             }
         }
 

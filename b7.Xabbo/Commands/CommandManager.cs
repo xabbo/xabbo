@@ -59,13 +59,13 @@ namespace b7.Xabbo.Commands
         {
             Initialize();
 
-            Interceptor.Dispatcher.Bind(this, Interceptor.ClientType);
+            Interceptor.Dispatcher.Bind(this, Interceptor.Client);
 
             foreach (CommandModule module in _modules)
             {
                 try
                 {
-                    Dispatcher.Bind(module, Interceptor.ClientType);
+                    Dispatcher.Bind(module, Interceptor.Client);
                     module.IsAvailable = true;
                 }
                 catch

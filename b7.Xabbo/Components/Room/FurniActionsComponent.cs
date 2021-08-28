@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
 
+using Xabbo;
 using Xabbo.Messages;
 using Xabbo.Interceptor;
-
 using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.GameData;
@@ -123,7 +123,7 @@ namespace b7.Xabbo.Components
                 IFloorItem? linkedItem = room.GetFloorItem(item.Extra);
                 if (linkedItem != null)
                 {
-                    if (ClientType == global::Xabbo.ClientType.Flash)
+                    if (Client == ClientType.Flash)
                     {
                         Send(In.StuffDataUpdate, linkedItem.Id.ToString(), 0, "2");
                         await Task.Delay(500);

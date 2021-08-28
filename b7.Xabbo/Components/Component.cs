@@ -11,7 +11,7 @@ namespace b7.Xabbo.Components
     public abstract class Component : ObservableObject
     {
         protected IInterceptor Interceptor { get; }
-        protected ClientType ClientType => Interceptor.ClientType;
+        protected ClientType Client => Interceptor.Client;
         protected IMessageManager Messages => Interceptor.Messages;
         protected Incoming In => Interceptor.Messages.In;
         protected Outgoing Out => Interceptor.Messages.Out;
@@ -39,7 +39,7 @@ namespace b7.Xabbo.Components
         {
             if (!Interceptor.Dispatcher.IsBound(this))
             {
-                Interceptor.Dispatcher.Bind(this, Interceptor.ClientType);
+                Interceptor.Dispatcher.Bind(this, Interceptor.Client);
             }
         }
 
