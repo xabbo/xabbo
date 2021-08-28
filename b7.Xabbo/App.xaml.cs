@@ -10,10 +10,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
+using MaterialDesignThemes.Wpf;
+
 using Xabbo.Messages;
 using Xabbo.Interceptor;
 using Xabbo.GEarth;
-
 using Xabbo.Core.Game;
 
 using b7.Xabbo.View;
@@ -21,6 +22,7 @@ using b7.Xabbo.Components;
 using b7.Xabbo.Commands;
 using b7.Xabbo.Services;
 using b7.Xabbo.Configuration;
+using b7.Xabbo.Util;
 
 namespace b7.Xabbo
 {
@@ -57,15 +59,29 @@ namespace b7.Xabbo
             services.AddSingleton<IUiContext, DispatcherContext>();
 
             // Interceptor
-            services.AddSingleton(GEarthOptions.Default
-                .WithTitle("xabbo")
-                .WithDescription("enhanced habbo")
-                .WithAuthor("b7")
-                .WithPort(9092) // default port for now
-                .WithConfiguration(context.Configuration)
-            );
+            services.AddGEarthOptions(options =>
+            {
+                options = options
+                    .WithTitle("xabbo")
+                    .WithDescription("enhanced habbo")
+                    .WithAuthor("b7")
+                    .WithConfiguration(context.Configuration);
+
+                if (string.IsNullOrWhiteSpace(options.Cookie))
+                {
+                    options = options
+                        .WithShowLeaveButton(false)
+                        .WithShowEventButton(false);
+                }
+
+                return options;
+            });
 
             services.AddSingleton<IMessageManager, UnifiedMessageManager>();
+
+            services.AddSingleton<GEarthExtension>();
+            services.AddSingleton<IInterceptor>(x => x.GetRequiredService<GEarthExtension>());
+            services.AddSingleton<IRemoteInterceptor>(x => x.GetRequiredService<GEarthExtension>());
 
             // Web
             services.AddHttpClient("Xabbo")
@@ -79,11 +95,6 @@ namespace b7.Xabbo
 
             services.AddSingleton<IUriProvider<HabboEndpoints>, HabboUrlProvider>();
             services.AddSingleton<IGameDataManager, GameDataManager>();
-
-            // Interceptor
-            services.AddSingleton<GEarthExtension>();
-            services.AddSingleton<IInterceptor>(x => x.GetRequiredService<GEarthExtension>());
-            services.AddSingleton<IRemoteInterceptor>(x => x.GetRequiredService<GEarthExtension>());
 
             // Game state
             foreach (Type gameStateManagerType in GameStateManager.GetManagerTypes())

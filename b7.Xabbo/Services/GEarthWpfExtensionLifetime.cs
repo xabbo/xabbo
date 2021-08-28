@@ -22,8 +22,47 @@ namespace b7.Xabbo.Services
             _application = application;
 
             _extension = extension;
+            _extension.InterceptorConnectionFailed += OnInterceptorConnectionFailed;
+            _extension.InterceptorConnected += OnInterceptorConnected;
+            _extension.Clicked += OnExtensionClicked;
+            _extension.InterceptorDisconnected += OnInterceptorDisconnected;
 
             _hostAppLifetime.ApplicationStopping.Register(() => application.Shutdown());
+        }
+
+        private void OnInterceptorConnectionFailed(object? sender, global::Xabbo.Interceptor.ConnectionFailedEventArgs e)
+        {
+            MessageBox.Show(
+                $"Failed to connect to G-Earth on port {_extension.Options.Port}", "xabbo",
+                MessageBoxButton.OK, MessageBoxImage.Error
+            );
+
+            _application.Shutdown();
+        }
+
+        private void OnInterceptorConnected(object? sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(_extension.Options.Cookie))
+            {
+                _application.MainWindow.Show();
+            }
+        }
+
+        private void OnExtensionClicked(object? sender, EventArgs e)
+        {
+            if (_application.MainWindow.IsVisible)
+            {
+                _application.MainWindow.Activate();
+            }
+            else
+            {
+                _application.MainWindow.Show();
+            }
+        }
+
+        private void OnInterceptorDisconnected(object? sender, global::Xabbo.Interceptor.DisconnectedEventArgs e)
+        {
+            _application.Shutdown();
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
@@ -36,13 +75,6 @@ namespace b7.Xabbo.Services
         public Task WaitForStartAsync(CancellationToken cancellationToken)
         {
             _application.Exit += (s, e) => _hostAppLifetime.StopApplication();
-
-            // Task.Run(() => _extension.RunAsync());
-
-            _application.Dispatcher.Invoke(() =>
-            {
-                _application.MainWindow.Show();
-            });
 
             return Task.CompletedTask;
         }
