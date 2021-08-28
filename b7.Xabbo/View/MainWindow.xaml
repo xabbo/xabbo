@@ -7,6 +7,7 @@
         xmlns:viewModel="clr-namespace:b7.Xabbo.ViewModel"
         xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:mde="clr-namespace:MaterialDesignExtensions.Controls;assembly=MaterialDesignExtensions"
+        xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
         TextElement.Foreground="{StaticResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"
         TextElement.FontSize="13"
@@ -21,16 +22,28 @@
         Topmost="{Binding IsChecked, ElementName=checkBoxTopmost}"
         UseLayoutRounding="True" SnapsToDevicePixels="True"
         RenderOptions.BitmapScalingMode="NearestNeighbor">
+    <mde:MaterialWindow.TitleTemplate>
+        <DataTemplate>
+            <DockPanel DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}">
+                <CheckBox
+                    DockPanel.Dock="Right"
+                    Margin="4"
+                    HorizontalAlignment="Right" VerticalAlignment="Center"
+                    shell:WindowChrome.IsHitTestVisibleInChrome="True"
+                    IsChecked="{Binding Topmost}"
+                    ToolTip="Stay on top"
+                />
+                <TextBlock
+                    DockPanel.Dock="Left"  
+                    Margin="8,0"
+                    VerticalAlignment="Center"
+                    TextTrimming="CharacterEllipsis"
+                    Text="{Binding Title}"
+                />
+            </DockPanel>
+        </DataTemplate>
+    </mde:MaterialWindow.TitleTemplate>
     <Grid>
-        <!--<CheckBox x:Name="checkBoxTopmost"
-            Panel.ZIndex="9999"
-            Margin="6"
-            HorizontalAlignment="Right" VerticalAlignment="Top"
-            VerticalContentAlignment="Center"
-            Opacity="0.33"
-            IsChecked="True"
-            Content="Topmost"
-        />-->
         <TabControl Style="{StaticResource MaterialDesignAppBarTabControl}"
                     mde:TabControlAssist.TabHeaderFontSize="12"
                     mde:TabControlAssist.TabHeaderMargin="0">
