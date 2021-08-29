@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:b7.Xabbo"
              xmlns:svc="clr-namespace:b7.Xabbo.Services"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
              TextElement.Foreground="{StaticResource MaterialDesignBody}"
              TextElement.FontFamily="{StaticResource MaterialDesignFont}"
              mc:Ignorable="d" 
@@ -16,12 +17,13 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <TextBox x:Name="textBoxLog"
-                 VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto"
+                 Padding="0" BorderThickness="0"
+                 VerticalContentAlignment="Stretch"
+                 md:TextFieldAssist.TextBoxViewMargin="8"
+                 VerticalScrollBarVisibility="Visible"
+                 HorizontalScrollBarVisibility="Auto"
                  IsReadOnly="True" FontFamily="Consolas" FontSize="14"
-                 BorderThickness="0"
-                 TextWrapping="Wrap"
-                 Padding="4"
-                 Text="{Binding LogText}">
+                 TextWrapping="Wrap" Text="{Binding LogText}">
         </TextBox>
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
             <CheckBox Margin="8"
