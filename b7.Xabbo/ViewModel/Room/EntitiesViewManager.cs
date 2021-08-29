@@ -16,11 +16,12 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Configuration;
 
+using MaterialDesignThemes.Wpf;
+
 using GalaSoft.MvvmLight.Command;
 
 using Xabbo.Messages;
 using Xabbo.Interceptor;
-
 using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.Events;
@@ -42,6 +43,7 @@ namespace b7.Xabbo.ViewModel
 
         private readonly ILogger _logger;
         private readonly IUiContext _uiContext;
+        private readonly ISnackbarMessageQueue _snackbarMq;
         private readonly HashSet<string> _staffList, _ambassadorList;
 
         private readonly RoomManager _roomManager;
@@ -102,6 +104,7 @@ namespace b7.Xabbo.ViewModel
         public EntitiesViewManager(IInterceptor interceptor,
             ILogger<EntitiesViewManager> logger,
             IUiContext uiContext,
+            ISnackbarMessageQueue snackbar,
             IConfiguration config,
             IOptions<GameOptions> gameOptions,
             RoomManager roomManager,
@@ -110,6 +113,7 @@ namespace b7.Xabbo.ViewModel
         {
             _logger = logger;
             _uiContext = uiContext;
+            _snackbarMq = snackbar;
 
             _staffList = gameOptions.Value.StaffList;
             _ambassadorList = gameOptions.Value.AmbassadorList;
@@ -391,10 +395,11 @@ namespace b7.Xabbo.ViewModel
             catch (Exception ex) { /*Dialog.ShowError($"Failed to set clipboard text: {ex.Message}");*/ }
         }
 
-        private void OnOpenProfile(string arg)
+        private async void OnOpenProfile(string arg)
         {
-            if (SelectedEntity == null ||
-                SelectedEntity.Entity.Type != EntityType.User) return;
+            EntityViewModel? user = SelectedEntity;
+            if (user is null ||
+                user.Entity.Type != EntityType.User) return;
 
             try
             {
@@ -403,13 +408,25 @@ namespace b7.Xabbo.ViewModel
                 switch (arg)
                 {
                     case "game":
-                        Send(Out.GetExtendedProfile, SelectedEntity.Id, true);
+                        try
+                        {
+                            Send(Out.GetExtendedProfile, (LegacyLong)user.Id, true);
+                            UserProfile profile = UserProfile.Parse(
+                                await Interceptor.ReceiveAsync(5000, In.ExtendedProfile)
+                            );
+
+                            if (!profile.DisplayInClient)
+                            {
+                                _snackbarMq.Enqueue($"{user.Name}'s profile is not visible.");
+                            }
+                        }
+                        catch (OperationCanceledException) { }
                         break;
                     case "web":
-                        Process.Start($"https://www.habbo.com/profile/{WebUtility.UrlEncode(SelectedEntity.Name)}");
+                        Process.Start($"https://www.habbo.com/profile/{WebUtility.UrlEncode(user.Name)}");
                         break;
                     case "widgets":
-                        Process.Start($"http://www.habbowidgets.com/habinfo/com/{WebUtility.UrlEncode(SelectedEntity.Name)}");
+                        Process.Start($"http://www.habbowidgets.com/habinfo/com/{WebUtility.UrlEncode(user.Name)}");
                         break;
                     default:
                         break;

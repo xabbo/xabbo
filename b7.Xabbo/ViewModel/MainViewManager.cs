@@ -5,7 +5,10 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
+using MaterialDesignThemes.Wpf;
+
 using GalaSoft.MvvmLight;
+
 using Xabbo.Interceptor;
 
 namespace b7.Xabbo.ViewModel
@@ -21,6 +24,8 @@ namespace b7.Xabbo.ViewModel
             get => _title;
             set => Set(ref _title, value);
         }
+
+        public ISnackbarMessageQueue SnackbarMessageQueue { get; }
 
         public GeneralViewManager General { get; }
         // Chat
@@ -40,7 +45,8 @@ namespace b7.Xabbo.ViewModel
         // Info
         public FurniDataViewManager FurniData { get; }
 
-        public MainViewManager(IRemoteInterceptor interceptor,
+        public MainViewManager(ISnackbarMessageQueue snackbarMessageQueue,
+            IRemoteInterceptor interceptor,
             GeneralViewManager general,
             ChatLogViewManager chat,
             WardrobeViewManager wardrobe,
@@ -54,6 +60,8 @@ namespace b7.Xabbo.ViewModel
             MimicViewManager mimic,
             FurniDataViewManager furniData)
         {
+            SnackbarMessageQueue = snackbarMessageQueue;
+
             _interceptor = interceptor;
 
             Version? version = Assembly.GetExecutingAssembly().GetName().Version;

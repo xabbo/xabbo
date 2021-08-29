@@ -104,5 +104,6 @@
                 </TabControl>
             </TabItem>
         </TabControl>
+        <md:Snackbar Margin="16" MessageQueue="{Binding SnackbarMessageQueue}" />
     </Grid>
 </mde:MaterialWindow>
