@@ -3,39 +3,30 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.IO;
 using System.Linq;
-using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Data;
 
+using Microsoft.Extensions.Hosting;
+
+using Xabbo.Interceptor;
 using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.Events;
 
 using b7.Xabbo.Services;
-using Xabbo.Interceptor;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Hosting;
 
 namespace b7.Xabbo.ViewModel
 {
     public class VisitorsViewManager : ComponentViewModel
     {
-#if PRO
-        const string LOG_DIRECTORY = @"b7\xabbo\logs\visitors";
-        string currentFilePath;
-        DateTime lastDate;
-#endif
+        private readonly IUiContext _context;
+        private readonly ProfileManager _profileManager;
+        private readonly RoomManager _roomManager;
 
-        private readonly IUiContext context;
-        private readonly ProfileManager profileManager;
-        private readonly RoomManager roomManager;
+        private readonly ConcurrentDictionary<long, VisitorViewModel> _visitorMap = new();
 
-        private readonly ConcurrentDictionary<long, VisitorViewModel> visitorMap = new();
-
-        private readonly ObservableCollection<VisitorViewModel> visitors;
-
-        private long lastRoomId = -1;
+        private readonly ObservableCollection<VisitorViewModel> _visitors;
 
         public ICollectionView Visitors { get; }
 
@@ -57,25 +48,32 @@ namespace b7.Xabbo.ViewModel
             }
         }
 
-        private bool isLogging;
+#if ENABLE_LOGGING
+        private bool _isLogging;
         public bool IsLogging
         {
-            get => isLogging;
-            set => Set(ref isLogging, value);
+            get => _isLogging;
+            set => Set(ref _isLogging, value);
         }
+
+        const string LOG_DIRECTORY = @"logs\visitors";
+        string _currentFilePath;
+        DateTime _lastDate;
+        long lastRoomId;
+#endif
 
         public VisitorsViewManager(IInterceptor interceptor, IHostApplicationLifetime lifetime,
             IUiContext context,
             ProfileManager profileManager, RoomManager roomManager)
             : base(interceptor)
         {
-            this.context = context;
-            this.profileManager = profileManager;
-            this.roomManager = roomManager;
+            _context = context;
+            _profileManager = profileManager;
+            _roomManager = roomManager;
 
-            visitors = new ObservableCollection<VisitorViewModel>();
+            _visitors = new ObservableCollection<VisitorViewModel>();
 
-            Visitors = CollectionViewSource.GetDefaultView(visitors);
+            Visitors = CollectionViewSource.GetDefaultView(_visitors);
             Visitors.SortDescriptions.Add(new SortDescription("Entered", ListSortDirection.Descending));
             Visitors.SortDescriptions.Add(new SortDescription("Index", ListSortDirection.Descending));
             Visitors.Filter = Filter;
@@ -97,22 +95,24 @@ namespace b7.Xabbo.ViewModel
         {
             try
             {
-                await profileManager.GetUserDataAsync();
+                await _profileManager.GetUserDataAsync();
             }
             catch { return; }
 
-            roomManager.Left += Room_Left;
-            roomManager.EntitiesAdded += Entities_EntitiesAdded;
-            roomManager.EntityRemoved += Entities_EntityRemoved;
+            Interceptor.Disconnected += OnGameDisconnected;
+
+            _roomManager.Left += OnLeftRoom;
+            _roomManager.EntitiesAdded += OnEntitiesAdded;
+            _roomManager.EntityRemoved += OnEntitiesRemoved;
 
             IsAvailable = true;
         }
 
         private void RefreshList()
         {
-            if (!context.IsSynchronized)
+            if (!_context.IsSynchronized)
             {
-                context.InvokeAsync(() => RefreshList());
+                _context.InvokeAsync(() => RefreshList());
                 return;
             }
 
@@ -121,29 +121,29 @@ namespace b7.Xabbo.ViewModel
 
         private void AddVisitors(IEnumerable<VisitorViewModel> newVisitors)
         {
-            if (!context.IsSynchronized)
+            if (!_context.IsSynchronized)
             {
-                context.InvokeAsync(() => AddVisitors(newVisitors));
+                _context.InvokeAsync(() => AddVisitors(newVisitors));
                 return;
             }
 
             foreach (var visitor in newVisitors)
-                visitors.Add(visitor);
+                _visitors.Add(visitor);
         }
 
         private void ClearVisitors()
         {
-            if (!context.IsSynchronized)
+            if (!_context.IsSynchronized)
             {
-                context.InvokeAsync(() => ClearVisitors());
+                _context.InvokeAsync(() => ClearVisitors());
                 return;
             }
 
-            visitors.Clear();
-            visitorMap.Clear();
+            _visitors.Clear();
+            _visitorMap.Clear();
         }
 
-#if PRO
+#if ENABLE_LOGGING
         private void Log(string text)
         {
             if (!IsLogging || !roomManager.IsInRoom)
@@ -169,11 +169,13 @@ namespace b7.Xabbo.ViewModel
         }
 #endif
 
-        private void Room_Left(object? sender, EventArgs e) => ClearVisitors();
+        private void OnGameDisconnected(object? sender, EventArgs e) => ClearVisitors();
 
-        private void Entities_EntitiesAdded(object? sender, EntitiesEventArgs e)
+        private void OnLeftRoom(object? sender, EventArgs e) => ClearVisitors();
+
+        private void OnEntitiesAdded(object? sender, EntitiesEventArgs e)
         {
-            if (!roomManager.IsLoadingRoom && !roomManager.IsInRoom)
+            if (!_roomManager.IsLoadingRoom && !_roomManager.IsInRoom)
                 return;
 
             bool needsRefresh = false;
@@ -181,7 +183,7 @@ namespace b7.Xabbo.ViewModel
 
             foreach (var user in e.Entities.OfType<IRoomUser>())
             {
-                if (visitorMap.TryGetValue(user.Id, out VisitorViewModel? visitorLog))
+                if (_visitorMap.TryGetValue(user.Id, out VisitorViewModel? visitorLog))
                 {
                     /* User already exists in the dictionary,
                      * so they have re-entered the room */
@@ -191,29 +193,29 @@ namespace b7.Xabbo.ViewModel
                     visitorLog.Left = null;
                     needsRefresh = true;
 
-#if PRO
+#if ENABLE_LOGGING
                     Log($"[{DateTime.UtcNow:O}]  In: {user.Name}\r\n");
 #endif
                 }
                 else
                 {
                     visitorLog = new VisitorViewModel(user.Index, user.Id, user.Name);
-                    if (visitorMap.TryAdd(user.Id, visitorLog))
+                    if (_visitorMap.TryAdd(user.Id, visitorLog))
                     {
                         /* Entities received when first loading the room were already in the room,
                          * so we don't know when they entered, but we can see what order they
                          * entered the room by their entity index */
-                        if (roomManager.IsLoadingRoom)
+                        if (_roomManager.IsLoadingRoom)
                         {
                             // Only set entry time for self
-                            if (user.Id == profileManager.UserData?.Id)
+                            if (user.Id == _profileManager.UserData?.Id)
                                 visitorLog.Entered = DateTime.Now;
                         }
                         else
                         {
                             visitorLog.Entered = DateTime.Now;
 
-#if PRO
+#if ENABLE_LOGGING
                             Log($"[{DateTime.UtcNow:O}]  In: {user.Name}\r\n");
 #endif
                         }
@@ -224,7 +226,7 @@ namespace b7.Xabbo.ViewModel
             }
 
             if (newLogs.Count > 0)
-                context.InvokeAsync(() => newLogs.ForEach(x => visitors.Add(x)));
+                _context.InvokeAsync(() => newLogs.ForEach(x => _visitors.Add(x)));
             /* The list gets refreshed when adding new items, only refresh the list 
              * if no new items were added and we need to re-order some items */
             if (newLogs.Count == 0 && needsRefresh)
@@ -232,12 +234,12 @@ namespace b7.Xabbo.ViewModel
         }
 
 
-        private void Entities_EntityRemoved(object? sender, EntityEventArgs e)
+        private void OnEntitiesRemoved(object? sender, EntityEventArgs e)
         {
-            if (visitorMap.TryGetValue(e.Entity.Id, out VisitorViewModel visitor))
+            if (_visitorMap.TryGetValue(e.Entity.Id, out VisitorViewModel? visitor))
             {
                 visitor.Left = DateTime.Now;
-#if PRO
+#if ENABLE_LOGGING
                 if (e.Entity.Id != profileManager.UserData?.Id)
                 {
                     Log($"[{DateTime.UtcNow:O}] Out: {e.Entity.Name}\r\n");

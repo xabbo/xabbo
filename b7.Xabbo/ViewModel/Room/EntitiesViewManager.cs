@@ -43,6 +43,7 @@ namespace b7.Xabbo.ViewModel
 
         private readonly ILogger _logger;
         private readonly IUiContext _uiContext;
+        private readonly IUriProvider<HabboEndpoints> _uris;
         private readonly ISnackbarMessageQueue _snackbarMq;
         private readonly HashSet<string> _staffList, _ambassadorList;
 
@@ -106,6 +107,7 @@ namespace b7.Xabbo.ViewModel
             IUiContext uiContext,
             ISnackbarMessageQueue snackbar,
             IConfiguration config,
+            IUriProvider<HabboEndpoints> uris,
             IOptions<GameOptions> gameOptions,
             RoomManager roomManager,
             RoomModeratorComponent moderation)
@@ -114,6 +116,7 @@ namespace b7.Xabbo.ViewModel
             _logger = logger;
             _uiContext = uiContext;
             _snackbarMq = snackbar;
+            _uris = uris;
 
             _staffList = gameOptions.Value.StaffList;
             _ambassadorList = gameOptions.Value.AmbassadorList;
@@ -135,8 +138,10 @@ namespace b7.Xabbo.ViewModel
             BanCommand = new RelayCommand<string>(OnBan);
             BounceCommand = new RelayCommand(OnBounce);
 
-            _roomManager.RoomDataUpdated += RoomManager_RoomDataUpdated;
-            _roomManager.Left += RoomManager_Left;
+            Interceptor.Disconnected += OnGameDisconnected;
+
+            _roomManager.RoomDataUpdated += OnRoomDataUpdated;
+            _roomManager.Left += OnLeftRoom;
 
             _roomManager.EntitiesAdded += OnEntitiesAdded;
             _roomManager.EntityRemoved += OnEntityRemoved;
@@ -144,6 +149,15 @@ namespace b7.Xabbo.ViewModel
             _roomManager.EntityDataUpdated += OnUserDataUpdated;
             _roomManager.EntityNameChanged += OnEntityNameChanged;
             _roomManager.EntityIdle += OnEntityIdle;
+        }
+
+        private static void OpenUri(Uri uri)
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = uri.AbsoluteUri,
+                UseShellExecute = true
+            });
         }
 
         private bool FilterEntity(object obj)
@@ -225,7 +239,12 @@ namespace b7.Xabbo.ViewModel
         }
 
         #region - Events -
-        private void RoomManager_RoomDataUpdated(object? sender, RoomDataEventArgs e)
+        private void OnGameDisconnected(object? sender, EventArgs e)
+        {
+            ClearEntities();
+        }
+
+        private void OnRoomDataUpdated(object? sender, RoomDataEventArgs e)
         {
             if (_entitiesById.TryGetValue(e.Data.OwnerId, out EntityViewModel? user))
             {
@@ -238,7 +257,7 @@ namespace b7.Xabbo.ViewModel
             }
         }
 
-        private void RoomManager_Left(object? sender, EventArgs e)
+        private void OnLeftRoom(object? sender, EventArgs e)
         {
             ClearEntities();
         }
@@ -255,7 +274,7 @@ namespace b7.Xabbo.ViewModel
                 var entityViewModels = e.Entities.Select(x => new EntityViewModel(x)).ToArray();
                 foreach (var vm in entityViewModels)
                 {
-                    if (vm.Entity.Type != EntityType.User)
+                    if (vm.Entity is not IRoomUser user)
                     {
                         vm.ImageSource = "";
                         vm.HeaderColor = COLOR_NONE;
@@ -269,7 +288,7 @@ namespace b7.Xabbo.ViewModel
                         refreshList = true;
                     }
 
-                    if (vm.IsStaff = _staffList.Contains(vm.Name))
+                    if (vm.IsStaff = (_staffList.Contains(vm.Name) || user.IsModerator))
                     {
                         vm.ImageSource = IMAGE_STAFF;
                         vm.HeaderColor = COLOR_STAFF;
@@ -423,10 +442,10 @@ namespace b7.Xabbo.ViewModel
                         catch (OperationCanceledException) { }
                         break;
                     case "web":
-                        Process.Start($"https://www.habbo.com/profile/{WebUtility.UrlEncode(user.Name)}");
+                        OpenUri(_uris.GetUri(HabboEndpoints.UserProfile, new { name = user.Name }));
                         break;
                     case "widgets":
-                        Process.Start($"http://www.habbowidgets.com/habinfo/com/{WebUtility.UrlEncode(user.Name)}");
+                        OpenUri(new Uri($"http://www.habbowidgets.com/habinfo/{_uris.Domain}/{WebUtility.UrlEncode(user.Name)}"));
                         break;
                     default:
                         break;

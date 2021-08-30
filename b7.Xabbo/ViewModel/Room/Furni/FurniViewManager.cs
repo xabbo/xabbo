@@ -12,16 +12,17 @@ using System.Windows.Input;
 using System.Windows.Data;
 using System.Diagnostics;
 
+using Microsoft.Extensions.Hosting;
+
 using GalaSoft.MvvmLight.Command;
 
+using Xabbo.Interceptor;
 using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.GameData;
 using Xabbo.Core.Events;
 
 using b7.Xabbo.Services;
-using Xabbo.Interceptor;
-using Microsoft.Extensions.Hosting;
 
 namespace b7.Xabbo.ViewModel
 {
@@ -164,8 +165,8 @@ namespace b7.Xabbo.ViewModel
         public ICommand HideCommand { get; }
         public ICommand PickupCommand { get; }
         public ICommand EjectCommand { get; }
-        public ICommand SetStateCommand { get; }
-        public ICommand RotateCommand { get; }
+        public ICommand SetStateCommand { get; } // TODO
+        public ICommand RotateCommand { get; } // TODO
 
         public ICollectionView Furni { get; }
 
@@ -325,23 +326,20 @@ namespace b7.Xabbo.ViewModel
                 return;
             }
 
-            _roomManager.RightsUpdated += RoomManager_RightsUpdated;
-            _roomManager.Left += RoomManager_Left;
+            Interceptor.Disconnected += OnGameDisconnected;
 
-            _roomManager.FloorItemsLoaded += FurniManager_FloorItemsLoaded;
-            _roomManager.FloorItemAdded += FurniManager_FloorItemAdded;
-            _roomManager.FloorItemRemoved += FurniManager_FloorItemRemoved;
+            _roomManager.RightsUpdated += OnRightsUpdated;
+            _roomManager.Left += OnLeftRoom;
 
-            _roomManager.WallItemsLoaded += FurniManager_WallItemsLoaded;
-            _roomManager.WallItemAdded += FurniManager_WallItemAdded;
-            _roomManager.WallItemRemoved += FurniManager_WallItemRemoved;
+            _roomManager.FloorItemsLoaded += OnFloorItemsLoaded;
+            _roomManager.FloorItemAdded += OnFloorItemAdded;
+            _roomManager.FloorItemRemoved += OnFloorItemRemoved;
+
+            _roomManager.WallItemsLoaded += OnWallItemsLoaded;
+            _roomManager.WallItemAdded += OnWallItemAdded;
+            _roomManager.WallItemRemoved += OnWallItemRemoved;
 
             IsAvailable = true;
-        }
-
-        private void RoomManager_RightsUpdated(object? sender, EventArgs e)
-        {
-            RaisePropertyChanged(nameof(CanEject));
         }
 
         private void RefreshList()
@@ -424,7 +422,7 @@ namespace b7.Xabbo.ViewModel
 
             FurniInfo info = FurniData.GetInfo(item);
 
-            string
+            string?
                 name = info.Name,
                 description = info.Description;
 
@@ -522,38 +520,48 @@ namespace b7.Xabbo.ViewModel
         #endregion
 
         #region - Events -
-        private void FurniManager_FloorItemsLoaded(object? sender, FloorItemsEventArgs e)
+        private void OnRightsUpdated(object? sender, EventArgs e)
+        {
+            RaisePropertyChanged(nameof(CanEject));
+        }
+
+        private void OnFloorItemsLoaded(object? sender, FloorItemsEventArgs e)
         {
             AddItems(e.Items.Select(item => WrapItem(item)));
         }
 
-        private void FurniManager_FloorItemAdded(object? sender, FloorItemEventArgs e)
+        private void OnFloorItemAdded(object? sender, FloorItemEventArgs e)
         {
             AddItem(WrapItem(e.Item));
         }
 
-        private void FurniManager_FloorItemRemoved(object? sender, FloorItemEventArgs e)
+        private void OnFloorItemRemoved(object? sender, FloorItemEventArgs e)
         {
             RemoveItem(ItemType.Floor, e.Item.Id);
         }
 
-        private void FurniManager_WallItemsLoaded(object? sender, WallItemsEventArgs e)
+        private void OnWallItemsLoaded(object? sender, WallItemsEventArgs e)
         {
             AddItems(e.Items.Select(item => WrapItem(item)));
         }
 
-        private void FurniManager_WallItemAdded(object? sender, WallItemEventArgs e)
+        private void OnWallItemAdded(object? sender, WallItemEventArgs e)
         {
             var view = WrapItem(e.Item);
             AddItem(view);
         }
 
-        private void FurniManager_WallItemRemoved(object? sender, WallItemEventArgs e)
+        private void OnWallItemRemoved(object? sender, WallItemEventArgs e)
         {
             RemoveItem(ItemType.Wall, e.Item.Id);
         }
 
-        private void RoomManager_Left(object? sender, EventArgs e)
+        private void OnLeftRoom(object? sender, EventArgs e)
+        {
+            ClearItems();
+        }
+
+        private void OnGameDisconnected(object? sender, EventArgs e)
         {
             ClearItems();
         }

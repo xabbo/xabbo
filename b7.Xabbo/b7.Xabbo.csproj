@@ -5,13 +5,15 @@
     <TargetFramework>net5.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <Nullable>enable</Nullable>
-    <Version>0.2.1</Version>
+    <Version>0.3.0</Version>
     <StartupObject></StartupObject>
     <DebugType>embedded</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Humanizer.Core" Version="2.11.10" />
     <PackageReference Include="LiteDB" Version="5.0.10" />
+    <PackageReference Include="LiveChartsCore.SkiaSharpView.WPF" Version="2.0.0-beta.60" />
     <PackageReference Include="MaterialDesignExtensions" Version="3.3.0" />
     <PackageReference Include="MaterialDesignThemes" Version="4.1.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="5.0.0" />
@@ -45,6 +47,10 @@
   
   <ItemGroup>
     <Resource Include="Resources\**" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="View\Marketplace\" />
   </ItemGroup>
 
 </Project>

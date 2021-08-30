@@ -1,9 +1,9 @@
 ﻿using System;
 
+using Xabbo.Interceptor;
 using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.Events;
-using Xabbo.Interceptor;
 
 namespace b7.Xabbo.ViewModel
 {
@@ -30,23 +30,32 @@ namespace b7.Xabbo.ViewModel
             : base(interceptor)
         {
             _roomManager = roomManager;
-            roomManager.Entered += RoomManager_Entered;
-            roomManager.RoomDataUpdated += RoomManager_RoomDataUpdated;
-            roomManager.Left += RoomManager_Left;
+
+            interceptor.Disconnected += OnGameDisconnected;
+
+            roomManager.Entered += OnEnteredRoom;
+            roomManager.RoomDataUpdated += OnRoomDataUpdated;
+            roomManager.Left += OnLeftRoom;
         }
 
-        private void RoomManager_Entered(object? sender, EventArgs e)
+        private void OnEnteredRoom(object? sender, EventArgs e)
         {
             Data = _roomManager.Data;
         }
 
-        private void RoomManager_RoomDataUpdated(object? sender, RoomDataEventArgs e)
+        private void OnRoomDataUpdated(object? sender, RoomDataEventArgs e)
         {
             Data = e.Data;
             IsInRoom = true;
         }
 
-        private void RoomManager_Left(object? sender, EventArgs e)
+        private void OnLeftRoom(object? sender, EventArgs e)
+        {
+            IsInRoom = false;
+            Data = null;
+        }
+
+        private void OnGameDisconnected(object? sender, EventArgs e)
         {
             IsInRoom = false;
             Data = null;

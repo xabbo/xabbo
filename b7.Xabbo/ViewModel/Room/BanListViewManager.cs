@@ -14,7 +14,6 @@ using GalaSoft.MvvmLight.Command;
 
 using Xabbo.Messages;
 using Xabbo.Interceptor;
-
 using Xabbo.Core.Game;
 
 using b7.Xabbo.Services;
@@ -40,48 +39,48 @@ namespace b7.Xabbo.ViewModel
             set => Set(ref _isAvailable, value);
         }
 
-        private bool isInRoom;
+        private bool _isInRoom;
         public bool IsInRoom
         {
-            get => isInRoom;
-            set => Set(ref isInRoom, value);
+            get => _isInRoom;
+            set => Set(ref _isInRoom, value);
         }
 
-        private bool isWorking;
+        private bool _isWorking;
         public bool IsWorking
         {
-            get => isWorking;
-            set => Set(ref isWorking, value);
+            get => _isWorking;
+            set => Set(ref _isWorking, value);
         }
 
-        private bool isUnbanning;
+        private bool _isUnbanning;
         public bool IsUnbanning
         {
-            get => isUnbanning;
-            set => Set(ref isUnbanning, value);
+            get => _isUnbanning;
+            set => Set(ref _isUnbanning, value);
         }
 
-        private bool isCancelling;
+        private bool _isCancelling;
         public bool IsCancelling
         {
-            get => isCancelling;
-            set => Set(ref isCancelling, value);
+            get => _isCancelling;
+            set => Set(ref _isCancelling, value);
         }
 
-        private string statusText;
+        private string _statusText;
         public string StatusText
         {
-            get => statusText;
-            set => Set(ref statusText, value);
+            get => _statusText;
+            set => Set(ref _statusText, value);
         }
 
-        private string filterText = string.Empty;
+        private string _filterText = string.Empty;
         public string FilterText
         {
-            get => filterText;
+            get => _filterText;
             set
             {
-                if (Set(ref filterText, value))
+                if (Set(ref _filterText, value))
                     RefreshUsers();
             }
         }
@@ -96,6 +95,7 @@ namespace b7.Xabbo.ViewModel
             _context = context;
             _roomManager = roomManager;
 
+            Interceptor.Disconnected += OnGameDisconnected;
             _roomManager.Entered += RoomManager_Entered;
             _roomManager.Left += RoomManager_Left;
 
@@ -106,11 +106,6 @@ namespace b7.Xabbo.ViewModel
             CancelCommand = new RelayCommand(Cancel);
             LoadCommand = new RelayCommand(Load);
             UnbanCommand = new RelayCommand<IList>(Unban);
-        }
-
-        protected async Task InitializeAsync()
-        {
-            // IsAvailable = IsAttached && Headers.AreResolved(this);
         }
 
         #region - Commands -
@@ -138,6 +133,13 @@ namespace b7.Xabbo.ViewModel
         #endregion
 
         #region - ViewModel logic -
+        private void Reset()
+        {
+            IsInRoom = false;
+            Cancel();
+            Clear();
+        }
+
         private bool FilterUsers(object obj)
         {
             if (!(obj is BannedUserViewModel user))
@@ -194,14 +196,9 @@ namespace b7.Xabbo.ViewModel
         #endregion
 
         #region - Events -
+        private void OnGameDisconnected(object? sender, EventArgs e) => Reset();
         private void RoomManager_Entered(object? sender, EventArgs e) => IsInRoom = true;
-        private void RoomManager_Left(object? sender, EventArgs e)
-        {
-            IsInRoom = false;
-
-            Cancel();
-            Clear();
-        }
+        private void RoomManager_Left(object? sender, EventArgs e) => Reset();
         #endregion
 
         #region - Logic -
