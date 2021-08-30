@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
+using System.Reflection;
 
 using Microsoft.Extensions.Configuration;
 
@@ -40,9 +42,26 @@ namespace b7.Xabbo.Services
 
         public Uri GetUri(HabboEndpoints endpoint) => _endpoints[endpoint];
 
-        public Uri GetUri(HabboEndpoints endpoint, Dictionary<string, string> parameters)
+        public Uri GetUri(HabboEndpoints endpoint, object parameters)
         {
-            throw new NotImplementedException();
+            string uriString = _endpoints[endpoint].OriginalString;
+
+            Type type = parameters.GetType();
+            foreach (PropertyInfo propertyInfo in type.GetProperties())
+            {
+                string selector = $":{propertyInfo.Name}";
+                if (!uriString.Contains(selector)) continue;
+
+                string propertyValue = propertyInfo.GetValue(parameters)?.ToString()
+                    ?? throw new InvalidOperationException($"Value for property '{propertyInfo.Name}' was null.");
+
+                uriString = uriString.Replace(
+                    $":{propertyInfo.Name}",
+                    WebUtility.UrlEncode(propertyValue)
+                );
+            }
+
+            return new Uri(uriString);
         }
     }
 }
