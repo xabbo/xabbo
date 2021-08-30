@@ -58,6 +58,9 @@ namespace b7.Xabbo
             services.AddSingleton(Dispatcher);
             services.AddSingleton<IUiContext, DispatcherContext>();
 
+            // UI
+            services.AddSingleton<ISnackbarMessageQueue, SnackbarMessageQueue>();
+
             // Interceptor
             services.AddGEarthOptions(options =>
             {
@@ -71,7 +74,8 @@ namespace b7.Xabbo
                 {
                     options = options
                         .WithShowLeaveButton(false)
-                        .WithShowEventButton(false);
+                        .WithShowEventButton(false)
+                        .WithShowDeleteButton(false);
                 }
 
                 return options;
@@ -152,32 +156,44 @@ namespace b7.Xabbo
         {
             base.OnStartup(e);
 
-            _host = Host.CreateDefaultBuilder(e.Args)
-                .ConfigureAppConfiguration((context, config) =>
-                {
-                    IConfigurationRoot originalConfig = config.Build();
-
-                    config.Sources.Clear();
-                    config.AddJsonFile("appsettings.json");
-
-                    string domain = originalConfig.GetValue<string>("Web:Domain");
-                    if (!string.IsNullOrWhiteSpace(domain))
+            try
+            {
+                _host = Host.CreateDefaultBuilder(e.Args)
+                    .ConfigureAppConfiguration((context, config) =>
                     {
-                        config.AddJsonFile($"appsettings.{domain}.json", true);
-                    }
+                        IConfigurationRoot originalConfig = config.Build();
 
-                    config.AddEnvironmentVariables();
-                    config.AddCommandLine(e.Args, _switchMappings);
-                })
-                .ConfigureLogging(ConfigureLogging)
-                .ConfigureServices(ConfigureServices)
-                .Build();
+                        config.Sources.Clear();
+                        config.AddJsonFile("appsettings.json");
 
-            _host.Services.GetRequiredService<IUriProvider<HabboEndpoints>>();
+                        string domain = originalConfig.GetValue<string>("Web:Domain");
+                        if (!string.IsNullOrWhiteSpace(domain))
+                        {
+                            config.AddJsonFile($"appsettings.{domain}.json", true);
+                        }
 
-            MainWindow = _host.Services.GetRequiredService<MainWindow>();
+                        config.AddEnvironmentVariables();
+                        config.AddCommandLine(e.Args, _switchMappings);
+                    })
+                    .ConfigureLogging(ConfigureLogging)
+                    .ConfigureServices(ConfigureServices)
+                    .Build();
 
-            await _host.StartAsync();
+                _host.Services.GetRequiredService<IUriProvider<HabboEndpoints>>();
+
+                MainWindow = _host.Services.GetRequiredService<MainWindow>();
+
+                await _host.StartAsync();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"Initialization failed: {ex}", "b7.Xabbo",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error
+                );
+                Shutdown();
+            }
         }
 
         protected override async void OnExit(ExitEventArgs e)
