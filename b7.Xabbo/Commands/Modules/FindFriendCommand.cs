@@ -28,6 +28,12 @@ namespace b7.Xabbo.Commands
             if (args.Count < 1)
                 throw new InvalidArgsException();
 
+            if (!_friendManager.IsInitialized)
+            {
+                ShowMessage("Friend manager has not yet initialized.");
+                return;
+            }
+
             var friend = _friendManager.Friends
                 .Where(x => x.Name.ToLower().Contains(args[0]))
                 .OrderBy(x => Math.Abs(x.Name.Length - args[0].Length))
