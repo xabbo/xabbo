@@ -3,11 +3,13 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:view="clr-namespace:b7.Xabbo.View"
-        xmlns:viewModel="clr-namespace:b7.Xabbo.ViewModel"
+        xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
         xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:mde="clr-namespace:MaterialDesignExtensions.Controls;assembly=MaterialDesignExtensions"
-        xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
+        xmlns:controlzEx="urn:controlzex"
+        xmlns:view="clr-namespace:b7.Xabbo.View"
+        xmlns:viewModel="clr-namespace:b7.Xabbo.ViewModel"
         TextElement.Foreground="{StaticResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"
         TextElement.FontSize="13"
@@ -19,20 +21,25 @@
         d:DataContext="{d:DesignInstance Type={x:Type viewModel:MainViewManager}}"
         Height="500" Width="450"
         Title="{Binding Title}"
-        Topmost="{Binding IsChecked, ElementName=checkBoxTopmost}"
         UseLayoutRounding="True" SnapsToDevicePixels="True"
         RenderOptions.BitmapScalingMode="NearestNeighbor">
     <mde:MaterialWindow.TitleTemplate>
         <DataTemplate>
             <DockPanel DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}">
-                <CheckBox
+                <ToggleButton
                     DockPanel.Dock="Right"
-                    Margin="4"
-                    HorizontalAlignment="Right" VerticalAlignment="Center"
                     shell:WindowChrome.IsHitTestVisibleInChrome="True"
+                    VerticalAlignment="Center"
+                    Style="{StaticResource MaterialDesignFlatPrimaryToggleButton}"
                     IsChecked="{Binding Topmost}"
-                    ToolTip="Stay on top"
-                />
+                    Height="24"
+                    Width="24"
+                >
+                    <md:PackIcon Kind="Pin"
+                                 VerticalAlignment="Stretch"
+                                 VerticalContentAlignment="Center"
+                    />
+                </ToggleButton>
                 <TextBlock
                     DockPanel.Dock="Left"  
                     Margin="8,0"
@@ -57,7 +64,7 @@
                 <view:ChatView DataContext="{Binding Chat}" />
             </TabItem>
             <TabItem Header="FIGURE">
-                <TabControl Margin="2" mde:TabControlAssist.TabHeaderMargin="0"
+                <TabControl mde:TabControlAssist.TabHeaderMargin="0"
                             Style="{StaticResource MaterialDesignTabControl}">
                     <TabItem Header="WARDROBE">
                         <view:WardrobeView DataContext="{Binding Wardrobe}" />
@@ -68,7 +75,7 @@
                 </TabControl>
             </TabItem>
             <TabItem Header="ROOM">
-                <TabControl Margin="2">
+                <TabControl>
                     <TabItem Header="INFO">
                         <view:RoomInfoView DataContext="{Binding RoomInfo}" />
                     </TabItem>
@@ -87,7 +94,7 @@
                 </TabControl>
             </TabItem>
             <TabItem Header="TOOLS">
-                <TabControl Margin="2">
+                <TabControl>
                     <TabItem Header="ALIGNER">
                         <view:AlignerView DataContext="{Binding Aligner}" />
                     </TabItem>
@@ -97,7 +104,7 @@
                 </TabControl>
             </TabItem>
             <TabItem Header="INFO">
-                <TabControl Margin="2">
+                <TabControl>
                     <TabItem Header="FURNI">
                         <view:FurniDataView DataContext="{Binding FurniData}" />
                     </TabItem>

@@ -18,27 +18,16 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <TextBlock
-                Margin="4"
-                VerticalAlignment="Center"
-                Text="Filter"
-                Style="{StaticResource MaterialDesignBody1TextBlock}"
-            />
-            <TextBox
-                Grid.Column="1"
-                Margin="4" Padding="0"
-                VerticalContentAlignment="Center"
-                FontSize="14"
-                Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}"
-            />
-        </Grid>
+        <TextBox
+            Grid.Row="0"
+            Margin="4" Padding="4"
+            VerticalContentAlignment="Center"
+            FontSize="16"
+            md:HintAssist.Hint="Filter"
+            Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}"
+        />
 
-        <ListView x:Name="listViewUsers" Grid.Row="1" Margin="2" ItemsSource="{Binding Users}">
+        <ListView x:Name="listViewUsers" Grid.Row="1" ItemsSource="{Binding Users}">
             <ListView.View>
                 <GridView>
                     <GridView.Columns>

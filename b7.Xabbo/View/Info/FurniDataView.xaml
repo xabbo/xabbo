@@ -16,17 +16,15 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <DockPanel>
-            <TextBlock DockPanel.Dock="Left" Margin="4" Text="Filter" Style="{StaticResource MaterialDesignBody1TextBlock}" />
-            <TextBox
-                DockPanel.Dock="Right"
-                Margin="4" Padding="0"
-                VerticalContentAlignment="Center"
-                FontSize="14"
-                Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}"
-            />
-        </DockPanel>
-        <ListView Grid.Row="1" Margin="2" ItemsSource="{Binding Furni}">
+        <TextBox
+            DockPanel.Dock="Right"
+            Margin="4" Padding="4"
+            VerticalContentAlignment="Center"
+            FontSize="16"
+            md:HintAssist.Hint="Filter"
+            Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}"
+        />
+        <ListView Grid.Row="1" ItemsSource="{Binding Furni}">
             <ListView.Resources>
                 <Style TargetType="{x:Type ListViewItem}">
                     <Setter Property="Foreground" Value="DarkSlateGray" />

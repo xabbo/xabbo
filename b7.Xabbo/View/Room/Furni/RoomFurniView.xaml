@@ -20,23 +20,18 @@
         </Grid.RowDefinitions>
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <TextBlock
-                Margin="4"
-                VerticalAlignment="Center"
-                Text="Filter"
-                Style="{StaticResource MaterialDesignBody1TextBlock}"
-            />
-            <TextBox x:Name="textBoxFilter" Grid.Column="1"
-                     Margin="4" Padding="0"
+            <TextBox x:Name="textBoxFilter"
+                     Margin="4" Padding="4"
                      VerticalContentAlignment="Center"
                      md:ValidationAssist.PopupPlacement="Bottom"
                      md:ValidationAssist.UsePopup="True"
                      md:ValidationAssist.OnlyShowOnFocus="True"
                      md:ValidationAssist.FontSize="14"
+                     FontSize="16"
+                     md:HintAssist.Hint="Filter"
                      Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}">
                 <TextBox.Style>
                     <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource MaterialDesignTextBox}">
@@ -51,13 +46,14 @@
                     <KeyBinding Key="Return" Command="{Binding RefreshFilterCommand}" />
                 </TextBox.InputBindings>
             </TextBox>
-            <CheckBox Grid.Column="2"
+            <CheckBox Grid.Column="1"
                       Margin="4"
-                      VerticalAlignment="Center" VerticalContentAlignment="Center"
+                      VerticalAlignment="Center"
+                      VerticalContentAlignment="Center"
                       Content="Query"
                       IsChecked="{Binding IsQuery}" />
         </Grid>
-        <ListView x:Name="listViewFurni" Grid.Row="1" Margin="2"
+        <ListView x:Name="listViewFurni" Grid.Row="1"
                   IsEnabled="{Binding IsAvailable}" ItemsSource="{Binding Furni}"
                   VirtualizingPanel.VirtualizationMode="Standard"
                   SelectionMode="Extended" DisplayMemberPath="Name"

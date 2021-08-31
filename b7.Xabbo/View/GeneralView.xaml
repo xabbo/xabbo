@@ -50,7 +50,6 @@
                 <StackPanel>
                     <WrapPanel>
                         <CheckBox DataContext="{Binding AntiKick}"
-                                  IsEnabled="{Binding IsAvailable}"
                                   IsChecked="{Binding IsActive}"
                                   Opacity="{Binding IsReady, Converter={StaticResource BoolToOpacityConverter}, ConverterParameter='1;0.5'}"
                                   Content="Anti kick" />
@@ -86,10 +85,9 @@
                                       IsChecked="{Binding ClickThrough.IsActive}" />
                         </StackPanel>
                     </GroupBox>
-                    <GroupBox DataContext="{Binding ClickTo}" IsEnabled="{Binding IsAvailable}">
+                    <GroupBox DataContext="{Binding ClickTo}">
                         <GroupBox.Header>
-                            <CheckBox IsEnabled="{Binding IsAvailable}"
-                                      IsChecked="{Binding IsActive}"
+                            <CheckBox IsChecked="{Binding IsActive}"
                                       VerticalAlignment="Center"
                                       VerticalContentAlignment="Center"
                                       Style="{StaticResource MaterialDesignAccentCheckBox}">
@@ -113,7 +111,7 @@
                             <RadioButton GroupName="ClickTo" Content="Bounce" IsChecked="{Binding Bounce}" />
                         </StackPanel>
                     </GroupBox>
-                    <GroupBox DataContext="{Binding Escape}" IsEnabled="{Binding IsAvailable}">
+                    <GroupBox DataContext="{Binding Escape}">
                         <GroupBox.Header>
                             <TextBlock Text="Escape from" Style="{StaticResource GroupBoxHeader}" />
                         </GroupBox.Header>
@@ -131,7 +129,7 @@
                             <TextBlock Text="Entry" Style="{StaticResource GroupBoxHeader}" />
                         </GroupBox.Header>
                         <StackPanel>
-                            <StackPanel DataContext="{Binding RoomEntry}" IsEnabled="{Binding IsAvailable}">
+                            <StackPanel DataContext="{Binding RoomEntry}">
                                 <CheckBox Content="Remember room passwords"
                                           IsChecked="{Binding RememberPasswords}" />
                             </StackPanel>
@@ -142,7 +140,6 @@
                         </StackPanel>
                     </GroupBox>
                     <CheckBox DataContext="{Binding FlattenRoom}"
-                              IsEnabled="{Binding IsAvailable}"
                               IsChecked="{Binding IsActive}"
                               Content="Flatten floor plan"
                               ToolTip="Flattens out the floor plan client-side. Must be active before entering a room." />
@@ -166,9 +163,8 @@
                                       IsChecked="{Binding IsLocalized}" />
                         </StackPanel>
                     </StackPanel>
-                    <CheckBox Content="No typing indicator" DataContext="{Binding AntiTyping}"
-                              IsChecked="{Binding IsActive}" IsEnabled="{Binding IsAvailable}" />
-                    <GroupBox DataContext="{Binding Chat}" IsEnabled="{Binding IsAvailable}">
+                    <CheckBox Content="No typing indicator" DataContext="{Binding AntiTyping}" />
+                    <GroupBox DataContext="{Binding Chat}">
                         <GroupBox.Header>
                             <TextBlock Text="Mute" Style="{StaticResource GroupBoxHeader}" />
                         </GroupBox.Header>
@@ -181,7 +177,7 @@
                             <CheckBox Content="Scratches" IsChecked="{Binding MuteScratches}" />
                         </WrapPanel>
                     </GroupBox>
-                    <StackPanel DataContext="{Binding Respected}" IsEnabled="{Binding IsAvailable}">
+                    <StackPanel DataContext="{Binding Respected}">
                         <CheckBox Content="Show who respected" IsChecked="{Binding ShowWhoRespected}" />
                         <CheckBox Content="Show total respect count" IsChecked="{Binding ShowTotalRespects}" />
                     </StackPanel>
@@ -191,7 +187,7 @@
                 <GroupBox.Header>
                     <TextBlock Text="Furni" Style="{StaticResource GroupBoxHeader}" />
                 </GroupBox.Header>
-                <StackPanel DataContext="{Binding FurniActions}" IsEnabled="{Binding IsAvailable}">
+                <StackPanel DataContext="{Binding FurniActions}">
                     <CheckBox Content="Prevent using furni" IsChecked="{Binding PreventUse}" />
                     <CheckBox Content="Double-click to show info" IsChecked="{Binding UseToShowInfo}" />
                     <CheckBox Content="Double-click to hide" IsChecked="{Binding UseToHide}" />
@@ -202,11 +198,10 @@
                 <GroupBox.Header>
                     <TextBlock Text="Hand item" Style="{StaticResource GroupBoxHeader}" />
                 </GroupBox.Header>
-                <StackPanel DataContext="{Binding HandItem}" IsEnabled="{Binding IsAvailable}">
+                <StackPanel DataContext="{Binding HandItem}">
                     <CheckBox Content="Drop received hand item" IsChecked="{Binding DropHandItem}" />
                     <CheckBox Content="Return received hand item" IsChecked="{Binding ReturnHandItem}" />
-                    <CheckBox Content="Maintain direction when given hand item"
-                          IsEnabled="{Binding CanMaintainDirection}" IsChecked="{Binding MaintainDirection}" />
+                    <CheckBox Content="Maintain direction when given hand item" IsChecked="{Binding MaintainDirection}" />
                 </StackPanel>
             </GroupBox>
             <GroupBox>

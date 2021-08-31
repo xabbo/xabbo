@@ -21,9 +21,9 @@
             <RowDefinition Height="1*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <ListBox x:Name="figureItems" Margin="2" ItemsSource="{Binding Figures}"
+        <ListBox x:Name="figureItems" ItemsSource="{Binding Figures}"
                  SelectionMode="Extended"
-                 Style="{StaticResource MaterialDesignGridList}">
+                 md:ScrollViewerAssist.IgnorePadding="True">
             <ListBox.InputBindings>
                 <KeyBinding Key="Delete"
                             CommandParameter="{Binding ElementName=figureItems, Path=SelectedItems}"
@@ -32,9 +32,14 @@
             <ListBox.Resources>
                 <RelativeSource x:Key="FindRoot" Mode="FindAncestor" AncestorType="{x:Type ListBox}" />
             </ListBox.Resources>
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Margin="4" />
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
             <ListBox.ItemContainerStyle>
                 <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource MaterialDesignCardsListBoxItem}">
-
+                    <Setter Property="Margin" Value="4" />
                 </Style>
             </ListBox.ItemContainerStyle>
             <ListBox.ItemTemplate>

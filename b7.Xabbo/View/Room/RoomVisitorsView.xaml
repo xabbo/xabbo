@@ -4,6 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:b7.Xabbo"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:mde="clr-namespace:MaterialDesignExtensions.Controls;assembly=MaterialDesignExtensions"
              xmlns:viewModel="clr-namespace:b7.Xabbo.ViewModel"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
@@ -20,22 +22,17 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="1*" />
             </Grid.ColumnDefinitions>
-            <TextBlock
-                Margin="4"
-                VerticalAlignment="Center"
-                Text="Filter"
-                Style="{StaticResource MaterialDesignBody1TextBlock}"
-            />
             <TextBox
                 Grid.Column="1" 
-                Margin="4" Padding="0"
+                Margin="4" Padding="4"
                 Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}"
                 Style="{StaticResource MaterialDesignTextBox}"
                 VerticalContentAlignment="Center"
-                FontSize="14"
+                FontSize="16"
+                md:HintAssist.Hint="Filter"
             />
         </Grid>
-        <ListView Grid.Row="1" x:Name="listViewVisitors" Margin="2"
+        <ListView Grid.Row="1" x:Name="listViewVisitors"
                   TextSearch.TextPath="Name"
                   ItemsSource="{Binding Visitors}">
             <ListView.View>
@@ -96,8 +93,10 @@
             <TextBlock DockPanel.Dock="Left" Margin="4" Style="{StaticResource MaterialDesignBody1TextBlock}">
                 Unique visitors: <Run Text="{Binding Items.Count, ElementName=listViewVisitors, Mode=OneWay}" />
             </TextBlock>
-            <CheckBox DockPanel.Dock="Right" Margin="2" HorizontalAlignment="Right" Content="Log to file"
-                      IsChecked="{Binding IsLogging}" IsEnabled="{Binding IsAvailable}" Visibility="Collapsed" />
+            <CheckBox DockPanel.Dock="Right"
+                      Margin="2" HorizontalAlignment="Right"
+                      IsChecked="{Binding IsLogging}" Visibility="Collapsed" 
+                      Content="Log to file" />
         </DockPanel>
     </Grid>
 </UserControl>
