@@ -30,7 +30,7 @@
         </Style>
     </UserControl.Resources>
     <ScrollViewer x:Name="layoutRoot" DataContext="{Binding Data}">
-        <Grid x:Name="gridInfo" HorizontalAlignment="Stretch">
+        <Grid x:Name="gridInfo" Margin="4" HorizontalAlignment="Stretch">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="1*" />

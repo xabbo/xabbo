@@ -32,12 +32,14 @@
                     VerticalAlignment="Center"
                     Style="{StaticResource MaterialDesignFlatPrimaryToggleButton}"
                     IsChecked="{Binding Topmost}"
+                    Margin="4"
                     Height="24"
                     Width="24"
                 >
-                    <md:PackIcon Kind="Pin"
-                                 VerticalAlignment="Stretch"
-                                 VerticalContentAlignment="Center"
+                    <md:PackIcon
+                        Kind="Pin"
+                        VerticalAlignment="Stretch"
+                        VerticalContentAlignment="Center"
                     />
                 </ToggleButton>
                 <TextBlock

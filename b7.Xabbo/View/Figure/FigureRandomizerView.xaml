@@ -26,72 +26,13 @@
         <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource MaterialDesignCheckBox}">
             <Setter Property="Margin" Value="2" />
         </Style>
-        <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignRaisedButton}">
+        <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignFlatMidBgButton}">
             <Setter Property="Margin" Value="4" />
         </Style>
-        <ControlTemplate x:Key="ColorCheckBoxTemplate" TargetType="{x:Type CheckBox}">
-            <Grid x:Name="templateRoot" Background="Transparent" SnapsToDevicePixels="True">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Border x:Name="checkBoxBorder" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="1" VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
-                    <Grid x:Name="markGrid">
-                        <Path x:Name="optionMark" Data="F1M9.97498,1.22334L4.6983,9.09834 4.52164,9.09834 0,5.19331 1.27664,3.52165 4.255,6.08833 8.33331,1.52588E-05 9.97498,1.22334z" Fill="{TemplateBinding Foreground}" Margin="1" Opacity="0" Stretch="None" />
-                        <Rectangle x:Name="indeterminateMark" Fill="#FF212121" Margin="2" Opacity="0"/>
-                    </Grid>
-                </Border>
-                <!--ContentPresenter x:Name="contentPresenter" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" Grid.Column="1" ContentStringFormat="{TemplateBinding ContentStringFormat}" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/-->
-            </Grid>
-            <ControlTemplate.Triggers>
-                <Trigger Property="HasContent" Value="True">
-                    <Setter Property="FocusVisualStyle">
-                        <Setter.Value>
-                            <Style>
-                                <Setter Property="Control.Template">
-                                    <Setter.Value>
-                                        <ControlTemplate>
-                                            <Rectangle Margin="14,0,0,0" SnapsToDevicePixels="True" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" StrokeThickness="1" StrokeDashArray="1 2"/>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                            </Style>
-                        </Setter.Value>
-                    </Setter>
-                    <Setter Property="Padding" Value="4,-1,0,0"/>
-                </Trigger>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <!--Setter Property="Background" TargetName="checkBoxBorder" Value="#FFF3F9FF"/-->
-                    <Setter Property="BorderBrush" TargetName="checkBoxBorder" Value="#FF5593FF"/>
-                    <!--Setter Property="Fill" TargetName="optionMark" Value="#FF212121"/>
-                    <Setter Property="Fill" TargetName="indeterminateMark" Value="#FF212121"/-->
-                </Trigger>
-                <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Background" TargetName="checkBoxBorder" Value="#FFE6E6E6"/>
-                    <Setter Property="BorderBrush" TargetName="checkBoxBorder" Value="#FFBCBCBC"/>
-                    <Setter Property="Fill" TargetName="optionMark" Value="#FF707070"/>
-                    <Setter Property="Fill" TargetName="indeterminateMark" Value="#FF707070"/>
-                </Trigger>
-                <Trigger Property="IsPressed" Value="True">
-                    <Setter Property="Background" TargetName="checkBoxBorder" Value="#FFD9ECFF"/>
-                    <Setter Property="BorderBrush" TargetName="checkBoxBorder" Value="#FF3C77DD"/>
-                    <Setter Property="Fill" TargetName="optionMark" Value="#FF212121"/>
-                    <Setter Property="Fill" TargetName="indeterminateMark" Value="#FF212121"/>
-                </Trigger>
-                <Trigger Property="IsChecked" Value="True">
-                    <Setter Property="Opacity" TargetName="optionMark" Value="1"/>
-                    <Setter Property="Opacity" TargetName="indeterminateMark" Value="0"/>
-                </Trigger>
-                <Trigger Property="IsChecked" Value="{x:Null}">
-                    <Setter Property="Opacity" TargetName="optionMark" Value="0"/>
-                    <Setter Property="Opacity" TargetName="indeterminateMark" Value="1"/>
-                </Trigger>
-            </ControlTemplate.Triggers>
-        </ControlTemplate>
     </UserControl.Resources>
     <ScrollViewer x:Name="layoutRoot" VerticalScrollBarVisibility="Auto">
         <StackPanel Orientation="Vertical" IsEnabled="{Binding IsReady}">
-            <Grid Margin="2" IsEnabled="{Binding IsTimerActive, Converter={StaticResource NotConverter}}">
+            <Grid Margin="4" IsEnabled="{Binding IsTimerActive, Converter={StaticResource NotConverter}}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="1*" />
@@ -105,7 +46,7 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <CheckBox Margin="2" VerticalContentAlignment="Center" VerticalAlignment="Center"
+                <CheckBox Margin="4" VerticalContentAlignment="Center" VerticalAlignment="Center"
                           Content="Use base" IsChecked="{Binding UseBaseFigure}" />
                 <TextBox
                     Grid.Column="1" Margin="4" Padding="0"
@@ -182,17 +123,30 @@
                                         </ItemsControl.ItemsPanel>
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate DataType="{x:Type viewModel:FigurePartColorViewModel}">
-                                                <Grid>
+                                                <Grid Margin="4,8">
+                                                    <Grid.Style>
+                                                        <Style TargetType="{x:Type Grid}">
+                                                            <Setter Property="Background" Value="Transparent" />
+                                                            <Style.Triggers>
+                                                                <MultiDataTrigger>
+                                                                    <MultiDataTrigger.Conditions>
+                                                                        <Condition Binding="{Binding IsVisible}" Value="True" />
+                                                                        <Condition Binding="{Binding IsLocked}" Value="True" />
+                                                                        <Condition Binding="{Binding ElementName=root, Path=DataContext.UseBaseFigure}" Value="True" />
+                                                                    </MultiDataTrigger.Conditions>
+                                                                    <Setter Property="Background" Value="{Binding Foreground}" />
+                                                                </MultiDataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Grid.Style>
                                                     <CheckBox
-                                                        Style="{StaticResource MaterialDesignUserForegroundCheckBox}"
-                                                        Margin="0" Padding="0"
+                                                        Style="{StaticResource MaterialDesignAccentCheckBox}"
+                                                        Margin="-4,-8"
                                                         HorizontalAlignment="Center" VerticalAlignment="Center"
                                                         Visibility="{Binding IsVisible, Converter={StaticResource BoolToVisibilityConverter}}"
                                                         IsChecked="{Binding IsLocked}"
                                                         IsEnabled="{Binding ElementName=root, Path=DataContext.UseBaseFigure}"
-                                                        Foreground="{Binding Foreground}"
                                                         Background="{Binding Background}"
-                                                        
                                                     >
                                                     </CheckBox>
                                                 </Grid>
@@ -205,25 +159,25 @@
                     </ItemsControl>
                 </StackPanel>
                 <Button Grid.Row="4" Grid.ColumnSpan="3"
-                        Margin="2" Padding="8,2"
+                        Margin="4" Padding="8,2"
                         Command="{Binding RandomizeLooksCommand}" 
                         Content="Randomize looks" />
             </Grid>
-            <Grid x:Name="gridDelay" Margin="2">
+            <Grid x:Name="gridDelay" Margin="4">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="60" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="1*" />
                 </Grid.ColumnDefinitions>
-                <TextBlock Margin="2" VerticalAlignment="Center" Text="Delay" />
-                <TextBox Margin="2" Grid.Column="1"
+                <TextBlock Margin="4" VerticalAlignment="Center" Text="Delay" />
+                <TextBox Margin="4" Grid.Column="1"
                          HorizontalContentAlignment="Right" VerticalContentAlignment="Center"
                          IsEnabled="{Binding IsTimerActive, Converter={StaticResource NotConverter}}"
                          Text="{Binding TimerInterval, UpdateSourceTrigger=PropertyChanged}" />
                 <TextBlock Grid.Column="2" Margin="2" VerticalAlignment="Center" Text="ms" />
                 <Button Grid.Column="3"
-                        Margin="2" Padding="0"
+                        Margin="4" Padding="0"
                         Command="{Binding StartStopTimerCommand}"
                         HorizontalContentAlignment="Stretch"
                         VerticalContentAlignment="Stretch">

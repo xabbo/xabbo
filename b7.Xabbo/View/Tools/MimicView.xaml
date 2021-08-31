@@ -10,15 +10,15 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
-        <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource MaterialDesignCheckBox}">
+        <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource MaterialDesignAccentCheckBox}">
             <Setter Property="Margin" Value="8" />
-            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
             <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
         </Style>
     </UserControl.Resources>
     <Grid IsEnabled="{Binding IsAvailable}">
-        <Grid HorizontalAlignment="Left">
+        <Grid Margin="4" HorizontalAlignment="Left">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
@@ -34,7 +34,6 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <CheckBox
-                HorizontalAlignment="Left"
                 IsChecked="{Binding MimicFigure}"
                 Content="Figure"
             />

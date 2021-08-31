@@ -54,7 +54,7 @@
             <Button DockPanel.Dock="Right" Margin="4"
                     Command="{Binding LoadCommand}">
                 <Button.Style>
-                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignRaisedButton}">
+                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignFlatMidBgButton}">
                         <Setter Property="Content" Value="Load" />
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding IsInRoom}" Value="False">
@@ -73,7 +73,7 @@
             <Button DockPanel.Dock="Right" Margin="4"
                     CommandParameter="{Binding Source={x:Reference listViewUsers}, Path=SelectedItems}">
                 <Button.Style>
-                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignRaisedButton}">
+                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignFlatMidBgButton}">
                         <Setter Property="Command" Value="{Binding UnbanCommand}" />
                         <Setter Property="Content" Value="Unban" />
                         <Style.Triggers>
