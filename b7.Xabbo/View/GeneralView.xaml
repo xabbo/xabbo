@@ -134,7 +134,6 @@
                                           IsChecked="{Binding RememberPasswords}" />
                             </StackPanel>
                             <CheckBox DataContext="{Binding Doorbell}"
-                                      IsEnabled="{Binding IsAvailable}"
                                       IsChecked="{Binding AcceptFriends}"
                                       Content="Auto accept friends at doorbell" />
                         </StackPanel>

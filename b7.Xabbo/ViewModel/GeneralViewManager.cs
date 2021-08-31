@@ -24,6 +24,7 @@ namespace b7.Xabbo.ViewModel
         public RespectedComponent Respected { get; }
         public FurniActionsComponent FurniActions { get; }
         public RoomEntryComponent RoomEntry { get; }
+        public DoorbellComponent Doorbell { get; set; }
 
         public FlattenRoomComponent FlattenRoom { get; }
 
@@ -32,13 +33,6 @@ namespace b7.Xabbo.ViewModel
         public AntiHcGiftNotificationComponent AntiHcGiftNotification { get; }
 
         public EntityOverlayComponent Overlay { get; }
-
-        /* 
-         public DoorbellComponent Doorbell { get; set; }
-
-         public FlattenRoomComponent FlattenRoom { get; set; }
-
-         public AntiHandItemComponent HandItem { get; set; }*/
 
         public GeneralViewManager(
             AntiKickComponent antiKick,
@@ -55,6 +49,7 @@ namespace b7.Xabbo.ViewModel
             RespectedComponent respected,
             FurniActionsComponent furniActions,
             RoomEntryComponent roomEntry,
+            DoorbellComponent doorbell,
             FlattenRoomComponent flattenRoom,
             AntiHandItemComponent handItem,
             AntiHcGiftNotificationComponent antiHcGiftNotification,
@@ -74,6 +69,7 @@ namespace b7.Xabbo.ViewModel
             Respected = respected;
             FurniActions = furniActions;
             RoomEntry = roomEntry;
+            Doorbell = doorbell;
             FlattenRoom = flattenRoom;
             HandItem = handItem;
             AntiHcGiftNotification = antiHcGiftNotification;

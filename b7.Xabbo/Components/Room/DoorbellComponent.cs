@@ -19,14 +19,15 @@ namespace b7.Xabbo.Components
             set => Set(ref _acceptFriends, value);
         }
 
-        public DoorbellComponent(IInterceptor interceptor,
+        public DoorbellComponent(
+            IInterceptor interceptor,
             FriendManager friendManager)
             : base(interceptor)
         {
             _friendManager = friendManager;
         }
 
-        [InterceptIn(nameof(Incoming.DoorbellRinging))]
+        [InterceptIn(nameof(Incoming.DoorbellRinging), RequiredClient = ClientType.Flash)]
         protected void HandleDoorbellRinging(InterceptArgs e)
         {
             if (Client != ClientType.Flash)
@@ -35,7 +36,8 @@ namespace b7.Xabbo.Components
             string name = e.Packet.ReadString();
             if (AcceptFriends && _friendManager.IsFriend(name))
             {
-                Send(Out["LetUserIn"], name, 1);
+                e.Block();
+                Send(Out["LetUserIn"], name, true);
             }
         }
     }
