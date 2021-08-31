@@ -59,7 +59,7 @@
 
             <!-- Room name -->
             <TextBlock Text="Room name" />
-            <TextBox Grid.Column="1" Text="{Binding Name, Mode=OneWay}" TextWrapping="Wrap" />
+            <TextBox Grid.Column="1" Text="{Binding Name, Mode=OneWay, Converter={StaticResource HabboStringConverter}}" TextWrapping="Wrap" />
 
             <!-- Room ID -->
             <TextBlock Grid.Row="1" Text="Room ID" />
@@ -67,7 +67,7 @@
 
             <!-- Owner name -->
             <TextBlock Grid.Row="2" Text="Owner name" />
-            <TextBox Grid.Column="1" Grid.Row="2" Text="{Binding OwnerName, Mode=OneWay}" TextWrapping="Wrap" />
+            <TextBox Grid.Column="1" Grid.Row="2" Text="{Binding OwnerName, Mode=OneWay, Converter={StaticResource HabboStringConverter}}" TextWrapping="Wrap" />
 
             <!-- Owner ID -->
             <TextBlock Grid.Row="3" Text="Owner ID" />
@@ -75,15 +75,15 @@
 
             <!-- Category -->
             <TextBlock Grid.Row="4" Text="Category" />
-            <TextBox Grid.Column="1" Grid.Row="4" Text="{Binding Category, Mode=OneWay}" TextWrapping="Wrap" />
+            <TextBox Grid.Column="1" Grid.Row="4" Text="{Binding Category, Mode=OneWay, Converter={StaticResource HumanizerConverter}}" TextWrapping="Wrap" />
 
             <!-- Description -->
             <TextBlock Grid.Row="5" Text="Description" />
-            <TextBox Grid.Column="1" Grid.Row="5" Text="{Binding Description, Mode=OneWay}" TextWrapping="Wrap" />
+            <TextBox Grid.Column="1" Grid.Row="5" Text="{Binding Description, Mode=OneWay, Converter={StaticResource HabboStringConverter}}" TextWrapping="Wrap" />
 
             <!-- Room access -->
             <TextBlock Grid.Row="6" Text="Room access" />
-            <TextBox Grid.Column="1" Grid.Row="6" Text="{Binding Access, Mode=OneWay}" TextWrapping="Wrap" />
+            <TextBox Grid.Column="1" Grid.Row="6" Text="{Binding Access, Mode=OneWay, Converter={StaticResource HumanizerConverter}}" TextWrapping="Wrap" />
 
             <!-- Maximum visitors -->
             <TextBlock Grid.Row="7" Text="Maximum visitors" />
@@ -91,37 +91,37 @@
 
             <!-- Trading -->
             <TextBlock Grid.Row="8" Text="Trading" />
-            <TextBox Grid.Column="1" Grid.Row="8" Text="{Binding Trading, Mode=OneWay}" TextWrapping="Wrap" />
+            <TextBox Grid.Column="1" Grid.Row="8" Text="{Binding Trading, Mode=OneWay, Converter={StaticResource HumanizerConverter}}" TextWrapping="Wrap" />
 
             <!-- Moderation Settings -->
             <TextBlock Grid.Row="9" HorizontalAlignment="Center" Text="Moderation settings" />
 
             <TextBlock Grid.Row="10" Text="Who can mute" />
-            <TextBox Grid.Column="1" Grid.Row="10" Text="{Binding Moderation.WhoCanMute, Mode=OneWay}" TextWrapping="Wrap" />
+            <TextBox Grid.Column="1" Grid.Row="10" Text="{Binding Moderation.WhoCanMute, Mode=OneWay, Converter={StaticResource HumanizerConverter}}" TextWrapping="Wrap" />
 
             <TextBlock Grid.Row="11" Text="Who can kick" />
-            <TextBox Grid.Column="1" Grid.Row="11" Text="{Binding Moderation.WhoCanKick, Mode=OneWay}" TextWrapping="Wrap" />
+            <TextBox Grid.Column="1" Grid.Row="11" Text="{Binding Moderation.WhoCanKick, Mode=OneWay, Converter={StaticResource HumanizerConverter}}" TextWrapping="Wrap" />
 
             <TextBlock Grid.Row="12" Text="Who can ban" />
-            <TextBox Grid.Column="1" Grid.Row="12" Text="{Binding Moderation.WhoCanBan, Mode=OneWay}" TextWrapping="Wrap" />
+            <TextBox Grid.Column="1" Grid.Row="12" Text="{Binding Moderation.WhoCanBan, Mode=OneWay, Converter={StaticResource HumanizerConverter}}" TextWrapping="Wrap" />
 
             <!-- Chat settings -->
             <TextBlock Grid.Row="13" Text="Chat settings" />
 
             <TextBlock Grid.Row="14" Text="Flow" />
-            <TextBox Grid.Column="1" Grid.Row="14" Text="{Binding ChatSettings.Flow, Mode=OneWay}" TextWrapping="Wrap" />
+            <TextBox Grid.Column="1" Grid.Row="14" Text="{Binding ChatSettings.Flow, Mode=OneWay, Converter={StaticResource HumanizerConverter}}" TextWrapping="Wrap" />
             
             <TextBlock Grid.Row="15" Text="Bubble width"  />
-            <TextBox Grid.Column="1" Grid.Row="15" Text="{Binding ChatSettings.BubbleWidth, Mode=OneWay}" TextWrapping="Wrap" />
+            <TextBox Grid.Column="1" Grid.Row="15" Text="{Binding ChatSettings.BubbleWidth, Mode=OneWay, Converter={StaticResource HumanizerConverter}}" TextWrapping="Wrap" />
             
             <TextBlock Grid.Row="16" Text="Scroll speed" />
-            <TextBox Grid.Column="1" Grid.Row="16" Text="{Binding ChatSettings.ScrollSpeed, Mode=OneWay}" TextWrapping="Wrap" />
+            <TextBox Grid.Column="1" Grid.Row="16" Text="{Binding ChatSettings.ScrollSpeed, Mode=OneWay, Converter={StaticResource HumanizerConverter}}" TextWrapping="Wrap" />
             
             <TextBlock Grid.Row="17" Text="Talk hearing distance" />
             <TextBox Grid.Column="1" Grid.Row="17" Text="{Binding ChatSettings.TalkHearingDistance, Mode=OneWay}" TextWrapping="Wrap" />
             
             <TextBlock Grid.Row="18" Text="Flood protection" />
-            <TextBox Grid.Column="1" Grid.Row="18" Text="{Binding ChatSettings.FloodProtection, Mode=OneWay}" TextWrapping="Wrap" />
+            <TextBox Grid.Column="1" Grid.Row="18" Text="{Binding ChatSettings.FloodProtection, Mode=OneWay, Converter={StaticResource HumanizerConverter}}" TextWrapping="Wrap" />
         </Grid>
     </ScrollViewer>
 </UserControl>

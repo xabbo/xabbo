@@ -52,6 +52,8 @@
                 <Setter Property="materialDesign:ListViewAssist.ListViewItemPadding" Value="4" />
             </Style>
 
+            <converter:HabboStringConverter x:Key="HabboStringConverter" />
+            <converter:HumanizerConverter x:Key="HumanizerConverter" />
 
             <converter:BoolToOpacityConverter x:Key="BoolToOpacityConverter" />
             <converter:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
