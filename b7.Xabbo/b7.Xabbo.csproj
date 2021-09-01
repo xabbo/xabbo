@@ -8,6 +8,7 @@
     <Version>0.3.0</Version>
     <StartupObject></StartupObject>
     <DebugType>embedded</DebugType>
+    <ApplicationIcon>Resources\app.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
