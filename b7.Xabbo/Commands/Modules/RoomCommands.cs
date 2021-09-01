@@ -23,7 +23,7 @@ namespace b7.Xabbo.Commands
         [RequiredIn(nameof(Incoming.Navigator2SearchResultBlocks))]
         [RequiredOut(
             nameof(Outgoing.FlatOpc),
-            nameof(Outgoing.Navigator2Search) // nameof(Outgoing.RequestNewNavigatorRooms)
+            nameof(Outgoing.Navigator2Search)
         )]
         private async Task GoCommandHandler(CommandArgs args)
         {
@@ -54,7 +54,7 @@ namespace b7.Xabbo.Commands
         [Command("goto"), RequiredOut(nameof(Outgoing.FlatOpc))]
         protected async Task GotoCommandHandler(CommandArgs args)
         {
-            if (args.Count < 1 || !int.TryParse(args[0], out int roomId))
+            if (args.Count < 1 || !long.TryParse(args[0], out long roomId))
             {
                 ShowMessage("Usage: /goto <room id> [password]");
                 return;
@@ -62,19 +62,19 @@ namespace b7.Xabbo.Commands
 
             string password = "";
             if (args.Count > 1)
-                password = args[1];
+                password = string.Join(" ", args.Skip(1));
 
-            Send(Out.FlatOpc, roomId, password, -1);
+            Send(Out.FlatOpc, (LegacyLong)roomId, password, -1L);
         }
 
         [Command("exit"), RequiredOut(nameof(Outgoing.FlatOpc))]
-        protected async Task ExitCommandHandler(CommandArgs args) => Send(Out.FlatOpc, 0, "", -1);
+        protected async Task ExitCommandHandler(CommandArgs args) => Send(Out.FlatOpc, 0, "", -1L);
 
         [Command("reload"), RequiredIn(nameof(Incoming.RoomForward))]
         protected async Task ReloadCommandHandler(CommandArgs args)
         {
             if (roomManager.IsInRoom)
-                Send(In.RoomForward, roomManager.CurrentRoomId);
+                Send(In.RoomForward, (LegacyLong)roomManager.CurrentRoomId);
         }
 
         [Command("trigger"), RequiredOut(nameof(Outgoing.GetRoomEntryData))]
