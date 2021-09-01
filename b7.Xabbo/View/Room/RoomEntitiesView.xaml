@@ -193,48 +193,61 @@
             </ListView.View>
             <ListView.GroupStyle>
                 <GroupStyle>
-                    <GroupStyle.HeaderTemplate>
-                        <DataTemplate>
-                            <Grid>
-                                <Grid.Background>
-                                    <SolidColorBrush Color="{Binding Items[0].HeaderColor}" Opacity="0.1" />
-                                </Grid.Background>
-                                <Grid>
-                                    <StackPanel Margin="4" Orientation="Vertical">
-                                        <Image
-                                            Source="{Binding Items[0].ImageSource}" SnapsToDevicePixels="True"
-                                            RenderOptions.BitmapScalingMode="HighQuality"
-                                            HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                        <TextBlock Text="{Binding Items[0].VisualGroupName}" HorizontalAlignment="Center">
-                                            <TextBlock.Style>
-                                                <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignBody1TextBlock}">
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding Items[0].VisualGroupName}" Value="">
-                                                            <Setter Property="Visibility" Value="Collapsed" />
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </TextBlock.Style>
-                                        </TextBlock>
-                                        <StackPanel x:Name="panel" Orientation="Horizontal" HorizontalAlignment="Center">
-                                            <StackPanel.Style>
-                                                <Style TargetType="StackPanel">
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding Items[0].IsRoomOwner}" Value="True">
-                                                            <Setter Property="Visibility" Value="Collapsed" />
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </StackPanel.Style>
-                                            <TextBlock FontWeight="Bold" FontSize="12" Text="(" />
-                                            <TextBlock FontWeight="Bold" FontSize="12" Text="{Binding ItemCount}" />
-                                            <TextBlock FontWeight="Bold" FontSize="12" Text=")" />
-                                        </StackPanel>
-                                    </StackPanel>
-                                </Grid>
-                            </Grid>
-                        </DataTemplate>
-                    </GroupStyle.HeaderTemplate>
+                    <GroupStyle.ContainerStyle>
+                        <Style TargetType="{x:Type GroupItem}">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate>
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="*" />
+                                                <RowDefinition Height="*" />
+                                            </Grid.RowDefinitions>
+                                            <Grid>
+                                                <Grid.Background>
+                                                    <SolidColorBrush Color="{Binding Items[0].HeaderColor}" Opacity="0.33" />
+                                                </Grid.Background>
+                                                <StackPanel Orientation="Vertical" Margin="4">
+                                                    <Image
+                                                        
+                                                        Source="{Binding Items[0].ImageSource}" SnapsToDevicePixels="True"
+                                                        RenderOptions.BitmapScalingMode="HighQuality"
+                                                        HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                    />
+                                                    <TextBlock Text="{Binding Items[0].VisualGroupName}"
+                                                               HorizontalAlignment="Center"
+                                                               Margin="2" Padding="0">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignBody1TextBlock}">
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding Items[0].VisualGroupName}" Value="">
+                                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
+                                                    <TextBlock Margin="2,0,2,2" Padding="0" HorizontalAlignment="Center">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource MaterialDesignBody2TextBlock}">
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding Items[0].IsRoomOwner}" Value="True">
+                                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                        (<Run Text="{Binding ItemCount, Mode=OneWay}" />)
+                                                    </TextBlock>
+                                                </StackPanel>
+                                            </Grid>
+                                            <ItemsPresenter Grid.Row="1" />
+                                        </Grid>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </GroupStyle.ContainerStyle>
                 </GroupStyle>
             </ListView.GroupStyle>
         </ListView>
