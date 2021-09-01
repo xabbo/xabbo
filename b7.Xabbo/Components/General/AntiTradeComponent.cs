@@ -41,10 +41,34 @@ namespace b7.Xabbo.Components
             _tradeManager = tradeManager;
 
             _roomManager.Entered += OnRoomEntered;
+            _roomManager.RoomDataUpdated += OnRoomDataUpdated;
 
             IsActive = _config.GetValue("AntiTrade:Active", false);
 
             Task initialization = Task.Run(InitializeAsync);
+        }
+
+        private bool CanTrade()
+        {
+            IRoomData? roomData = _roomManager.Room?.Data;
+            if (roomData is null) return false;
+
+            return (
+                roomData.Trading == TradePermissions.Allowed ||
+                (roomData.Trading == TradePermissions.RightsHolders && _roomManager.HasRights)
+            );
+        }
+
+        private void TradeSelf(IRoom? room)
+        {
+            if (room is null) return;
+            if (!room.TryGetUserById(_profileManager.UserData?.Id ?? -1, out IRoomUser? self))
+                return;
+
+            if (CanTrade())
+            {
+                Send(Out.TradeOpen, self.Index);
+            }
         }
 
         private async Task InitializeAsync()
@@ -73,10 +97,7 @@ namespace b7.Xabbo.Components
                     }
                     else
                     {
-                        if (room.TryGetUserById(userData.Id, out IRoomUser? self))
-                        {
-                            Send(Out.TradeOpen, self.Index);
-                        }
+                        TradeSelf(room);
                     }
                 }
                 else
@@ -91,27 +112,26 @@ namespace b7.Xabbo.Components
             }
         }
 
+        private void OnRoomEntered(object? sender, RoomEventArgs e)
+        {
+            if (!IsActive) return;
+
+            TradeSelf(e.Room);
+        }
+        private void OnRoomDataUpdated(object? sender, RoomDataEventArgs e)
+        {
+            if (IsActive && !_tradeManager.IsTrading)
+            {
+                TradeSelf(_roomManager.Room);
+            }
+        }
+
         [InterceptIn(nameof(Incoming.TradeOpen))]
         protected void HandleTradeOpen(InterceptArgs e)
         {
             if (IsActive)
             {
                 e.Block();
-            }
-        }
-
-        private void OnRoomEntered(object? sender, RoomEventArgs e)
-        {
-            UserData? userData = _profileManager.UserData;
-
-            if (userData is null) return;
-
-            if (IsActive)
-            {
-                if (e.Room.TryGetUserById(userData.Id, out IRoomUser? self))
-                {
-                    Send(Out.TradeOpen, self.Index);
-                }
             }
         }
     }
