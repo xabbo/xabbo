@@ -38,6 +38,7 @@ namespace b7.Xabbo.ViewModel
         public ICommand AddFromClipboardCommand { get; }
         public ICommand AddCurrentFigureCommand { get; }
         public ICommand SetFigureCommand { get; }
+        public ICommand RemoveFigureCommand { get; }
         public ICommand RemoveFiguresCommand { get; }
         public ICommand CopyFigureCommand { get; }
         public ICommand ImportWardrobeCommand { get; }
@@ -66,6 +67,7 @@ namespace b7.Xabbo.ViewModel
             AddFromClipboardCommand = new RelayCommand(OnAddFromClipboard);
             AddCurrentFigureCommand = new RelayCommand(OnAddCurrentFigure);
             SetFigureCommand = new RelayCommand<FigureViewModel>(OnSetFigure);
+            RemoveFigureCommand = new RelayCommand<FigureViewModel>(OnRemoveFigure);
             RemoveFiguresCommand = new RelayCommand<IList>(OnRemoveFigures);
             CopyFigureCommand = new RelayCommand<FigureViewModel>(OnCopyFigure);
             ImportWardrobeCommand = new RelayCommand(OnImportWardrobe);
@@ -223,6 +225,11 @@ namespace b7.Xabbo.ViewModel
                 figureViewModel.Figure.GetGenderString(),
                 figureViewModel.Figure.GetFigureString()
             );
+        }
+
+        private void OnRemoveFigure(FigureViewModel figureViewModel)
+        {
+            RemoveFigure(figureViewModel);
         }
 
         private void OnRemoveFigures(IList selected)

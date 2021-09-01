@@ -22,13 +22,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <ListBox x:Name="figureItems" ItemsSource="{Binding Figures}"
-                 SelectionMode="Extended"
                  md:ScrollViewerAssist.IgnorePadding="True">
-            <ListBox.InputBindings>
-                <KeyBinding Key="Delete"
-                            CommandParameter="{Binding ElementName=figureItems, Path=SelectedItems}"
-                            Command="{Binding RemoveFiguresCommand}" />
-            </ListBox.InputBindings>
             <ListBox.Resources>
                 <RelativeSource x:Key="FindRoot" Mode="FindAncestor" AncestorType="{x:Type ListBox}" />
             </ListBox.Resources>
@@ -56,13 +50,20 @@
                                 <ContextMenu.Resources>
                                     <RelativeSource x:Key="FindRoot" Mode="FindAncestor" AncestorType="{x:Type ContextMenu}" />
                                 </ContextMenu.Resources>
-                                <MenuItem Header="Copy figure string"
-                                              CommandParameter="{Binding}" 
-                                              Command="{Binding Source={x:Reference layoutRoot}, Path=DataContext.CopyFigureCommand}" />
+                                <MenuItem
+                                    Header="Copy figure string"
+                                    CommandParameter="{Binding}" 
+                                    Command="{Binding Source={x:Reference layoutRoot}, Path=DataContext.CopyFigureCommand}"
+                                />
+                                <MenuItem
+                                    Header="Remove"
+                                    CommandParameter="{Binding}"
+                                    Command="{Binding Source={x:Reference layoutRoot}, Path=DataContext.RemoveFigureCommand}"
+                                />
                             </ContextMenu>
                         </ListBoxItem.ContextMenu>
                         <Image x:Name="imageView" Stretch="None" SnapsToDevicePixels="True"
-                                    Width="64" Height="110">
+                               Width="64" Height="110">
                             <Image.Source>
                                 <BitmapImage UriCachePolicy="CacheIfAvailable"
                                              UriSource="{Binding ImageUrl}" />
