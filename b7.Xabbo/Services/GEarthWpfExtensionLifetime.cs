@@ -1,9 +1,12 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
 using Microsoft.Extensions.Hosting;
+
+using Xabbo.Interceptor;
 using Xabbo.GEarth;
 
 namespace b7.Xabbo.Services
@@ -30,10 +33,10 @@ namespace b7.Xabbo.Services
             _hostAppLifetime.ApplicationStopping.Register(() => application.Shutdown());
         }
 
-        private void OnInterceptorConnectionFailed(object? sender, global::Xabbo.Interceptor.ConnectionFailedEventArgs e)
+        private void OnInterceptorConnectionFailed(object? sender, ConnectionFailedEventArgs e)
         {
             MessageBox.Show(
-                $"Failed to connect to G-Earth on port {_extension.Options.Port}", "xabbo",
+                $"Failed to connect to G-Earth on port {_extension.Options.Port}.", "xabbo",
                 MessageBoxButton.OK, MessageBoxImage.Error
             );
 
@@ -60,7 +63,17 @@ namespace b7.Xabbo.Services
             }
         }
 
-        private void OnInterceptorDisconnected(object? sender, global::Xabbo.Interceptor.DisconnectedEventArgs e)
+        private void MainWindow_Closing(object sender, CancelEventArgs e)
+        {
+            if (_extension.IsInterceptorConnected &&
+                !string.IsNullOrEmpty(_extension.Options.Cookie))
+            {
+                e.Cancel = true;
+                _application.MainWindow.Hide();
+            }
+        }
+
+        private void OnInterceptorDisconnected(object? sender, DisconnectedEventArgs e)
         {
             _application.Shutdown();
         }
@@ -74,6 +87,7 @@ namespace b7.Xabbo.Services
 
         public Task WaitForStartAsync(CancellationToken cancellationToken)
         {
+            _application.MainWindow.Closing += MainWindow_Closing;
             _application.Exit += (s, e) => _hostAppLifetime.StopApplication();
 
             return Task.CompletedTask;
