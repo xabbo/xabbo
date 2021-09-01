@@ -28,7 +28,7 @@ namespace b7.Xabbo.Commands
 
         private readonly ProfileManager _profileManager;
         private readonly RoomManager _roomManager;
-        private readonly XabboUserComponent _xabboUser;
+        private readonly XabbotComponent _xabbot;
 
         public bool IsAvailable { get; private set; }
 
@@ -42,7 +42,7 @@ namespace b7.Xabbo.Commands
             IEnumerable<CommandModule> modules,
             ProfileManager profileManager,
             RoomManager roomManager,
-            XabboUserComponent xabboUser)
+            XabbotComponent xabbot)
         {
             _bindings = new Dictionary<string, CommandBinding>(StringComparer.OrdinalIgnoreCase);
 
@@ -50,7 +50,7 @@ namespace b7.Xabbo.Commands
             _modules = modules.ToArray();
             _profileManager = profileManager;
             _roomManager = roomManager;
-            _xabboUser = xabboUser;
+            _xabbot = xabbot;
 
             Interceptor.Connected += OnConnected;
         }
@@ -157,7 +157,7 @@ namespace b7.Xabbo.Commands
         [RequiredIn(nameof(Incoming.Whisper))]
         public void ShowMessage(string message)
         {
-            _xabboUser.ShowMessage(message);
+            _xabbot.ShowMessage(message);
         }
 
         [InterceptOut(

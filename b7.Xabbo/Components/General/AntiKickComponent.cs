@@ -7,6 +7,7 @@ using Xabbo.Messages;
 using Xabbo.Core;
 using Xabbo.Core.Events;
 using Xabbo.Core.Game;
+using Microsoft.Extensions.Configuration;
 
 namespace b7.Xabbo.Components
 {
@@ -41,18 +42,24 @@ namespace b7.Xabbo.Components
             set => Set(ref returnToPosition, value);
         }
 
-        private ProfileManager _profileManager;
-        private RoomManager _roomManager;
+        private readonly XabbotComponent _xabbot;
+        private readonly ProfileManager _profileManager;
+        private readonly RoomManager _roomManager;
 
         public AntiKickComponent(IInterceptor interceptor,
+            IConfiguration config,
+            XabbotComponent xabbot,
             ProfileManager profileManager,
             RoomManager roomManager)
             : base(interceptor)
         {
+            _xabbot = xabbot;
             _profileManager = profileManager;
             _roomManager = roomManager;
 
             _roomManager.Entered += OnEnteredRoom;
+
+            IsActive = config.GetValue("AntiKick:Active", true);
         }
 
         protected override void OnInitialized(object? sender, InterceptorInitializedEventArgs e)
@@ -66,14 +73,14 @@ namespace b7.Xabbo.Components
             IsReady = true;
         }
 
-        async Task HandleKickAsync(string msg)
+        private async Task HandleKickAsync(string msg)
         {
             _blockHotelView = true;
             _preventRoomRefresh = true;
             _lastKick = DateTime.Now;
 
             Send(Out.FlatOpc, (LegacyLong)_roomManager.CurrentRoomId, string.Empty, -1);
-            SendInfoMessage(msg);
+            _xabbot.ShowMessage(msg);
 
             if (_profileManager.UserData is not null)
             {
@@ -89,7 +96,7 @@ namespace b7.Xabbo.Components
         [InterceptIn(nameof(Incoming.Notification))]
         public async void HandleNotification(InterceptArgs e)
         {
-            if (_roomManager.CurrentRoomId <= 0) return;
+            if (!IsActive || _roomManager.CurrentRoomId <= 0) return;
 
             if (e.Packet.ReadString().Contains("room.kick.cannonball"))
             {
@@ -101,11 +108,7 @@ namespace b7.Xabbo.Components
         [InterceptIn(nameof(Incoming.Error))]
         public async void HandleError(InterceptArgs e)
         {
-            if (!IsActive)
-                return;
-
-            long roomId = _roomManager.CurrentRoomId;
-            if (roomId <= 0)
+            if (!IsActive || _roomManager.CurrentRoomId <= 0)
                 return;
 
             int errorCode = e.Packet.ReadInt();
@@ -135,11 +138,6 @@ namespace b7.Xabbo.Components
                 e.Block();
                 _preventRoomRefresh = false;
             }
-        }
-
-        private void SendInfoMessage(string message)
-        {
-            Send(In.Whisper, -0xb7, message, 0, 30, 0, 0);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -17,7 +18,7 @@ namespace b7.Xabbo.Components
         private readonly SemaphoreSlim semaphore = new SemaphoreSlim(1, 1);
         private DateTime lastUpdate = DateTime.MinValue;
 
-        private bool _dropHandItem = true;
+        private bool _dropHandItem;
         public bool DropHandItem
         {
             get => _dropHandItem;
@@ -31,7 +32,7 @@ namespace b7.Xabbo.Components
             set => Set(ref _returnHandItem, value);
         }
 
-        private bool _maintainDirection = true;
+        private bool _maintainDirection;
         public bool MaintainDirection
         {
             get => _maintainDirection;
@@ -39,12 +40,17 @@ namespace b7.Xabbo.Components
         }
 
         public AntiHandItemComponent(IInterceptor interceptor,
+            IConfiguration config,
             ProfileManager profileManager,
             RoomManager roomManager)
             : base(interceptor)
         {
             _profileManager = profileManager;
             _roomManager = roomManager;
+
+            DropHandItem = config.GetValue("AntiHandItem:DropHandItem", false);
+            ReturnHandItem = config.GetValue("AntiHandItem:ReturnHandItem", false);
+            MaintainDirection = config.GetValue("AntiHandItem:MaintainDirection", false);
         }
 
         [InterceptIn(nameof(Incoming.HandItemReceived))]

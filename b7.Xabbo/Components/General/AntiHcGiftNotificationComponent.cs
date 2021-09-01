@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using System;
 
 using Xabbo.Interceptor;
 using Xabbo.Messages;
@@ -7,10 +8,11 @@ namespace b7.Xabbo.Components
 {
     public class AntiHcGiftNotificationComponent : Component
     {
-        public AntiHcGiftNotificationComponent(IInterceptor interceptor)
+        public AntiHcGiftNotificationComponent(IInterceptor interceptor,
+            IConfiguration config)
             : base(interceptor)
         {
-            IsActive = true;
+            IsActive = config.GetValue("AntiHcGiftNotification:Active", true);
         }
 
         [InterceptIn(nameof(Incoming.CSubscriptionUserGifts))]

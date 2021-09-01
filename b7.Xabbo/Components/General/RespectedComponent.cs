@@ -1,5 +1,7 @@
 ﻿using System;
 
+using Microsoft.Extensions.Configuration;
+
 using Xabbo.Messages;
 using Xabbo.Interceptor;
 
@@ -29,9 +31,14 @@ namespace b7.Xabbo.Components
             set => Set(ref _showTotalRespects, value);
         }
 
-        public RespectedComponent(IInterceptor interceptor, RoomManager roomManager)
+        public RespectedComponent(IInterceptor interceptor,
+            IConfiguration config,
+            RoomManager roomManager)
             : base(interceptor)
         {
+            ShowWhoRespected = config.GetValue("Respect:ShowWhoRespected", true);
+            ShowTotalRespects = config.GetValue("Respect:ShowTotalRespects", true);
+
             _roomManager = roomManager;
             roomManager.Left += Room_Left;
         }

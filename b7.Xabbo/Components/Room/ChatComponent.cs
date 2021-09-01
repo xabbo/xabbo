@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Configuration;
 
 using Xabbo.Messages;
 using Xabbo.Interceptor;
@@ -20,14 +21,14 @@ namespace b7.Xabbo.Components
         private readonly RoomManager _roomManager;
         private readonly HashSet<string> _petCommands;
 
-        private bool _mutePets = true;
+        private bool _mutePets;
         public bool MutePets
         {
             get => _mutePets;
             set => Set(ref _mutePets, value);
         }
 
-        private bool _mutePetCommands = true;
+        private bool _mutePetCommands;
         public bool MutePetCommands
         {
             get => _mutePetCommands;
@@ -63,6 +64,7 @@ namespace b7.Xabbo.Components
         }
 
         public ChatComponent(IInterceptor interceptor,
+            IConfiguration config,
             IOptions<GameOptions> gameOptions,
             RoomManager roomManager)
             : base(interceptor)
@@ -71,16 +73,31 @@ namespace b7.Xabbo.Components
             _roomManager.EntityChat += OnEntityChat;
 
             _petCommands = gameOptions.Value.PetCommands;
+
+            MutePets = config.GetValue("Chat:Mute:Pets", false);
+            MutePetCommands = config.GetValue("Chat:Mute:PetCommands", false);
+            MuteBots = config.GetValue("Chat:Mute:Bots", false);
+            MuteWired = config.GetValue("Chat:Mute:Wired", false);
+            MuteRespects = config.GetValue("Chat:Mute:Respects", false);
+            MuteScratches = config.GetValue("Chat:Mute:Scratches", false);
         }
 
         private void OnEntityChat(object? sender, EntityChatEventArgs e)
         {
-            if (MutePets && e.Entity.Type == EntityType.Pet) e.Block();
+            if (MutePets && e.Entity.Type == EntityType.Pet)
+            {
+                e.Block();
+                return;
+            }
+
             if (MuteBots)
             {
                 if (e.Entity.Type == EntityType.PublicBot ||
                     e.Entity.Type == EntityType.PrivateBot)
+                {
                     e.Block();
+                    return;
+                }
             }
 
             if (MutePetCommands)
@@ -92,7 +109,11 @@ namespace b7.Xabbo.Components
                     if (name == "bobba" || _roomManager.Room?.GetEntity<IPet>(name) is not null)
                     {
                         string command = e.Message[(index + 1)..].ToLower();
-                        if (_petCommands.Contains(command)) e.Block();
+                        if (_petCommands.Contains(command))
+                        {
+                            e.Block();
+                            return;
+                        }
                     }
                 }
             }

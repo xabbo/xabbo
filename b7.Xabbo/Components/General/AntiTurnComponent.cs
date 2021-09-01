@@ -1,5 +1,7 @@
 ﻿using System;
 
+using Microsoft.Extensions.Configuration;
+
 using Xabbo.Interceptor;
 using Xabbo.Messages;
 
@@ -7,6 +9,8 @@ namespace b7.Xabbo.Components
 {
     public class AntiTurnComponent : Component
     {
+        private readonly double _reselectThreshold;
+
         private long _lastSelectedUser = -1;
         private int _lastLookAtX, _lastLookAtY;
         private DateTime _lastSelection = DateTime.MinValue;
@@ -18,15 +22,14 @@ namespace b7.Xabbo.Components
             set => Set(ref _turnOnReselect, value);
         }
 
-        public AntiTurnComponent(IInterceptor interceptor)
+        public AntiTurnComponent(IInterceptor interceptor,
+            IConfiguration config)
             : base(interceptor)
-        { }
-
-        protected override void OnConnected(object? sender, EventArgs e)
         {
-            base.OnConnected(sender, e);
+            _reselectThreshold = config.GetValue("AntiTurn:ReselectThreshold", 1.0);
 
-            IsActive = true;
+            IsActive = config.GetValue("AntiTurn:Active", true);
+            TurnOnReselect = config.GetValue("AntiTurn:TurnOnReselect", true);
         }
 
         [InterceptOut(nameof(Outgoing.LookTo))]
@@ -42,7 +45,7 @@ namespace b7.Xabbo.Components
         {
             long userId = e.Packet.ReadLegacyLong();
 
-            if (IsActive && TurnOnReselect && (DateTime.Now - _lastSelection).TotalSeconds < 2.0)
+            if (IsActive && TurnOnReselect && (DateTime.Now - _lastSelection).TotalSeconds < _reselectThreshold)
             {
                 if (userId == _lastSelectedUser)
                     Send(Out.LookTo, _lastLookAtX, _lastLookAtY);

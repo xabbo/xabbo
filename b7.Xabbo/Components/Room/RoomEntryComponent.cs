@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 
+using Microsoft.Extensions.Configuration;
+
 using Xabbo.Messages;
 using Xabbo.Interceptor;
 using Xabbo.Core;
@@ -18,7 +20,7 @@ namespace b7.Xabbo.Components
 
         private int _lastRequestedRoom = -1;
 
-        private bool _rememberPasswords = true;
+        private bool _rememberPasswords;
         public bool RememberPasswords
         {
             get => _rememberPasswords;
@@ -32,9 +34,12 @@ namespace b7.Xabbo.Components
             set => Set(ref _dontAskToRingDoorbell, value);
         }
 
-        public RoomEntryComponent(IInterceptor interceptor)
+        public RoomEntryComponent(IInterceptor interceptor,
+            IConfiguration config)
             : base(interceptor)
         {
+            RememberPasswords = config.GetValue("RoomEntry:RememberPasswords", true);
+
             if (File.Exists(FILE_PATH))
             {
                 try

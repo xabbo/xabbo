@@ -13,7 +13,7 @@ using Xabbo.Core;
 
 namespace b7.Xabbo.Components
 {
-    public class XabboUserComponent : Component, IHostedService
+    public class XabbotComponent : Component, IHostedService
     {
         private readonly ProfileManager _profileManager;
         private readonly RoomManager _roomManager;
@@ -21,7 +21,7 @@ namespace b7.Xabbo.Components
         public long UserId { get; private set; } = 0xb7;
         public int UserIndex { get; private set; } = -0xb7;
 
-        public XabboUserComponent(IInterceptor interceptor,
+        public XabbotComponent(IInterceptor interceptor,
             ProfileManager profileManager, RoomManager roomManager)
             : base(interceptor)
         {

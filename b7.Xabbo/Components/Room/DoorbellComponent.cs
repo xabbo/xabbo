@@ -1,5 +1,7 @@
 ﻿using System;
 
+using Microsoft.Extensions.Configuration;
+
 using Xabbo;
 using Xabbo.Interceptor;
 using Xabbo.Messages;
@@ -21,10 +23,13 @@ namespace b7.Xabbo.Components
 
         public DoorbellComponent(
             IInterceptor interceptor,
+            IConfiguration config,
             FriendManager friendManager)
             : base(interceptor)
         {
             _friendManager = friendManager;
+
+            AcceptFriends = config.GetValue("Doorbell:AcceptFriends", false);
         }
 
         [InterceptIn(nameof(Incoming.DoorbellRinging), RequiredClient = ClientType.Flash)]

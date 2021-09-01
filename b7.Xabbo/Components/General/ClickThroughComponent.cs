@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
+
+using Microsoft.Extensions.Configuration;
 
 using Xabbo.Messages;
 using Xabbo.Interceptor;
 
 using b7.Xabbo.Commands;
-using System.Runtime.CompilerServices;
 
 namespace b7.Xabbo.Components
 {
@@ -13,11 +15,15 @@ namespace b7.Xabbo.Components
     {
         protected readonly CommandManager _commandManager;
 
-        public ClickThroughComponent(IInterceptor interceptor, CommandManager commandManager)
+        public ClickThroughComponent(IInterceptor interceptor,
+            IConfiguration config,
+            CommandManager commandManager)
             : base(interceptor)
         {
             _commandManager = commandManager;
             _commandManager.Register(OnToggle, "ct", null);
+
+            IsActive = config.GetValue("ClickThrough:Active", false);
         }
 
         protected override void OnInitialized(object? sender, InterceptorInitializedEventArgs e)

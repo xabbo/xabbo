@@ -123,9 +123,9 @@ namespace b7.Xabbo.Components
             _friendManager = friendManager;
             _roomManager = roomManager;
 
-            IsActive = config.GetValue<bool>("ClickTo:Active");
+            IsActive = config.GetValue("ClickTo:Active", false);
 
-            switch (config.GetValue<string>("ClickTo:Mode")?.ToLower() ?? string.Empty)
+            switch (config.GetValue("ClickTo:Mode", "kick").ToLower())
             {
                 case "mute":
                     Mute = true;
@@ -160,7 +160,7 @@ namespace b7.Xabbo.Components
                     break;
             }
 
-            _disableForFriends = config.GetValue<bool>("ClickTo:DisableForFriends");
+            _disableForFriends = config.GetValue("ClickTo:IgnoreFriends", true);
 
             _bounceUnbanDelay = config.GetValue("ClickTo:BounceUnbanDelay", 100);
             if (_bounceUnbanDelay < 0)

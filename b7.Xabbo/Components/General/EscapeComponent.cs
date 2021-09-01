@@ -1,15 +1,17 @@
-﻿using b7.Xabbo.Configuration;
-using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
 using Xabbo.Core;
 using Xabbo.Core.Events;
 using Xabbo.Core.Game;
 using Xabbo.Interceptor;
 using Xabbo.Messages;
+
+using b7.Xabbo.Configuration;
 
 namespace b7.Xabbo.Components
 {
@@ -48,11 +50,16 @@ namespace b7.Xabbo.Components
         }
 
         public EscapeComponent(IInterceptor interceptor,
-            IOptions<GameOptions> gameOptions, RoomManager roomManager)
+            IConfiguration config,
+            IOptions<GameOptions> gameOptions,
+            RoomManager roomManager)
             : base(interceptor)
         {
             _gameOptions = gameOptions.Value;
             _roomManager = roomManager;
+
+            EscapeStaff = config.GetValue("Escape:Staff", false);
+            EscapeAmbassadors = config.GetValue("Escape:Ambassadors", false);
 
             CanEscapeStaff = _gameOptions.StaffList.Any();
             CanEscapeAmbassadors = _gameOptions.AmbassadorList.Any();
@@ -86,7 +93,7 @@ namespace b7.Xabbo.Components
             if (escape)
             {
                 await Task.Delay(500);
-                Send(Out.FlatOpc, (LegacyLong)0, "", -1);
+                Send(Out.FlatOpc, (LegacyLong)0, "", -1L);
                 Send(In.SystemBroadcast, escapeMessage);
                 return;
             }

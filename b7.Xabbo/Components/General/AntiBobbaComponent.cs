@@ -14,23 +14,23 @@ namespace b7.Xabbo.Components
     {
         private static readonly Regex _regexBrackets = new Regex(@"\[([^\[\]]+?)\]", RegexOptions.Compiled);
 
-        private readonly IConfiguration _config;
         private readonly string _injectString;
 
-        private bool _isLocalized = true;
+        private bool _isLocalized;
         public bool IsLocalized
         {
             get => _isLocalized;
             set => Set(ref _isLocalized, value);
         }
 
-        public AntiBobbaComponent(IInterceptor interceptor, IConfiguration config)
+        public AntiBobbaComponent(IInterceptor interceptor,
+            IConfiguration config)
             : base(interceptor)
         {
-            _config = config;
             _injectString = config.GetValue("AntiBobba:Inject", "");
 
-            IsActive = _config.GetValue("AntiBobba:Active", true);
+            IsActive = config.GetValue("AntiBobba:Active", true);
+            IsLocalized = config.GetValue("AntiBobba:Localized", true);
         }
 
         protected override void OnInitialized(object? sender, InterceptorInitializedEventArgs e)

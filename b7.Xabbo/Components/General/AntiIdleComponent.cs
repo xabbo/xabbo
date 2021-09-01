@@ -38,6 +38,9 @@ namespace b7.Xabbo.Components
 
             _profileManager = profileManager;
             _roomManager = roomManager;
+
+            IsActive = config.GetValue("AntiIdle:Active", true);
+            IsAntiIdleOutActive = config.GetValue("AntiIdle:AntiIdleOut", true);
         }
 
         public override void RaisePropertyChanged([CallerMemberName] string propertyName = null)
@@ -94,10 +97,18 @@ namespace b7.Xabbo.Components
                 {
                     Send(Out.Move, 0, 0);
                 }
+                else if (IsActive)
+                {
+                    Send(Out.Expression, 0);
+                }
             }
-
-            if (IsActive)
-                Send(Out.Expression, 0);
+            else
+            {
+                if (IsActive)
+                {
+                    Send(Out.Expression, 0);
+                }
+            }
         }
     }
 }

@@ -3,6 +3,8 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
+using Microsoft.Extensions.Configuration;
+
 using Xabbo.Core;
 using Xabbo.Core.Events;
 using Xabbo.Core.Game;
@@ -26,6 +28,7 @@ namespace b7.Xabbo.Components
         }
 
         public EntityOverlayComponent(IInterceptor interceptor,
+            IConfiguration config,
             ProfileManager profileManager,
             RoomManager roomManager)
             : base(interceptor)
@@ -33,6 +36,8 @@ namespace b7.Xabbo.Components
             _profileManager = profileManager;
             _roomManager = roomManager;
             _roomManager.Entered += OnRoomEntered;
+
+            IsActive = config.GetValue("EntityOverlay:ShowSelfOnTop", false);
 
             Task initialization = Task.Run(InitializeAsync);
         }

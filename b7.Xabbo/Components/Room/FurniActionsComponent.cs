@@ -16,7 +16,7 @@ namespace b7.Xabbo.Components
     {
         private readonly IGameDataManager _gameDataManager;
         private readonly RoomManager _roomManager;
-        private readonly XabboUserComponent _xabboUser;
+        private readonly XabbotComponent _xabbot;
 
         private FurniData? FurniData => _gameDataManager.FurniData;
         private ExternalTexts? Texts => _gameDataManager.ExternalTexts;
@@ -60,12 +60,12 @@ namespace b7.Xabbo.Components
 
         public FurniActionsComponent(IInterceptor interceptor,
             IGameDataManager gameDataManager, RoomManager roomManager,
-            XabboUserComponent xabboUser)
+            XabbotComponent xabbot)
             : base(interceptor)
         {
             _gameDataManager = gameDataManager;
             _roomManager = roomManager;
-            _xabboUser = xabboUser;
+            _xabbot = xabbot;
 
             _initialization = InitializeAsync();
         }
@@ -114,7 +114,7 @@ namespace b7.Xabbo.Components
                     if (string.IsNullOrWhiteSpace(name))
                         name = info.Identifier;
 
-                    _xabboUser.ShowMessage($"{name} [{info.Identifier}] (id:{item.Id}) {item.Location} {item.Direction}", item.Location);
+                    _xabbot.ShowMessage($"{name} [{info.Identifier}] (id:{item.Id}) {item.Location} {item.Direction}", item.Location);
                 }
             }
 
@@ -173,7 +173,7 @@ namespace b7.Xabbo.Components
                     if (string.IsNullOrWhiteSpace(name))
                         name = info.Identifier;
 
-                    _xabboUser.ShowMessage($"{name} [{info.Identifier}] (id:{item.Id}) {item.Location}");
+                    _xabbot.ShowMessage($"{name} [{info.Identifier}] (id:{item.Id}) {item.Location}");
                 }
             }
         }

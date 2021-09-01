@@ -129,7 +129,7 @@ namespace b7.Xabbo
                 }
             }
 
-            services.AddHostedService(provider => provider.GetRequiredService<XabboUserComponent>());
+            services.AddHostedService(provider => provider.GetRequiredService<XabbotComponent>());
 
             // Wardrobe
             services.AddSingleton<IWardrobeRepository, LiteDbWardrobeRepository>();
