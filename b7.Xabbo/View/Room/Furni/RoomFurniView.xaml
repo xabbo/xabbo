@@ -51,7 +51,8 @@
                       VerticalAlignment="Center"
                       VerticalContentAlignment="Center"
                       Content="Query"
-                      IsChecked="{Binding IsQuery}" />
+                      IsChecked="{Binding IsQuery}"
+                      Style="{StaticResource MaterialDesignAccentCheckBox}" />
         </Grid>
         <ListView x:Name="listViewFurni" Grid.Row="1"
                   IsEnabled="{Binding IsAvailable}" ItemsSource="{Binding Furni}"

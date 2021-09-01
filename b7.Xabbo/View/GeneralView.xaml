@@ -26,12 +26,12 @@
         <Style TargetType="{x:Type WrapPanel}">
             <Setter Property="Margin" Value="0" />
         </Style>
-        <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource MaterialDesignCheckBox}">
+        <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource MaterialDesignAccentCheckBox}">
             <Setter Property="Margin" Value="2" />
             <Setter Property="HorizontalAlignment" Value="Left" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
         </Style>
-        <Style TargetType="{x:Type RadioButton}" BasedOn="{StaticResource MaterialDesignRadioButton}">
+        <Style TargetType="{x:Type RadioButton}" BasedOn="{StaticResource MaterialDesignAccentRadioButton}">
             <Setter Property="Margin" Value="2" />
             <Setter Property="HorizontalAlignment" Value="Left" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
@@ -87,10 +87,11 @@
                     </GroupBox>
                     <GroupBox DataContext="{Binding ClickTo}">
                         <GroupBox.Header>
-                            <CheckBox IsChecked="{Binding IsActive}"
-                                      VerticalAlignment="Center"
-                                      VerticalContentAlignment="Center"
-                                      Style="{StaticResource MaterialDesignAccentCheckBox}">
+                            <CheckBox 
+                                Margin="0"
+                                IsChecked="{Binding IsActive}"
+                                VerticalAlignment="Center"
+                                VerticalContentAlignment="Center">
                                 <TextBlock Text="Click to" Style="{StaticResource GroupBoxHeader}" Margin="0" />
                             </CheckBox>
                         </GroupBox.Header>

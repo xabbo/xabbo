@@ -23,7 +23,7 @@
         <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource MaterialDesignBody1TextBlock}">
             <Setter Property="Margin" Value="4" />
         </Style>
-        <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource MaterialDesignCheckBox}">
+        <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource MaterialDesignAccentCheckBox}">
             <Setter Property="Margin" Value="2" />
         </Style>
         <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignFlatMidBgButton}">
@@ -130,6 +130,7 @@
                                                             <Style.Triggers>
                                                                 <MultiDataTrigger>
                                                                     <MultiDataTrigger.Conditions>
+                                                                        <Condition Binding="{Binding ElementName=root, Path=DataContext.IsTimerActive}" Value="False" />
                                                                         <Condition Binding="{Binding IsVisible}" Value="True" />
                                                                         <Condition Binding="{Binding IsLocked}" Value="True" />
                                                                         <Condition Binding="{Binding ElementName=root, Path=DataContext.UseBaseFigure}" Value="True" />
@@ -182,15 +183,17 @@
                         HorizontalContentAlignment="Stretch"
                         VerticalContentAlignment="Stretch">
                     <Button.Content>
-                        <Grid IsHitTestVisible="False" Margin="-1">
+                        <Grid IsHitTestVisible="False">
                             <ProgressBar
                                 Visibility="{Binding IsTimerActive, Converter={StaticResource BoolToVisibilityConverter}}"
                                 IsIndeterminate="True"
                                 HorizontalAlignment="Stretch"
                                 VerticalAlignment="Stretch"
+                                Height="60"
                                 Opacity="0.5"
+                                md:TransitionAssist.DisableTransitions="True"
                             />
-                            <TextBlock Margin="2" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="Text" Value="Start timer" />
