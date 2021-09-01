@@ -146,7 +146,7 @@
                         DataContext="{Binding Overlay}"
                         IsEnabled="{Binding IsAvailable}"
                         IsChecked="{Binding IsActive}"
-                        Content="Show self behind furni"
+                        Content="Show self through furni"
                     />
                 </StackPanel>
             </GroupBox>
