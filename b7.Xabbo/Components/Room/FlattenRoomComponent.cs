@@ -5,6 +5,7 @@ using Xabbo.Interceptor;
 
 using Xabbo.Core;
 using Xabbo.Core.Game;
+using System.Linq;
 
 namespace b7.Xabbo.Components
 {
@@ -14,8 +15,6 @@ namespace b7.Xabbo.Components
 
         private bool _isActivated = false;
         private Heightmap? _heightmap;
-
-        private Heightmap? _originalHeightmap;
         private FloorPlan? _originalFloorPlan;
 
         public FlattenRoomComponent(IInterceptor interceptor, RoomManager roomManager)
@@ -60,7 +59,7 @@ namespace b7.Xabbo.Components
         }
 
         [InterceptIn(nameof(Incoming.StackingHeightmap))]
-        private void HandleHeightMap(InterceptArgs e)
+        private void HandleStackingHeightmap(InterceptArgs e)
         {
             if (!_isActivated) return;
 
@@ -68,14 +67,12 @@ namespace b7.Xabbo.Components
 
             // Height map comes before the floor plan so it must be saved
             // and modified after receiving the floor plan
-            _originalHeightmap = Heightmap.Parse(e.OriginalPacket);
-
             e.OriginalPacket.Position = 0;
             _heightmap = Heightmap.Parse(e.OriginalPacket);
         }
 
         [InterceptIn(nameof(Incoming.FloorHeightmap))]
-        private void HandleFloorPlan(InterceptArgs e)
+        private void HandleFloorHeightmap(InterceptArgs e)
         {
             if (!_isActivated || _heightmap is null) return;
 
@@ -111,7 +108,7 @@ namespace b7.Xabbo.Components
         }
 
         [InterceptIn(nameof(Incoming.StackingHeightmapDiff))]
-        private void HandleUpdateStackHeight(InterceptArgs e)
+        private void HandleStackingHeightmapDiff(InterceptArgs e)
         {
             if (!_isActivated) return;
 
@@ -139,7 +136,7 @@ namespace b7.Xabbo.Components
         }
 
         [InterceptIn(nameof(Incoming.UsersInRoom))]
-        private void HandleRoomUsers(InterceptArgs e)
+        private void HandleUsersInRoom(InterceptArgs e)
         {
             if (!_isActivated) return;
 
@@ -152,11 +149,11 @@ namespace b7.Xabbo.Components
         }
 
         [InterceptIn(nameof(Incoming.Status))]
-        private void HandleEntityUpdate(InterceptArgs e)
+        private void HandleStatus(InterceptArgs e)
         {
             if (!_isActivated) return;
 
-            var updates = EntityStatusUpdate.ParseMany(e.Packet);
+            EntityStatusUpdate[] updates = EntityStatusUpdate.ParseMany(e.Packet).ToArray();
             foreach (var update in updates)
             {
                 update.Location = AdjustTile(update.Location);
@@ -165,7 +162,8 @@ namespace b7.Xabbo.Components
                 if (movingTo.HasValue)
                     update.MovingTo = AdjustTile(movingTo.Value);
 
-                // TODO action height
+                if (update.ActionHeight.HasValue)
+                    update.ActionHeight -= GetOffset(update.Location);
             }
 
             e.Packet = new Packet(e.Client, e.Packet.Header);
@@ -173,7 +171,7 @@ namespace b7.Xabbo.Components
         }
 
         [InterceptIn(nameof(Incoming.ActiveObjects))]
-        private void HandleFloorItems(InterceptArgs e)
+        private void HandleActiveObjects(InterceptArgs e)
         {
             if (!_isActivated) return;
 
@@ -186,7 +184,7 @@ namespace b7.Xabbo.Components
         }
 
         [InterceptIn(nameof(Incoming.ActiveObjectAdd))]
-        private void HandleAddFloorItem(InterceptArgs e)
+        private void HandleActiveObjectAdd(InterceptArgs e)
         {
             if (!_isActivated) return;
 
@@ -196,15 +194,18 @@ namespace b7.Xabbo.Components
         }
 
         [InterceptIn(nameof(Incoming.ActiveObjectUpdate))]
-        private void HandleUpdateFloorItem(InterceptArgs e)
+        private void HandleActiveObjectUpdate(InterceptArgs e)
         {
             if (!_isActivated) return;
 
-            // TODO
+            FloorItem floorItem = FloorItem.Parse(e.Packet);
+            floorItem.Location = AdjustTile(floorItem.Location);
+
+            e.Packet = Packet.Compose(e.Client, e.Packet.Header, floorItem);
         }
 
         [InterceptIn(nameof(Incoming.QueueMoveUpdate))]
-        private void HandleObjectOnRoller(InterceptArgs e)
+        private void HandleQueueMoveUpdate(InterceptArgs e)
         {
             if (!_isActivated) return;
 
