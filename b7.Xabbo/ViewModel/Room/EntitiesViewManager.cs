@@ -338,9 +338,9 @@ namespace b7.Xabbo.ViewModel
 
                 vm.IsTrading = update.IsTrading;
 
-                if (update.IsController != vm.HasRights)
+                if (update.ControlLevel != vm.ControlLevel)
                 {
-                    vm.HasRights = update.IsController;
+                    vm.ControlLevel = update.ControlLevel;
                     _logger.LogTrace("Updating rights for {user} = {hasRights} (level:level)", vm.Entity, vm.HasRights, update.ControlLevel);
                     if (!vm.IsStaff && !vm.IsAmbassador && !vm.IsRoomOwner)
                         refresh = true;

@@ -14,80 +14,85 @@ namespace b7.Xabbo.ViewModel
         public int Index => Entity.Index;
         public long Id => Entity.Id;
 
-        private string name;
+        private string _name;
         public string Name
         {
-            get => name;
-            set => Set(ref name, value);
+            get => _name;
+            set => Set(ref _name, value);
         }
 
-        private string figure;
+        private string _figure;
         public string Figure
         {
-            get => figure;
+            get => _figure;
             set
             {
-                if (Set(ref figure, value))
+                if (Set(ref _figure, value))
                     RaisePropertyChanged(nameof(AvatarImageUrl));
             }
         }
 
-        private string motto;
+        private string _motto;
         public string Motto
         {
-            get => motto;
-            set => Set(ref motto, value);
+            get => _motto;
+            set => Set(ref _motto, value);
         }
 
-        private bool isStaff;
+        private bool _isStaff;
         public bool IsStaff
         {
-            get => isStaff;
+            get => _isStaff;
             set
             {
-                if (Set(ref isStaff, value))
+                if (Set(ref _isStaff, value))
                     UpdateVisualGroup();
             }
         }
 
-        private bool isAmbassador;
+        private bool _isAmbassador;
         public bool IsAmbassador
         {
-            get => isAmbassador;
+            get => _isAmbassador;
             set
             {
-                if (Set(ref isAmbassador, value))
+                if (Set(ref _isAmbassador, value))
                     UpdateVisualGroup();
             }
         }
 
-        private bool isRoomOwner;
+        private bool _isRoomOwner;
         public bool IsRoomOwner
         {
-            get => isRoomOwner;
+            get => _isRoomOwner;
             set
             {
-                if (Set(ref isRoomOwner, value))
+                if (Set(ref _isRoomOwner, value))
                     UpdateVisualGroup();
             }
         }
 
-        private bool hasRights;
-        public bool HasRights
+        private int _controlLevel;
+        public int ControlLevel
         {
-            get => hasRights;
+            get => _controlLevel;
             set
             {
-                if (Set(ref hasRights, value))
+                if (Set(ref _controlLevel, value))
+                {
+                    RaisePropertyChanged(nameof(HasRights));
                     UpdateVisualGroup();
+                }
             }
         }
 
-        private string imageSource = string.Empty;
+        public bool HasRights => ControlLevel > 0;
+
+        private string _imageSource = string.Empty;
         public string ImageSource
         {
-            get => imageSource;
-            set => Set(ref imageSource, value);
+            get => _imageSource;
+            set => Set(ref _imageSource, value);
         }
 
         public string VisualGroupName
@@ -95,19 +100,37 @@ namespace b7.Xabbo.ViewModel
             get
             {
                 if (Entity.Type == EntityType.Pet)
+                {
                     return "Pets";
+                }
                 else if (Entity.Type == EntityType.PrivateBot || Entity.Type == EntityType.PublicBot)
+                {
                     return "Bots";
+                }
                 else
                 {
                     if (IsRoomOwner)
-                        return "Room owner";
+                    {
+                        return "Owner";
+                    }
                     else if (IsStaff)
+                    {
                         return "Staff";
+                    }
                     else if (IsAmbassador)
+                    {
                         return "Ambassadors";
+                    }
                     else if (HasRights)
-                        return "Rights holders";
+                    {
+                        return ControlLevel switch
+                        {
+                            4 => "Owner",
+                            3 => "Group Admin",
+                            2 or 1 => "Room Rights",
+                            _ => $"{ControlLevel}"
+                        };
+                    }
                     else
                         return "Users";
                 }
@@ -120,7 +143,7 @@ namespace b7.Xabbo.ViewModel
             {
                 if (IsStaff) return 0;
                 else if (IsAmbassador) return 1;
-                else if (IsRoomOwner) return 2;
+                else if (IsRoomOwner || ControlLevel == 4) return 2;
                 else if (HasRights) return 3;
                 else
                 {
@@ -138,18 +161,18 @@ namespace b7.Xabbo.ViewModel
             }
         }
 
-        private Color headerColor = Colors.Red;
+        private Color _headerColor = Colors.Red;
         public Color HeaderColor
         {
-            get => headerColor;
-            set => Set(ref headerColor, value);
+            get => _headerColor;
+            set => Set(ref _headerColor, value);
         }
 
-        private bool isIdle;
+        private bool _isIdle;
         public bool IsIdle
         {
-            get => isIdle;
-            set => Set(ref isIdle, value);
+            get => _isIdle;
+            set => Set(ref _isIdle, value);
         }
 
         private bool _isTrading;
@@ -176,10 +199,10 @@ namespace b7.Xabbo.ViewModel
 
         public EntityViewModel(IEntity entity)
         {
-            name = entity.Name;
+            _name = entity.Name;
             Entity = entity;
-            motto = entity.Motto;
-            figure = entity.Figure;
+            _motto = entity.Motto;
+            _figure = entity.Figure;
         }
 
         private void UpdateVisualGroup()
