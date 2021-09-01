@@ -32,7 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="$(SolutionDir)\Xabbo.Common\Xabbo.Common\messages.ini">
+    <None Include="$(SolutionDir)\Xabbo.Messages\messages.ini">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
