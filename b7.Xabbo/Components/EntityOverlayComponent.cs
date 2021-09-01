@@ -20,6 +20,8 @@ namespace b7.Xabbo.Components
         private readonly ProfileManager _profileManager;
         private readonly RoomManager _roomManager;
 
+        private bool _isInjected;
+
         private bool _isAvailable;
         public bool IsAvailable
         {
@@ -35,9 +37,10 @@ namespace b7.Xabbo.Components
         {
             _profileManager = profileManager;
             _roomManager = roomManager;
-            _roomManager.Entered += OnRoomEntered;
+            _roomManager.Entered += OnEnteredRoom;
+            _roomManager.Left += OnLeftRoom;
 
-            IsActive = config.GetValue("EntityOverlay:ShowSelfOnTop", false);
+            IsActive = config.GetValue("EntityOverlay:Active", false);
 
             Task initialization = Task.Run(InitializeAsync);
         }
@@ -79,6 +82,8 @@ namespace b7.Xabbo.Components
                     Location = self.CurrentUpdate.Location.Add(32, 32, 32)
                 });
             }
+
+            _isInjected = true;
         }
 
         private void RemoveGhostUser()
@@ -91,10 +96,15 @@ namespace b7.Xabbo.Components
             if (!room.TryGetUserById(userData.Id, out IRoomUser? self))
                 return;
 
-            Send(In.UserLoggedOut, GHOST_INDEX.ToString());
+            _isInjected = false;
+            Send(In.Status, 1, new EntityStatusUpdate()
+            {
+                Index = GHOST_INDEX,
+                Location = (0, 0, -1000)
+            });
         }
 
-        private void OnRoomEntered(object? sender, RoomEventArgs e)
+        private void OnEnteredRoom(object? sender, RoomEventArgs e)
         {
             if (IsAvailable && IsActive)
             {
@@ -102,9 +112,16 @@ namespace b7.Xabbo.Components
             }
         }
 
+        private void OnLeftRoom(object? sender, EventArgs e)
+        {
+            _isInjected = false;
+        }
+
         [InterceptIn(nameof(Incoming.Status))]
         protected void HandleStatus(InterceptArgs e)
         {
+            if (!_isInjected) return;
+
             UserData? userData = _profileManager.UserData;
             IRoom? room = _roomManager.Room;
 
