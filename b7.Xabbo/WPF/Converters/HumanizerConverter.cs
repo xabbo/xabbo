@@ -11,7 +11,14 @@ namespace b7.Xabbo.WPF.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return value?.ToString().Humanize() ?? string.Empty;
+            if (value is Enum e)
+            {
+                return e.Humanize();
+            }
+            else
+            {
+                return value?.ToString().Humanize() ?? string.Empty;
+            }
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
