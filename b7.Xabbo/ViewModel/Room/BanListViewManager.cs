@@ -17,6 +17,7 @@ using Xabbo.Interceptor;
 using Xabbo.Core.Game;
 
 using b7.Xabbo.Services;
+using Microsoft.Extensions.Configuration;
 
 namespace b7.Xabbo.ViewModel
 {
@@ -29,6 +30,8 @@ namespace b7.Xabbo.ViewModel
 
         private readonly ObservableCollection<BannedUserViewModel> _users = new();
         private readonly ConcurrentDictionary<long, BannedUserViewModel> _userIdMap = new();
+
+        private readonly int _banInterval;
 
         public ICollectionView Users { get; }
 
@@ -82,11 +85,17 @@ namespace b7.Xabbo.ViewModel
         public ICommand LoadCommand { get; }
         public ICommand UnbanCommand { get; }
 
-        public BanListViewManager(IInterceptor interceptor, IUiContext context, RoomManager roomManager)
+        public BanListViewManager(
+            IInterceptor interceptor,
+            IConfiguration config,
+            IUiContext context,
+            RoomManager roomManager)
             : base(interceptor)
         {
             _context = context;
             _roomManager = roomManager;
+
+            _banInterval = config.GetValue("BanList:Interval", 600);
 
             Interceptor.Disconnected += OnGameDisconnected;
             _roomManager.Entered += RoomManager_Entered;
@@ -269,7 +278,7 @@ namespace b7.Xabbo.ViewModel
                 {
                     var user = array[i];
                     await SendAsync(Out.RoomUnbanUser, (LegacyLong)user.Id, (LegacyLong)roomId);
-                    await Task.Delay(333, _cts.Token);
+                    await Task.Delay(_banInterval, _cts.Token);
                 }
             }
             catch (OperationCanceledException)
