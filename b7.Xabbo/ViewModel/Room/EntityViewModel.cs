@@ -28,7 +28,9 @@ namespace b7.Xabbo.ViewModel
             set
             {
                 if (Set(ref _figure, value))
+                {
                     RaisePropertyChanged(nameof(AvatarImageUrl));
+                }
             }
         }
 
@@ -46,7 +48,9 @@ namespace b7.Xabbo.ViewModel
             set
             {
                 if (Set(ref _isStaff, value))
+                {
                     UpdateVisualGroup();
+                }
             }
         }
 
@@ -57,7 +61,9 @@ namespace b7.Xabbo.ViewModel
             set
             {
                 if (Set(ref _isAmbassador, value))
+                {
                     UpdateVisualGroup();
+                }
             }
         }
 
@@ -68,7 +74,9 @@ namespace b7.Xabbo.ViewModel
             set
             {
                 if (Set(ref _isRoomOwner, value))
+                {
                     UpdateVisualGroup();
+                }
             }
         }
 
@@ -99,19 +107,11 @@ namespace b7.Xabbo.ViewModel
         {
             get
             {
-                if (Entity.Type == EntityType.Pet)
-                {
-                    return "Pets";
-                }
-                else if (Entity.Type == EntityType.PrivateBot || Entity.Type == EntityType.PublicBot)
-                {
-                    return "Bots";
-                }
-                else
+                if (Entity.Type == EntityType.User)
                 {
                     if (IsRoomOwner)
                     {
-                        return "Owner";
+                        return "Room Owner";
                     }
                     else if (IsStaff)
                     {
@@ -125,14 +125,28 @@ namespace b7.Xabbo.ViewModel
                     {
                         return ControlLevel switch
                         {
-                            4 => "Owner",
-                            3 => "Group Admin",
-                            2 or 1 => "Room Rights",
-                            _ => $"{ControlLevel}"
+                            4 => "Room Owner",
+                            3 => "Group Admins",
+                            1 => "Rights Holders",
+                            _ => "Users"
                         };
                     }
                     else
+                    {
                         return "Users";
+                    }
+                }
+                else if (Entity.Type == EntityType.Pet)
+                {
+                    return "Pets";
+                }
+                else if (Entity.Type == EntityType.PrivateBot || Entity.Type == EntityType.PublicBot)
+                {
+                    return "Bots";
+                }
+                else
+                {
+                    return string.Empty;
                 }
             }
         }
@@ -141,23 +155,42 @@ namespace b7.Xabbo.ViewModel
         {
             get
             {
-                if (IsStaff) return 0;
-                else if (IsAmbassador) return 1;
-                else if (IsRoomOwner || ControlLevel == 4) return 2;
-                else if (HasRights) return 3;
-                else
+                if (Entity.Type == EntityType.User)
                 {
-                    switch (Entity.Type)
+                    if (IsRoomOwner)
                     {
-                        case EntityType.User: return 4;
-                        case EntityType.Pet: return 5;
-                        case EntityType.PublicBot: return 6;
-                        case EntityType.PrivateBot: return 6;
-                        default: break;
+                        return -300;
+                    }
+                    else if (IsStaff)
+                    {
+                        return -200;
+                    }
+                    else if (IsAmbassador)
+                    {
+                        return -100;
+                    }
+                    else
+                    {
+                        return ControlLevel switch
+                        {
+                            2 => 0,
+                            _ => -ControlLevel
+                        };
                     }
                 }
-
-                return 100;
+                else if (Entity.Type == EntityType.PublicBot ||
+                         Entity.Type == EntityType.PrivateBot)
+                {
+                    return 100;
+                }
+                else if (Entity.Type == EntityType.Pet)
+                {
+                    return 200;
+                }
+                else
+                {
+                    return 1000;
+                }
             }
         }
 

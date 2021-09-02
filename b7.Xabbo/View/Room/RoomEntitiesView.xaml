@@ -209,27 +209,48 @@
                                                 </Grid.Background>
                                                 <StackPanel Orientation="Vertical" Margin="4">
                                                     <Image
-                                                        
                                                         Source="{Binding Items[0].ImageSource}" SnapsToDevicePixels="True"
                                                         RenderOptions.BitmapScalingMode="HighQuality"
                                                         HorizontalAlignment="Center" VerticalAlignment="Center"
                                                     />
-                                                    <TextBlock Text="{Binding Items[0].VisualGroupName}"
-                                                               HorizontalAlignment="Center"
-                                                               Margin="2" Padding="0">
-                                                        <TextBlock.Style>
-                                                            <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignBody1TextBlock}">
-                                                                <Style.Triggers>
-                                                                    <DataTrigger Binding="{Binding Items[0].VisualGroupName}" Value="">
-                                                                        <Setter Property="Visibility" Value="Collapsed" />
-                                                                    </DataTrigger>
-                                                                </Style.Triggers>
-                                                            </Style>
-                                                        </TextBlock.Style>
-                                                    </TextBlock>
+                                                    <Grid>
+                                                        <TextBlock Text="{Binding Items[0].VisualGroupName}"
+                                                                   HorizontalAlignment="Center"
+                                                                   VerticalAlignment="Center"
+                                                                   Margin="2" Padding="0">
+                                                            <TextBlock.Style>
+                                                                <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignBody1TextBlock}">
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding Items[0].VisualGroupName}" Value="">
+                                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </TextBlock.Style>
+                                                        </TextBlock>
+                                                        <TextBlock
+                                                            Text="{Binding ItemCount}"
+                                                            HorizontalAlignment="Right"
+                                                            VerticalAlignment="Center"
+                                                            FontSize="16"
+                                                            Margin="4"
+                                                            Opacity="0.5"
+                                                        >
+                                                            <TextBlock.Style>
+                                                                <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource MaterialDesignBody2TextBlock}">
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding Items[0].IsRoomOwner}" Value="True">
+                                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </TextBlock.Style>
+                                                        </TextBlock>
+                                                    </Grid>
                                                     <TextBlock Margin="2,0,2,2" Padding="0" HorizontalAlignment="Center">
                                                         <TextBlock.Style>
                                                             <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource MaterialDesignBody2TextBlock}">
+                                                                <Setter Property="Visibility" Value="Collapsed" />
                                                                 <Style.Triggers>
                                                                     <DataTrigger Binding="{Binding Items[0].IsRoomOwner}" Value="True">
                                                                         <Setter Property="Visibility" Value="Collapsed" />

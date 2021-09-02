@@ -106,7 +106,6 @@ namespace b7.Xabbo.ViewModel
             ILogger<EntitiesViewManager> logger,
             IUiContext uiContext,
             ISnackbarMessageQueue snackbar,
-            IConfiguration config,
             IUriProvider<HabboEndpoints> uris,
             IOptions<GameOptions> gameOptions,
             RoomManager roomManager,
@@ -338,12 +337,24 @@ namespace b7.Xabbo.ViewModel
 
                 vm.IsTrading = update.IsTrading;
 
+                if (update.ControlLevel == 4 &&
+                    !vm.IsRoomOwner)
+                {
+                    vm.IsRoomOwner = true;
+                    refresh = true;
+
+                    _logger.LogTrace("Room owner detected: {user}", vm.Entity);
+                }
+
                 if (update.ControlLevel != vm.ControlLevel)
                 {
-                    vm.ControlLevel = update.ControlLevel;
-                    _logger.LogTrace("Updating rights for {user} = {hasRights} (level:level)", vm.Entity, vm.HasRights, update.ControlLevel);
                     if (!vm.IsStaff && !vm.IsAmbassador && !vm.IsRoomOwner)
+                    {
                         refresh = true;
+                    }
+
+                    vm.ControlLevel = update.ControlLevel;
+                    _logger.LogTrace("Updating control level for {user} = {level}", vm.Entity, vm.HasRights, update.ControlLevel);
                 }
             }
 
