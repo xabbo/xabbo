@@ -67,13 +67,6 @@ namespace b7.Xabbo.ViewModel
             set => Set(ref _isCancelling, value);
         }
 
-        private string _statusText;
-        public string StatusText
-        {
-            get => _statusText;
-            set => Set(ref _statusText, value);
-        }
-
         private string _filterText = string.Empty;
         public string FilterText
         {
@@ -245,17 +238,13 @@ namespace b7.Xabbo.ViewModel
                         AddUser(userViewModel);
                 }
             }
-            catch (OperationCanceledException)
-            when (_cts.IsCancellationRequested)
-            { }
-            catch (Exception ex)
-            { }
+            catch { }
             finally
             {
                 _cts.Dispose();
                 _cts = null;
 
-                IsWorking = false;
+                IsWorking =
                 IsCancelling = false;
             }
         }
@@ -272,11 +261,13 @@ namespace b7.Xabbo.ViewModel
                 long roomId = _roomManager.CurrentRoomId;
                 if (roomId <= 0) return;
 
+                IsWorking =
+                IsUnbanning = true;
+
                 var array = users.ToArray();
                 for (int i = 0; i < array.Length; i++)
                 {
                     var user = array[i];
-                    StatusText = $"Unbanning '{user.Name}'... ({i+1}/{array.Length})";
                     await SendAsync(Out.RoomUnbanUser, (LegacyLong)user.Id, (LegacyLong)roomId);
                     await Task.Delay(333, _cts.Token);
                 }
@@ -293,10 +284,9 @@ namespace b7.Xabbo.ViewModel
                 _cts.Dispose();
                 _cts = null;
 
-                IsWorking = false;
-                IsUnbanning = false;
+                IsWorking =
+                IsUnbanning =
                 IsCancelling = false;
-                StatusText = string.Empty;
             }
         }
         #endregion

@@ -4,13 +4,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:b7.Xabbo.View"
-             xmlns:svc="clr-namespace:b7.Xabbo.Services"
+             xmlns:viewModel="clr-namespace:b7.Xabbo.ViewModel"
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mde="clr-namespace:MaterialDesignExtensions.Controls;assembly=MaterialDesignExtensions"
              TextElement.Foreground="{StaticResource MaterialDesignBody}"
              TextElement.FontFamily="{StaticResource MaterialDesignFont}"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="400">
+             d:DesignHeight="450" d:DesignWidth="400"
+             d:DataContext="{d:DesignInstance {x:Type viewModel:BanListViewManager}}">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -50,28 +51,8 @@
             </ListView.View>
         </ListView>
 
-        <DockPanel Grid.Row="2" Margin="4">
-            <Button DockPanel.Dock="Right" Margin="4"
-                    Command="{Binding LoadCommand}">
-                <Button.Style>
-                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignFlatMidBgButton}">
-                        <Setter Property="Content" Value="Load" />
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding IsInRoom}" Value="False">
-                                <Setter Property="IsEnabled" Value="False" />
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding IsWorking}" Value="True">
-                                <Setter Property="IsEnabled" Value="False" />
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding IsCancelling}" Value="True">
-                                <Setter Property="IsEnabled" Value="False" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Button.Style>
-            </Button>
-            <Button DockPanel.Dock="Right" Margin="4"
-                    CommandParameter="{Binding Source={x:Reference listViewUsers}, Path=SelectedItems}">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Row="2" Margin="4">
+            <Button Margin="4" CommandParameter="{Binding Source={x:Reference listViewUsers}, Path=SelectedItems}">
                 <Button.Style>
                     <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignFlatMidBgButton}">
                         <Setter Property="Command" Value="{Binding UnbanCommand}" />
@@ -95,14 +76,30 @@
                     </Style>
                 </Button.Style>
             </Button>
-            <TextBlock DockPanel.Dock="Left" Margin="4"
-                       VerticalAlignment="Center"
-                       Text="{Binding StatusText}" />
-        </DockPanel>
+            <Button Margin="4" Command="{Binding LoadCommand}">
+                <Button.Style>
+                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignFlatMidBgButton}">
+                        <Setter Property="Content" Value="Load" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsInRoom}" Value="False">
+                                <Setter Property="IsEnabled" Value="False" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding IsWorking}" Value="True">
+                                <Setter Property="IsEnabled" Value="False" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding IsCancelling}" Value="True">
+                                <Setter Property="IsEnabled" Value="False" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+        </StackPanel>
 
         <mde:BusyOverlay
-            Grid.RowSpan="3"
+            Grid.RowSpan="2"
             IsBusy="{Binding IsWorking}"
+            Style="{StaticResource MaterialBusyOverlayCircular}"
         />
     </Grid>
 </UserControl>
