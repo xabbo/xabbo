@@ -105,7 +105,8 @@
                                 Margin="4" Padding="4"
                                 IsEnabled="{Binding IsInitialized}"
                                 Command="{Binding EnableDisableCommand}"
-                                Content="{Binding ButtonText}"/>
+                                Content="{Binding ButtonText}"
+                    Style="{StaticResource MaterialDesignFlatMidBgButton}" />
 
             <TextBlock Grid.Row="6" Grid.ColumnSpan="3"
                                    HorizontalAlignment="Center"
