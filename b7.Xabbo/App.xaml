@@ -52,6 +52,7 @@
                 <Setter Property="materialDesign:ListViewAssist.ListViewItemPadding" Value="4" />
             </Style>
 
+            <converter:WhitespaceNewlineConverter x:Key="WhitespaceNewlineConverter" />
             <converter:HabboStringConverter x:Key="HabboStringConverter" />
             <converter:HumanizerConverter x:Key="HumanizerConverter" />
 

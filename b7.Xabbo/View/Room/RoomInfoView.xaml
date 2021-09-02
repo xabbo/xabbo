@@ -4,8 +4,10 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:b7.Xabbo"
+             xmlns:c="clr-namespace:b7.Xabbo.WPF.Converters"
              xmlns:viewModel="clr-namespace:b7.Xabbo.ViewModel"
              TextElement.Foreground="{StaticResource MaterialDesignBody}"
+             TextElement.FontSize="16"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance Type={x:Type viewModel:RoomInfoViewManager}}"
@@ -79,7 +81,18 @@
 
             <!-- Description -->
             <TextBlock Grid.Row="5" Text="Description" />
-            <TextBox Grid.Column="1" Grid.Row="5" Text="{Binding Description, Mode=OneWay, Converter={StaticResource HabboStringConverter}}" TextWrapping="Wrap" />
+            <TextBox Grid.Column="1" Grid.Row="5" TextWrapping="Wrap">
+                <TextBox.Text>
+                    <Binding Path="Description" Mode="OneWay">
+                        <Binding.Converter>
+                            <c:MultiValueConverter>
+                                <StaticResource ResourceKey="HabboStringConverter" />
+                                <StaticResource ResourceKey="WhitespaceNewlineConverter" />
+                            </c:MultiValueConverter>
+                        </Binding.Converter>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
 
             <!-- Room access -->
             <TextBlock Grid.Row="6" Text="Room access" />
@@ -94,7 +107,14 @@
             <TextBox Grid.Column="1" Grid.Row="8" Text="{Binding Trading, Mode=OneWay, Converter={StaticResource HumanizerConverter}}" TextWrapping="Wrap" />
 
             <!-- Moderation Settings -->
-            <TextBlock Grid.Row="9" HorizontalAlignment="Center" Text="Moderation settings" />
+            <TextBlock
+                Grid.Row="9" Grid.ColumnSpan="2"
+                Padding="4"
+                HorizontalAlignment="Stretch"
+                TextAlignment="Center"
+                Background="{StaticResource AttentionToActionBrush}"
+                Text="Moderation"
+            />
 
             <TextBlock Grid.Row="10" Text="Who can mute" />
             <TextBox Grid.Column="1" Grid.Row="10" Text="{Binding Moderation.WhoCanMute, Mode=OneWay, Converter={StaticResource HumanizerConverter}}" TextWrapping="Wrap" />
@@ -106,7 +126,14 @@
             <TextBox Grid.Column="1" Grid.Row="12" Text="{Binding Moderation.WhoCanBan, Mode=OneWay, Converter={StaticResource HumanizerConverter}}" TextWrapping="Wrap" />
 
             <!-- Chat settings -->
-            <TextBlock Grid.Row="13" Text="Chat settings" />
+            <TextBlock
+                Grid.Row="13" Grid.ColumnSpan="2"
+                Padding="4"
+                HorizontalAlignment="Stretch"
+                TextAlignment="Center"
+                Background="{StaticResource AttentionToActionBrush}"
+                Text="Chat"
+            />
 
             <TextBlock Grid.Row="14" Text="Flow" />
             <TextBox Grid.Column="1" Grid.Row="14" Text="{Binding ChatSettings.Flow, Mode=OneWay, Converter={StaticResource HumanizerConverter}}" TextWrapping="Wrap" />
