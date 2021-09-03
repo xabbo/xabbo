@@ -2,14 +2,15 @@
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using System.Diagnostics.CodeAnalysis;
 
 using Microsoft.Extensions.Configuration;
 
+using Xabbo.Messages;
+using Xabbo.Interceptor;
 using Xabbo.Core;
 using Xabbo.Core.Events;
 using Xabbo.Core.Game;
-using Xabbo.Interceptor;
-using Xabbo.Messages;
 
 namespace b7.Xabbo.Components
 {
@@ -38,11 +39,44 @@ namespace b7.Xabbo.Components
             _profileManager = profileManager;
             _roomManager = roomManager;
             _roomManager.Entered += OnEnteredRoom;
+            _roomManager.EntityDataUpdated += OnEntityDataUpdated;
             _roomManager.Left += OnLeftRoom;
 
             IsActive = config.GetValue("EntityOverlay:Active", false);
 
             Task initialization = Task.Run(InitializeAsync);
+        }
+
+        private bool TryGetSelf([NotNullWhen(true)] out IRoomUser? self)
+        {
+            UserData? userData = _profileManager.UserData;
+            IRoom? room = _roomManager.Room;
+
+            if (userData is null || room is null)
+            {
+                self = null;
+                return false;
+            }
+            else
+            {
+                return room.TryGetUserById(userData.Id, out self);
+            }
+        }
+
+        private void OnEntityDataUpdated(object? sender, EntityDataUpdatedEventArgs e)
+        {
+            if (_isInjected &&
+                e.Entity.Id == _profileManager.UserData?.Id &&
+                e.Entity is IRoomUser self)
+            {
+                Send(In.UpdateAvatar,
+                    GHOST_INDEX,
+                    self.Figure,
+                    self.Gender.ToShortString(),
+                    self.Motto,
+                    self.AchievementScore
+                );
+            }
         }
 
         private async Task InitializeAsync()
@@ -54,13 +88,7 @@ namespace b7.Xabbo.Components
 
         private void InjectGhostUser()
         {
-            UserData? userData = _profileManager.UserData;
-            IRoom? room = _roomManager.Room;
-
-            if (userData is null || room is null) return;
-
-            if (!room.TryGetUserById(userData.Id, out IRoomUser? self))
-                return;
+            if (!TryGetSelf(out IRoomUser? self)) return;
 
             RoomUser ghostUser = new RoomUser(self.Id, GHOST_INDEX)
             {
@@ -71,15 +99,18 @@ namespace b7.Xabbo.Components
                 Location = self.Location.Add(32, 32, 32)
             };
 
-            Send(In.UsersInRoom, 1, ghostUser);
-            Send(In.RoomAvatarEffect, ghostUser.Index, 13, 0);
+            if (!_isInjected)
+            {
+                Send(In.UsersInRoom, 1, ghostUser);
+                Send(In.RoomAvatarEffect, ghostUser.Index, 13, 0);
+            }
 
             if (self.CurrentUpdate is not null)
             {
                 Send(In.Status, 1, new EntityStatusUpdate(self.CurrentUpdate)
                 {
                     Index = ghostUser.Index,
-                    Location = self.CurrentUpdate.Location.Add(32, 32, 32)
+                    Location = self.CurrentUpdate.Location.Add(64, 64, 64)
                 });
             }
 
@@ -88,15 +119,8 @@ namespace b7.Xabbo.Components
 
         private void RemoveGhostUser()
         {
-            UserData? userData = _profileManager.UserData;
-            IRoom? room = _roomManager.Room;
+            if (!_isInjected) return;
 
-            if (userData is null || room is null) return;
-
-            if (!room.TryGetUserById(userData.Id, out IRoomUser? self))
-                return;
-
-            _isInjected = false;
             Send(In.Status, 1, new EntityStatusUpdate()
             {
                 Index = GHOST_INDEX,
@@ -120,13 +144,9 @@ namespace b7.Xabbo.Components
         [InterceptIn(nameof(Incoming.Status))]
         protected void HandleStatus(InterceptArgs e)
         {
-            if (!_isInjected) return;
+            if (!IsActive || !_isInjected) return;
 
-            UserData? userData = _profileManager.UserData;
-            IRoom? room = _roomManager.Room;
-
-            if (userData is null || room is null) return;
-            if (!room.TryGetUserById(userData.Id, out IRoomUser? self)) return;
+            if (!TryGetSelf(out IRoomUser? self)) return;
 
             EntityStatusUpdate? selfUpdate = EntityStatusUpdate
                 .ParseMany(e.Packet)
