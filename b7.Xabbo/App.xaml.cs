@@ -74,7 +74,6 @@ namespace b7.Xabbo
                 {
                     options = options
                         .WithShowLeaveButton(false)
-                        .WithShowEventButton(false)
                         .WithShowDeleteButton(false);
                 }
 

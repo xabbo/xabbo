@@ -55,7 +55,13 @@ namespace b7.Xabbo.Services
         {
             if (_application.MainWindow.IsVisible)
             {
+                if (_application.MainWindow.WindowState == WindowState.Minimized)
+                {
+                    _application.MainWindow.WindowState = WindowState.Normal;
+                }
+
                 _application.MainWindow.Activate();
+                _application.MainWindow.Focus();
             }
             else
             {
