@@ -1,23 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 using MaterialDesignThemes.Wpf;
 
 using GalaSoft.MvvmLight;
 
-using Xabbo.Interceptor;
-
 namespace b7.Xabbo.ViewModel
 {
     public class MainViewManager : ObservableObject
     {
-        private readonly IRemoteInterceptor _interceptor;
-        private Task? _interceptorTask;
-
         private string _title = "xabbo";
         public string Title
         {
@@ -45,8 +36,8 @@ namespace b7.Xabbo.ViewModel
         // Info
         public FurniDataViewManager FurniData { get; }
 
-        public MainViewManager(ISnackbarMessageQueue snackbarMessageQueue,
-            IRemoteInterceptor interceptor,
+        public MainViewManager(
+            ISnackbarMessageQueue snackbarMessageQueue,
             GeneralViewManager general,
             ChatLogViewManager chat,
             WardrobeViewManager wardrobe,
@@ -60,15 +51,13 @@ namespace b7.Xabbo.ViewModel
             MimicViewManager mimic,
             FurniDataViewManager furniData)
         {
-            SnackbarMessageQueue = snackbarMessageQueue;
-
-            _interceptor = interceptor;
-
             Version? version = Assembly.GetExecutingAssembly().GetName().Version;
             if (version is not null)
             {
                 Title = $"xabbo v{version.ToString(3)}";
             }
+
+            SnackbarMessageQueue = snackbarMessageQueue;
 
             General = general;
             Chat = chat;
@@ -82,30 +71,6 @@ namespace b7.Xabbo.ViewModel
             Aligner = aligner;
             Mimic = mimic;
             FurniData = furniData;
-        }
-
-        public Task InitializeAsync()
-        {
-            _interceptor.Initialized += OnInitialized;
-            _interceptor.Connected += OnConnected;
-
-            _interceptorTask = RunInterceptorAsync();
-
-            return Task.CompletedTask;
-        }
-
-        private void OnInitialized(object? sender, EventArgs e)
-        {
-        }
-
-        private void OnConnected(object? sender, GameConnectedEventArgs e)
-        {
-
-        }
-
-        private async Task RunInterceptorAsync()
-        {
-            await _interceptor.RunAsync();
         }
     }
 }

@@ -178,8 +178,6 @@ namespace b7.Xabbo
                     .ConfigureServices(ConfigureServices)
                     .Build();
 
-                _host.Services.GetRequiredService<IUriProvider<HabboEndpoints>>();
-
                 MainWindow = _host.Services.GetRequiredService<MainWindow>();
 
                 await _host.StartAsync();

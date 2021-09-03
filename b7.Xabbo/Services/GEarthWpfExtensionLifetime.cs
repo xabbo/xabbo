@@ -3,32 +3,36 @@ using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
 
 using Microsoft.Extensions.Hosting;
 
 using Xabbo.Interceptor;
 using Xabbo.GEarth;
 
+using b7.Xabbo.Util;
+
 namespace b7.Xabbo.Services
 {
     public class GEarthWpfExtensionLifetime : IHostLifetime
     {
         private readonly IHostApplicationLifetime _hostAppLifetime;
-        private readonly Application _application;
-
-        private readonly GEarthExtension _extension;
+        
+        public GEarthExtension Extension { get; }
+        public Application Application { get; }
+        public Window Window => Application.MainWindow;
 
         public GEarthWpfExtensionLifetime(IHostApplicationLifetime hostAppLifetime, Application application,
             GEarthExtension extension)
         {
             _hostAppLifetime = hostAppLifetime;
-            _application = application;
+            Application = application;
 
-            _extension = extension;
-            _extension.InterceptorConnectionFailed += OnInterceptorConnectionFailed;
-            _extension.InterceptorConnected += OnInterceptorConnected;
-            _extension.Clicked += OnExtensionClicked;
-            _extension.InterceptorDisconnected += OnInterceptorDisconnected;
+            Extension = extension;
+            Extension.InterceptorConnectionFailed += OnInterceptorConnectionFailed;
+            Extension.InterceptorConnected += OnInterceptorConnected;
+            Extension.Clicked += OnExtensionClicked;
+            Extension.InterceptorDisconnected += OnInterceptorDisconnected;
 
             _hostAppLifetime.ApplicationStopping.Register(() => application.Shutdown());
         }
@@ -36,65 +40,70 @@ namespace b7.Xabbo.Services
         private void OnInterceptorConnectionFailed(object? sender, ConnectionFailedEventArgs e)
         {
             MessageBox.Show(
-                $"Failed to connect to G-Earth on port {_extension.Options.Port}.", "xabbo",
+                $"Failed to connect to G-Earth on port {Extension.Options.Port}.", "xabbo",
                 MessageBoxButton.OK, MessageBoxImage.Error
             );
 
-            _application.Shutdown();
+            Application.Shutdown();
         }
 
         private void OnInterceptorConnected(object? sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(_extension.Options.Cookie))
+            if (!Extension.Options.IsInstalledExtension)
             {
-                _application.MainWindow.Show();
+                Window.Dispatcher.InvokeAsync(() => Window.Show(), DispatcherPriority.ApplicationIdle);
             }
         }
 
         private void OnExtensionClicked(object? sender, EventArgs e)
         {
-            if (_application.MainWindow.IsVisible)
-            {
-                if (_application.MainWindow.WindowState == WindowState.Minimized)
+            Window.Dispatcher.InvokeAsync(
+                () =>
                 {
-                    _application.MainWindow.WindowState = WindowState.Normal;
-                }
+                    if (!Window.IsVisible)
+                    {
+                        Window.Show();
+                    }
 
-                _application.MainWindow.Activate();
-                _application.MainWindow.Focus();
-            }
-            else
-            {
-                _application.MainWindow.Show();
-            }
+                    if (Window.WindowState == WindowState.Minimized)
+                    {
+                        Window.WindowState = WindowState.Normal;
+                    }
+
+                    WindowUtil.ActivateWindow(Window);
+                },
+                DispatcherPriority.ApplicationIdle
+            );
         }
 
         private void MainWindow_Closing(object sender, CancelEventArgs e)
         {
-            if (_extension.IsInterceptorConnected &&
-                !string.IsNullOrEmpty(_extension.Options.Cookie))
+            if (Extension.IsInterceptorConnected &&
+                !string.IsNullOrEmpty(Extension.Options.Cookie))
             {
                 e.Cancel = true;
-                _application.MainWindow.Hide();
+                Application.MainWindow.Hide();
             }
         }
 
         private void OnInterceptorDisconnected(object? sender, DisconnectedEventArgs e)
         {
-            _application.Shutdown();
+            Application.Shutdown();
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            _application.Shutdown();
+            Application.Shutdown();
 
             return Task.CompletedTask;
         }
 
         public Task WaitForStartAsync(CancellationToken cancellationToken)
         {
-            _application.MainWindow.Closing += MainWindow_Closing;
-            _application.Exit += (s, e) => _hostAppLifetime.StopApplication();
+            Application.MainWindow.Closing += MainWindow_Closing;
+            Application.Exit += (s, e) => _hostAppLifetime.StopApplication();
+
+            _ = Extension.RunAsync();
 
             return Task.CompletedTask;
         }
