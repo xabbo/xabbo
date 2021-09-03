@@ -102,10 +102,10 @@
             </StackPanel>
 
             <Button Grid.Row="5" Grid.ColumnSpan="3"
-                                Margin="4" Padding="4"
-                                IsEnabled="{Binding IsInitialized}"
-                                Command="{Binding EnableDisableCommand}"
-                                Content="{Binding ButtonText}"
+                    Margin="4" Padding="4"
+                    IsEnabled="{Binding IsInitialized}"
+                    Command="{Binding EnableDisableCommand}"
+                    Content="{Binding ButtonText}"
                     Style="{StaticResource MaterialDesignFlatMidBgButton}" />
 
             <TextBlock Grid.Row="6" Grid.ColumnSpan="3"
