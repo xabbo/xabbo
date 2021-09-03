@@ -22,10 +22,13 @@ namespace b7.Xabbo.Services
         public Application Application { get; }
         public Window Window => Application.MainWindow;
 
-        public GEarthWpfExtensionLifetime(IHostApplicationLifetime hostAppLifetime, Application application,
+        public GEarthWpfExtensionLifetime(
+            IHostApplicationLifetime hostAppLifetime,
+            Application application,
             GEarthExtension extension)
         {
             _hostAppLifetime = hostAppLifetime;
+            
             Application = application;
 
             Extension = extension;
@@ -51,7 +54,7 @@ namespace b7.Xabbo.Services
         {
             if (!Extension.Options.IsInstalledExtension)
             {
-                Window.Dispatcher.InvokeAsync(() => Window.Show(), DispatcherPriority.ApplicationIdle);
+                Window.Show();
             }
         }
 
@@ -60,6 +63,8 @@ namespace b7.Xabbo.Services
             Window.Dispatcher.InvokeAsync(
                 () =>
                 {
+                    WindowUtil.ActivateWindow(Window);
+
                     if (!Window.IsVisible)
                     {
                         Window.Show();
@@ -69,8 +74,6 @@ namespace b7.Xabbo.Services
                     {
                         Window.WindowState = WindowState.Normal;
                     }
-
-                    WindowUtil.ActivateWindow(Window);
                 },
                 DispatcherPriority.ApplicationIdle
             );
