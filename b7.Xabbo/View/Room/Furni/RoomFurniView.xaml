@@ -84,18 +84,15 @@
                               Command="{Binding PickupCommand}"/>
                 </ContextMenu>
             </ListView.ContextMenu>
-            <ListView.Resources>
-                <Style TargetType="{x:Type ListViewItem}">
-                    <Setter Property="Foreground" Value="DarkSlateGray" />
-                    <Setter Property="Background" Value="Transparent" />
+            <ListView.ItemContainerStyle>
+                <Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource MaterialDesignGridViewItem}">
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding IsHidden, Mode=OneWay}" Value="True">
-                            <Setter Property="Foreground" Value="DarkSlateGray" />
-                            <Setter Property="Background" Value="LightGray" />
+                            <Setter Property="Opacity" Value="0.33" />
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
-            </ListView.Resources>
+            </ListView.ItemContainerStyle>
             <ListView.View>
                 <GridView>
                     <GridView.Columns>
