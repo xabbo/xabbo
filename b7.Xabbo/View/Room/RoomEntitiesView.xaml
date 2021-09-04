@@ -149,12 +149,12 @@
                                                                 <Setter Property="TextWrapping" Value="Wrap" />
                                                             </Style>
                                                         </StackPanel.Resources>
-                                                        <TextBlock Margin="2" FontWeight="Bold" Text="{Binding Name, Mode=OneWay}" />
+                                                        <TextBlock Margin="2" FontWeight="Bold" Text="{Binding Name, Mode=OneWay, Converter={StaticResource HabboStringConverter}}" />
                                                         <TextBlock Margin="2">
                                                             <Run FontWeight="Bold" Text="ID: " /><Run Text="{Binding Id, Mode=OneWay}" />
                                                         </TextBlock>
                                                         <TextBlock Margin="2">
-                                                            <Run FontWeight="Bold" Text="Motto: " /><Run Text="{Binding Motto, Mode=OneWay}" />
+                                                            <Run FontWeight="Bold" Text="Motto: " /><Run Text="{Binding Motto, Mode=OneWay, Converter={StaticResource HabboStringConverter}}" />
                                                         </TextBlock>
                                                     </StackPanel>
                                                 </Grid>
@@ -162,7 +162,7 @@
                                         </DockPanel.ToolTip>
                                         <TextBlock
                                             DockPanel.Dock="Left"
-                                            TextTrimming="CharacterEllipsis" Text="{Binding Name}"
+                                            TextTrimming="CharacterEllipsis" Text="{Binding Name, Converter={StaticResource HabboStringConverter}}"
                                         />
                                         <Image 
                                             Stretch="None"
