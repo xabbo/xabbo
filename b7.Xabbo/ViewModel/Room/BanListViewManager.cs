@@ -18,12 +18,14 @@ using Xabbo.Core.Game;
 
 using b7.Xabbo.Services;
 using Microsoft.Extensions.Configuration;
+using MaterialDesignThemes.Wpf;
 
 namespace b7.Xabbo.ViewModel
 {
     public class BanListViewManager : ComponentViewModel
     {
         private readonly IUiContext _context;
+        private readonly ISnackbarMessageQueue _snackbarMq;
         private readonly RoomManager _roomManager;
 
         private CancellationTokenSource? _cts;
@@ -88,11 +90,13 @@ namespace b7.Xabbo.ViewModel
         public BanListViewManager(
             IInterceptor interceptor,
             IConfiguration config,
+            ISnackbarMessageQueue snackbarMq,
             IUiContext context,
             RoomManager roomManager)
             : base(interceptor)
         {
             _context = context;
+            _snackbarMq = snackbarMq;
             _roomManager = roomManager;
 
             _banInterval = config.GetValue("BanList:Interval", 600);
@@ -144,10 +148,10 @@ namespace b7.Xabbo.ViewModel
 
         private bool FilterUsers(object obj)
         {
-            if (!(obj is BannedUserViewModel user))
+            if (obj is not BannedUserViewModel user)
                 return false;
 
-            return user.Name.ToLower().Contains(FilterText.ToLower());
+            return user.Name.Contains(FilterText, StringComparison.OrdinalIgnoreCase);
         }
 
         private void RefreshUsers()
@@ -246,6 +250,10 @@ namespace b7.Xabbo.ViewModel
                     if (_userIdMap.TryAdd(userId, userViewModel))
                         AddUser(userViewModel);
                 }
+            }
+            catch (OperationCanceledException)
+            {
+                _snackbarMq.Enqueue("Failed to load the banned users list.");
             }
             catch { }
             finally
