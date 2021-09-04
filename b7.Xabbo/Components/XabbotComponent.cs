@@ -40,7 +40,7 @@ namespace b7.Xabbo.Components
             {
                 Name = "xabbo",
                 Motto = "enhanced habbo",
-                Location = new Tile(0, 0, -1000),
+                Location = new Tile(0, 0, -100),
                 Gender = Gender.Male,
                 Figure = "hr-100.hd-185-14.ch-805-71.lg-281-75.sh-305-80.ea-1406.cc-260-80"
             };
@@ -69,7 +69,7 @@ namespace b7.Xabbo.Components
             Send(In.Status, 1, new EntityStatusUpdate
             {
                 Index = UserIndex,
-                Location = new Tile(location.X, location.Y, -1000),
+                Location = new Tile(location.X, location.Y, -100),
                 Direction = 4,
                 HeadDirection = 4
             });
