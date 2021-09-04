@@ -23,7 +23,8 @@
                  VerticalScrollBarVisibility="Visible"
                  HorizontalScrollBarVisibility="Auto"
                  IsReadOnly="True" FontFamily="Consolas" FontSize="14"
-                 TextWrapping="Wrap" Text="{Binding LogText}">
+                 TextAlignment="Left" TextWrapping="Wrap"
+                 Text="{Binding LogText}">
         </TextBox>
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
             <CheckBox Margin="8"
