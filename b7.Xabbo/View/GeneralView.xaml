@@ -163,7 +163,7 @@
                                       IsChecked="{Binding IsLocalized}" />
                         </StackPanel>
                     </StackPanel>
-                    <CheckBox Content="No typing indicator" DataContext="{Binding AntiTyping}" />
+                    <CheckBox Content="No typing indicator" IsChecked="{Binding AntiTyping.IsActive}" />
                     <GroupBox DataContext="{Binding Chat}">
                         <GroupBox.Header>
                             <TextBlock Text="Mute" Style="{StaticResource GroupBoxHeader}" />
