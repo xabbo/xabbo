@@ -354,7 +354,7 @@ namespace b7.Xabbo.ViewModel
                     }
 
                     vm.ControlLevel = update.ControlLevel;
-                    _logger.LogTrace("Updating control level for {user} = {level}", vm.Entity, vm.HasRights, update.ControlLevel);
+                    _logger.LogTrace("Updating control level for {user} = {level}", vm.Entity, update.ControlLevel);
                 }
             }
 
@@ -422,7 +422,10 @@ namespace b7.Xabbo.ViewModel
             if (text is null) return;
 
             try { Clipboard.SetText(text); }
-            catch (Exception ex) { /*Dialog.ShowError($"Failed to set clipboard text: {ex.Message}");*/ }
+            catch
+            {
+                _snackbarMq.Enqueue("Failed to set clipboard text.");
+            }
         }
 
         private async void OnOpenProfile(string arg)
@@ -433,8 +436,6 @@ namespace b7.Xabbo.ViewModel
 
             try
             {
-                // TODO dynamic domain
-
                 switch (arg)
                 {
                     case "game":
@@ -450,7 +451,10 @@ namespace b7.Xabbo.ViewModel
                                 _snackbarMq.Enqueue($"{user.Name}'s profile is not visible.");
                             }
                         }
-                        catch (OperationCanceledException) { }
+                        catch (OperationCanceledException)
+                        {
+                            _snackbarMq.Enqueue("Profile load timed out.");
+                        }
                         break;
                     case "web":
                         OpenUri(_uris.GetUri(HabboEndpoints.UserProfile, new { name = user.Name }));
