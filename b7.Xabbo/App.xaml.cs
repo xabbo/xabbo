@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using System.Reflection;
@@ -41,7 +42,17 @@ namespace b7.Xabbo
             ["-f"] = "Xabbo:Interceptor:File"
         };
 
-        public App() { }
+        public App()
+        {
+            Dispatcher.UnhandledException += Dispatcher_UnhandledException;
+        }
+
+        private void Dispatcher_UnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+        {
+            File.AppendAllLines("error.log", new[] {
+                $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}] [DispatcherUnhandledException] {e.Exception}"
+            });
+        }
 
         private void ConfigureLogging(HostBuilderContext context, ILoggingBuilder logging) { }
 
