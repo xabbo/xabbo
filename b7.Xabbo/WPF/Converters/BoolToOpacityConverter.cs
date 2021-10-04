@@ -12,10 +12,13 @@ namespace b7.Xabbo.WPF.Converters
             if (parameter is string param)
             {
                 string[] split = param.Split(new char[] { ';' });
-                if (split.Length != 2)
-                    throw new FormatException();
-                trueValue = double.Parse(split[0]);
-                falseValue = double.Parse(split[1]);
+                if (split.Length == 2)
+                {
+                    if (!double.TryParse(split[0], out trueValue))
+                        trueValue = 1.0;
+                    if (!double.TryParse(split[1], out falseValue))
+                        falseValue = 0.0;
+                }
             }
 
             return ((bool)value) ? trueValue : falseValue;
