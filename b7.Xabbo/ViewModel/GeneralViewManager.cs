@@ -34,6 +34,8 @@ namespace b7.Xabbo.ViewModel
 
         public EntityOverlayComponent Overlay { get; }
 
+        public FlashWindowComponent Flash { get; }
+
         public GeneralViewManager(
             AntiKickComponent antiKick,
             AntiIdleComponent antiIdle,
@@ -53,7 +55,8 @@ namespace b7.Xabbo.ViewModel
             FlattenRoomComponent flattenRoom,
             AntiHandItemComponent handItem,
             AntiHcGiftNotificationComponent antiHcGiftNotification,
-            EntityOverlayComponent overlay)
+            EntityOverlayComponent overlay,
+            FlashWindowComponent flash)
         {
             AntiKick = antiKick;
             AntiIdle = antiIdle;
@@ -74,6 +77,7 @@ namespace b7.Xabbo.ViewModel
             HandItem = handItem;
             AntiHcGiftNotification = antiHcGiftNotification;
             Overlay = overlay;
+            Flash = flash;
         }
     }
 }

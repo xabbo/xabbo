@@ -206,6 +206,19 @@
             </GroupBox>
             <GroupBox>
                 <GroupBox.Header>
+                    <TextBlock Text="Flash window" Style="{StaticResource GroupBoxHeader}" />
+                </GroupBox.Header>
+                <WrapPanel DataContext="{Binding Flash}">
+                    <CheckBox Content="On whisper" IsChecked="{Binding FlashOnWhisper}" />
+                    <CheckBox Content="On user chat" IsChecked="{Binding FlashOnUserChat}" />
+                    <CheckBox Content="On friend chat" IsChecked="{Binding FlashOnFriendChat}" />
+                    <CheckBox Content="On user entered" IsChecked="{Binding FlashOnUserEntered}" />
+                    <CheckBox Content="On friend entered" IsChecked="{Binding FlashOnFriendEntered}" />
+                    <CheckBox Content="On private message" IsChecked="{Binding FlashOnPrivateMessage}" />
+                </WrapPanel>
+            </GroupBox>
+            <GroupBox>
+                <GroupBox.Header>
                     <TextBlock Text="Misc." Style="{StaticResource GroupBoxHeader}" />
                 </GroupBox.Header>
                 <CheckBox DataContext="{Binding AntiHcGiftNotification}"
