@@ -234,7 +234,7 @@ namespace b7.Xabbo.ViewModel
                 Clear();
 
                 await SendAsync(Out.GetBannedUsers, (LegacyLong)_roomManager.CurrentRoomId);
-                var packet = await Interceptor.ReceiveAsync(4000, In.UsersBannedFromRoom);
+                var packet = await Interceptor.ReceiveAsync(In.UsersBannedFromRoom, 4000);
 
                 long roomId = packet.ReadLegacyLong();
                 if (roomId != _roomManager.CurrentRoomId)

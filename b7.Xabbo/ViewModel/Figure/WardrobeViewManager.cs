@@ -250,7 +250,7 @@ namespace b7.Xabbo.ViewModel
             try
             {
                 await SendAsync(Out.GetWardrobe);
-                var packet = await Interceptor.ReceiveAsync(5000, In.UserWardrobe);
+                var packet = await Interceptor.ReceiveAsync(In.UserWardrobe, 5000);
                 int state = packet.ReadInt();
                 short n = packet.ReadLegacyShort();
                 for (int i = 0; i < n; i++)
@@ -258,7 +258,7 @@ namespace b7.Xabbo.ViewModel
                     int slot = packet.ReadInt();
                     string figureString = packet.ReadString();
                     Gender gender = H.ToGender(packet.ReadString());
-                    if (Figure.TryParse(figureString, out Figure figure))
+                    if (Figure.TryParse(figureString, out Figure? figure))
                     {
                         figure.Gender = gender;
                         AddFigure(figure);

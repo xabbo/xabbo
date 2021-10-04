@@ -443,7 +443,7 @@ namespace b7.Xabbo.ViewModel
                         {
                             Send(Out.GetExtendedProfile, (LegacyLong)user.Id, true);
                             UserProfile profile = UserProfile.Parse(
-                                await Interceptor.ReceiveAsync(5000, In.ExtendedProfile)
+                                await Interceptor.ReceiveAsync(In.ExtendedProfile, 5000)
                             );
 
                             if (!profile.DisplayInClient)

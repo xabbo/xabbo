@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -38,35 +39,16 @@ namespace b7.Xabbo.Commands
 
         protected void ShowMessage(string message) => Commands.ShowMessage(message);
 
-        protected Task<IPacket> CaptureAsync(Destination destination, Header[] headers,
-            int timeout, CancellationToken cancellationToken, bool block)
+        protected Task<IPacket> ReceiveAsync(Header header, int timeout = -1, bool block = false,
+            CancellationToken cancellationToken = default)
         {
-            return new CaptureMessageTask(Interceptor, destination, block, headers)
-                .ExecuteAsync(timeout, cancellationToken);
+            return Interceptor.ReceiveAsync(header, timeout, block, cancellationToken);
         }
 
-        protected Task<IPacket> ReceiveAsync(Header header, int timeout = 10000,
-            CancellationToken cancellationToken = default, bool block = false)
+        protected Task<IPacket> ReceiveAsync(ITuple tuple, int timeout = -1, bool block = false,
+            CancellationToken cancellationToken = default)
         {
-            return ReceiveAsync(new[] { header }, timeout, cancellationToken, block);
-        }
-
-        protected Task<IPacket> ReceiveAsync(Header[] headers, int timeout = 10000,
-            CancellationToken cancellationToken = default, bool block = false)
-        {
-            return CaptureAsync(Destination.Client, headers, timeout, cancellationToken, block);
-        }
-
-        protected Task<IPacket> CaptureOutAsync(Header header, int timeout = 10000,
-            CancellationToken cancellationToken = default, bool block = false)
-        {
-            return CaptureOutAsync(new[] { header }, timeout, cancellationToken, block);
-        }
-
-        protected Task<IPacket> CaptureOutAsync(Header[] headers, int timeout = 10000,
-            CancellationToken cancellationToken = default, bool block = false)
-        {
-            return CaptureAsync(Destination.Server, headers, timeout, cancellationToken, block);
+            return Interceptor.ReceiveAsync(tuple, timeout, block, cancellationToken);
         }
     }
 }
