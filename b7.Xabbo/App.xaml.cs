@@ -81,7 +81,7 @@ namespace b7.Xabbo
                     .WithAuthor("b7")
                     .WithConfiguration(context.Configuration);
 
-                if (string.IsNullOrWhiteSpace(options.Cookie))
+                if (!options.IsInstalledExtension)
                 {
                     options = options
                         .WithShowLeaveButton(false)
