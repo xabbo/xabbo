@@ -1,5 +1,4 @@
-﻿using b7.Xabbo.Events;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
@@ -9,19 +8,12 @@ using System.Threading.Tasks;
 using Xabbo.Core.GameData;
 using Xabbo.Core.Web;
 
+using b7.Xabbo.Events;
+
 namespace b7.Xabbo.Services
 {
     public class GameDataManager : IGameDataManager
     {
-        private static readonly IReadOnlyDictionary<GameDataType, string>
-            metadataKeys = new Dictionary<GameDataType, string>()
-            {
-                { GameDataType.Figure, "external.figurepartlist.txt" },
-                { GameDataType.Furni, "furnidata.load.url" },
-                { GameDataType.Product, "productdata.load.url" },
-                { GameDataType.Texts, "external.texts.txt" }
-            };
-
         private readonly string _cachePath;
         private readonly IUriProvider<HabboEndpoints> _uriProvider;
         private readonly IHttpClientFactory _httpClientFactory;

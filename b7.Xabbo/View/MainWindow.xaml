@@ -7,7 +7,6 @@
         xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
         xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:mde="clr-namespace:MaterialDesignExtensions.Controls;assembly=MaterialDesignExtensions"
-        xmlns:controlzEx="urn:controlzex"
         xmlns:view="clr-namespace:b7.Xabbo.View"
         xmlns:viewModel="clr-namespace:b7.Xabbo.ViewModel"
         TextElement.Foreground="{StaticResource MaterialDesignBody}"
