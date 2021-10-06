@@ -129,6 +129,7 @@ namespace b7.Xabbo
                 {
                     Debug.WriteLine($"Registering component service: {type.Name}");
                     services.AddSingleton(type);
+                    services.AddSingleton(typeof(Component), provider => provider.GetRequiredService(type));
                 }
             }
 

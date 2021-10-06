@@ -1,13 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Hosting;
 
+using b7.Xabbo.Components;
+
 namespace b7.Xabbo.Services
 {
     public class InitializationService : IHostedService
     {
+        private readonly IEnumerable<Component> _components;
         private readonly IHostApplicationLifetime _lifetime;
         private readonly IUiContext _uiContext;
         private readonly IGameDataManager _gameDataManager;
@@ -15,11 +19,13 @@ namespace b7.Xabbo.Services
         public InitializationService(
             IHostApplicationLifetime lifetime,
             IUiContext uiContext,
-            IGameDataManager gameDataManager)
+            IGameDataManager gameDataManager,
+            IEnumerable<Component> components)
         {
             _lifetime = lifetime;
             _uiContext = uiContext;
             _gameDataManager = gameDataManager;
+            _components = components;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
