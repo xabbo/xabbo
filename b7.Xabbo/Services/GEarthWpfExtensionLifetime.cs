@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
@@ -42,25 +43,28 @@ namespace b7.Xabbo.Services
 
         private void OnInterceptorConnectionFailed(object? sender, ConnectionFailedEventArgs e)
         {
-            MessageBox.Show(
-                $"Failed to connect to G-Earth on port {Extension.Options.Port}.", "xabbo",
-                MessageBoxButton.OK, MessageBoxImage.Error
-            );
+            Application.Dispatcher.Invoke(() =>
+            {
+                MessageBox.Show(
+                    $"Failed to connect to G-Earth on port {Extension.Options.Port}.", "xabbo",
+                    MessageBoxButton.OK, MessageBoxImage.Error
+                );
 
-            Application.Shutdown();
+                Application.Shutdown();
+            });
         }
 
         private void OnInterceptorConnected(object? sender, EventArgs e)
         {
             if (!Extension.Options.IsInstalledExtension)
             {
-                Window.Show();
+                Application.Dispatcher.InvokeAsync(() => Window.Show());
             }
         }
 
         private void OnExtensionClicked(object? sender, EventArgs e)
         {
-            Window.Dispatcher.InvokeAsync(
+            Application.Dispatcher.InvokeAsync(
                 () =>
                 {
                     WindowUtil.ActivateWindow(Window);
@@ -79,19 +83,18 @@ namespace b7.Xabbo.Services
             );
         }
 
-        private void MainWindow_Closing(object sender, CancelEventArgs e)
+        private void OnWindowClosing(object sender, CancelEventArgs e)
         {
-            if (Extension.IsInterceptorConnected &&
-                !string.IsNullOrEmpty(Extension.Options.Cookie))
+            if (Extension.IsInterceptorConnected)
             {
                 e.Cancel = true;
-                Application.MainWindow.Hide();
+                Window.Hide();
             }
         }
 
         private void OnInterceptorDisconnected(object? sender, DisconnectedEventArgs e)
         {
-            Application.Shutdown();
+            Application.Dispatcher.Invoke(() => Application.Shutdown());
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
@@ -103,10 +106,26 @@ namespace b7.Xabbo.Services
 
         public Task WaitForStartAsync(CancellationToken cancellationToken)
         {
-            Application.MainWindow.Closing += MainWindow_Closing;
+            Window.Closing += OnWindowClosing;
             Application.Exit += (s, e) => _hostAppLifetime.StopApplication();
 
-            _ = Extension.RunAsync();
+            _ = Task.Run(
+                async () =>
+                {
+                    try
+                    {
+                        await Extension.RunAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        File.AppendAllText(
+                            "error.log",
+                            $"\r\n[{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}] [Extension.RunAsync] {ex}"
+                        );
+                    }
+                },
+                cancellationToken
+            );
 
             return Task.CompletedTask;
         }
