@@ -14,8 +14,8 @@ namespace b7.Xabbo.Commands
     {
         private readonly RoomManager _roomManager;
 
-        private readonly Dictionary<string, int> toMute = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-        private readonly Dictionary<string, BanDuration> toBan = new Dictionary<string, BanDuration>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, int> _muteList = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, BanDuration> _banList = new Dictionary<string, BanDuration>(StringComparer.OrdinalIgnoreCase);
 
         public ModerationCommands(RoomManager roomManager)
         {
@@ -30,40 +30,42 @@ namespace b7.Xabbo.Commands
             IsAvailable = true;
         }
 
-        private void MuteUser(IRoomUser user, int minutes) => Send(Out.RoomMuteUser, user.Id, _roomManager.CurrentRoomId, minutes);
+        private void MuteUser(IRoomUser user, int minutes)
+            => Send(Out.RoomMuteUser, (LegacyLong)user.Id, (LegacyLong)_roomManager.CurrentRoomId, minutes);
+
         private void UnmuteUser(IRoomUser user) => MuteUser(user, 0);
-        private void KickUser(IRoomUser user) => Send(Out.KickUser, user.Id);
-        private void BanUser(IRoomUser user, BanDuration duration) => Send(Out.RoomBanWithDuration, user.Id, _roomManager.CurrentRoomId, duration.GetValue());
+
+        private void KickUser(IRoomUser user) => Send(Out.KickUser, (LegacyLong)user.Id);
+
+        private void BanUser(IRoomUser user, BanDuration duration)
+            => Send(Out.RoomBanWithDuration, (LegacyLong)user.Id, (LegacyLong)_roomManager.CurrentRoomId, duration.GetValue());
+
         private void UnbanUser(int userId) => Send(Out.RoomUnbanUser, userId, _roomManager.CurrentRoomId);
 
         private void RoomManager_Left(object? sender, EventArgs e)
         {
-            toMute.Clear();
-            toBan.Clear();
+            _muteList.Clear();
+            _banList.Clear();
         }
 
         private async void OnEntitiesAdded(object? sender, EntitiesEventArgs e)
         {
-            if (e.Entities.Length != 1)
-                return;
+            if (e.Entities.Length != 1) return;
+            if (e.Entities[0] is not IRoomUser user) return;
 
-            var user = e.Entities.Single() as IRoomUser;
-            if (user == null)
-                return;
-
-            if (toBan.TryGetValue(user.Name, out BanDuration banDuration))
+            if (_banList.TryGetValue(user.Name, out BanDuration banDuration))
             {
                 ShowMessage($"Banning user '{user.Name}'");
                 await Task.Delay(100);
                 BanUser(user, banDuration);
-                toBan.Remove(user.Name);
+                _banList.Remove(user.Name);
             }
-            else if (toMute.TryGetValue(user.Name, out int muteDuration))
+            else if (_muteList.TryGetValue(user.Name, out int muteDuration))
             {
                 ShowMessage($"Muting user '{user.Name}'");
                 await Task.Delay(100);
                 MuteUser(user, muteDuration);
-                toMute.Remove(user.Name);
+                _muteList.Remove(user.Name);
             }
         }
 
@@ -116,7 +118,7 @@ namespace b7.Xabbo.Commands
                         else
                         {
                             ShowMessage($"Muting user '{user.Name}' for {inputDuration} {(isHours ? "hour(s)" : "minute(s)")}");
-                            Send(Out.RoomMuteUser, user.Id, _roomManager.CurrentRoomId, duration);
+                            MuteUser(user, duration);
                         }
                     }
                 }
@@ -151,7 +153,7 @@ namespace b7.Xabbo.Commands
                 _roomManager.Room.TryGetEntityByName(userName, out IRoomUser? user))
             {
                 ShowMessage($"Unmuting user '{user.Name}'");
-                Send(Out.RoomMuteUser, user.Id, _roomManager.CurrentRoomId, 0);
+                UnmuteUser(user);
             }
             else
             {
@@ -160,7 +162,7 @@ namespace b7.Xabbo.Commands
         }
 
         [Command("kick"), RequiredOut(nameof(Outgoing.KickUser))]
-        protected async Task HandleKickCommand(CommandArgs args)
+        protected void HandleKickCommand(CommandArgs args)
         {
             if (args.Count < 1) return;
 
@@ -182,7 +184,7 @@ namespace b7.Xabbo.Commands
                 _roomManager.Room.TryGetUserByName(userName, out IRoomUser? user))
             {
                 ShowMessage($"Kicking user '{user.Name}'");
-                Send(Out.KickUser, user.Id);
+                KickUser(user);
             }
             else
             {
@@ -231,7 +233,7 @@ namespace b7.Xabbo.Commands
             else
             {
                 ShowMessage($"User '{userName}' not found, will be banned {durationString} upon next entry to this room.");
-                toBan[userName] = banDuration;
+                _banList[userName] = banDuration;
             }
         }
 
@@ -254,9 +256,9 @@ namespace b7.Xabbo.Commands
 
             string userName = args[0];
 
-            if (toBan.ContainsKey(userName))
+            if (_banList.ContainsKey(userName))
             {
-                toBan.Remove(userName);
+                _banList.Remove(userName);
                 ShowMessage($"Removing user '{userName}' from the ban list");
             }
             else
