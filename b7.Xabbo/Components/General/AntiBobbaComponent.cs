@@ -8,13 +8,16 @@ using Microsoft.Extensions.Configuration;
 using Xabbo.Interceptor;
 using Xabbo.Messages;
 
+using b7.Xabbo.Configuration;
+
 namespace b7.Xabbo.Components
 {
     public class AntiBobbaComponent : Component
     {
         private static readonly Regex _regexBrackets = new Regex(@"\[([^\[\]]+?)\]", RegexOptions.Compiled);
 
-        private readonly string _injectString;
+        private readonly AntiBobbaOptions _options;
+        private readonly Regex _regexAuto;
 
         private bool _isLocalized;
         public bool IsLocalized
@@ -23,19 +26,42 @@ namespace b7.Xabbo.Components
             set => Set(ref _isLocalized, value);
         }
 
+        private bool _isAutoEnabled;
+        public bool IsAutoEnabled
+        {
+            get => _isAutoEnabled;
+            set => Set(ref _isAutoEnabled, value);
+        }
+
         public AntiBobbaComponent(IInterceptor interceptor,
             IConfiguration config)
             : base(interceptor)
         {
-            _injectString = config.GetValue("AntiBobba:Inject", "");
+            _options = config.GetValue<AntiBobbaOptions>("AntiBobba");
 
-            IsActive = config.GetValue("AntiBobba:Active", true);
-            IsLocalized = config.GetValue("AntiBobba:Localized", true);
+            IsActive = _options.Active;
+            IsLocalized = _options.Localized;
+            IsAutoEnabled = _options.Auto;
+
+            string autoPattern = "(" + string.Join('|', _options.AutoList.Select(x => Regex.Escape(x))) + ")";
+            _regexAuto = new Regex(autoPattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
         }
 
         protected override void OnInitialized(object? sender, InterceptorInitializedEventArgs e)
         {
             base.OnInitialized(sender, e);
+        }
+
+        private string InjectAntiBobba(Match m)
+        {
+            var sb = new StringBuilder();
+            foreach (var c in m.Groups[1].Value)
+            {
+                sb.Append(_options.Inject);
+                sb.Append(c);
+            }
+            sb.Append(_options.Inject);
+            return sb.ToString();
         }
 
         [InterceptOut(nameof(Outgoing.Chat), nameof(Outgoing.Shout), nameof(Outgoing.Whisper))]
@@ -45,21 +71,7 @@ namespace b7.Xabbo.Components
 
             string message = e.Packet.ReadString();
 
-            if (IsLocalized)
-            {
-                message = _regexBrackets.Replace(message, m =>
-                {
-                    var sb = new StringBuilder();
-                    foreach (var c in m.Groups[1].Value)
-                    {
-                        sb.Append(_injectString);
-                        sb.Append(c);
-                    }
-                    sb.Append(_injectString);
-                    return sb.ToString();
-                });
-            }
-            else
+            if (!IsLocalized && !IsAutoEnabled)
             {
                 var sb = new StringBuilder();
 
@@ -82,10 +94,22 @@ namespace b7.Xabbo.Components
                 for (int i = 0; i < message.Length; i++)
                 {
                     if (i > 0)
-                        sb.Append(_injectString);
+                        sb.Append(_options.Inject);
                     sb.Append(message[i]);
                 }
                 message = sb.ToString();
+            }
+            else
+            {
+                if (IsLocalized)
+                {
+                    message = _regexBrackets.Replace(message, InjectAntiBobba);
+                }
+
+                if (IsAutoEnabled)
+                {
+                    message = _regexAuto.Replace(message, InjectAntiBobba);
+                }
             }
 
             e.Packet.ReplaceAt(0, message);

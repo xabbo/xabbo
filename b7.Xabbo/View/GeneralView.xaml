@@ -161,6 +161,8 @@
                         <StackPanel Margin="20,0,0,0">
                             <CheckBox Content="Localized" ToolTip="Only apply anti-bobba to text between [square brackets]."
                                       IsChecked="{Binding IsLocalized}" />
+                            <CheckBox Content="Auto" ToolTip="Automatically apply anti-bobba to words in the auto list."
+                                      IsChecked="{Binding IsAutoEnabled}" />
                         </StackPanel>
                     </StackPanel>
                     <CheckBox Content="No typing indicator" IsChecked="{Binding AntiTyping.IsActive}" />
