@@ -76,7 +76,7 @@ namespace b7.Xabbo
             services.AddGEarthOptions(options =>
             {
                 options = options
-                    .WithTitle("xabbo")
+                    .WithName("xabbo")
                     .WithDescription("enhanced habbo")
                     .WithAuthor("b7")
                     .WithConfiguration(context.Configuration);
