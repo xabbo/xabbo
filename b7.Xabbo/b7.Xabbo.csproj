@@ -17,6 +17,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Dragablz" Version="0.0.3.223" />
     <PackageReference Include="Humanizer.Core" Version="2.11.10" />
     <PackageReference Include="LiteDB" Version="5.0.10" />
     <PackageReference Include="MaterialDesignExtensions" Version="3.3.0" />
@@ -29,16 +30,16 @@
     <PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.10" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(Configuration)'=='Debug'">
+  <ItemGroup Condition="'$(UseNugetLibs)'!='true'">
     <ProjectReference Include="$(SolutionDir)\Xabbo.Common\Xabbo.Common\Xabbo.Common.csproj" />
     <ProjectReference Include="$(SolutionDir)\Xabbo.GEarth\Xabbo.GEarth\Xabbo.GEarth.csproj" />
     <ProjectReference Include="$(SolutionDir)\Xabbo.Core\Xabbo.Core\Xabbo.Core.csproj" />
   </ItemGroup>
-  
-  <ItemGroup Condition="'$(Configuration)'=='Release'">
-    <PackageReference Include="Xabbo.Common" Version="1.0.0-alpha" />
-    <PackageReference Include="Xabbo.GEarth" Version="1.0.0-alpha" />
-    <PackageReference Include="Xabbo.Core" Version="1.0.0-alpha" />
+
+  <ItemGroup Condition="'$(UseNugetLibs)'=='true'">
+    <PackageReference Include="Xabbo.Common" Version="1.0.0-beta" />
+    <PackageReference Include="Xabbo.GEarth" Version="1.0.0-beta" />
+    <PackageReference Include="Xabbo.Core" Version="1.0.0-beta" />
   </ItemGroup>
 
   <ItemGroup>
