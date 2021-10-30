@@ -13,96 +13,96 @@ namespace b7.Xabbo.ViewModel
 {
     public class AlignerViewManager : ComponentViewModel
     {
-        private RoomManager _roomManager;
+        private readonly RoomManager _roomManager;
 
-        private bool haltAlignment;
-        private WallLocation? originalLocation;
+        private bool _haltAlignment;
+        private WallLocation? _originalLocation;
 
-        private bool isInRoom;
+        private bool _isInRoom;
         public bool IsInRoom
         {
-            get => isInRoom;
-            set => Set(ref isInRoom, value);
+            get => _isInRoom;
+            set => Set(ref _isInRoom, value);
         }
 
-        private bool isCapturing;
+        private bool _isCapturing;
         public bool IsCapturing
         {
-            get => isCapturing;
-            set => Set(ref isCapturing, value);
+            get => _isCapturing;
+            set => Set(ref _isCapturing, value);
         }
 
-        private bool hasCapturedItem;
+        private bool _hasCapturedItem;
         public bool HasCapturedItem
         {
-            get => hasCapturedItem;
+            get => _hasCapturedItem;
             set
             {
-                if (Set(ref hasCapturedItem, value))
+                if (Set(ref _hasCapturedItem, value))
                     RaisePropertyChanged(nameof(CanMoveLocation));
             }
         }
 
-        private long currentId = -1;
+        private long _currentId = -1;
         public long CurrentId
         {
-            get => currentId;
-            set => Set(ref currentId, value);
+            get => _currentId;
+            set => Set(ref _currentId, value);
         }
 
-        private string locationString = string.Empty;
+        private string _locationString = string.Empty;
         public string LocationString
         {
-            get => locationString;
+            get => _locationString;
             set
             {
-                if (!haltAlignment) WallLocation.Parse(value);
-                Set(ref locationString, value);
+                if (!_haltAlignment) WallLocation.Parse(value);
+                Set(ref _locationString, value);
             }
         }
 
-        private int wallX;
-        public int WallX
+        private int _wx;
+        public int WX
         {
-            get => wallX;
-            set => Set(ref wallX, value);
+            get => _wx;
+            set => Set(ref _wx, value);
         }
 
-        private int wallY;
-        public int WallY
+        private int _wy;
+        public int WY
         {
-            get => wallY;
-            set => Set(ref wallY, value);
+            get => _wy;
+            set => Set(ref _wy, value);
         }
 
-        private int locationX;
-        public int LocationX
+        private int _lx;
+        public int LX
         {
-            get => locationX;
-            set => Set(ref locationX, value);
+            get => _lx;
+            set => Set(ref _lx, value);
         }
 
-        private int locationY;
-        public int LocationY
+        private int _ly;
+        public int LY
         {
-            get => locationY;
-            set => Set(ref locationY, value);
+            get => _ly;
+            set => Set(ref _ly, value);
         }
 
-        private bool isLeft = true;
+        private bool _isLeft = true;
         public bool IsLeft
         {
-            get => isLeft;
-            set => Set(ref isLeft, value);
+            get => _isLeft;
+            set => Set(ref _isLeft, value);
         }
 
-        private bool lockLocation;
+        private bool _lockLocation;
         public bool LockLocation
         {
-            get => lockLocation;
+            get => _lockLocation;
             set
             {
-                if (Set(ref lockLocation, value))
+                if (Set(ref _lockLocation, value))
                     RaisePropertyChanged(nameof(CanMoveLocation));
             }
         }
@@ -134,14 +134,14 @@ namespace b7.Xabbo.ViewModel
         {
             base.RaisePropertyChanged(propertyName);
 
-            bool isHaltingAlignment = haltAlignment;
+            bool isHaltingAlignment = _haltAlignment;
             if (ignoreChangeEvents) return;
 
             IRoom? room = _roomManager.Room;
 
             try
             {
-                haltAlignment = true;
+                _haltAlignment = true;
 
                 switch (propertyName)
                 {
@@ -153,36 +153,36 @@ namespace b7.Xabbo.ViewModel
                         int? scale = room?.FloorPlan.Scale;
                         if (LockLocation && scale.HasValue)
                         {
-                            int diffX = WallX - previousWallX;
-                            int diffY = WallY - previousWallY;
+                            int diffX = WX - previousWallX;
+                            int diffY = WY - previousWallY;
 
                             ignoreChangeEvents = true;
-                            LocationX -= (diffX - diffY) * scale.Value / 2;
-                            LocationY -= (diffX + diffY) * scale.Value / 4;
+                            LX -= (diffX - diffY) * scale.Value / 2;
+                            LY -= (diffX + diffY) * scale.Value / 4;
                             ignoreChangeEvents = false;
                         }
 
-                        previousWallX = WallX;
-                        previousWallY = wallY;
+                        previousWallX = WX;
+                        previousWallY = _wy;
 
-                        LocationString = WallLocation.ToString(WallX, WallY, LocationX, LocationY, IsLeft ? 'l' : 'r');
+                        LocationString = WallLocation.ToString(WX, WY, LX, LY, IsLeft ? 'l' : 'r');
                         break;
                     case "LocationString":
                         if (WallLocation.TryParse(LocationString, out WallLocation location))
                         {
-                            WallX = previousWallX = location.WallX;
-                            WallY = previousWallY = location.WallY;
-                            LocationX = location.X;
-                            LocationY = location.Y;
+                            WX = previousWallX = location.WX;
+                            WY = previousWallY = location.WY;
+                            LX = location.LX;
+                            LY = location.LY;
                             IsLeft = location.Orientation.IsLeft;
                         }
                         break;
                     default: return;
                 }
             }
-            finally { haltAlignment = isHaltingAlignment; }
+            finally { _haltAlignment = isHaltingAlignment; }
 
-            if (haltAlignment) return;
+            if (_haltAlignment) return;
 
             if (HasCapturedItem)
             {
@@ -190,7 +190,7 @@ namespace b7.Xabbo.ViewModel
             }
         }
 
-        private WallLocation GetLocation() => new WallLocation(WallX, WallY, LocationX, LocationY, IsLeft ? 'l' : 'r');
+        private WallLocation GetLocation() => new WallLocation(WX, WY, LX, LY, IsLeft ? 'l' : 'r');
 
         private void OnToggleOrientation()
         {
@@ -199,7 +199,7 @@ namespace b7.Xabbo.ViewModel
 
         private void Reset()
         {
-            haltAlignment = true;
+            _haltAlignment = true;
 
             try
             {
@@ -207,20 +207,20 @@ namespace b7.Xabbo.ViewModel
 
                 CurrentId = -1;
                 LocationString = "";
-                WallX = 0;
-                WallY = 0;
-                LocationX = 0;
-                LocationY = 0;
+                WX = 0;
+                WY = 0;
+                LX = 0;
+                LY = 0;
                 IsLeft = true;
             }
-            finally { haltAlignment = false; }
+            finally { _haltAlignment = false; }
         }
 
         private async void OnReset()
         {
-            if (originalLocation is null) return;
+            if (_originalLocation is null) return;
 
-            await SendAsync(Out.MoveWallItem, (LegacyLong)CurrentId, originalLocation.ToString());
+            await SendAsync(Out.MoveWallItem, (LegacyLong)CurrentId, _originalLocation.ToString());
         }
 
         private void RoomManager_Entered(object? sender, EventArgs e)
@@ -255,14 +255,14 @@ namespace b7.Xabbo.ViewModel
 
                 try
                 {
-                    haltAlignment = true;
+                    _haltAlignment = true;
 
                     HasCapturedItem = true;
                     CurrentId = itemId;
-                    originalLocation = item.Location;
+                    _originalLocation = item.Location;
                     LocationString = item.Location.ToString();
                 }
-                finally { haltAlignment = false; }
+                finally { _haltAlignment = false; }
             }
         }
     }

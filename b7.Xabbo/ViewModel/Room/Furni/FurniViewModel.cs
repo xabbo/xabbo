@@ -47,10 +47,10 @@ namespace b7.Xabbo.ViewModel
         public int? Dir { get; set; }
 
         public WallLocation? WallLocation { get; set; }
-        public int? WallX => WallLocation?.WallX;
-        public int? WallY => WallLocation?.WallY;
-        public int? OffsetX => WallLocation?.X;
-        public int? OffsetY => WallLocation?.Y;
+        public int? WX => WallLocation?.WX;
+        public int? WY => WallLocation?.WY;
+        public int? LX => WallLocation?.LX;
+        public int? LY => WallLocation?.LY;
         public char? Wall => WallLocation?.Orientation;
 
         public string Data { get; set; } = string.Empty;
