@@ -92,7 +92,7 @@ namespace b7.Xabbo.ViewModel
 
             foreach (var figureModel in figureModels.OrderBy(x => x.Order))
             {
-                if (!Figure.TryParse(figureModel.FigureString, out Figure figure) ||
+                if (!Figure.TryParse(figureModel.FigureString, out Figure? figure) ||
                     !knownFigures.Add(figure.GetFigureString()))
                 {
                     continue;
@@ -197,7 +197,7 @@ namespace b7.Xabbo.ViewModel
                 string text = Clipboard.GetText();
                 foreach (Match match in regexFigure.Matches(text))
                 {
-                    if (Figure.TryParse(match.Value, out Figure figure))
+                    if (Figure.TryParse(match.Value, out Figure? figure))
                         AddFigure(figure);
                 }
             }
@@ -209,9 +209,9 @@ namespace b7.Xabbo.ViewModel
 
         private void OnAddCurrentFigure()
         {
-            if (!IsAvailable) return;
+            if (!IsAvailable || _profileManager.UserData is null) return;
 
-            if (!Figure.TryParse(_profileManager.UserData.Figure, out Figure figure))
+            if (!Figure.TryParse(_profileManager.UserData.Figure, out Figure? figure))
                 return;
 
             AddFigure(figure);

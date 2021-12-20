@@ -18,6 +18,7 @@ namespace b7.Xabbo.Services
         event EventHandler<GameDataEventArgs>? MetadataLoadFailed;
 
         Task InitializeAsync();
+        Task LoadAsync();
 
         Task<FigureData> GetFigureDataAsync();
         Task<FurniData> GetFurniDataAsync();

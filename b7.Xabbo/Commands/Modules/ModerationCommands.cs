@@ -69,7 +69,7 @@ namespace b7.Xabbo.Commands
             }
         }
 
-        [Command("mute"), RequiredOut(nameof(Outgoing.RoomMuteUser))]
+        [Command("mute")]
         protected Task HandleMuteCommand(CommandArgs args)
         {
             if (args.Count < 2)
@@ -130,7 +130,7 @@ namespace b7.Xabbo.Commands
             return Task.CompletedTask;
         }
 
-        [Command("unmute"), RequiredOut(nameof(Outgoing.RoomMuteUser))]
+        [Command("unmute")]
         protected async Task HandleUnmuteCommand(CommandArgs args)
         {
             if (args.Count < 1) return;
@@ -161,8 +161,8 @@ namespace b7.Xabbo.Commands
             }
         }
 
-        [Command("kick"), RequiredOut(nameof(Outgoing.KickUser))]
-        protected void HandleKickCommand(CommandArgs args)
+        [Command("kick")]
+        protected async Task HandleKickCommand(CommandArgs args)
         {
             if (args.Count < 1) return;
 
@@ -192,7 +192,7 @@ namespace b7.Xabbo.Commands
             }
         }
 
-        [Command("ban"), RequiredOut(nameof(Outgoing.RoomBanWithDuration))]
+        [Command("ban")]
         protected async Task HandleBanCommand(CommandArgs args)
         {
             if (args.Count < 1) return;

@@ -8,7 +8,6 @@ namespace b7.Xabbo.Services
     {
         string Domain { get; }
         Uri this[TEndpoints endpoint] { get; }
-        Uri GetUri(TEndpoints endpoint);
-        Uri GetUri(TEndpoints endpoint, object parameters);
+        Uri GetUri(TEndpoints endpoint, object? parameters = null, string? domain = null);
     }
 }

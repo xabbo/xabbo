@@ -76,16 +76,16 @@
                  IsEnabled="{Binding CanMoveLocation}" />
 
         <controls:NumericUpDown Grid.Column="1" Grid.Row="2" Margin="2"
-                                Value="{Binding WX}"
+                                Value="{Binding WX, UpdateSourceTrigger=PropertyChanged}"
                                 IsEnabled="{Binding HasCapturedItem}" />
         <controls:NumericUpDown Grid.Column="2" Grid.Row="2" Margin="2"
-                                Value="{Binding WY}"
+                                Value="{Binding WY, UpdateSourceTrigger=PropertyChanged}"
                                 IsEnabled="{Binding HasCapturedItem}" />
         <controls:NumericUpDown Grid.Column="3" Grid.Row="2" Margin="2"
-                                Value="{Binding LX}"
+                                Value="{Binding LX, UpdateSourceTrigger=PropertyChanged}"
                                 IsEnabled="{Binding CanMoveLocation}" />
         <controls:NumericUpDown Grid.Column="4" Grid.Row="2" Margin="2"
-                                Value="{Binding LY}"
+                                Value="{Binding LY, UpdateSourceTrigger=PropertyChanged}"
                                 IsEnabled="{Binding CanMoveLocation}" />
         <Button Grid.Column="5" Grid.Row="2" Margin="4"
                 HorizontalContentAlignment="Center" VerticalContentAlignment="Center"

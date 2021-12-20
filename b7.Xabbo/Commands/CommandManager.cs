@@ -99,6 +99,7 @@ namespace b7.Xabbo.Commands
                     var commandAttribute = method.GetCustomAttribute<CommandAttribute>();
                     if (commandAttribute == null) continue;
 
+                    // TODO Validate method signature
                     var handler = (CommandHandler)method.CreateDelegate(typeof(CommandHandler), module);
                     var binding = new CommandBinding(
                         module,

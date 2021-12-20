@@ -9,6 +9,7 @@ using Xabbo.Core.GameData;
 using Xabbo.Core.Web;
 
 using b7.Xabbo.Events;
+using Xabbo.Core;
 
 namespace b7.Xabbo.Services
 {
@@ -49,6 +50,8 @@ namespace b7.Xabbo.Services
 
         private string GetCacheDirectory(GameDataType type) => Path.Combine(_cachePath, type.ToString().ToLower());
 
+        public Task LoadAsync() => throw new NotImplementedException();
+
         public async Task InitializeAsync()
         {
             if (_isInitialized) return;
@@ -77,7 +80,6 @@ namespace b7.Xabbo.Services
                 {
                     "furnidata" => GameDataType.Furni,
                     "productdata" => GameDataType.Product,
-                    // "external_variables" => GameDataType.Variables,
                     "external_texts" => GameDataType.Texts,
                     "figurepartlist" => GameDataType.Figure,
                     _ => (GameDataType)(-1)
@@ -89,6 +91,11 @@ namespace b7.Xabbo.Services
             }
 
             await Task.WhenAll(loadTasks);
+
+            XabboCoreExtensions.Initialize(
+                await GetFurniDataAsync(),
+                await GetExternalTextsAsync()
+            );
         }
 
         private async Task LoadMetadataAsync(HttpClient client, GameDataType type, string url)

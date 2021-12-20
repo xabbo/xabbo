@@ -145,11 +145,11 @@ namespace b7.Xabbo.ViewModel
 
                 switch (propertyName)
                 {
-                    case "WallX":
-                    case "WallY":
-                    case "LocationX":
-                    case "LocationY":
-                    case "IsLeft":
+                    case nameof(WX):
+                    case nameof(WY):
+                    case nameof(LX):
+                    case nameof(LY):
+                    case nameof(IsLeft):
                         int? scale = room?.FloorPlan.Scale;
                         if (LockLocation && scale.HasValue)
                         {
@@ -167,7 +167,7 @@ namespace b7.Xabbo.ViewModel
 
                         LocationString = WallLocation.ToString(WX, WY, LX, LY, IsLeft ? 'l' : 'r');
                         break;
-                    case "LocationString":
+                    case nameof(LocationString):
                         if (WallLocation.TryParse(LocationString, out WallLocation location))
                         {
                             WX = previousWallX = location.WX;

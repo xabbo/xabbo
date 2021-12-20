@@ -9,7 +9,7 @@ namespace b7.Xabbo.Commands
 {
     public class CommandArgs : EventArgs, IReadOnlyList<string>
     {
-        private IReadOnlyList<string> _args;
+        private readonly IReadOnlyList<string> _args;
 
         public string Command { get;  }
         public ChatType ChatType { get; }

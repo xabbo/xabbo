@@ -40,7 +40,7 @@ namespace b7.Xabbo.Services
 
             _hostAppLifetime.ApplicationStopping.Register(() => application.Shutdown());
         }
-
+        
         private void OnInterceptorConnectionFailed(object? sender, ConnectionFailedEventArgs e)
         {
             Application.Dispatcher.Invoke(() =>
@@ -65,20 +65,7 @@ namespace b7.Xabbo.Services
         private void OnExtensionClicked(object? sender, EventArgs e)
         {
             Application.Dispatcher.InvokeAsync(
-                () =>
-                {
-                    WindowUtil.ActivateWindow(Window);
-
-                    if (!Window.IsVisible)
-                    {
-                        Window.Show();
-                    }
-
-                    if (Window.WindowState == WindowState.Minimized)
-                    {
-                        Window.WindowState = WindowState.Normal;
-                    }
-                },
+                () => WindowUtil.Show(Window),
                 DispatcherPriority.ApplicationIdle
             );
         }
@@ -109,25 +96,24 @@ namespace b7.Xabbo.Services
             Window.Closing += OnWindowClosing;
             Application.Exit += (s, e) => _hostAppLifetime.StopApplication();
 
-            _ = Task.Run(
-                async () =>
-                {
-                    try
-                    {
-                        await Extension.RunAsync();
-                    }
-                    catch (Exception ex)
-                    {
-                        File.AppendAllText(
-                            "error.log",
-                            $"\r\n[{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}] [Extension.RunAsync] {ex}"
-                        );
-                    }
-                },
-                cancellationToken
-            );
+            _ = Task.Run(RunExtensionAsync, cancellationToken);
 
             return Task.CompletedTask;
+        }
+
+        private async Task RunExtensionAsync()
+        {
+            try
+            {
+                await Extension.RunAsync();
+            }
+            catch (Exception ex)
+            {
+                File.AppendAllText(
+                    "error.log",
+                    $"\r\n[{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}] [Extension.RunAsync] {ex}"
+                );
+            }
         }
     }
 }

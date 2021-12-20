@@ -1,6 +1,7 @@
 ﻿<Application x:Class="b7.Xabbo.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
              xmlns:local="clr-namespace:b7.Xabbo"
              xmlns:converter="clr-namespace:b7.Xabbo.WPF.Converters"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
@@ -8,32 +9,11 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <!--<materialDesign:BundledTheme BaseTheme="Light" PrimaryColor="DeepPurple" SecondaryColor="Lime" />
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />-->
-
-                <!-- material design styles -->
-
-                <materialDesign:BundledTheme
-                    BaseTheme="Dark"
-                    PrimaryColor="Purple"
-                    SecondaryColor="Yellow"
-                />
+                <materialDesign:BundledTheme BaseTheme="Dark" PrimaryColor="Purple" SecondaryColor="Yellow" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
-
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignExtensions;component/Themes/Generic.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignExtensions;component/Themes/MaterialDesignDarkTheme.xaml" />
-
-
-                <!--<ResourceDictionary>
-                    <SolidColorBrush x:Key="MaterialDesignBackground" Color="{Binding Color, Source={StaticResource MaterialDesignPaper}}" />
-                </ResourceDictionary>-->
-
-                <!--<ResourceDictionary>
-                    <Style TargetType="ScrollViewer" BasedOn="{StaticResource MaterialDesignScrollViewer}">
-                        <Setter Property="md:ScrollViewerAssist.IgnorePadding" Value="False" />
-                    </Style>
-                </ResourceDictionary>-->
-
+                <ResourceDictionary Source="pack://application:,,,/Dragablz;component/Themes/materialdesign.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
             <Style TargetType="{x:Type ListView}" BasedOn="{StaticResource MaterialDesignListView}">
@@ -59,6 +39,30 @@
             <converter:BoolToOpacityConverter x:Key="BoolToOpacityConverter" />
             <converter:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
             <converter:BooleanNotConverter x:Key="NotConverter" />
+
+            <Style x:Key="MaterialDesignTabablzSlimControlStyle"
+                   TargetType="{x:Type dragablz:TabablzControl}"
+                   BasedOn="{StaticResource MaterialDesignTabablzControlStyle}">
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="ItemContainerStyle">
+                    <Setter.Value>
+                        <Style TargetType="{x:Type dragablz:DragablzItem}" BasedOn="{StaticResource MaterialDesignDragableTabItemStyle}">
+                            <Setter Property="Margin" Value="0" />
+                            <Setter Property="Padding" Value="0" />
+                            <Setter Property="Height" Value="40" />
+                        </Style>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="MaterialDesignAlternateTabablzSlimControlStyle"
+                   TargetType="{x:Type dragablz:TabablzControl}"
+                   BasedOn="{StaticResource MaterialDesignAlternateTabablzControlStyle}">
+                <Setter Property="BorderThickness" Value="0" />
+                
+            </Style>
+
+            <Style TargetType="{x:Type dragablz:TabablzControl}" BasedOn="{StaticResource MaterialDesignAlternateTabablzSlimControlStyle}" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

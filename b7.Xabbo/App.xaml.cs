@@ -24,6 +24,7 @@ using b7.Xabbo.Commands;
 using b7.Xabbo.Services;
 using b7.Xabbo.Configuration;
 using b7.Xabbo.Util;
+using System.Windows.Threading;
 
 namespace b7.Xabbo
 {
@@ -44,15 +45,12 @@ namespace b7.Xabbo
 
         public App()
         {
-            Dispatcher.UnhandledException += Dispatcher_UnhandledException;
+            Dispatcher.UnhandledException += (s, e) => LogError($"Unhandled dispatcher exception: {e.Exception}");
         }
 
-        private void Dispatcher_UnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
-        {
-            File.AppendAllLines("error.log", new[] {
-                $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}] [DispatcherUnhandledException] {e.Exception}"
-            });
-        }
+        private static void LogError(string message) => File.AppendAllLines(
+            "error.log", new[] { $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {message}" }
+        );
 
         private void ConfigureLogging(HostBuilderContext context, ILoggingBuilder logging) { }
 
@@ -62,8 +60,10 @@ namespace b7.Xabbo
 
             // Options
             services.Configure<GameOptions>(context.Configuration.GetSection(GameOptions.Path));
+            services.Configure<AntiBobbaOptions>(context.Configuration.GetSection(AntiBobbaOptions.Path));
 
             // Application
+            services.AddSingleton(this);
             services.AddSingleton<Application>(this);
             services.AddSingleton<IHostLifetime, GEarthWpfExtensionLifetime>();
             services.AddSingleton(Dispatcher);
@@ -100,7 +100,7 @@ namespace b7.Xabbo
                     );
                 });
 
-            services.AddSingleton<IUriProvider<HabboEndpoints>, HabboUrlProvider>();
+            services.AddSingleton<IUriProvider<HabboEndpoints>, HabboUriProvider>();
             services.AddSingleton<IGameDataManager, GameDataManager>();
 
             // Game state
@@ -168,7 +168,7 @@ namespace b7.Xabbo
                         IConfigurationRoot originalConfig = config.Build();
 
                         config.Sources.Clear();
-                        config.AddJsonFile("appsettings.json");
+                        config.AddJsonFile("appsettings.json", false, true);
 
                         string domain = originalConfig.GetValue<string>("Web:Domain");
                         if (!string.IsNullOrWhiteSpace(domain))
@@ -189,8 +189,9 @@ namespace b7.Xabbo
             }
             catch (Exception ex)
             {
+
                 MessageBox.Show(
-                    $"Initialization failed: {ex}", "b7.Xabbo",
+                    $"Initialization failed: {ex.Message}", "b7.Xabbo",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error
                 );

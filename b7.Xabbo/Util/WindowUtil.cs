@@ -37,5 +37,16 @@ namespace b7.Xabbo.Util
                 SetForegroundWindow(hwnd);
             }
         }
+
+        public static void Show(Window window)
+        {
+            ActivateWindow(window);
+
+            if (!window.IsVisible)
+                window.Show();
+
+            if (window.WindowState == WindowState.Minimized)
+                window.WindowState = WindowState.Normal;
+        }
     }
 }

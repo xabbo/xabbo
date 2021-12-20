@@ -7,6 +7,7 @@
         xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
         xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:mde="clr-namespace:MaterialDesignExtensions.Controls;assembly=MaterialDesignExtensions"
+        xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
         xmlns:view="clr-namespace:b7.Xabbo.View"
         xmlns:viewModel="clr-namespace:b7.Xabbo.ViewModel"
         TextElement.Foreground="{StaticResource MaterialDesignBody}"
@@ -52,9 +53,10 @@
         </DataTemplate>
     </mde:MaterialWindow.TitleTemplate>
     <Grid>
-        <TabControl Style="{StaticResource MaterialDesignAppBarTabControl}"
-                    mde:TabControlAssist.TabHeaderFontSize="12"
-                    mde:TabControlAssist.TabHeaderMargin="0">
+        <dragablz:TabablzControl Style="{StaticResource MaterialDesignTabablzSlimControlStyle}"
+                FixedHeaderCount="100"
+                mde:TabControlAssist.TabHeaderFontSize="12"
+                mde:TabControlAssist.TabHeaderMargin="0">
             <TabControl.Resources>
                 <Style TargetType="{x:Type TabControl}" BasedOn="{StaticResource MaterialDesignTabControl}" />
             </TabControl.Resources>
@@ -65,18 +67,17 @@
                 <view:ChatView DataContext="{Binding Chat}" />
             </TabItem>
             <TabItem Header="FIGURE">
-                <TabControl mde:TabControlAssist.TabHeaderMargin="0"
-                            Style="{StaticResource MaterialDesignTabControl}">
+                <dragablz:TabablzControl>
                     <TabItem Header="WARDROBE">
                         <view:WardrobeView DataContext="{Binding Wardrobe}" />
                     </TabItem>
                     <TabItem Header="RANDOMIZER">
                         <view:FigureRandomizerView DataContext="{Binding FigureRandomizer}" />
                     </TabItem>
-                </TabControl>
+                </dragablz:TabablzControl>
             </TabItem>
             <TabItem Header="ROOM">
-                <TabControl>
+                <dragablz:TabablzControl>
                     <TabItem Header="INFO">
                         <view:RoomInfoView DataContext="{Binding RoomInfo}" />
                     </TabItem>
@@ -92,26 +93,26 @@
                     <TabItem Header="FURNI">
                         <view:RoomFurniView DataContext="{Binding Furni}" />
                     </TabItem>
-                </TabControl>
+                </dragablz:TabablzControl>
             </TabItem>
             <TabItem Header="TOOLS">
-                <TabControl>
+                <dragablz:TabablzControl>
                     <TabItem Header="ALIGNER">
                         <view:AlignerView DataContext="{Binding Aligner}" />
                     </TabItem>
                     <TabItem Header="MIMIC">
                         <view:MimicView DataContext="{Binding Mimic}" />
                     </TabItem>
-                </TabControl>
+                </dragablz:TabablzControl>
             </TabItem>
             <TabItem Header="INFO">
-                <TabControl>
+                <dragablz:TabablzControl>
                     <TabItem Header="FURNI">
                         <view:FurniDataView DataContext="{Binding FurniData}" />
                     </TabItem>
-                </TabControl>
+                </dragablz:TabablzControl>
             </TabItem>
-        </TabControl>
+        </dragablz:TabablzControl>
         <md:Snackbar Margin="16" MessageQueue="{Binding SnackbarMessageQueue}" />
     </Grid>
 </mde:MaterialWindow>

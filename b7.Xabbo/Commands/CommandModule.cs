@@ -26,6 +26,9 @@ namespace b7.Xabbo.Commands
         protected void Send(Header header, params object[] values) => Interceptor.Send(header, values);
         protected void Send(IReadOnlyPacket packet) => Interceptor.Send(packet);
 
+        protected Task SendAsync(Header header, params object[] values) => Interceptor.SendAsync(header, values);
+        protected Task SendAsync(IReadOnlyPacket packet) => Interceptor.SendAsync(packet);
+
         public CommandModule() { }
 
         public void Initialize(CommandManager manager)

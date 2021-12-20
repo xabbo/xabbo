@@ -9,6 +9,7 @@ using Xabbo.Interceptor;
 using Xabbo.Messages;
 
 using b7.Xabbo.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace b7.Xabbo.Components
 {
@@ -34,10 +35,10 @@ namespace b7.Xabbo.Components
         }
 
         public AntiBobbaComponent(IInterceptor interceptor,
-            IConfiguration config)
+            IOptions<AntiBobbaOptions> options)
             : base(interceptor)
         {
-            _options = config.GetValue<AntiBobbaOptions>("AntiBobba");
+            _options = options.Value;
 
             IsActive = _options.Active;
             IsLocalized = _options.Localized;
@@ -52,17 +53,7 @@ namespace b7.Xabbo.Components
             base.OnInitialized(sender, e);
         }
 
-        private string InjectAntiBobba(Match m)
-        {
-            var sb = new StringBuilder();
-            foreach (var c in m.Groups[1].Value)
-            {
-                sb.Append(_options.Inject);
-                sb.Append(c);
-            }
-            sb.Append(_options.Inject);
-            return sb.ToString();
-        }
+        private string InjectAntiBobba(Match m) => string.Join(_options.Inject, m.Groups[1].Value.ToCharArray());
 
         [InterceptOut(nameof(Outgoing.Chat), nameof(Outgoing.Shout), nameof(Outgoing.Whisper))]
         private void OnChat(InterceptArgs e)
