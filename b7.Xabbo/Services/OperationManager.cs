@@ -2,23 +2,46 @@
 using System.Threading;
 using System.Threading.Tasks;
 
+using Microsoft.Extensions.Hosting;
+
+using b7.Xabbo.Components;
+
 namespace b7.Xabbo.Services
 {
     public class OperationManager : IOperationManager
     {
+        private readonly IHostApplicationLifetime _lifetime;
+        private readonly XabbotComponent _xabbotComponent;
+
         private readonly object _sync = new();
         private CancellationTokenSource? _cts;
 
-        public OperationManager() { }
+        public bool IsRunning => _cts is not null;
+        public bool IsCancelling { get; private set; }
 
-        public bool IsTaskRunning => _cts is not null;
-
-        public void CancelCurrentTask()
+        public OperationManager(
+            IHostApplicationLifetime lifetime,
+            XabbotComponent xabbotComponent)
         {
-            _cts?.Cancel();
+            _lifetime = lifetime;
+            _xabbotComponent = xabbotComponent;
         }
 
-        public async Task RunTaskAsync(Func<CancellationToken, Task> task)
+        public bool Cancel()
+        {
+            lock (_sync)
+            {
+                if (!IsCancelling && _cts is not null)
+                {
+                    _cts.Cancel();
+                    return true;
+                }
+
+                return false;
+            }
+        }
+
+        public async Task RunAsync(Func<CancellationToken, Task> task)
         {
             lock (_sync)
             {
@@ -27,7 +50,7 @@ namespace b7.Xabbo.Services
                     throw new InvalidOperationException("A task is already running.");
                 }
 
-                _cts = new CancellationTokenSource();
+                _cts = CancellationTokenSource.CreateLinkedTokenSource(_lifetime.ApplicationStopping);
             }
 
             try
@@ -35,12 +58,20 @@ namespace b7.Xabbo.Services
                 await task(_cts.Token);
             }
             catch (OperationCanceledException)
-            when (_cts.IsCancellationRequested)
-            { }
+            {
+                if (!_lifetime.ApplicationStopping.IsCancellationRequested)
+                {
+                    _xabbotComponent.ShowMessage("Operation canceled.");
+                }
+            }
             finally
             {
-                _cts.Dispose();
-                _cts = null;
+                lock (_sync)
+                {
+                    IsCancelling = false;
+                    _cts.Dispose();
+                    _cts = null;
+                }
             }
         }
     }

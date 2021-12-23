@@ -6,8 +6,9 @@ namespace b7.Xabbo.Services
 {
     public interface IOperationManager
     {
-        bool IsTaskRunning { get; }
-        Task RunTaskAsync(Func<CancellationToken, Task> task);
-        void CancelCurrentTask();
+        bool IsRunning { get; }
+        bool IsCancelling { get; }
+        Task RunAsync(Func<CancellationToken, Task> task);
+        bool Cancel();
     }
 }

@@ -8,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Interceptor;
+using Xabbo.Messages;
 
 namespace b7.Xabbo.Components
 {
@@ -18,6 +19,8 @@ namespace b7.Xabbo.Components
 
         private readonly ProfileManager _profileManager;
         private readonly RoomManager _roomManager;
+
+        private int _latencyCheckCount = -1;
 
         private bool _isAntiIdleOutActive;
         public bool IsAntiIdleOutActive
@@ -43,6 +46,13 @@ namespace b7.Xabbo.Components
             IsAntiIdleOutActive = config.GetValue("AntiIdle:AntiIdleOut", true);
         }
 
+        protected override void OnDisconnected(object? sender, EventArgs e)
+        {
+            base.OnDisconnected(sender, e);
+
+            _latencyCheckCount = -1;
+        }
+
         public override void RaisePropertyChanged([CallerMemberName] string propertyName = null)
         {
             base.RaisePropertyChanged(propertyName);
@@ -66,25 +76,24 @@ namespace b7.Xabbo.Components
 
             IsActive = _config.GetValue("AntiIdle:Active", true);
             IsAntiIdleOutActive = _config.GetValue("AntiIdle:IdleOutActive", true);
-
-            Task.Run(DoAntiIdle);
         }
 
-        private async Task DoAntiIdle()
+        [InterceptIn(nameof(Incoming.ClientLatencyPingResponse))]
+        protected void HandleClientLatencyPingResponse(InterceptArgs e)
         {
-            try
+            _latencyCheckCount = e.Packet.ReadInt();
+
+            if (_latencyCheckCount > 0 &&
+                _latencyCheckCount % 12 == 0)
             {
-                while (!_lifetime.ApplicationStopping.IsCancellationRequested)
-                {
-                    await Task.Delay(60000, _lifetime.ApplicationStopping);
-                    SendAntiIdlePacket();
-                }
+                SendAntiIdlePacket();
             }
-            catch (OperationCanceledException) { }
         }
 
         private void SendAntiIdlePacket()
         {
+            if (_latencyCheckCount <= 0) return;
+
             if (_profileManager.UserData is not null &&
                 _roomManager.Room is not null &&
                 _roomManager.Room.TryGetUserById(_profileManager.UserData.Id, out IRoomUser? self))

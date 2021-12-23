@@ -69,6 +69,8 @@ namespace b7.Xabbo
             services.AddSingleton(Dispatcher);
             services.AddSingleton<IUiContext, DispatcherContext>();
 
+            services.AddSingleton<IOperationManager, OperationManager>();
+
             // UI
             services.AddSingleton<ISnackbarMessageQueue, SnackbarMessageQueue>();
 
@@ -189,7 +191,6 @@ namespace b7.Xabbo
             }
             catch (Exception ex)
             {
-
                 MessageBox.Show(
                     $"Initialization failed: {ex.Message}", "b7.Xabbo",
                     MessageBoxButton.OK,
