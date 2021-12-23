@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace b7.Xabbo.Services
 {
     public interface IUriProvider<TEndpoints>
         where TEndpoints : Enum
     {
-        string Domain { get; }
+        string Domain { get; set; }
         Uri this[TEndpoints endpoint] { get; }
         Uri GetUri(TEndpoints endpoint, object? parameters = null, string? domain = null);
     }

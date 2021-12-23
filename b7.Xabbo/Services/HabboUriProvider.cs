@@ -11,7 +11,7 @@ namespace b7.Xabbo.Services
     {
         private readonly Dictionary<HabboEndpoints, Uri> _endpoints = new();
 
-        public string Domain { get; }
+        public string Domain { get; set; }
 
         public Uri this[HabboEndpoints endpoint] => _endpoints[endpoint];
 
@@ -23,7 +23,7 @@ namespace b7.Xabbo.Services
             foreach (IConfigurationSection endpointSection in endpoints.GetChildren())
             {
                 string host = endpointSection.GetValue<string>("Host");
-                Uri baseUri = new(host.Replace("{domain}", Domain));
+                Uri baseUri = new(host);
 
                 foreach (IConfigurationSection pathSection in endpointSection.GetSection("Paths").GetChildren())
                 {
