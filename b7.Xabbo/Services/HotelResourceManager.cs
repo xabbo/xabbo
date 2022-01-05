@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 
 using Xabbo.Interceptor;
+using Xabbo.Core;
 using Xabbo.Core.GameData;
 
 namespace b7.Xabbo.Services
@@ -29,6 +30,8 @@ namespace b7.Xabbo.Services
 
             _uriProvider = uriProvider;
             _gameDataManager = gameDataManager;
+
+            _gameDataManager.Loaded += OnGameDataLoaded;
         }
 
         public Task StartAsync(CancellationToken cancellationToken) => Task.CompletedTask;
@@ -65,6 +68,16 @@ namespace b7.Xabbo.Services
             _uriProvider.Domain = domain;
 
             Task.Run(() => _gameDataManager.LoadAsync(domain, ct));
+        }
+
+        private void OnGameDataLoaded()
+        {
+            FurniData? furni = _gameDataManager.Furni;
+            ExternalTexts? texts = _gameDataManager.Texts;
+
+            if (furni is null || texts is null) return;
+
+            XabboCoreExtensions.Initialize(furni, texts);
         }
     }
 }
