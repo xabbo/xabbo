@@ -1,19 +1,21 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Threading.Tasks;
 using System.Windows.Data;
 
 using GalaSoft.MvvmLight;
 
+using Xabbo.Interceptor;
+using Xabbo.Core.GameData;
+
 using b7.Xabbo.Services;
 
-using Xabbo.Core.GameData;
 
 namespace b7.Xabbo.ViewModel
 {
     public class FurniDataViewManager : ObservableObject
     {
+        private readonly IInterceptor _interceptor;
         private readonly IUiContext _uiContext;
         private readonly IGameDataManager _gameDataManager;
 
@@ -47,15 +49,54 @@ namespace b7.Xabbo.ViewModel
             set => Set(ref _errorText, value);
         }
 
-        public FurniDataViewManager(IUiContext uiContext, IGameDataManager gameDataManager)
+        public FurniDataViewManager(
+            IInterceptor interceptor,
+            IUiContext uiContext,
+            IGameDataManager gameDataManager)
         {
+            _interceptor = interceptor;
             _uiContext = uiContext;
             _gameDataManager = gameDataManager;
 
             Furni = CollectionViewSource.GetDefaultView(_furni);
             Furni.Filter = Filter;
 
-            Task initialization = Task.Run(InitializeAsync);
+            _interceptor.Connected += OnGameConnected;
+            _interceptor.Disconnected += OnGameDisconnected;
+        }
+
+        private async void OnGameConnected(object? sender, GameConnectedEventArgs e)
+        {
+            try
+            {
+                IsLoading = true;
+
+                await _gameDataManager.WaitForLoadAsync(_interceptor.DisconnectToken);
+
+                FurniData? furniData = _gameDataManager.Furni;
+                if (furniData is null) return;
+
+                await _uiContext.InvokeAsync(() =>
+                {
+                    foreach (FurniInfo info in furniData)
+                    {
+                        _furni.Add(new FurniInfoViewModel(info));
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                ErrorText = $"Failed to load furni data: {ex.Message}.";
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+        }
+
+        private void OnGameDisconnected(object? sender, EventArgs e)
+        {
+            _uiContext.Invoke(() => _furni.Clear());
         }
 
         private void RefreshList()
@@ -82,32 +123,6 @@ namespace b7.Xabbo.ViewModel
                 info.Line.Contains(_filterText, StringComparison.OrdinalIgnoreCase) ||
                 info.Category.Contains(_filterText, StringComparison.OrdinalIgnoreCase) ||
                 (int.TryParse(_filterText, out int i) && info.Kind == i);
-        }
-
-        private async Task InitializeAsync()
-        {
-            IsLoading = true;
-
-            try
-            {
-                FurniData furniData = await _gameDataManager.GetFurniDataAsync();
-
-                await _uiContext.InvokeAsync(() =>
-                {
-                    foreach (FurniInfo info in furniData)
-                    {
-                        _furni.Add(new FurniInfoViewModel(info));
-                    }
-                });
-            }
-            catch (Exception ex)
-            {
-                ErrorText = $"Failed to load furni data: {ex.Message}.";
-            }
-            finally
-            {
-                IsLoading = false;
-            }
         }
     }
 }

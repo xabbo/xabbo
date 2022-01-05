@@ -9,25 +9,24 @@ using System.Diagnostics;
 using System.Windows.Input;
 using System.Windows.Media;
 
+using Microsoft.Extensions.Hosting;
+
 using GalaSoft.MvvmLight.Command;
 
+using Xabbo.Interceptor;
 using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.GameData;
-
-using b7.Xabbo.Services;
-using Microsoft.Extensions.Hosting;
-using Xabbo.Interceptor;
 
 namespace b7.Xabbo.ViewModel
 {
     public class FigureRandomizerViewManager : ComponentViewModel
     {
         private readonly IHostApplicationLifetime _lifetime;
-        private readonly IGameDataManager _gameDataManager;
+        private readonly IGameDataManager _gameData;
         private readonly ProfileManager _profileManager;
 
-        private FigureData? FigureData => _gameDataManager.FigureData;
+        private FigureData? FigureData => _gameData.Figure;
 
         private FigureRandomizer? _figureRandomizer;
         private Figure? _baseFigure;
@@ -105,7 +104,7 @@ namespace b7.Xabbo.ViewModel
             : base(interceptor)
         {
             _lifetime = lifetime;
-            _gameDataManager = gameDataManager;
+            _gameData = gameDataManager;
             _profileManager = profileManager;
 
             FigurePartOptions = new ObservableCollection<FigureRandomizerPartViewModel>()
@@ -131,7 +130,21 @@ namespace b7.Xabbo.ViewModel
             RandomizeLooksCommand = new RelayCommand(OnRandomizeLooks);
             StartStopTimerCommand = new RelayCommand(OnStartStopTimer);
 
-            _lifetime.ApplicationStarted.Register(() => Task.Run(InitializeAsync));
+            Interceptor.Connected += OnGameConnected;
+            Interceptor.Disconnected += OnGameDisconnected;
+        }
+
+        private async void OnGameConnected(object? sender, GameConnectedEventArgs e)
+        {
+            await _gameData.WaitForLoadAsync(CancellationToken.None);
+            await _profileManager.GetUserDataAsync();
+
+            IsReady = true;
+        }
+
+        private void OnGameDisconnected(object? sender, EventArgs e)
+        {
+            IsReady = false;
         }
 
         private bool SetupRandomizer()
@@ -205,21 +218,6 @@ namespace b7.Xabbo.ViewModel
                 BaseFigureString = _profileManager.UserData.Figure;
                 BaseFigureGender = _profileManager.UserData.Gender;
             }
-        }
-
-        private async Task InitializeAsync()
-        {
-            FigureData figureData;
-            try
-            {
-                figureData = await _gameDataManager.GetFigureDataAsync();
-
-                await _profileManager.GetUserDataAsync();
-            }
-            catch { return; }
-
-            _figureRandomizer = new FigureRandomizer(figureData);
-            IsReady = true;
         }
 
         private void UpdateBaseFigure()

@@ -6,8 +6,6 @@ using System.Threading.Tasks;
 
 using Xabbo.Core.GameData;
 
-using b7.Xabbo.Services;
-
 namespace b7.Xabbo.Commands
 {
     public class EffectCommands : CommandModule
@@ -23,32 +21,36 @@ namespace b7.Xabbo.Commands
         public EffectCommands(IGameDataManager gameDataManager)
         {
             _gameDataManager = gameDataManager;
+
+            _gameDataManager.Loaded += OnGameDataLoaded;
+            _gameDataManager.LoadFailed += OnGameDataLoadFailed;
         }
 
-        protected override async void OnInitialize()
+        protected override void OnInitialize()
         {
             IsAvailable = true;
+        }
 
-            try
+        private void OnGameDataLoadFailed(Exception ex)
+        {
+            _isFaulted = true;
+        }
+
+        private void OnGameDataLoaded()
+        {
+            var texts = _gameDataManager.Texts ?? throw new Exception("Failed to load game data.");
+
+            foreach (var (key, value) in texts)
             {
-                ExternalTexts externalTexts = await _gameDataManager.GetExternalTextsAsync();
-
-                foreach (var (key, value) in externalTexts)
+                var match = _regexEffect.Match(key);
+                if (match.Success)
                 {
-                    var match = _regexEffect.Match(key);
-                    if (match.Success)
-                    {
-                        int effectId = int.Parse(match.Groups[1].Value);
-                        _effectNames[effectId] = value;
-                    }
+                    int effectId = int.Parse(match.Groups[1].Value);
+                    _effectNames[effectId] = value;
                 }
+            }
 
-                _isReady = true;
-            }
-            catch
-            {
-                _isFaulted = true;
-            }
+            _isReady = true;
         }
 
         private List<(int Id, string Name)> FindEffects(string searchText)

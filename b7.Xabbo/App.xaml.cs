@@ -4,6 +4,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Windows;
+using System.Windows.Threading;
 using System.Diagnostics;
 
 using Microsoft.Extensions.Configuration;
@@ -16,7 +17,9 @@ using MaterialDesignThemes.Wpf;
 using Xabbo.Messages;
 using Xabbo.Interceptor;
 using Xabbo.GEarth;
+
 using Xabbo.Core.Game;
+using Xabbo.Core.GameData;
 
 using b7.Xabbo.View;
 using b7.Xabbo.Components;
@@ -24,7 +27,6 @@ using b7.Xabbo.Commands;
 using b7.Xabbo.Services;
 using b7.Xabbo.Configuration;
 using b7.Xabbo.Util;
-using System.Windows.Threading;
 
 namespace b7.Xabbo
 {
@@ -75,16 +77,12 @@ namespace b7.Xabbo
             services.AddSingleton<ISnackbarMessageQueue, SnackbarMessageQueue>();
 
             // Interceptor
-            services.AddGEarthOptions(options =>
-            {
-                options = options
-                    .WithName("xabbo")
-                    .WithDescription("enhanced habbo")
-                    .WithAuthor("b7")
-                    .WithConfiguration(context.Configuration);
-
-                return options;
-            });
+            services.AddGEarthOptions(options => options
+                .WithName("xabbo")
+                .WithDescription("enhanced habbo")
+                .WithAuthor("b7")
+                .WithConfiguration(context.Configuration)
+            );
 
             services.AddSingleton<IMessageManager, UnifiedMessageManager>();
 
@@ -93,7 +91,7 @@ namespace b7.Xabbo
             services.AddSingleton<IRemoteInterceptor>(x => x.GetRequiredService<GEarthExtension>());
 
             // Web
-            services.AddHttpClient("Xabbo")
+            services.AddHttpClient("habbo")
                 .ConfigureHttpClient(client =>
                 {
                     client.DefaultRequestHeaders.Add(
@@ -135,8 +133,6 @@ namespace b7.Xabbo
                 }
             }
 
-            services.AddHostedService(provider => provider.GetRequiredService<XabbotComponent>());
-
             // Wardrobe
             services.AddSingleton<IWardrobeRepository, LiteDbWardrobeRepository>();
 
@@ -154,8 +150,10 @@ namespace b7.Xabbo
             // Views
             services.AddSingleton<MainWindow>();
 
-            // Initialiation
-            services.AddHostedService<InitializationService>();
+            // Hosted services
+            services.AddHostedService<HotelResourceManager>();
+
+            services.AddHostedService(provider => provider.GetRequiredService<XabbotComponent>());
         }
 
         protected override async void OnStartup(StartupEventArgs e)
@@ -191,8 +189,9 @@ namespace b7.Xabbo
             }
             catch (Exception ex)
             {
+                LogError($"Initialization failed: {ex}");
                 MessageBox.Show(
-                    $"Initialization failed: {ex.Message}", "b7.Xabbo",
+                    $"Initialization failed: {ex.Message}", "xabbo",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error
                 );

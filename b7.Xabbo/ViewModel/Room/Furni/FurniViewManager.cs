@@ -77,8 +77,8 @@ namespace b7.Xabbo.ViewModel
         private RoomManager _roomManager;
 
         private readonly IGameDataManager _gameDataManager;
-        private FurniData? FurniData => _gameDataManager.FurniData;
-        private ExternalTexts? Texts => _gameDataManager.ExternalTexts;
+        private FurniData? FurniData => _gameDataManager.Furni;
+        private ExternalTexts? Texts => _gameDataManager.Texts;
 
         private readonly ObservableCollection<FurniViewModel> _furniViewModels = new();
         private readonly ConcurrentDictionary<long, FurniViewModel>
@@ -243,8 +243,9 @@ namespace b7.Xabbo.ViewModel
             return dynamicFilter?.Invoke(furniViewModel) ?? true;
         }
 
-        public FurniViewManager(IHostApplicationLifetime lifetime,
+        public FurniViewManager(
             IInterceptor interceptor,
+            IHostApplicationLifetime lifetime,
             IUiContext uiContext,
             IGameDataManager gameDataManager,
             ProfileManager profileManager,
@@ -270,7 +271,19 @@ namespace b7.Xabbo.ViewModel
 
             _roomManager.FurniVisibilityToggled += RoomManager_FurniVisibilityToggled;
 
-            lifetime.ApplicationStarted.Register(() => Task.Run(InitializeAsync));
+            _roomManager.RightsUpdated += OnRightsUpdated;
+            _roomManager.Left += OnLeftRoom;
+
+            _roomManager.FloorItemsLoaded += OnFloorItemsLoaded;
+            _roomManager.FloorItemAdded += OnFloorItemAdded;
+            _roomManager.FloorItemRemoved += OnFloorItemRemoved;
+
+            _roomManager.WallItemsLoaded += OnWallItemsLoaded;
+            _roomManager.WallItemAdded += OnWallItemAdded;
+            _roomManager.WallItemRemoved += OnWallItemRemoved;
+
+            Interceptor.Connected += OnGameConnected;
+            Interceptor.Disconnected += OnGameDisconnected;
         }
 
         public void RefreshCommandsCanExecute()
@@ -306,40 +319,6 @@ namespace b7.Xabbo.ViewModel
         private void OnRefreshFilter()
         {
             UpdateFilter();
-        }
-
-        private async Task InitializeAsync()
-        {
-            IsLoading = true;
-
-            try
-            {
-                await _gameDataManager.GetFurniDataAsync();
-                await _gameDataManager.GetExternalTextsAsync();
-
-                IsLoading = false;
-                await _profileManager.GetUserDataAsync();
-            }
-            catch (Exception ex)
-            {
-                ErrorText = $"Failed to initialize: {ex.Message}";
-                return;
-            }
-
-            Interceptor.Disconnected += OnGameDisconnected;
-
-            _roomManager.RightsUpdated += OnRightsUpdated;
-            _roomManager.Left += OnLeftRoom;
-
-            _roomManager.FloorItemsLoaded += OnFloorItemsLoaded;
-            _roomManager.FloorItemAdded += OnFloorItemAdded;
-            _roomManager.FloorItemRemoved += OnFloorItemRemoved;
-
-            _roomManager.WallItemsLoaded += OnWallItemsLoaded;
-            _roomManager.WallItemAdded += OnWallItemAdded;
-            _roomManager.WallItemRemoved += OnWallItemRemoved;
-
-            IsAvailable = true;
         }
 
         private void RefreshList()
@@ -520,6 +499,28 @@ namespace b7.Xabbo.ViewModel
         #endregion
 
         #region - Events -
+        private async void OnGameConnected(object? sender, GameConnectedEventArgs e)
+        {
+            IsLoading = true;
+
+            try
+            {
+                await _gameDataManager.WaitForLoadAsync(Interceptor.DisconnectToken);
+                await _profileManager.GetUserDataAsync();
+            }
+            catch (Exception ex)
+            {
+                ErrorText = $"Failed to initialize: {ex.Message}";
+                return;
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+
+            IsAvailable = true;
+        }
+
         private void OnRightsUpdated(object? sender, EventArgs e)
         {
             RaisePropertyChanged(nameof(CanEject));
@@ -564,6 +565,8 @@ namespace b7.Xabbo.ViewModel
         private void OnGameDisconnected(object? sender, EventArgs e)
         {
             ClearItems();
+
+            IsAvailable = false;
         }
         #endregion
     }

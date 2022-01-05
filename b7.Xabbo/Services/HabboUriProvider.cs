@@ -9,11 +9,11 @@ namespace b7.Xabbo.Services
 {
     public class HabboUriProvider : IUriProvider<HabboEndpoints>
     {
-        private readonly Dictionary<HabboEndpoints, Uri> _endpoints = new();
+        private readonly Dictionary<HabboEndpoints, string> _endpoints = new();
 
         public string Domain { get; set; }
 
-        public Uri this[HabboEndpoints endpoint] => _endpoints[endpoint];
+        public Uri this[HabboEndpoints endpoint] => new(_endpoints[endpoint].Replace("{domain}", Domain));
 
         public HabboUriProvider(IConfiguration config)
         {
@@ -23,7 +23,6 @@ namespace b7.Xabbo.Services
             foreach (IConfigurationSection endpointSection in endpoints.GetChildren())
             {
                 string host = endpointSection.GetValue<string>("Host");
-                Uri baseUri = new(host);
 
                 foreach (IConfigurationSection pathSection in endpointSection.GetSection("Paths").GetChildren())
                 {
@@ -34,16 +33,14 @@ namespace b7.Xabbo.Services
                         throw new Exception($"Unknown Habbo endpoint name: '{endpointName}'.");
                     }
 
-                    string relativePath = pathSection.Value;
-                    _endpoints[endpoint] = new Uri(baseUri, relativePath);
+                    _endpoints[endpoint] = host + pathSection.Value;
                 }
             }
         }
 
         public Uri GetUri(HabboEndpoints endpoint, object? param = null, string? domain = null)
         {
-            string uriString = _endpoints[endpoint].OriginalString
-                .Replace("{domain}", domain ?? Domain);
+            string url = _endpoints[endpoint].Replace("{domain}", domain ?? Domain);
 
             if (param is not null)
             {
@@ -51,16 +48,16 @@ namespace b7.Xabbo.Services
                 foreach (PropertyInfo propertyInfo in type.GetProperties())
                 {
                     string selector = $"{{{propertyInfo.Name}}}";
-                    if (!uriString.Contains(selector)) continue;
+                    if (!url.Contains(selector)) continue;
 
                     string propertyValue = propertyInfo.GetValue(param)?.ToString()
                         ?? throw new InvalidOperationException($"Value for property '{propertyInfo.Name}' was null.");
 
-                    uriString = uriString.Replace(selector, WebUtility.UrlEncode(propertyValue));
+                    url = url.Replace(selector, WebUtility.UrlEncode(propertyValue));
                 }
             }
 
-            return new Uri(uriString);
+            return new Uri(url);
         }
     }
 }

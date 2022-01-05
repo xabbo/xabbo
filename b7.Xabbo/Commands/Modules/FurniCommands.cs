@@ -1,11 +1,12 @@
-﻿using b7.Xabbo.Services;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+
 using Xabbo.Core;
 using Xabbo.Core.Game;
+using Xabbo.Core.GameData;
+
+using b7.Xabbo.Services;
 
 namespace b7.Xabbo.Commands
 {
@@ -95,12 +96,16 @@ namespace b7.Xabbo.Commands
 
             if (userData is null || room is null) return;
 
-            string name = string.Join(" ", args.Skip(1));
-            foreach (IFurni furni in room.Furni.NamedLike(name))
+            await _operationManager.RunAsync(async ct =>
             {
-                if (eject == (furni.OwnerId == userData.Id)) continue;
-
-            }
+                string name = string.Join(" ", args.Skip(1));
+                foreach (IFurni furni in room.Furni.NamedLike(name))
+                {
+                    if (eject == (furni.OwnerId == userData.Id)) continue;
+                    _roomManager.Pickup(furni);
+                    await Task.Delay(100, ct);
+                }
+            });
         }
     }
 }

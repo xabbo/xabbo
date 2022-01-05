@@ -8,8 +8,6 @@ using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.GameData;
 
-using b7.Xabbo.Services;
-
 namespace b7.Xabbo.Components
 {
     public class FurniActionsComponent : Component
@@ -18,8 +16,8 @@ namespace b7.Xabbo.Components
         private readonly RoomManager _roomManager;
         private readonly XabbotComponent _xabbot;
 
-        private FurniData? FurniData => _gameDataManager.FurniData;
-        private ExternalTexts? Texts => _gameDataManager.ExternalTexts;
+        private FurniData? FurniData => _gameDataManager.Furni;
+        private ExternalTexts? Texts => _gameDataManager.Texts;
 
         private bool _preventUse;
         public bool PreventUse
@@ -56,8 +54,6 @@ namespace b7.Xabbo.Components
             set => Set(ref _useToShowInfo, value);
         }
 
-        private readonly Task _initialization;
-
         public FurniActionsComponent(IInterceptor interceptor,
             IGameDataManager gameDataManager, RoomManager roomManager,
             XabbotComponent xabbot)
@@ -67,21 +63,7 @@ namespace b7.Xabbo.Components
             _roomManager = roomManager;
             _xabbot = xabbot;
 
-            _initialization = InitializeAsync();
-        }
-
-        private async Task InitializeAsync()
-        {
-            try
-            {
-                await Task.WhenAll(
-                    _gameDataManager.GetFurniDataAsync(),
-                    _gameDataManager.GetExternalTextsAsync()
-                );
-
-                CanShowInfo = true;
-            }
-            catch { }
+            _gameDataManager.Loaded += () => CanShowInfo = true;
         }
 
         [InterceptOut(nameof(Outgoing.UseStuff))]

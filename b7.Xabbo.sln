@@ -1,17 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30717.126
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "b7.Xabbo", "b7.Xabbo\b7.Xabbo.csproj", "{79999CB6-9241-456B-B34F-1CA0907FC102}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Submodules", "Submodules", "{8FED0B39-3960-4634-AC23-42DC1092E373}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xabbo.Common", "Xabbo.Common\Xabbo.Common\Xabbo.Common.csproj", "{67496483-88D0-4EB2-A5AD-8450F081868B}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xabbo.Core", "Xabbo.Core\Xabbo.Core\Xabbo.Core.csproj", "{83CB5EAE-9954-47F4-BC9C-4DA592F914BB}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xabbo.GEarth", "Xabbo.GEarth\Xabbo.GEarth\Xabbo.GEarth.csproj", "{F17D8996-35BD-41E8-BD27-B73047A8FE2C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,26 +15,9 @@ Global
 		{79999CB6-9241-456B-B34F-1CA0907FC102}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{79999CB6-9241-456B-B34F-1CA0907FC102}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{79999CB6-9241-456B-B34F-1CA0907FC102}.Release|Any CPU.Build.0 = Release|Any CPU
-		{67496483-88D0-4EB2-A5AD-8450F081868B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{67496483-88D0-4EB2-A5AD-8450F081868B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{67496483-88D0-4EB2-A5AD-8450F081868B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{67496483-88D0-4EB2-A5AD-8450F081868B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{83CB5EAE-9954-47F4-BC9C-4DA592F914BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{83CB5EAE-9954-47F4-BC9C-4DA592F914BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{83CB5EAE-9954-47F4-BC9C-4DA592F914BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{83CB5EAE-9954-47F4-BC9C-4DA592F914BB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F17D8996-35BD-41E8-BD27-B73047A8FE2C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F17D8996-35BD-41E8-BD27-B73047A8FE2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F17D8996-35BD-41E8-BD27-B73047A8FE2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F17D8996-35BD-41E8-BD27-B73047A8FE2C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{67496483-88D0-4EB2-A5AD-8450F081868B} = {8FED0B39-3960-4634-AC23-42DC1092E373}
-		{83CB5EAE-9954-47F4-BC9C-4DA592F914BB} = {8FED0B39-3960-4634-AC23-42DC1092E373}
-		{F17D8996-35BD-41E8-BD27-B73047A8FE2C} = {8FED0B39-3960-4634-AC23-42DC1092E373}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {75AC1C17-09AE-4B3C-B1B2-45DA0AA72A2C}
