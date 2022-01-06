@@ -40,10 +40,10 @@
                         <MenuItem Header="In game"
                                   CommandParameter="game"
                                   Command="{Binding OpenProfileCommand}" />
-                        <MenuItem Header="On habbo.com" 
+                        <MenuItem Header="On the web" 
                                   CommandParameter="web"
                                   Command="{Binding OpenProfileCommand}" />
-                        <MenuItem Header="On habbowidgets.com"
+                        <MenuItem Header="On Habbowidgets"
                                   CommandParameter="widgets"
                                   Command="{Binding OpenProfileCommand}" />
                     </MenuItem>
