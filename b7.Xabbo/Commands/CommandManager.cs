@@ -123,22 +123,15 @@ namespace b7.Xabbo.Commands
 
         private Task OnHelp(CommandArgs args)
         {
-            if (args.Count > 0) return Task.CompletedTask;
-
-            foreach (var commandGroup in _bindings.Values.GroupBy(x => x.Handler.Target))
+            try
             {
-                if (commandGroup.Key == this) continue;
-
-                string groupName = commandGroup.Key?.GetType().Name ?? "<unknown>";
-                var commandNames = commandGroup
-                    .Distinct()
-                    .SelectMany(x =>
-                        new[] { x.CommandName }
-                        .Concat(x.Aliases)
-                    );
-
-                ShowMessage($"{groupName}: {string.Join(", ", commandNames)}");
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = "https://github.com/b7c/b7.Xabbo#commands",
+                    UseShellExecute = true
+                });
             }
+            catch { }
 
             return Task.CompletedTask;
         }
