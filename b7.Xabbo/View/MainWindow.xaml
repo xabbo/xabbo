@@ -77,7 +77,7 @@
                 </dragablz:TabablzControl>
             </TabItem>
             <TabItem Header="ROOM">
-                <dragablz:TabablzControl>
+                <dragablz:TabablzControl FixedHeaderCount="100">
                     <TabItem Header="INFO">
                         <view:RoomInfoView DataContext="{Binding RoomInfo}" />
                     </TabItem>
