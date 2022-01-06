@@ -7,18 +7,18 @@ using Xabbo.Core.Game;
 
 namespace b7.Xabbo.Commands
 {
-    public class LookCommand : CommandModule
+    public class TurnCommand : CommandModule
     {
         private readonly ProfileManager _profileManager;
         private readonly RoomManager _roomManager;
 
-        public LookCommand(ProfileManager profileManager, RoomManager roomManager)
+        public TurnCommand(ProfileManager profileManager, RoomManager roomManager)
         {
             _profileManager = profileManager;
             _roomManager = roomManager;
         }
 
-        [Command("turn", "look", "face"), RequiredOut(nameof(Outgoing.LookTo))]
+        [Command("turn", "t"), RequiredOut(nameof(Outgoing.LookTo))]
         protected async Task HandleLookCommand(CommandArgs args)
         {
             if (args.Count == 0) return;
