@@ -32,6 +32,6 @@ namespace b7.Xabbo.Commands
         }
 
         [Command("group", "grp", "g")]
-        public Task ShowGroupInfoAsync(CommandArgs args) => SendAsync(Out.GetHabboGroupDetails, long.Parse(args[0]));
+        public Task ShowGroupInfoAsync(CommandArgs args) => SendAsync(Out.GetHabboGroupDetails, long.Parse(args[0]), true);
     }
 }
