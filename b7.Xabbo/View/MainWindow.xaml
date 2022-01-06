@@ -67,7 +67,7 @@
                 <view:ChatView DataContext="{Binding Chat}" />
             </TabItem>
             <TabItem Header="FIGURE">
-                <dragablz:TabablzControl>
+                <dragablz:TabablzControl FixedHeaderCount="100">
                     <TabItem Header="WARDROBE">
                         <view:WardrobeView DataContext="{Binding Wardrobe}" />
                     </TabItem>
