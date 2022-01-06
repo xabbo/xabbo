@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -8,6 +7,8 @@ using Microsoft.Extensions.Hosting;
 using Xabbo.Interceptor;
 using Xabbo.Core;
 using Xabbo.Core.GameData;
+
+using b7.Xabbo.Util;
 
 namespace b7.Xabbo.Services
 {
@@ -44,21 +45,7 @@ namespace b7.Xabbo.Services
             _ctsLoad = new CancellationTokenSource();
             CancellationToken ct = _ctsLoad.Token;
 
-            string? domain = null;
-
-            Match m = Regex.Match(e.Host, @"^game-(?<host>[a-z]+)\.habbo\.com$");
-            if (m.Success)
-            {
-                string host = m.Groups["host"].Value;
-                domain = host switch
-                {
-                    "de" or "nl" or "fr" or "it" => host,
-                    "br" => "com.br",
-                    "tr" => "com.tr",
-                    "us" => "com",
-                    _ => null
-                };
-            }
+            string? domain = HabboUtil.GetDomainFromGameHost(e.Host);
 
             if (string.IsNullOrWhiteSpace(domain))
             {
