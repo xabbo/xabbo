@@ -4,38 +4,47 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:b7.Xabbo"
-             xmlns:svc="clr-namespace:b7.Xabbo.Services"
+             xmlns:viewModel="clr-namespace:b7.Xabbo.ViewModel"
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
              TextElement.Foreground="{StaticResource MaterialDesignBody}"
              TextElement.FontFamily="{StaticResource MaterialDesignFont}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
+             d:DataContext="{d:DesignInstance Type={x:Type viewModel:ChatLogViewManager}}"
              x:Name="root">
+    <UserControl.Resources>
+        <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource MaterialDesignAccentCheckBox}">
+            <Setter Property="Margin" Value="4" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="1*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <TextBox x:Name="textBoxLog"
-                 Padding="0" BorderThickness="0"
-                 VerticalContentAlignment="Stretch"
-                 md:TextFieldAssist.TextBoxViewMargin="8"
-                 VerticalScrollBarVisibility="Visible"
-                 HorizontalScrollBarVisibility="Auto"
-                 IsReadOnly="True" FontFamily="Consolas" FontSize="14"
-                 TextAlignment="Left" TextWrapping="Wrap"
-                 Text="{Binding LogText}">
-        </TextBox>
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
-            <CheckBox Margin="8"
-                      VerticalContentAlignment="Center" 
-                      Content="Autoscroll"
-                      IsChecked="{Binding ElementName=root, Path=AutoScroll}" />
-            <CheckBox Margin="8"
-                      VerticalContentAlignment="Center"
-                      Content="Log to file"
-                      IsChecked="{Binding LogToFile}"
-                      Visibility="Collapsed" />
-        </StackPanel>
+        <TextBox
+            x:Name="textBoxLog"
+            Padding="0" BorderThickness="0"
+            md:TextFieldAssist.TextBoxViewMargin="8"
+            VerticalScrollBarVisibility="Auto"
+            HorizontalScrollBarVisibility="Auto"
+            IsReadOnly="True" FontFamily="Consolas" FontSize="14"
+            TextAlignment="Left" TextWrapping="Wrap"
+            Text="{Binding LogText}"
+        />
+        <WrapPanel Grid.Row="1" Margin="4" HorizontalAlignment="Right">
+            <WrapPanel>
+                <CheckBox Content="Normal" IsChecked="{Binding IncludeNormalChat}" />
+                <CheckBox Content="Whispers" IsChecked="{Binding IncludeWhispers}" />
+                <CheckBox Content="Wired" IsChecked="{Binding IncludeWiredMessages}" />
+                <CheckBox Content="Bots" IsChecked="{Binding IncludeBotMessages}" />
+            </WrapPanel>
+            <WrapPanel>
+                <CheckBox Content="Log to file" IsChecked="{Binding LogToFile}" />
+                <CheckBox Content="Autoscroll" IsChecked="{Binding ElementName=root, Path=AutoScroll}" />
+            </WrapPanel>
+        </WrapPanel>
     </Grid>
 </UserControl>

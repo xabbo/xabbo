@@ -1,6 +1,9 @@
-﻿using Microsoft.Extensions.Configuration;
-using System;
+﻿using System;
+using System.IO;
 using System.Text;
+
+using Microsoft.Extensions.Configuration;
+
 using Xabbo.Core;
 using Xabbo.Core.Events;
 using Xabbo.Core.Game;
@@ -10,10 +13,8 @@ namespace b7.Xabbo.ViewModel
 {
     public class ChatLogViewManager : ComponentViewModel
     {
-#if PRO
-        const string LOG_DIRECTORY = @"b7\xabbo\logs\chat";
-        private string currentFilePath;
-#endif
+        const string LogDirectory = @"logs\chat";
+        private string? _currentFilePath;
 
         private readonly RoomManager _roomManager;
 
@@ -22,18 +23,46 @@ namespace b7.Xabbo.ViewModel
         private DateTime _lastDate = DateTime.MinValue;
         private long _lastRoom = -1;
 
-        private StringBuilder _logText = new StringBuilder();
+        private StringBuilder _logText = new();
         public string LogText
         {
             get => _logText.ToString();
             set
             {
-                _logText = new StringBuilder(value);
+                _logText = new(value);
                 RaisePropertyChanged(nameof(LogText));
             }
         }
 
-        private bool _logToFile = true;
+        private bool _includeNormalChat;
+        public bool IncludeNormalChat
+        {
+            get => _includeNormalChat;
+            set => Set(ref _includeNormalChat, value);
+        }
+
+        private bool _includeWhispers;
+        public bool IncludeWhispers
+        {
+            get => _includeWhispers;
+            set => Set(ref _includeWhispers, value);
+        }
+
+        private bool _includeWiredMessages;
+        public bool IncludeWiredMessages
+        {
+            get => _includeWiredMessages;
+            set => Set(ref _includeWiredMessages, value);
+        }
+
+        private bool _includeBotMessages;
+        public bool IncludeBotMessages
+        {
+            get => _includeBotMessages;
+            set => Set(ref _includeBotMessages, value);
+        }
+
+        private bool _logToFile;
         public bool LogToFile
         {
             get => _logToFile;
@@ -47,19 +76,20 @@ namespace b7.Xabbo.ViewModel
             RoomManager roomManager)
             : base(interceptor)
         {
+            Directory.CreateDirectory(LogDirectory);
+
             _roomManager = roomManager;
             _roomManager.EntityChat += RoomManager_EntityChat;
 
             _stringBuffer = new StringBuilder();
 
             _antiBobba = config.GetValue<string>("AntiBobba:Inject");
-        }
 
-        private void OnInitialize()
-        {
-#if PRO
-            Directory.CreateDirectory(LOG_DIRECTORY);
-#endif
+            _includeNormalChat = config.GetValue("ChatLog:Normal", true);
+            _includeWhispers = config.GetValue("ChatLog:Whispers", true);
+            _includeWiredMessages = config.GetValue("ChatLog:Wired", false);
+            _includeBotMessages = config.GetValue("ChatLog:Bots", false);
+            _logToFile = config.GetValue("ChatLog:LogToFile", false);
         }
 
         private void Log(string text)
@@ -70,22 +100,23 @@ namespace b7.Xabbo.ViewModel
 
         private void RoomManager_EntityChat(object? sender, EntityChatEventArgs e)
         {
-            if (e.Entity.Type != EntityType.User) return;
-            if (e.ChatType == ChatType.Whisper && e.BubbleStyle == 34) return;
-
-            var today = DateTime.Today;
-            if (today != _lastDate)
-            {
-                _lastDate = today;
-#if PRO
-                currentFilePath = Path.Combine(LOG_DIRECTORY, $"{today:yyyy-MM-dd}.txt");
-#endif
-
-                Log($"---------- {today:D} ----------\r\n");
-            }
+            if (!IncludeNormalChat && e.Entity.Type == EntityType.User && e.ChatType != ChatType.Whisper) return;
+            if (!IncludeWhispers && e.ChatType == ChatType.Whisper && e.BubbleStyle != 34) return;
+            if (!IncludeBotMessages && (e.Entity.Type == EntityType.PublicBot || e.Entity.Type == EntityType.PrivateBot)) return;
+            if (!IncludeWiredMessages && e.ChatType == ChatType.Whisper && e.BubbleStyle == 34) return;
+            if (e.Entity.Type == EntityType.Pet) return;
 
             IRoom? room = _roomManager.Room;
             if (room is null) return;
+
+            DateTime today = DateTime.Today;
+            if (today != _lastDate)
+            {
+                _lastDate = today;
+                _currentFilePath = Path.Combine(LogDirectory, $"{today:yyyy-MM-dd}.txt");
+
+                Log($"---------- {today:D} ----------\r\n");
+            }
 
             if (_lastRoom != room.Id)
             {
@@ -117,17 +148,15 @@ namespace b7.Xabbo.ViewModel
 
             Log(text);
 
-#if PRO
-            if (LogToFile)
+            if (LogToFile && !string.IsNullOrWhiteSpace(_currentFilePath))
             {
-                try { File.AppendAllText(currentFilePath, text); }
+                try { File.AppendAllText(_currentFilePath, text); }
                 catch (Exception ex)
                 {
                     LogToFile = false;
                     Log($"[ERROR] Failed to log to file! {ex}");
                 }
             }
-#endif
 
             _stringBuffer.Clear();
         }
