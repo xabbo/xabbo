@@ -57,7 +57,7 @@
 
 ## Rooms
 
-`/go <text>` searches the navigator for the specified text and enter the first room.
+`/go <text>` searches the navigator for the specified text and enters the first room in the results.
 
 `/goto <id>` enters the room with the specified ID.
 
