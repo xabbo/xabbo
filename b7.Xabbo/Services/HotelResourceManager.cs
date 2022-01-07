@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 
 using Xabbo.Interceptor;
 using Xabbo.Core;
 using Xabbo.Core.GameData;
-
-using b7.Xabbo.Util;
 
 namespace b7.Xabbo.Services
 {
@@ -17,16 +18,21 @@ namespace b7.Xabbo.Services
     /// </summary>
     public class HotelResourceManager : IHostedService
     {
+        private readonly IDictionary<string, string> _domainMap;
         private readonly IUriProvider<HabboEndpoints> _uriProvider;
         private readonly IGameDataManager _gameDataManager;
 
         private CancellationTokenSource? _ctsLoad;
 
         public HotelResourceManager(
+            IConfiguration config,
             IInterceptor interceptor,
             IUriProvider<HabboEndpoints> uriProvider,
             IGameDataManager gameDataManager)
         {
+            _domainMap = new Dictionary<string, string>();
+            config.Bind("DomainMap", _domainMap);
+
             interceptor.Connected += OnGameConnected;
 
             _uriProvider = uriProvider;
@@ -45,12 +51,13 @@ namespace b7.Xabbo.Services
             _ctsLoad = new CancellationTokenSource();
             CancellationToken ct = _ctsLoad.Token;
 
-            string? domain = HabboUtil.GetDomainFromGameHost(e.Host);
+            Match m = Regex.Match(e.Host, @"^game-(?<host>[a-z]+)\.habbo\.com$");
+            if (!m.Success) return;
 
-            if (string.IsNullOrWhiteSpace(domain))
-            {
-                throw new Exception($"Unsupported game host: \"{e.Host}\"");
-            }
+            string hostIdentifier = m.Groups[1].Value;
+
+            if (!_domainMap.TryGetValue(hostIdentifier, out string? domain))
+                domain = hostIdentifier;
 
             _uriProvider.Domain = domain;
 
