@@ -7,10 +7,32 @@
 
 `/x` opens the application window and brings it to the foreground.
 
+## Furni
+
+`/f[urni] h[ide] <name>` hides furni in the room.
+* `/f h duck` will hide furni containing "duck" in its name: "Rubber Duck", "Skeleduck", etc.
+
+`/f[urni] s[how] <name>` shows furni in the room.
+
+`/f[urni] p[ickup] <name>` picks up furni in the room owned by you.
+
+`/f[urni] e[ject] <name>` ejects furni in the room that are not owned by you.
+
+## Moderation
+
+`/mute <name> <duration>(h|m)` mutes a user for the specified number of h(ours) or m(inutes).
+* `/mute user 24h` will mute user for 24 hours
+
+`/unmute <name>` unmutes the specified user.
+
+`/kick <name>` kicks the specified user.
+
+`/ban <name> [hour|day|perm]` bans the specified user for an hour, a day or permanently. Duration defaults to an hour. If the user is not in the room they will be added to a temporary list (cleared when leaving the room) and banned when they next enter.
+
 ## Effects
 
 `/fx <name>` enables the effect specified by its name. This will not consume an effect, and the effect will not be enabled if it has not been activated.
-- `/fx mer` will enable the Merdragon effect. (Rain effect from the Totem set)
+* `/fx mer` will enable the Merdragon effect. (Rain effect from the Totem set)
 
 `/fxa <name>` activates the effect specified by its name. *This will consume the effect if it is not currently activated.*
 
@@ -20,23 +42,10 @@
 
 `/find <name>` finds which room a friend is currently in. The name doesn't need to match their full username.
 
-## Furni
-
-`/f[urni] h[ide] <name>` hides furni in the room.
-
-- `/f h duck` will hide furni containing "duck" in its name: "Rubber Duck", "Skeleduck", etc.
-
-`/f[urni] s[how] <name>` shows furni in the room.
-
-`/f[urni] p[ickup] <name>` picks up furni in the room owned by you.
-
-`/f[urni] e[ject] <name>` ejects furni in the room that are not owned by you.
-
 ## Info
 
 `/p[rofile] <name>` or `/p id:<id>` opens a user's profile specified by their name or ID.
-
-- `/p 1234` will open user "1234"'s profile, `/p id:1234` will open the profile of the user with ID 1234.
+* `/p 1234` will open user "1234"'s profile, `/p id:1234` will open the profile of the user with ID 1234.
 
 `/g[roup] <id>` opens information of the group with the specified ID.
 
