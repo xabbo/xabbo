@@ -13,7 +13,6 @@
 - `/fx mer` will enable the Merdragon effect. (Rain effect from the Totem set)
 
 `/fxa <name>` activates the effect specified by its name. *This will consume the effect if it is not currently activated.*
-- `/fx mer` will activate the Merdragon effect, this will consume the effect.
 
 `/dropfx` removes an effect applied by a furni, this works by quickly enabling and disabling the lightsaber effect.
 
