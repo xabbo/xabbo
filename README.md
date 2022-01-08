@@ -1,6 +1,17 @@
 # b7.Xabbo
 [enhanced habbo] A multi feature extension for G-Earth.
 
+# Features
+
+## Anti-bobba
+
+Injects invisible characters between each letter to avoid the bobba filter.\
+Since this increases the length of your message, it's easy to hit the character limit when writing longer messages.\
+If localized is enabled, anti-bobba is only applied to text between square brackets.\
+If you type `a [filtered] word`, only `filtered` will have anti-bobba applied to it.\
+With localized disabled, anti-bobba is applied to your entire chat message.\
+**Warning!** *These invisible characters are visible on the Unity client, and also in the chat log when a user attempts to report you. Use with caution.*
+
 # Commands
 
 ## Application
