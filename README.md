@@ -3,7 +3,33 @@
 
 # Features
 
-## Anti-bobba
+## General
+
+### Anti-kick
+Re-enters the room instantly (and attempts to prevent room reload in client) when you get kicked.
+
+### Anti idle
+Prevents your avatar from idling.
+
+### Anti idle-out
+Prevents your avatar from leaving the room when idling for too long.
+
+### Anti trade
+Prevents users from initiating a trade with you.
+
+### No turn
+Prevents you from turning when clicking another user. If `except when reselecting user` is enabled, you will turn to face another user only if clicking the same user twice within a few seconds.
+
+### No walk
+Prevents you from walking. If `turn towards tile clicked` is enabled, you will turn to face that tile instead of moving.
+
+### Click to
+Allows you to mute, kick, ban, or bounce (*ban then unban, this kicks the user without displaying a kick message to them*) a user by clicking on them..
+
+### Escape from
+Escape from staff or ambassadors when they enter the room.
+
+### Anti-bobba
 
 Injects invisible characters between each letter to avoid the bobba filter.\
 Since this increases the length of your message, it's easy to hit the character limit when writing longer messages.\
@@ -11,6 +37,76 @@ If localized is enabled, anti-bobba is only applied to text between square brack
 If you type `a [filtered] word`, only `filtered` will have anti-bobba applied to it.\
 With localized disabled, anti-bobba is applied to your entire chat message.\
 **Warning!** *These invisible characters are visible on the Unity client, and also in the chat log when a user attempts to report you. Use with caution.*
+
+### No typing indicator
+Prevent your avatar from displaying a typing indicator.
+
+### Mute
+Prevent chat from bots, pets, pet commands, wired messages, respects or scratches from showing.
+
+### Show who respected / show total respect count
+When a user receives respect, shows who gave the respect and the receiver's total respect count.
+
+### Prevent using furni
+Prevent using furni when double clicking.
+
+### Double-click to show info
+Shows some information about a furni (name, identifier, coordinates, direction) when double clicking it.
+
+### Double-click to hide
+Hides a furni when double clicking it. It can be re-shown by going to the Room > Furni tab, selecting all furni with Ctrl+A, right clicking and selecting show.
+
+### Double-click tele to find link
+When double clicking a teleporter, if the linking teleporter is also in the room, that teleporter will animate for a second to show which one is linked.
+
+### Flash window
+Flashes the Habbo window when receiving whispers, when a user or friend chats, when a user or friend enters, or when receiving a private message.
+
+### Block HC gift notification
+Blocks the useless HC gift notification.
+
+## Figure
+
+### Wardrobe
+An infinite wardrobe where you can save your avatar's looks.\
+`Import wardrobe` will import your in-game wardrobe into the xabbo wardrobe.\
+`Add from clipboard` will add all figure strings found in your clipboard to the wardrobe.
+
+### Randomizer
+A figure randomizer where you can configure the probability of each part appearing in the figure.\
+By using a base figure and checking lock part/color, individual parts/colors from the base figure can be kept while still randomizing the other parts.
+
+## Room
+
+### Info
+Shows information about the current room.
+
+### Users
+Shows a list of users in the room.\
+Users that are currently trading will show a trading icon next to their name.\
+Right click to enable pets/bots being shown in the list.
+
+### Visitors
+Shows a log of visitors who have entered/left the room.
+
+### Banlist
+Shows all users banned from the room and allows you to unban specific users.
+
+### Furni
+Shows a list of all furni in the room. Furni can be shown/hidden, picked up or ejected by selecting them and right clicking.
+
+## Tools
+
+### Aligner
+A basic wall item aligner that allows you to adjust the individual coordinate values. Check capture and move a wall item to select it.
+
+### Mimic
+Allows you to mimic another user's figure, motto, actions, etc.
+
+## Info
+
+### Furni
+Shows a list of all furni loaded from furni data.
 
 # Commands
 
