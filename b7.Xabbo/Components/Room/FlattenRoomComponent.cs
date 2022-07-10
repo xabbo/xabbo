@@ -87,7 +87,7 @@ namespace b7.Xabbo.Components
                     if (floorPlan.GetHeight(x, y) >= 0)
                         floorPlan.SetHeight(x, y, 0);
 
-            e.Packet.ReplaceAt(5, floorPlan.ToString());
+            e.Packet.ReplaceString(floorPlan.ToString(), 5);
 
             // Modify the heightmap
             for (int y = 0; y < _heightmap.Length; y++)
@@ -144,7 +144,7 @@ namespace b7.Xabbo.Components
             foreach (var entity in entities)
                 entity.Location = AdjustTile(entity.Location);
 
-            e.Packet = new Packet(e.Client, e.Packet.Header);
+            e.Packet = new Packet(e.Packet.Protocol, e.Packet.Header);
             Entity.ComposeAll(e.Packet, entities);
         }
 
@@ -166,7 +166,7 @@ namespace b7.Xabbo.Components
                     update.ActionHeight -= GetOffset(update.Location);
             }
 
-            e.Packet = new Packet(e.Client, e.Packet.Header);
+            e.Packet = new Packet(e.Packet.Protocol, e.Packet.Header);
             EntityStatusUpdate.ComposeAll(e.Packet, updates);
         }
 
@@ -179,7 +179,7 @@ namespace b7.Xabbo.Components
             foreach (var item in floorItems)
                 item.Location = AdjustTile(item.Location);
 
-            e.Packet = new Packet(e.Client, e.Packet.Header);
+            e.Packet = new Packet(e.Packet.Protocol, e.Packet.Header);
             FloorItem.ComposeAll(e.Packet, floorItems);
         }
 
@@ -190,7 +190,8 @@ namespace b7.Xabbo.Components
 
             var floorItem = FloorItem.Parse(e.Packet);
             floorItem.Location = AdjustTile(floorItem.Location);
-            e.Packet = Packet.Compose(e.Client, e.Packet.Header, floorItem);
+            e.Packet = new Packet(e.Packet.Protocol, e.Packet.Header)
+                .Write(floorItem);
         }
 
         [InterceptIn(nameof(Incoming.ActiveObjectUpdate))]
@@ -201,7 +202,8 @@ namespace b7.Xabbo.Components
             FloorItem floorItem = FloorItem.Parse(e.Packet);
             floorItem.Location = AdjustTile(floorItem.Location);
 
-            e.Packet = Packet.Compose(e.Client, e.Packet.Header, floorItem);
+            e.Packet = new Packet(e.Packet.Protocol, e.Packet.Header)
+                .Write(floorItem);
         }
 
         [InterceptIn(nameof(Incoming.QueueMoveUpdate))]
@@ -226,7 +228,8 @@ namespace b7.Xabbo.Components
                 update.EntityTargetZ -= targetOffset;
             }
 
-            e.Packet = Packet.Compose(e.Client, e.Packet.Header, update);
+            e.Packet = new Packet(e.Packet.Protocol, e.Packet.Header)
+                .Write(update);
         }
     }
 }

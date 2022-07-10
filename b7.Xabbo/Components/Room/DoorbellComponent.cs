@@ -2,7 +2,7 @@
 
 using Microsoft.Extensions.Configuration;
 
-using Xabbo;
+using Xabbo.Common;
 using Xabbo.Interceptor;
 using Xabbo.Messages;
 

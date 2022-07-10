@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 
 using Xabbo.Messages;
+using Xabbo.Interceptor;
 
 namespace b7.Xabbo.Commands
 {

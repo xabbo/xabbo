@@ -2,13 +2,13 @@
 
 using GalaSoft.MvvmLight;
 
-using Xabbo;
-using Xabbo.Interceptor;
+using Xabbo.Common;
 using Xabbo.Messages;
+using Xabbo.Interceptor;
 
 namespace b7.Xabbo.Components
 {
-    public abstract class Component : ObservableObject
+    public abstract class Component : ObservableObject, IInterceptHandler
     {
         protected IInterceptor Interceptor { get; }
         protected ClientType Client => Interceptor.Client;

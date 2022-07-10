@@ -2,9 +2,11 @@
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+
+using Xabbo.Messages;
 using Xabbo.Core;
 using Xabbo.Core.Game;
-using Xabbo.Messages;
+using Xabbo.Core.Extensions;
 
 namespace b7.Xabbo.Commands
 {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-using Xabbo;
+using Xabbo.Common;
 using Xabbo.Messages;
 using Xabbo.Interceptor;
 using Xabbo.Core;

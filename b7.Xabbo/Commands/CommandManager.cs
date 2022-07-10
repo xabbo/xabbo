@@ -16,7 +16,7 @@ using b7.Xabbo.Components;
 
 namespace b7.Xabbo.Commands
 {
-    public class CommandManager
+    public class CommandManager : IInterceptHandler
     {
         public const string PREFIX = "/";
 

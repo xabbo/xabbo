@@ -70,7 +70,8 @@ namespace b7.Xabbo.Components
                 (DontAskToRingDoorbell && roomData.Access == RoomAccess.Doorbell))
             {
                 roomData.IsGroupMember = true;
-                e.Packet = Packet.Compose(Client, e.Packet.Header, roomData);
+                e.Packet = new Packet(Client, e.Packet.Header)
+                    .Write(roomData);
             }
         }
 
@@ -92,7 +93,7 @@ namespace b7.Xabbo.Components
                 if (_passwords.ContainsKey(_lastRequestedRoom))
                 {
                     password = _passwords[_lastRequestedRoom];
-                    e.Packet.ReplaceAt(4, password);
+                    e.Packet.ReplaceString(password, 4);
                 }
             }
         }

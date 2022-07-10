@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 
 using Xabbo.Messages;
+using Xabbo.Interceptor;
 using Xabbo.Core;
 using Xabbo.Core.Game;
 

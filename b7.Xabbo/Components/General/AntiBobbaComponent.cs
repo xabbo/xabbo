@@ -103,7 +103,7 @@ namespace b7.Xabbo.Components
                 }
             }
 
-            e.Packet.ReplaceAt(0, message);
+            e.Packet.ReplaceString(message, 0);
         }
     }
 }

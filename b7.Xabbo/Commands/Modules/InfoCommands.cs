@@ -17,7 +17,7 @@ namespace b7.Xabbo.Commands
 
                 if (long.TryParse(name, out long id))
                 {
-                    return SendAsync(Out.GetExtendedProfile, id, true);
+                    return SendAsync(Out.GetExtendedProfile, id, true).AsTask();
                 }
                 else
                 {
@@ -27,11 +27,11 @@ namespace b7.Xabbo.Commands
             }
             else
             {
-                return SendAsync(Out.GetExtendedProfileByUsername, name);
+                return SendAsync(Out.GetExtendedProfileByUsername, name).AsTask();
             }
         }
 
         [Command("group", "grp", "g")]
-        public Task ShowGroupInfoAsync(CommandArgs args) => SendAsync(Out.GetHabboGroupDetails, long.Parse(args[0]), true);
+        public Task ShowGroupInfoAsync(CommandArgs args) => SendAsync(Out.GetHabboGroupDetails, long.Parse(args[0]), true).AsTask();
     }
 }

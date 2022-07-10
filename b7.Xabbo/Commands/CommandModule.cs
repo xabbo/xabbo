@@ -12,7 +12,7 @@ using Xabbo.Messages;
 
 namespace b7.Xabbo.Commands
 {
-    public abstract class CommandModule
+    public abstract class CommandModule : IInterceptHandler
     {
         public bool IsAvailable { get; set; }
         public CommandManager Commands { get; private set; } = null!;
@@ -26,8 +26,8 @@ namespace b7.Xabbo.Commands
         protected void Send(Header header, params object[] values) => Interceptor.Send(header, values);
         protected void Send(IReadOnlyPacket packet) => Interceptor.Send(packet);
 
-        protected Task SendAsync(Header header, params object[] values) => Interceptor.SendAsync(header, values);
-        protected Task SendAsync(IReadOnlyPacket packet) => Interceptor.SendAsync(packet);
+        protected ValueTask SendAsync(Header header, params object[] values) => Interceptor.SendAsync(header, values);
+        protected ValueTask SendAsync(IReadOnlyPacket packet) => Interceptor.SendAsync(packet);
 
         public CommandModule() { }
 

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.GameData;
+using Xabbo.Core.Extensions;
 
 using b7.Xabbo.Services;
 
