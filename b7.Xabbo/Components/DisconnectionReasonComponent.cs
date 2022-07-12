@@ -24,7 +24,7 @@ namespace b7.Xabbo.Components
             string reasonText = Enum.IsDefined(reason) ? reason.Humanize() : $"unknown ({(int)reason})";
             string message = $"[xabbo] You were disconnected by the server.\n\nReason: {reasonText}";
 
-            Send(In.SystemBroadcast, message);
+            Interceptor.Send(In.SystemBroadcast, message);
         }
     }
 }

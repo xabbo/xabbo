@@ -15,8 +15,6 @@ namespace b7.Xabbo.Components
         protected IMessageManager Messages => Interceptor.Messages;
         protected Incoming In => Interceptor.Messages.In;
         protected Outgoing Out => Interceptor.Messages.Out;
-        protected void Send(Header header, params object[] values) => Interceptor.Send(header, values);
-        protected void Send(IReadOnlyPacket packet) => Interceptor.Send(packet);
 
         private bool _isActive;
         public bool IsActive

@@ -107,15 +107,15 @@ namespace b7.Xabbo.Components
                 {
                     if (Client == ClientType.Flash)
                     {
-                        Send(In.StuffDataUpdate, linkedItem.Id.ToString(), 0, "2");
+                        Interceptor.Send(In.StuffDataUpdate, linkedItem.Id.ToString(), 0, "2");
                         await Task.Delay(500);
-                        Send(In.StuffDataUpdate, linkedItem.Id.ToString(), 0, "0");
+                        Interceptor.Send(In.StuffDataUpdate, linkedItem.Id.ToString(), 0, "0");
                     }
                     else
                     {
-                        Send(In.StuffDataUpdate, linkedItem.Id, 0, "2");
+                        Interceptor.Send(In.StuffDataUpdate, linkedItem.Id, 0, "2");
                         await Task.Delay(500);
-                        Send(In.StuffDataUpdate, linkedItem.Id, 0, "0");
+                        Interceptor.Send(In.StuffDataUpdate, linkedItem.Id, 0, "0");
                     }
                 }
             }

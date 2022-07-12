@@ -103,8 +103,8 @@ namespace b7.Xabbo.Components
                 }
             }
 
-            Send(In.StackingHeightmap, _heightmap);
-            Send(e.Packet);
+            Interceptor.Send(In.StackingHeightmap, _heightmap);
+            Interceptor.Send(e.Packet);
         }
 
         [InterceptIn(nameof(Incoming.StackingHeightmapDiff))]

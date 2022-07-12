@@ -69,7 +69,7 @@ namespace b7.Xabbo.Components
                 e.Entity.Id == _profileManager.UserData?.Id &&
                 e.Entity is IRoomUser self)
             {
-                Send(In.UpdateAvatar,
+                Interceptor.Send(In.UpdateAvatar,
                     GHOST_INDEX,
                     self.Figure,
                     self.Gender.ToShortString(),
@@ -101,13 +101,13 @@ namespace b7.Xabbo.Components
 
             if (!_isInjected)
             {
-                Send(In.UsersInRoom, 1, ghostUser);
-                Send(In.RoomAvatarEffect, ghostUser.Index, 13, 0);
+                Interceptor.Send(In.UsersInRoom, 1, ghostUser);
+                Interceptor.Send(In.RoomAvatarEffect, ghostUser.Index, 13, 0);
             }
 
             if (self.CurrentUpdate is not null)
             {
-                Send(In.Status, 1, new EntityStatusUpdate(self.CurrentUpdate)
+                Interceptor.Send(In.Status, 1, new EntityStatusUpdate(self.CurrentUpdate)
                 {
                     Index = ghostUser.Index,
                     Location = self.CurrentUpdate.Location.Add(64, 64, 64)
@@ -121,7 +121,7 @@ namespace b7.Xabbo.Components
         {
             if (!_isInjected) return;
 
-            Send(In.Status, 1, new EntityStatusUpdate()
+            Interceptor.Send(In.Status, 1, new EntityStatusUpdate()
             {
                 Index = GHOST_INDEX,
                 Location = (0, 0, -1000)

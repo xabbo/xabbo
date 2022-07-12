@@ -79,7 +79,7 @@ namespace b7.Xabbo.Components
             _preventRoomRefresh = true;
             _lastKick = DateTime.Now;
 
-            Send(Out.FlatOpc, (LegacyLong)_roomManager.CurrentRoomId, string.Empty, -1);
+            Interceptor.Send(Out.FlatOpc, (LegacyLong)_roomManager.CurrentRoomId, string.Empty, -1);
             _xabbot.ShowMessage(msg);
 
             if (_profileManager.UserData is not null)
@@ -88,7 +88,7 @@ namespace b7.Xabbo.Components
                     _roomManager.Room.TryGetUserById(_profileManager.UserData.Id, out IRoomUser? self))
                 {
                     await Task.Delay(500);
-                    Send(Out.Move, self.X, self.Y);
+                    Interceptor.Send(Out.Move, self.X, self.Y);
                 }
             }
         }

@@ -100,22 +100,22 @@ namespace b7.Xabbo.Components
             {
                 if (self.IsIdle && IsAntiIdleOutActive)
                 {
-                    Send(Out.Expression, 5);
+                    Interceptor.Send(Out.Expression, 5);
                 }
                 else if (self.Dance != 0 && IsActive)
                 {
-                    Send(Out.Move, 0, 0);
+                    Interceptor.Send(Out.Move, 0, 0);
                 }
                 else if (IsActive)
                 {
-                    Send(Out.Expression, 0);
+                    Interceptor.Send(Out.Expression, 0);
                 }
             }
             else
             {
                 if (IsActive)
                 {
-                    Send(Out.Expression, 0);
+                    Interceptor.Send(Out.Expression, 0);
                 }
             }
         }

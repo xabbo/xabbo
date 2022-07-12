@@ -63,13 +63,13 @@ namespace b7.Xabbo.Components
                     _roomManager.Room.TryGetUserByIndex(index, out IRoomUser? user))
                 {
                     e.Block();
-                    Send(Out.PassHandItem, (LegacyLong)user.Id);
+                    Interceptor.Send(Out.PassHandItem, (LegacyLong)user.Id);
                 }
             }
             else if (DropHandItem)
             {
                 e.Block();
-                Send(Out.DropHandItem);
+                Interceptor.Send(Out.DropHandItem);
             }
 
             if (MaintainDirection)
@@ -97,9 +97,9 @@ namespace b7.Xabbo.Components
                             (int invX, int invY) = H.GetMagicVector(dir + 4);
 
                             await Task.Delay(100);
-                            Send(Out.LookTo, invX, invY);
+                            Interceptor.Send(Out.LookTo, invX, invY);
                             await Task.Delay(100);
-                            Send(Out.LookTo, x, y);
+                            Interceptor.Send(Out.LookTo, x, y);
                         }
                     }
                     finally { semaphore.Release(); }

@@ -50,7 +50,7 @@ namespace b7.Xabbo.Components
 
             if (claimReward)
             {
-                Send(Out.ClaimEarning, (byte)1);
+                Interceptor.Send(Out.ClaimEarning, (byte)1);
                 _xabbot.ShowMessage("Claimed daily reward.");
             }
         }

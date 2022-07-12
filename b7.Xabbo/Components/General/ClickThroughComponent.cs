@@ -46,7 +46,7 @@ namespace b7.Xabbo.Components
 
             if (propertyName.Equals(nameof(IsActive)))
             {
-                Send(In.GameYouArePlayer, IsActive);
+                Interceptor.Send(In.GameYouArePlayer, IsActive);
             }
         }
 
@@ -56,7 +56,7 @@ namespace b7.Xabbo.Components
         {
             if (IsActive)
             {
-                Send(In.GameYouArePlayer, true);
+                Interceptor.Send(In.GameYouArePlayer, true);
             }
         }
     }

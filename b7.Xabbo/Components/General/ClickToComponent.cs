@@ -195,7 +195,7 @@ namespace b7.Xabbo.Components
                     muteMinutes = 30000;
 
                 SendInfoMessage($"(click-muting user for {MuteValue} {(MuteInMinutes ? "minute(s)" : "hour(s)")})", user.Index);
-                Send(Out.RoomMuteUser, (LegacyLong)user.Id, (LegacyLong)_roomManager.CurrentRoomId, muteMinutes);
+                Interceptor.Send(Out.RoomMuteUser, (LegacyLong)user.Id, (LegacyLong)_roomManager.CurrentRoomId, muteMinutes);
             }
             else if (Kick)
             {
@@ -203,7 +203,7 @@ namespace b7.Xabbo.Components
                     return;
 
                 SendInfoMessage("(click-kicking user)", user.Index);
-                Send(Out.KickUser, (LegacyLong)user.Id);
+                Interceptor.Send(Out.KickUser, (LegacyLong)user.Id);
             }
             else if (Ban)
             {
@@ -231,7 +231,7 @@ namespace b7.Xabbo.Components
                     return;
 
                 SendInfoMessage($"(click-banning user {banText})", user.Index);
-                Send(Out.RoomBanWithDuration, (LegacyLong)user.Id, (LegacyLong)_roomManager.CurrentRoomId, banType);
+                Interceptor.Send(Out.RoomBanWithDuration, (LegacyLong)user.Id, (LegacyLong)_roomManager.CurrentRoomId, banType);
             }
             else if (Bounce)
             {
@@ -239,15 +239,15 @@ namespace b7.Xabbo.Components
                     return;
 
                 SendInfoMessage($"(click-bouncing user)", user.Index);
-                Send(Out.RoomBanWithDuration, (LegacyLong)user.Id, (LegacyLong)_roomManager.CurrentRoomId, BAN_HOUR);
+                Interceptor.Send(Out.RoomBanWithDuration, (LegacyLong)user.Id, (LegacyLong)_roomManager.CurrentRoomId, BAN_HOUR);
                 await Task.Delay(_bounceUnbanDelay);
-                Send(Out.RoomUnbanUser, (LegacyLong)user.Id, (LegacyLong)_roomManager.CurrentRoomId);
+                Interceptor.Send(Out.RoomUnbanUser, (LegacyLong)user.Id, (LegacyLong)_roomManager.CurrentRoomId);
             }
         }
 
         private void SendInfoMessage(string message, int entityIndex = -1)
         {
-            Send(In.Whisper, entityIndex, message, 0, 0, 0, 0);
+            Interceptor.Send(In.Whisper, entityIndex, message, 0, 0, 0, 0);
         }
     }
 }

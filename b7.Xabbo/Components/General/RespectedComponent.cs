@@ -99,7 +99,7 @@ namespace b7.Xabbo.Components
             if (ShowTotalRespects)
                 message += $" ({totalRespects})";
 
-            Send(In.Whisper, respectee.Index, message, 0, 1, 0, 0);
+            Interceptor.Send(In.Whisper, respectee.Index, message, 0, 1, 0, 0);
         }
     }
 }

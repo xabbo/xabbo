@@ -48,7 +48,7 @@ namespace b7.Xabbo.Components
             if (IsActive && TurnOnReselect && (DateTime.Now - _lastSelection).TotalSeconds < _reselectThreshold)
             {
                 if (userId == _lastSelectedUser)
-                    Send(Out.LookTo, _lastLookAtX, _lastLookAtY);
+                    Interceptor.Send(Out.LookTo, _lastLookAtX, _lastLookAtY);
             }
 
             _lastSelection = DateTime.Now;

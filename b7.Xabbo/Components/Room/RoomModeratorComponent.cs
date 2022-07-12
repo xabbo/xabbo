@@ -44,7 +44,7 @@ namespace b7.Xabbo.Components
         {
             if (!_roomManager.CanMute || e == null)
                 return false;
-            Send(Out.RoomMuteUser, e.Id, _roomManager.CurrentRoomId, minutes);
+            Interceptor.Send(Out.RoomMuteUser, e.Id, _roomManager.CurrentRoomId, minutes);
             return true;
         }
 
@@ -53,7 +53,7 @@ namespace b7.Xabbo.Components
         {
             if (!_roomManager.CanKick || e == null)
                 return false;
-            Send(Out.KickUser, e.Id);
+            Interceptor.Send(Out.KickUser, e.Id);
             return true;
         }
 
@@ -62,7 +62,7 @@ namespace b7.Xabbo.Components
         {
             if (!_roomManager.CanBan || e == null)
                 return false;
-            Send(Out.RoomBanWithDuration, e.Id, _roomManager.CurrentRoomId, duration.GetValue());
+            Interceptor.Send(Out.RoomBanWithDuration, e.Id, _roomManager.CurrentRoomId, duration.GetValue());
             return true;
         }
 
@@ -71,7 +71,7 @@ namespace b7.Xabbo.Components
         {
             if (!_roomManager.IsOwner || e == null)
                 return false;
-            Send(Out.RoomUnbanUser, e.Id, _roomManager.CurrentRoomId);
+            Interceptor.Send(Out.RoomUnbanUser, e.Id, _roomManager.CurrentRoomId);
             return true;
         }
     }

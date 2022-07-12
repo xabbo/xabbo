@@ -67,7 +67,7 @@ namespace b7.Xabbo.Components
 
             if (CanTrade())
             {
-                Send(Out.TradeOpen, self.Index);
+                Interceptor.Send(Out.TradeOpen, self.Index);
             }
         }
 
@@ -106,7 +106,7 @@ namespace b7.Xabbo.Components
                         _tradeManager.Partner is not null &&
                         _tradeManager.Partner.Id == userData.Id)
                     {
-                        Send(Out.TradeClose);
+                        Interceptor.Send(Out.TradeClose);
                     }
                 }
             }

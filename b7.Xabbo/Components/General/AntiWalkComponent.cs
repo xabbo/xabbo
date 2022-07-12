@@ -33,7 +33,7 @@ namespace b7.Xabbo.Components
             {
                 int x = e.Packet.ReadInt();
                 int y = e.Packet.ReadInt();
-                Send(Out.LookTo, x, y);
+                Interceptor.Send(Out.LookTo, x, y);
             }
         }
     }

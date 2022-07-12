@@ -42,7 +42,7 @@ namespace b7.Xabbo.Components
             if (AcceptFriends && _friendManager.IsFriend(name))
             {
                 e.Block();
-                Send(Out["LetUserIn"], name, true);
+                Interceptor.Send(Out["LetUserIn"], name, true);
             }
         }
     }

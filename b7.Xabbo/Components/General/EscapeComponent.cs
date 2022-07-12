@@ -93,8 +93,8 @@ namespace b7.Xabbo.Components
             if (escape)
             {
                 await Task.Delay(500);
-                Send(Out.FlatOpc, (LegacyLong)0, "", -1L);
-                Send(In.SystemBroadcast, escapeMessage);
+                Interceptor.Send(Out.FlatOpc, (LegacyLong)0, "", -1L);
+                Interceptor.Send(In.SystemBroadcast, escapeMessage);
                 return;
             }
         }
