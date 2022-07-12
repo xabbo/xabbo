@@ -221,7 +221,7 @@ namespace b7.Xabbo.ViewModel
         {
             if (!IsAvailable) return;
 
-            await SendAsync(Out.UpdateAvatar,
+            await Interceptor.SendAsync(Out.UpdateAvatar,
                 figureViewModel.Figure.GetGenderString(),
                 figureViewModel.Figure.GetFigureString()
             );
@@ -249,7 +249,7 @@ namespace b7.Xabbo.ViewModel
         {
             try
             {
-                await SendAsync(Out.GetWardrobe);
+                await Interceptor.SendAsync(Out.GetWardrobe);
                 var packet = await Interceptor.ReceiveAsync(In.UserWardrobe, 5000);
                 int state = packet.ReadInt();
                 short n = packet.ReadLegacyShort();

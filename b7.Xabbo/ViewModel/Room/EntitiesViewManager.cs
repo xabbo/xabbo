@@ -397,7 +397,7 @@ namespace b7.Xabbo.ViewModel
         {
             if (SelectedEntity == null) return;
 
-            Send(In.Whisper,
+            Interceptor.Send(In.Whisper,
                 (LegacyLong)SelectedEntity.Index,
                 "(click here to find)", 0, 0, 0, 0
             );
@@ -441,7 +441,7 @@ namespace b7.Xabbo.ViewModel
                     case "game":
                         try
                         {
-                            Send(Out.GetExtendedProfile, (LegacyLong)user.Id, true);
+                            Interceptor.Send(Out.GetExtendedProfile, (LegacyLong)user.Id, true);
                             UserProfile profile = UserProfile.Parse(
                                 await Interceptor.ReceiveAsync(In.ExtendedProfile, 5000)
                             );
@@ -451,7 +451,7 @@ namespace b7.Xabbo.ViewModel
                                 _snackbarMq.Enqueue($"{user.Name}'s profile is not visible.");
                             }
                         }
-                        catch (OperationCanceledException)
+                        catch (TimeoutException)
                         {
                             _snackbarMq.Enqueue("Profile load timed out.");
                         }
@@ -460,7 +460,7 @@ namespace b7.Xabbo.ViewModel
                         OpenUri(_uris.GetUri(HabboEndpoints.UserProfile, new { name = user.Name }));
                         break;
                     case "widgets":
-                        OpenUri(new Uri($"http://www.habbowidgets.com/habinfo/{_uris.Domain}/{WebUtility.UrlEncode(user.Name)}"));
+                        OpenUri(new Uri($"http://www.habbowidgets.com/habinfo/{_uris.Host}/{WebUtility.UrlEncode(user.Name)}"));
                         break;
                     default:
                         break;
@@ -477,7 +477,7 @@ namespace b7.Xabbo.ViewModel
             if (!int.TryParse(arg, out int minutes))
                 return;
            
-            await SendAsync(Out.RoomMuteUser,
+            await Interceptor.SendAsync(Out.RoomMuteUser,
                 (LegacyLong)SelectedEntity.Id,
                 (LegacyLong)_roomManager.CurrentRoomId,
                 minutes
@@ -489,7 +489,7 @@ namespace b7.Xabbo.ViewModel
             if (SelectedEntity == null ||
                 SelectedEntity.Entity.Type != EntityType.User) return;
 
-            await SendAsync(Out.KickUser, (LegacyLong)SelectedEntity.Id);
+            await Interceptor.SendAsync(Out.KickUser, (LegacyLong)SelectedEntity.Id);
         }
 
         private async void OnBan(string arg)
@@ -507,7 +507,7 @@ namespace b7.Xabbo.ViewModel
                 default: return;
             }
 
-            await SendAsync(Out.RoomBanWithDuration,
+            await Interceptor.SendAsync(Out.RoomBanWithDuration,
                 (LegacyLong)SelectedEntity.Id,
                 (LegacyLong)_roomManager.CurrentRoomId,
                 banDuration.GetValue()
@@ -522,9 +522,9 @@ namespace b7.Xabbo.ViewModel
             long userId = SelectedEntity.Id;
             long roomId = _roomManager.CurrentRoomId;
 
-            await SendAsync(Out.RoomBanWithDuration, (LegacyLong)userId, (LegacyLong)roomId, BanDuration.Hour.GetValue());
+            await Interceptor.SendAsync(Out.RoomBanWithDuration, (LegacyLong)userId, (LegacyLong)roomId, BanDuration.Hour.GetValue());
             await Task.Delay(200);
-            await SendAsync(Out.RoomUnbanUser, (LegacyLong)userId, (LegacyLong)roomId);
+            await Interceptor.SendAsync(Out.RoomUnbanUser, (LegacyLong)userId, (LegacyLong)roomId);
         }
 #endregion
     }

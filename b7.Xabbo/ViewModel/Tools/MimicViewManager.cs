@@ -201,37 +201,37 @@ namespace b7.Xabbo.ViewModel
             IsAvailable = true;
         }
 
-        public override async void RaisePropertyChanged(string propertyName)
+        public override void RaisePropertyChanged(string propertyName)
         {
             base.RaisePropertyChanged(propertyName);
 
             if (!Active)
-                    return;
+                return;
 
             switch (propertyName)
             {
                 case "MimicFigure":
                     if (MimicFigure)
-                        await SetFigureAsync(target);
+                        SetFigure(target);
                     break;
                 case "MimicMotto":
                     if (MimicMotto)
-                        await SetMottoAsync(target);
+                        SetMotto(target);
                     break;
                 case "MimicAction":
-                    await SetIdleAsync(MimicAction ? target : null);
+                    SetIdle(MimicAction ? target : null);
                     break;
                 case "MimicDance":
-                    await SetDanceAsync(MimicDance ? target : null);
+                    SetDance(MimicDance ? target : null);
                     break;
                 case "MimicEffect":
-                    await SetEffectAsync(MimicEffect ? target : null);
+                    SetEffect(MimicEffect ? target : null);
                     break;
                 case "MimicSit":
-                    await SetSittingAsync(MimicSit ? target : null);
+                    SetSitting(MimicSit ? target : null);
                     break;
                 case "MimicTyping":
-                    await SetTypingAsync(MimicTyping ? target : null);
+                    SetTyping(MimicTyping ? target : null);
                     break;
 
                 default:
@@ -239,12 +239,12 @@ namespace b7.Xabbo.ViewModel
             }
         }
 
-        private async void OnEnableDisable()
+        private void OnEnableDisable()
         {
-            await SetStateAsync(state == State.Inactive ? State.SelectingTarget : State.Inactive);
+            SetState(state == State.Inactive ? State.SelectingTarget : State.Inactive);
         }
 
-        private async void RoomManager_Entering(object? sender, EventArgs e)
+        private void RoomManager_Entering(object? sender, EventArgs e)
         {
             target = null;
             self = null;
@@ -252,11 +252,11 @@ namespace b7.Xabbo.ViewModel
             if (!IsInitialized)
             {
                 IsInitialized = true;
-                await SetStateAsync(State.Inactive);
+                SetState(State.Inactive);
             }
         }
 
-        private async void EntityManager_EntitiesAdded(object? sender, EntitiesEventArgs e)
+        private void EntityManager_EntitiesAdded(object? sender, EntitiesEventArgs e)
         {
             foreach (var user in e.Entities.OfType<IRoomUser>())
             {
@@ -264,32 +264,32 @@ namespace b7.Xabbo.ViewModel
                 {
                     self = user;
                     if (target != null)
-                        await AttachAsync(target);
+                        Attach(target);
                 }
                 else if (user.Id == targetId)
                 {
-                    await SendInfoMessageAsync("Mimic target found");
+                    SendInfoMessage("Mimic target found");
                     target = user;
                     if (self != null)
-                        await AttachAsync(user);
+                        Attach(user);
                 }
             }
         }
 
-        private async void EntityManager_EntityRemoved(object? sender, EntityEventArgs e)
+        private void EntityManager_EntityRemoved(object? sender, EntityEventArgs e)
         {
             var entity = e.Entity;
             if (entity.Id == targetId)
             {
                 target = null;
-                await AttachAsync(null);
+                Attach(null);
                 if (followTarget)
-                    await SendAsync(Out.Move, entity.X, entity.Y);
-                await SendInfoMessageAsync("Mimic target left the room");
+                    Interceptor.Send(Out.Move, entity.X, entity.Y);
+                SendInfoMessage("Mimic target left the room");
             }
         }
 
-        private async Task SetStateAsync(State newState)
+        private void SetState(State newState)
         {
             if (state == newState)
                 return;
@@ -305,7 +305,7 @@ namespace b7.Xabbo.ViewModel
                         // TODO move this out
                         SetTarget(null);
                         if (state == State.Active)
-                            await AttachAsync(null);
+                            Attach(null);
                     }
                     break;
                 case State.SelectingTarget:
@@ -329,7 +329,7 @@ namespace b7.Xabbo.ViewModel
 
         #region /* Message handlers */
         [InterceptOut(nameof(Outgoing.GetSelectedBadges))]
-        private async void OnSelectUser(InterceptArgs e)
+        private void OnSelectUser(InterceptArgs e)
         {
             IRoom? room = _roomManager.Room;
             if (room is null) return;
@@ -341,7 +341,7 @@ namespace b7.Xabbo.ViewModel
                     return;
 
                 if (room.TryGetEntityById(id, out IRoomUser? user))
-                    await SetMimicTargetAsync(user);
+                    SetMimicTarget(user);
             }
         }
 
@@ -352,26 +352,26 @@ namespace b7.Xabbo.ViewModel
                 e.Block();
         }
 
-        private async void EntityManager_EntityDataUpdated(object? sender, EntityDataUpdatedEventArgs e)
+        private void EntityManager_EntityDataUpdated(object? sender, EntityDataUpdatedEventArgs e)
         {
             if (e.Entity is not IRoomUser user) return;
 
             if (user.Id == targetId)
             {
                 if (e.FigureUpdated || e.GenderUpdated)
-                    await SetFigureAsync(user);
+                    SetFigure(user);
                 if (e.MottoUpdated)
-                    await SetMottoAsync(user);
+                    SetMotto(user);
             }
         }
 
-        private async void EntityManager_EntityAction(object? sender, EntityActionEventArgs e)
+        private void EntityManager_EntityAction(object? sender, EntityActionEventArgs e)
         {
             if (e.Entity.Id == targetId && e.Action != Actions.Idle)
-                await DoActionAsync((int)e.Action);
+                DoActionAsync((int)e.Action);
         }
 
-        private async void EntityManager_EntityIdle(object? sender, EntityIdleEventArgs e)
+        private void EntityManager_EntityIdle(object? sender, EntityIdleEventArgs e)
         {
             // TODO: fix unidle bug
             // if someone is idle, then does an action,
@@ -382,48 +382,48 @@ namespace b7.Xabbo.ViewModel
                 user.Id == targetId &&
                 user.IsIdle != e.WasIdle)
             {
-                await SetIdleAsync(user);
+                SetIdle(user);
             }
         }
 
-        private async void EntityManager_EntityDance(object? sender, EntityDanceEventArgs e)
+        private void EntityManager_EntityDance(object? sender, EntityDanceEventArgs e)
         {
             if (e.Entity is RoomUser user &&
                 user.Id == targetId &&
                 user.Dance != e.PreviousDance)
             {
-                await SetDanceAsync(user);
+                SetDance(user);
             }
         }
 
-        private async void EntityManager_EntityEffect(object? sender, EntityEffectEventArgs e)
+        private void EntityManager_EntityEffect(object? sender, EntityEffectEventArgs e)
         {
             if (e.Entity is RoomUser user &&
                 user.Id == targetId &&
                 user.Effect != e.PreviousEffect)
             {
-                await SetEffectAsync(user);
+                SetEffect(user);
             }
         }
 
-        private async void EntityManager_EntityTyping(object? sender, EntityTypingEventArgs e)
+        private void EntityManager_EntityTyping(object? sender, EntityTypingEventArgs e)
         {
             if (e.Entity is RoomUser user &&
                 user.Id == targetId &&
                 user.IsTyping != e.WasTyping)
             {
-                await SetTypingAsync(user);
+                SetTyping(user);
             }
         }
 
-        private async void EntityManager_EntityUpdated(object? sender, EntityEventArgs e)
+        private void EntityManager_EntityUpdated(object? sender, EntityEventArgs e)
         {
             if (e.Entity is RoomUser user)
             {
                 if (user == self)
-                    await HandleSelfUpdateAsync(user);
+                    HandleSelfUpdateAsync(user);
                 else if (user == target)
-                    await HandleTargetUpdateAsync(user);
+                    HandleTargetUpdateAsync(user);
             }
         }
 
@@ -445,33 +445,32 @@ namespace b7.Xabbo.ViewModel
 
                 if (DelaySpeech && SpeechDelay > 0)
                 {
-                    await Task.Yield();
                     await Task.Delay(SpeechDelay);
                 }
 
-                await SendChatAsync(e.ChatType, message, e.BubbleStyle);
+                SendChat(e.ChatType, message, e.BubbleStyle);
             }
         }
 
-        private async Task HandleTargetUpdateAsync(IRoomUser user)
+        private void HandleTargetUpdateAsync(IRoomUser user)
         {
             if (user.PreviousUpdate is null ||
                 user.CurrentUpdate is null) return;
 
             if (user.PreviousUpdate.SittingOnFloor != user.CurrentUpdate.SittingOnFloor)
-                await SetSittingAsync(user);
+                SetSitting(user);
             if (user.PreviousUpdate.Sign != user.CurrentUpdate.Sign && user.CurrentUpdate.Sign != Signs.None)
-                await SendSignAsync((int)user.CurrentUpdate.Sign);
+                SendSign((int)user.CurrentUpdate.Sign);
 
             if (user.X != user.PreviousUpdate.Location.X ||
                 user.Y != user.PreviousUpdate.Location.Y)
             {
                 if (followTarget)
-                    await SendAsync(Out.Move, user.PreviousUpdate.Location.X, user.PreviousUpdate.Location.Y);
+                    Interceptor.Send(Out.Move, user.PreviousUpdate.Location.X, user.PreviousUpdate.Location.Y);
             }
         }
 
-        private async Task HandleSelfUpdateAsync(RoomUser user)
+        private void HandleSelfUpdateAsync(RoomUser user)
         {
             if (target is null ||
                 user.PreviousUpdate is null ||
@@ -484,7 +483,7 @@ namespace b7.Xabbo.ViewModel
                 user.CurrentUpdate.Stance == Stances.Stand &&
                 target.Dance != 0)
             {
-                await SetDanceAsync(target);
+                SetDance(target);
             }
 
             if (followTarget &&
@@ -493,17 +492,17 @@ namespace b7.Xabbo.ViewModel
             {
                 if (target.PreviousUpdate != null && (user.CurrentUpdate.Location != target.PreviousUpdate.Location))
                 {
-                    await SendAsync(Out.Move, target.PreviousUpdate.Location.X, target.PreviousUpdate.Location.Y);
+                    Interceptor.Send(Out.Move, target.PreviousUpdate.Location.X, target.PreviousUpdate.Location.Y);
                 }
             }
         }
         #endregion
 
         #region /* Mimic functions */
-        private Task SendInfoMessageAsync(string message)
-            => SendAsync(In.Whisper, self?.Index ?? -1, message, 0, 34, 0, 0);
+        private void SendInfoMessage(string message)
+            => Interceptor.Send(In.Whisper, self?.Index ?? -1, message, 0, 34, 0, 0);
 
-        private async Task SetFigureAsync(IRoomUser? user)
+        private void SetFigure(IRoomUser? user)
         {
             if (!mimicFigure || user == null)
                 return;
@@ -512,30 +511,30 @@ namespace b7.Xabbo.ViewModel
                 self.Figure.Equals(user.Figure))
                 return;
 
-            await SendAsync(Out.UpdateAvatar,
+            Interceptor.Send(Out.UpdateAvatar,
                 user.Gender.ToShortString(),
                 user.Figure
             );
         }
 
-        private async Task SetMottoAsync(IRoomUser? user)
+        private void SetMotto(IRoomUser? user)
         {
             if (!mimicMotto || user == null)
                 return;
             if (self != null &&
                 self.Motto.Equals(user.Motto))
                 return;
-            await SendAsync(Out.ChangeAvatarMotto, user.Motto);
+            Interceptor.Send(Out.ChangeAvatarMotto, user.Motto);
         }
 
-        private async Task DoActionAsync(int action)
+        private void DoActionAsync(int action)
         {
             if (!mimicAction)
                 return;
-            await SendAsync(Out.Expression, action);
+            Interceptor.Send(Out.Expression, action);
         }
 
-        private async Task SetIdleAsync(IRoomUser? user)
+        private void SetIdle(IRoomUser? user)
         {
             bool idle;
             if (user != null)
@@ -550,10 +549,10 @@ namespace b7.Xabbo.ViewModel
             if (self != null && self.IsIdle == idle)
                 return;
 
-            await SendAsync(Out.Expression, idle ? 5 : 0);
+            Interceptor.Send(Out.Expression, idle ? 5 : 0);
         }
 
-        private async Task SetDanceAsync(IRoomUser? user)
+        private void SetDance(IRoomUser? user)
         {
             int dance;
             if (user != null)
@@ -568,17 +567,17 @@ namespace b7.Xabbo.ViewModel
             if (self != null && self.Dance.Equals(dance))
                 return;
 
-            await SendAsync(Out.Dance, dance);
+            Interceptor.Send(Out.Dance, dance);
         }
 
-        private async Task SendSignAsync(int sign)
+        private void SendSign(int sign)
         {
             if (!mimicSign)
                 return;
-            await SendAsync(Out.ShowSign, sign);
+            Interceptor.Send(Out.ShowSign, sign);
         }
 
-        private async Task SetEffectAsync(IRoomUser? user)
+        private void SetEffect(IRoomUser? user)
         {
             int effect;
             if (user != null)
@@ -595,27 +594,27 @@ namespace b7.Xabbo.ViewModel
 
             if (effect == 0) effect = -1;
 
-            if (!await SendSpecialEffectAsync(effect))
+            if (!SendSpecialEffect(effect))
             {
-                if (await SendSpecialEffectAsync(self?.Effect ?? 0) && effect == -1)
+                if (SendSpecialEffect(self?.Effect ?? 0) && effect == -1)
                     return;
-                await SendAsync(Out.UseAvatarEffect, effect);
+                Interceptor.Send(Out.UseAvatarEffect, effect);
             }
         }
 
-        private async Task<bool> SendSpecialEffectAsync(int effect)
+        private bool SendSpecialEffect(int effect)
         {
             switch (effect)
             {
-                case 0x8c: await SendChatAsync(":habnam"); break;
-                case 0x88: await SendChatAsync(":moonwalk"); break;
-                case 0xc4: await SendChatAsync(":yyxxabxa"); break;
+                case 0x8c: SendChat(":habnam"); break;
+                case 0x88: SendChat(":moonwalk"); break;
+                case 0xc4: SendChat(":yyxxabxa"); break;
                 default: return false;
             }
             return true;
         }
 
-        private async Task SetTypingAsync(IRoomUser? user)
+        private void SetTyping(IRoomUser? user)
         {
             bool typing;
             if (user != null)
@@ -630,12 +629,12 @@ namespace b7.Xabbo.ViewModel
             if (self != null && self.IsTyping.Equals(typing))
                 return;
 
-            await SendAsync(typing ? Out.UserStartTyping : Out.UserCancelTyping);
+            Interceptor.Send(typing ? Out.UserStartTyping : Out.UserCancelTyping);
         }
 
-        private Task SendChatAsync(string message) => SendChatAsync(ChatType.Talk, message);
+        private void SendChat(string message) => SendChat(ChatType.Talk, message);
 
-        private async Task SendChatAsync(ChatType type, string message, int chatBubbleStyle = 0)
+        private void SendChat(ChatType type, string message, int chatBubbleStyle = 0)
         {
             var packet = new Packet();
             switch (type)
@@ -651,10 +650,10 @@ namespace b7.Xabbo.ViewModel
             if (type == ChatType.Talk)
                 packet.WriteInt(-1);
 
-            await SendAsync(packet);
+            Interceptor.Send(packet);
         }
 
-        private async Task SetSittingAsync(IEntity e)
+        private void SetSitting(IEntity? e)
         {
             bool sitting;
             if (e != null)
@@ -669,36 +668,36 @@ namespace b7.Xabbo.ViewModel
             if (self?.CurrentUpdate != null && self.CurrentUpdate.SittingOnFloor == sitting)
                 return;
 
-            await SendAsync(Out.Posture, sitting ? 1 : 0);
+            Interceptor.Send(Out.Posture, sitting ? 1 : 0);
         }
 
-        private void SetTarget(IRoomUser user)
+        private void SetTarget(IRoomUser? user)
         {
             target = user;
             targetId = target?.Id ?? -1;
         }
 
-        private async Task SetMimicTargetAsync(IRoomUser user)
+        private void SetMimicTarget(IRoomUser user)
         {
             SetTarget(user);
-            await SetStateAsync(State.Active);
-            await AttachAsync(user);
+            SetState(State.Active);
+            Attach(user);
 
-            await SendInfoMessageAsync($"Mimic target set to {user.Name}");
+            SendInfoMessage($"Mimic target set to {user.Name}");
         }
 
-        private async Task AttachAsync(IRoomUser? user)
+        private void Attach(IRoomUser? user)
         {
             if (state == State.Active)
             {
-                await SetFigureAsync(user);
-                await SetMottoAsync(user);
-                await SetDanceAsync(user);
-                await SetEffectAsync(user);
-                await SetSittingAsync(user);
+                SetFigure(user);
+                SetMotto(user);
+                SetDance(user);
+                SetEffect(user);
+                SetSitting(user);
             }
-            await SetTypingAsync(user);
-            await SetIdleAsync(user);
+            SetTyping(user);
+            SetIdle(user);
         }
         #endregion
     }

@@ -233,7 +233,7 @@ namespace b7.Xabbo.ViewModel
 
                 Clear();
 
-                await SendAsync(Out.GetBannedUsers, (LegacyLong)_roomManager.CurrentRoomId);
+                await Interceptor.SendAsync(Out.GetBannedUsers, (LegacyLong)_roomManager.CurrentRoomId);
                 var packet = await Interceptor.ReceiveAsync(In.UsersBannedFromRoom, 4000);
 
                 long roomId = packet.ReadLegacyLong();
@@ -285,7 +285,7 @@ namespace b7.Xabbo.ViewModel
                 for (int i = 0; i < array.Length; i++)
                 {
                     var user = array[i];
-                    await SendAsync(Out.RoomUnbanUser, (LegacyLong)user.Id, (LegacyLong)roomId);
+                    await Interceptor.SendAsync(Out.RoomUnbanUser, (LegacyLong)user.Id, (LegacyLong)roomId);
                     await Task.Delay(_banInterval, _cts.Token);
                 }
             }

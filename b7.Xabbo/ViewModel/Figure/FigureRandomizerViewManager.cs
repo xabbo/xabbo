@@ -31,7 +31,7 @@ namespace b7.Xabbo.ViewModel
         private FigureRandomizer? _figureRandomizer;
         private Figure? _baseFigure;
 
-        private CancellationTokenSource _timerCts;
+        private CancellationTokenSource? _timerCts;
 
         private readonly Dictionary<FigurePartType, FigureRandomizerPartViewModel> figureRandomizerParts;
 
@@ -137,6 +137,8 @@ namespace b7.Xabbo.ViewModel
         private async void OnGameConnected(object? sender, GameConnectedEventArgs e)
         {
             await _gameData.WaitForLoadAsync(CancellationToken.None);
+            _figureRandomizer = new FigureRandomizer(_gameData.Figure!);
+
             await _profileManager.GetUserDataAsync();
 
             IsReady = true;
@@ -170,7 +172,7 @@ namespace b7.Xabbo.ViewModel
         {
             if (IsTimerActive)
             {
-                _timerCts.Cancel();
+                _timerCts?.Cancel();
                 return;
             }
 
@@ -222,7 +224,7 @@ namespace b7.Xabbo.ViewModel
 
         private void UpdateBaseFigure()
         {
-            if (!IsReady) return;
+            if (!IsReady || FigureData is null) return;
 
             try
             {
@@ -249,9 +251,9 @@ namespace b7.Xabbo.ViewModel
                         var color = palette.GetColor(part.Colors[i]);
                         if (color == null) continue;
 
-                        byte r = byte.Parse(color.Value.Substring(0, 2), NumberStyles.HexNumber);
-                        byte g = byte.Parse(color.Value.Substring(2, 2), NumberStyles.HexNumber);
-                        byte b = byte.Parse(color.Value.Substring(4, 2), NumberStyles.HexNumber);
+                        byte r = byte.Parse(color.Value[0..2], NumberStyles.HexNumber);
+                        byte g = byte.Parse(color.Value[2..4], NumberStyles.HexNumber);
+                        byte b = byte.Parse(color.Value[4..6], NumberStyles.HexNumber);
 
                         var colorViewModel = figurePartViewModel.Colors[i];
 
@@ -365,7 +367,7 @@ namespace b7.Xabbo.ViewModel
             else
                 figure = _figureRandomizer.Generate();
 
-            await SendAsync(Out.UpdateAvatar, figure.GetGenderString(), figure.GetFigureString());
+            await Interceptor.SendAsync(Out.UpdateAvatar, figure.GetGenderString(), figure.GetFigureString());
         }
     }
 }

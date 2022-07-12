@@ -186,7 +186,7 @@ namespace b7.Xabbo.ViewModel
 
             if (HasCapturedItem)
             {
-                await SendAsync(Out.MoveWallItem, (LegacyLong)CurrentId, GetLocation().ToString());
+                await Interceptor.SendAsync(Out.MoveWallItem, (LegacyLong)CurrentId, GetLocation().ToString());
             }
         }
 
@@ -220,7 +220,7 @@ namespace b7.Xabbo.ViewModel
         {
             if (_originalLocation is null) return;
 
-            await SendAsync(Out.MoveWallItem, (LegacyLong)CurrentId, _originalLocation.ToString());
+            await Interceptor.SendAsync(Out.MoveWallItem, (LegacyLong)CurrentId, _originalLocation.ToString());
         }
 
         private void RoomManager_Entered(object? sender, EventArgs e)
