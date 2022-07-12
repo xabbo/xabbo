@@ -70,7 +70,7 @@ namespace b7.Xabbo.Services
             );
         }
 
-        private void OnWindowClosing(object sender, CancelEventArgs e)
+        private void OnWindowClosing(object? sender, CancelEventArgs e)
         {
             if (Extension.IsInterceptorConnected)
             {
