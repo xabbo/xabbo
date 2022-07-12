@@ -11,36 +11,31 @@ namespace b7.Xabbo.Services
     {
         private readonly Dictionary<HabboEndpoints, string> _endpoints = new();
 
-        public string Domain { get; set; }
+        public string Host { get; set; } = "";
 
-        public Uri this[HabboEndpoints endpoint] => new(_endpoints[endpoint].Replace("{domain}", Domain));
+        public Uri this[HabboEndpoints endpoint] => GetUri(endpoint);
 
         public HabboUriProvider(IConfiguration config)
         {
-            Domain = config.GetValue<string>("Web:Domain");
+            IConfigurationSection endpointSection = config.GetSection("Web:Endpoints");
+            string host = endpointSection.GetValue<string>("Host");
 
-            IConfigurationSection endpoints = config.GetSection("Web:Endpoints");
-            foreach (IConfigurationSection endpointSection in endpoints.GetChildren())
+            foreach (IConfigurationSection pathSection in endpointSection.GetSection("Paths").GetChildren())
             {
-                string host = endpointSection.GetValue<string>("Host");
-
-                foreach (IConfigurationSection pathSection in endpointSection.GetSection("Paths").GetChildren())
-                {
-                    string endpointName = pathSection.Key;
+                string endpointName = pathSection.Key;
                     
-                    if (!Enum.TryParse(endpointName, out HabboEndpoints endpoint))
-                    {
-                        throw new Exception($"Unknown Habbo endpoint name: '{endpointName}'.");
-                    }
-
-                    _endpoints[endpoint] = host + pathSection.Value;
+                if (!Enum.TryParse(endpointName, out HabboEndpoints endpoint))
+                {
+                    throw new Exception($"Unknown Habbo endpoint name: '{endpointName}'.");
                 }
+
+                _endpoints[endpoint] = host + pathSection.Value;
             }
         }
 
-        public Uri GetUri(HabboEndpoints endpoint, object? param = null, string? domain = null)
+        public Uri GetUri(HabboEndpoints endpoint, object? param = null)
         {
-            string url = _endpoints[endpoint].Replace("{domain}", domain ?? Domain);
+            string url = "https://" + Host + _endpoints[endpoint];
 
             if (param is not null)
             {
