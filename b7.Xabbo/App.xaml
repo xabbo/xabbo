@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
              xmlns:local="clr-namespace:b7.Xabbo"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:converter="clr-namespace:b7.Xabbo.WPF.Converters"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:controls="clr-namespace:MaterialDesignExtensions.Controls;assembly=MaterialDesignExtensions">
@@ -14,6 +15,7 @@
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignExtensions;component/Themes/Generic.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignExtensions;component/Themes/MaterialDesignDarkTheme.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/Dragablz;component/Themes/materialdesign.xaml"/>
+                <ui:Resources Theme="Dark" />
             </ResourceDictionary.MergedDictionaries>
 
             <Style TargetType="{x:Type ListView}" BasedOn="{StaticResource MaterialDesignListView}">
