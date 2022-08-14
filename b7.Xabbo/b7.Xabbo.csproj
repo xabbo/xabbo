@@ -65,4 +65,12 @@
 	  </Resource>
 	</ItemGroup>
 
+	<ItemGroup>
+	  <EditorConfigFiles Remove="C:\Dev\b7\b7.Xabbo\b7.Xabbo\View\.editorconfig" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="C:\Dev\b7\b7.Xabbo\b7.Xabbo\View\.editorconfig" />
+	</ItemGroup>
+
 </Project>

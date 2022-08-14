@@ -13,16 +13,15 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace b7.Xabbo.View
+namespace b7.Xabbo.View;
+
+/// <summary>
+/// Interaction logic for FriendsView.xaml
+/// </summary>
+public partial class FriendsView : UserControl
 {
-    /// <summary>
-    /// Interaction logic for FriendsView.xaml
-    /// </summary>
-    public partial class FriendsView : UserControl
+    public FriendsView()
     {
-        public FriendsView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

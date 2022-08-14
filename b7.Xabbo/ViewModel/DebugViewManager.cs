@@ -7,24 +7,23 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace b7.Xabbo.ViewModel
+namespace b7.Xabbo.ViewModel;
+
+public class DebugViewManager
 {
-    public class DebugViewManager
+    private readonly ISnackbarMessageQueue _snackbarMq;
+
+    public ICommand TestSnackbar { get; }
+
+    public DebugViewManager(ISnackbarMessageQueue snackbarMq)
     {
-        private readonly ISnackbarMessageQueue _snackbarMq;
+        _snackbarMq = snackbarMq;
 
-        public ICommand TestSnackbar { get; }
+        TestSnackbar = new RelayCommand(OnTestSnackbar);
+    }
 
-        public DebugViewManager(ISnackbarMessageQueue snackbarMq)
-        {
-            _snackbarMq = snackbarMq;
-
-            TestSnackbar = new RelayCommand(OnTestSnackbar);
-        }
-
-        private void OnTestSnackbar()
-        {
-            _snackbarMq.Enqueue("Hello, world");
-        }
+    private void OnTestSnackbar()
+    {
+        _snackbarMq.Enqueue("Hello, world");
     }
 }

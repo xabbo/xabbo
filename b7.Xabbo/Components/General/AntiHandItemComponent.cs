@@ -8,102 +8,101 @@ using Xabbo.Core.Game;
 using Xabbo.Interceptor;
 using Xabbo.Messages;
 
-namespace b7.Xabbo.Components
+namespace b7.Xabbo.Components;
+
+public class AntiHandItemComponent : Component
 {
-    public class AntiHandItemComponent : Component
+    private ProfileManager _profileManager;
+    private RoomManager _roomManager;
+
+    private readonly SemaphoreSlim semaphore = new SemaphoreSlim(1, 1);
+    private DateTime lastUpdate = DateTime.MinValue;
+
+    private bool _dropHandItem;
+    public bool DropHandItem
     {
-        private ProfileManager _profileManager;
-        private RoomManager _roomManager;
+        get => _dropHandItem;
+        set => Set(ref _dropHandItem, value);
+    }
 
-        private readonly SemaphoreSlim semaphore = new SemaphoreSlim(1, 1);
-        private DateTime lastUpdate = DateTime.MinValue;
+    private bool _returnHandItem;
+    public bool ReturnHandItem
+    {
+        get => _returnHandItem;
+        set => Set(ref _returnHandItem, value);
+    }
 
-        private bool _dropHandItem;
-        public bool DropHandItem
+    private bool _maintainDirection;
+    public bool MaintainDirection
+    {
+        get => _maintainDirection;
+        set => Set(ref _maintainDirection, value);
+    }
+
+    public AntiHandItemComponent(IInterceptor interceptor,
+        IConfiguration config,
+        ProfileManager profileManager,
+        RoomManager roomManager)
+        : base(interceptor)
+    {
+        _profileManager = profileManager;
+        _roomManager = roomManager;
+
+        DropHandItem = config.GetValue("AntiHandItem:DropHandItem", false);
+        ReturnHandItem = config.GetValue("AntiHandItem:ReturnHandItem", false);
+        MaintainDirection = config.GetValue("AntiHandItem:MaintainDirection", false);
+    }
+
+    [InterceptIn(nameof(Incoming.HandItemReceived))]
+    private async void HandleHandItemReceived(InterceptArgs e)
+    {
+        if (ReturnHandItem)
         {
-            get => _dropHandItem;
-            set => Set(ref _dropHandItem, value);
-        }
-
-        private bool _returnHandItem;
-        public bool ReturnHandItem
-        {
-            get => _returnHandItem;
-            set => Set(ref _returnHandItem, value);
-        }
-
-        private bool _maintainDirection;
-        public bool MaintainDirection
-        {
-            get => _maintainDirection;
-            set => Set(ref _maintainDirection, value);
-        }
-
-        public AntiHandItemComponent(IInterceptor interceptor,
-            IConfiguration config,
-            ProfileManager profileManager,
-            RoomManager roomManager)
-            : base(interceptor)
-        {
-            _profileManager = profileManager;
-            _roomManager = roomManager;
-
-            DropHandItem = config.GetValue("AntiHandItem:DropHandItem", false);
-            ReturnHandItem = config.GetValue("AntiHandItem:ReturnHandItem", false);
-            MaintainDirection = config.GetValue("AntiHandItem:MaintainDirection", false);
-        }
-
-        [InterceptIn(nameof(Incoming.HandItemReceived))]
-        private async void HandleHandItemReceived(InterceptArgs e)
-        {
-            if (ReturnHandItem)
-            {
-                int index = e.Packet.ReadInt();
-                if (_roomManager.Room is not null &&
-                    _roomManager.Room.TryGetUserByIndex(index, out IRoomUser? user))
-                {
-                    e.Block();
-                    Interceptor.Send(Out.PassHandItem, (LegacyLong)user.Id);
-                }
-            }
-            else if (DropHandItem)
+            int index = e.Packet.ReadInt();
+            if (_roomManager.Room is not null &&
+                _roomManager.Room.TryGetUserByIndex(index, out IRoomUser? user))
             {
                 e.Block();
-                Interceptor.Send(Out.DropHandItem);
+                Interceptor.Send(Out.PassHandItem, (LegacyLong)user.Id);
             }
+        }
+        else if (DropHandItem)
+        {
+            e.Block();
+            Interceptor.Send(Out.DropHandItem);
+        }
 
-            if (MaintainDirection)
+        if (MaintainDirection)
+        {
+            lastUpdate = DateTime.Now;
+
+            if (await semaphore.WaitAsync(0))
             {
-                lastUpdate = DateTime.Now;
-
-                if (await semaphore.WaitAsync(0))
+                try
                 {
-                    try
+                    if (_roomManager.Room is null ||
+                        !_roomManager.Room.TryGetUserById(_profileManager.UserData?.Id ?? -1, out IRoomUser? user))
                     {
-                        if (_roomManager.Room is null ||
-                            !_roomManager.Room.TryGetUserById(_profileManager.UserData?.Id ?? -1, out IRoomUser? user))
-                        {
-                            return;
-                        }
-
-                        int dir = user.Direction;
-
-                        while ((DateTime.Now - lastUpdate).TotalSeconds < 1.0)
-                        {
-                            do { await Task.Delay(100); }
-                            while ((DateTime.Now - lastUpdate).TotalSeconds < 1.0);
-
-                            (int x, int y) = H.GetMagicVector(dir);
-                            (int invX, int invY) = H.GetMagicVector(dir + 4);
-
-                            await Task.Delay(100);
-                            Interceptor.Send(Out.LookTo, invX, invY);
-                            await Task.Delay(100);
-                            Interceptor.Send(Out.LookTo, x, y);
-                        }
+                        return;
                     }
-                    finally { semaphore.Release(); }
+
+                    int dir = user.Direction;
+
+                    while ((DateTime.Now - lastUpdate).TotalSeconds < 1.0)
+                    {
+                        do { await Task.Delay(100); }
+                        while ((DateTime.Now - lastUpdate).TotalSeconds < 1.0);
+
+                        (int x, int y) = H.GetMagicVector(dir);
+                        (int invX, int invY) = H.GetMagicVector(dir + 4);
+
+                        await Task.Delay(100);
+                        Interceptor.Send(Out.LookTo, invX, invY);
+                        await Task.Delay(100);
+                        Interceptor.Send(Out.LookTo, x, y);
+                    }
                 }
+                finally { semaphore.Release(); }
             }
         }
     }

@@ -5,19 +5,18 @@ using System.Text;
 using System.Threading.Tasks;
 using Xabbo.Interceptor;
 
-namespace b7.Xabbo.ViewModel
+namespace b7.Xabbo.ViewModel;
+
+public class InventoryViewManager : ComponentViewModel
 {
-    public class InventoryViewManager : ComponentViewModel
+
+    
+
+    public InventoryViewManager(IInterceptor interceptor)
+        : base(interceptor)
     {
 
-        
-
-        public InventoryViewManager(IInterceptor interceptor)
-            : base(interceptor)
-        {
-
-        }
-
-
     }
+
+
 }

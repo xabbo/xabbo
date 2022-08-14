@@ -13,16 +13,15 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace b7.Xabbo.View
+namespace b7.Xabbo.View;
+
+/// <summary>
+/// Interaction logic for FigureRandomizerView.xaml
+/// </summary>
+public partial class FigureRandomizerView : UserControl
 {
-    /// <summary>
-    /// Interaction logic for FigureRandomizerView.xaml
-    /// </summary>
-    public partial class FigureRandomizerView : UserControl
+    public FigureRandomizerView()
     {
-        public FigureRandomizerView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

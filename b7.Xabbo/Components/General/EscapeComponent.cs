@@ -13,90 +13,89 @@ using Xabbo.Messages;
 
 using b7.Xabbo.Configuration;
 
-namespace b7.Xabbo.Components
+namespace b7.Xabbo.Components;
+
+public class EscapeComponent : Component
 {
-    public class EscapeComponent : Component
+    private readonly RoomManager _roomManager;
+
+    private readonly GameOptions _gameOptions;
+
+    private bool _canEscapeStaff;
+    public bool CanEscapeStaff
     {
-        private readonly RoomManager _roomManager;
+        get => _canEscapeStaff;
+        set => Set(ref _canEscapeStaff, value);
+    }
 
-        private readonly GameOptions _gameOptions;
+    private bool _escapeStaff;
+    public bool EscapeStaff
+    {
+        get => _escapeStaff;
+        set => Set(ref _escapeStaff, value);
+    }
 
-        private bool _canEscapeStaff;
-        public bool CanEscapeStaff
+    private bool _canEscapeAmbassadors;
+    public bool CanEscapeAmbassadors
+    {
+        get => _canEscapeAmbassadors;
+        set => Set(ref _canEscapeAmbassadors, value);
+    }
+
+    private bool _escapeAmbassadors;
+    public bool EscapeAmbassadors
+    {
+        get => _escapeAmbassadors;
+        set => Set(ref _escapeAmbassadors, value);
+    }
+
+    public EscapeComponent(IInterceptor interceptor,
+        IConfiguration config,
+        IOptions<GameOptions> gameOptions,
+        RoomManager roomManager)
+        : base(interceptor)
+    {
+        _gameOptions = gameOptions.Value;
+        _roomManager = roomManager;
+
+        EscapeStaff = config.GetValue("Escape:Staff", false);
+        EscapeAmbassadors = config.GetValue("Escape:Ambassadors", false);
+
+        CanEscapeStaff = _gameOptions.StaffList.Any();
+        CanEscapeAmbassadors = _gameOptions.AmbassadorList.Any();
+
+        _roomManager.EntitiesAdded += Entities_EntitiesAdded;
+    }
+
+    private async void Entities_EntitiesAdded(object? sender, EntitiesEventArgs e)
+    {
+        bool escape = false;
+        string escapeMessage = "";
+
+        foreach (var user in e.Entities.OfType<IRoomUser>())
         {
-            get => _canEscapeStaff;
-            set => Set(ref _canEscapeStaff, value);
-        }
+            string name = user.Name;
 
-        private bool _escapeStaff;
-        public bool EscapeStaff
-        {
-            get => _escapeStaff;
-            set => Set(ref _escapeStaff, value);
-        }
-
-        private bool _canEscapeAmbassadors;
-        public bool CanEscapeAmbassadors
-        {
-            get => _canEscapeAmbassadors;
-            set => Set(ref _canEscapeAmbassadors, value);
-        }
-
-        private bool _escapeAmbassadors;
-        public bool EscapeAmbassadors
-        {
-            get => _escapeAmbassadors;
-            set => Set(ref _escapeAmbassadors, value);
-        }
-
-        public EscapeComponent(IInterceptor interceptor,
-            IConfiguration config,
-            IOptions<GameOptions> gameOptions,
-            RoomManager roomManager)
-            : base(interceptor)
-        {
-            _gameOptions = gameOptions.Value;
-            _roomManager = roomManager;
-
-            EscapeStaff = config.GetValue("Escape:Staff", false);
-            EscapeAmbassadors = config.GetValue("Escape:Ambassadors", false);
-
-            CanEscapeStaff = _gameOptions.StaffList.Any();
-            CanEscapeAmbassadors = _gameOptions.AmbassadorList.Any();
-
-            _roomManager.EntitiesAdded += Entities_EntitiesAdded;
-        }
-
-        private async void Entities_EntitiesAdded(object? sender, EntitiesEventArgs e)
-        {
-            bool escape = false;
-            string escapeMessage = "";
-
-            foreach (var user in e.Entities.OfType<IRoomUser>())
+            if (EscapeStaff && _gameOptions.StaffList.Contains(name))
             {
-                string name = user.Name;
-
-                if (EscapeStaff && _gameOptions.StaffList.Contains(name))
-                {
-                    escape = true;
-                    escapeMessage = $"Escaped from staff! {name}";
-                    break;
-                }
-                else if (EscapeAmbassadors && _gameOptions.AmbassadorList.Contains(name))
-                {
-                    escape = true;
-                    escapeMessage = $"Escaped from ambassador! {name}";
-                    break;
-                }
+                escape = true;
+                escapeMessage = $"Escaped from staff! {name}";
+                break;
             }
-
-            if (escape)
+            else if (EscapeAmbassadors && _gameOptions.AmbassadorList.Contains(name))
             {
-                await Task.Delay(500);
-                Interceptor.Send(Out.FlatOpc, (LegacyLong)0, "", -1L);
-                Interceptor.Send(In.SystemBroadcast, escapeMessage);
-                return;
+                escape = true;
+                escapeMessage = $"Escaped from ambassador! {name}";
+                break;
             }
+        }
+
+        if (escape)
+        {
+            await Task.Delay(500);
+            Interceptor.Send(Out.FlatOpc, (LegacyLong)0, "", -1L);
+            Interceptor.Send(In.SystemBroadcast, escapeMessage);
+            return;
         }
     }
 }

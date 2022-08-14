@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Windows.Controls;
 
-namespace b7.Xabbo.View
+namespace b7.Xabbo.View;
+
+public partial class BanListView : UserControl
 {
-    public partial class BanListView : UserControl
+    public BanListView()
     {
-        public BanListView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

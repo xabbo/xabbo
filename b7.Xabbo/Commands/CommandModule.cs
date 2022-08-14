@@ -10,48 +10,47 @@ using Xabbo.Interceptor.Dispatcher;
 using Xabbo.Interceptor.Tasks;
 using Xabbo.Messages;
 
-namespace b7.Xabbo.Commands
+namespace b7.Xabbo.Commands;
+
+public abstract class CommandModule : IInterceptHandler
 {
-    public abstract class CommandModule : IInterceptHandler
+    public bool IsAvailable { get; set; }
+    public CommandManager Commands { get; private set; } = null!;
+
+    protected IInterceptor Interceptor => Commands.Interceptor;
+    protected IInterceptDispatcher Dispatcher => Interceptor.Dispatcher;
+    protected IMessageManager Messages => Interceptor.Messages;
+    protected Incoming In => Messages.In;
+    protected Outgoing Out => Messages.Out;
+
+    protected void Send(Header header, params object[] values) => Interceptor.Send(header, values);
+    protected void Send(IReadOnlyPacket packet) => Interceptor.Send(packet);
+
+    protected ValueTask SendAsync(Header header, params object[] values) => Interceptor.SendAsync(header, values);
+    protected ValueTask SendAsync(IReadOnlyPacket packet) => Interceptor.SendAsync(packet);
+
+    public CommandModule() { }
+
+    public void Initialize(CommandManager manager)
     {
-        public bool IsAvailable { get; set; }
-        public CommandManager Commands { get; private set; } = null!;
+        Commands = manager;
 
-        protected IInterceptor Interceptor => Commands.Interceptor;
-        protected IInterceptDispatcher Dispatcher => Interceptor.Dispatcher;
-        protected IMessageManager Messages => Interceptor.Messages;
-        protected Incoming In => Messages.In;
-        protected Outgoing Out => Messages.Out;
+        OnInitialize();
+    }
 
-        protected void Send(Header header, params object[] values) => Interceptor.Send(header, values);
-        protected void Send(IReadOnlyPacket packet) => Interceptor.Send(packet);
+    protected virtual void OnInitialize() { IsAvailable = true; }
 
-        protected ValueTask SendAsync(Header header, params object[] values) => Interceptor.SendAsync(header, values);
-        protected ValueTask SendAsync(IReadOnlyPacket packet) => Interceptor.SendAsync(packet);
+    protected void ShowMessage(string message) => Commands.ShowMessage(message);
 
-        public CommandModule() { }
+    protected Task<IPacket> ReceiveAsync(Header header, int timeout = -1, bool block = false,
+        CancellationToken cancellationToken = default)
+    {
+        return Interceptor.ReceiveAsync(header, timeout, block, cancellationToken);
+    }
 
-        public void Initialize(CommandManager manager)
-        {
-            Commands = manager;
-
-            OnInitialize();
-        }
-
-        protected virtual void OnInitialize() { IsAvailable = true; }
-
-        protected void ShowMessage(string message) => Commands.ShowMessage(message);
-
-        protected Task<IPacket> ReceiveAsync(Header header, int timeout = -1, bool block = false,
-            CancellationToken cancellationToken = default)
-        {
-            return Interceptor.ReceiveAsync(header, timeout, block, cancellationToken);
-        }
-
-        protected Task<IPacket> ReceiveAsync(ITuple tuple, int timeout = -1, bool block = false,
-            CancellationToken cancellationToken = default)
-        {
-            return Interceptor.ReceiveAsync(tuple, timeout, block, cancellationToken);
-        }
+    protected Task<IPacket> ReceiveAsync(ITuple tuple, int timeout = -1, bool block = false,
+        CancellationToken cancellationToken = default)
+    {
+        return Interceptor.ReceiveAsync(tuple, timeout, block, cancellationToken);
     }
 }

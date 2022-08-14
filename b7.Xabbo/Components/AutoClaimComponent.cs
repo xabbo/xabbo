@@ -9,50 +9,49 @@ using Microsoft.Extensions.Configuration;
 using Xabbo.Interceptor;
 using Xabbo.Messages;
 
-namespace b7.Xabbo.Components
+namespace b7.Xabbo.Components;
+
+public class AutoClaimComponent : Component
 {
-    public class AutoClaimComponent : Component
+    private readonly XabbotComponent _xabbot;
+
+    public AutoClaimComponent(
+        IInterceptor interceptor,
+        IConfiguration config,
+        XabbotComponent xabbot)
+        : base(interceptor)
     {
-        private readonly XabbotComponent _xabbot;
+        _xabbot = xabbot;
 
-        public AutoClaimComponent(
-            IInterceptor interceptor,
-            IConfiguration config,
-            XabbotComponent xabbot)
-            : base(interceptor)
+        IsActive = config.GetValue("AutoClaimDailyReward:Active", false);
+    }
+
+    [InterceptIn(nameof(Incoming.EarningStatus))]
+    protected void OnEarningStatus(InterceptArgs e)
+    {
+        if (!IsActive) return;
+
+        bool claimReward = false;
+
+        int n = e.Packet.ReadInt();
+        for (int i = 0; i < n; i++)
         {
-            _xabbot = xabbot;
+            int rewardCategory = e.Packet.ReadByte();
+            int rewardType = e.Packet.ReadByte();
+            int amount = e.Packet.ReadInt();
+            string productCode = e.Packet.ReadString();
 
-            IsActive = config.GetValue("AutoClaimDailyReward:Active", false);
+            if (rewardCategory == 1 &&
+                amount > 0)
+            {
+                claimReward = true;
+            }
         }
 
-        [InterceptIn(nameof(Incoming.EarningStatus))]
-        protected void OnEarningStatus(InterceptArgs e)
+        if (claimReward)
         {
-            if (!IsActive) return;
-
-            bool claimReward = false;
-
-            int n = e.Packet.ReadInt();
-            for (int i = 0; i < n; i++)
-            {
-                int rewardCategory = e.Packet.ReadByte();
-                int rewardType = e.Packet.ReadByte();
-                int amount = e.Packet.ReadInt();
-                string productCode = e.Packet.ReadString();
-
-                if (rewardCategory == 1 &&
-                    amount > 0)
-                {
-                    claimReward = true;
-                }
-            }
-
-            if (claimReward)
-            {
-                Interceptor.Send(Out.ClaimEarning, (byte)1);
-                _xabbot.ShowMessage("Claimed daily reward.");
-            }
+            Interceptor.Send(Out.ClaimEarning, (byte)1);
+            _xabbot.ShowMessage("Claimed daily reward.");
         }
     }
 }

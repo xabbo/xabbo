@@ -6,106 +6,105 @@ using LiteDB;
 using b7.Xabbo.Model;
 using Microsoft.Extensions.Configuration;
 
-namespace b7.Xabbo.Services
+namespace b7.Xabbo.Services;
+
+public class LiteDbWardrobeRepository : IWardrobeRepository
 {
-    public class LiteDbWardrobeRepository : IWardrobeRepository
+    public string Path { get; }
+
+    public LiteDbWardrobeRepository(IConfiguration config)
     {
-        public string Path { get; }
+        Path = config.GetValue("Wardrobe:Path", "wardrobe.db");
+    }
 
-        public LiteDbWardrobeRepository(IConfiguration config)
+    private ILiteRepository OpenDatabase() => new LiteRepository(Path);
+
+    public void Initialize()
+    {
+        using (var db = OpenDatabase())
         {
-            Path = config.GetValue("Wardrobe:Path", "wardrobe.db");
+            db.EnsureIndex<FigureModel>(nameof(FigureModel.FigureString));
         }
+    }
 
-        private ILiteRepository OpenDatabase() => new LiteRepository(Path);
-
-        public void Initialize()
+    public IEnumerable<FigureModel> Load()
+    {
+        using (var db = OpenDatabase())
         {
-            using (var db = OpenDatabase())
+            return db.Query<FigureModel>().ToList();
+        }
+    }
+
+    public bool Insert(FigureModel figure)
+    {
+        using (var db = OpenDatabase())
+        {
+            if (db.Query<FigureModel>()
+                .Where(x => x.FigureString == figure.FigureString)
+                .Exists())
             {
-                db.EnsureIndex<FigureModel>(nameof(FigureModel.FigureString));
+                return false;
+            }
+            else
+            {
+                db.Insert(figure);
+                return true;
             }
         }
+    }
 
-        public IEnumerable<FigureModel> Load()
+    public int Insert(IEnumerable<FigureModel> figures)
+    {
+        using (var db = OpenDatabase())
         {
-            using (var db = OpenDatabase())
+            int c = 0;
+            foreach (var figure in figures)
             {
-                return db.Query<FigureModel>().ToList();
-            }
-        }
-
-        public bool Insert(FigureModel figure)
-        {
-            using (var db = OpenDatabase())
-            {
-                if (db.Query<FigureModel>()
+                if (!db.Query<FigureModel>()
                     .Where(x => x.FigureString == figure.FigureString)
                     .Exists())
                 {
-                    return false;
-                }
-                else
-                {
                     db.Insert(figure);
-                    return true;
+                    c++;
                 }
             }
+            return c;
         }
+    }
 
-        public int Insert(IEnumerable<FigureModel> figures)
+    public bool Update(FigureModel figure)
+    {
+        using (var db = OpenDatabase())
         {
-            using (var db = OpenDatabase())
-            {
-                int c = 0;
-                foreach (var figure in figures)
-                {
-                    if (!db.Query<FigureModel>()
-                        .Where(x => x.FigureString == figure.FigureString)
-                        .Exists())
-                    {
-                        db.Insert(figure);
-                        c++;
-                    }
-                }
-                return c;
-            }
+            return db.Update(figure);
         }
+    }
 
-        public bool Update(FigureModel figure)
+    public int Update(IEnumerable<FigureModel> figures)
+    {
+        using (var db = OpenDatabase())
         {
-            using (var db = OpenDatabase())
-            {
-                return db.Update(figure);
-            }
+            return db.Update(figures);
         }
+    }
 
-        public int Update(IEnumerable<FigureModel> figures)
+    public bool Delete(FigureModel figure)
+    {
+        using (var db = OpenDatabase())
         {
-            using (var db = OpenDatabase())
-            {
-                return db.Update(figures);
-            }
+            return db.Delete<FigureModel>(figure.Id);
         }
+    }
 
-        public bool Delete(FigureModel figure)
+    public int Delete(IEnumerable<FigureModel> figures)
+    {
+        using (var db = OpenDatabase())
         {
-            using (var db = OpenDatabase())
-            {
-                return db.Delete<FigureModel>(figure.Id);
-            }
-        }
-
-        public int Delete(IEnumerable<FigureModel> figures)
-        {
-            using (var db = OpenDatabase())
-            {
-                int c = 0;
-                foreach (var figure in figures)
-                    if (db.Delete<FigureModel>(figure.Id))
-                        c++;
-                return c;
-            }
+            int c = 0;
+            foreach (var figure in figures)
+                if (db.Delete<FigureModel>(figure.Id))
+                    c++;
+            return c;
         }
     }
 }
