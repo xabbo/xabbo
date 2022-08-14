@@ -3,12 +3,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:local="clr-namespace:b7.Xabbo"
              xmlns:svc="clr-namespace:b7.Xabbo.Services"
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mde="clr-namespace:MaterialDesignExtensions.Controls;assembly=MaterialDesignExtensions"
-             TextElement.Foreground="{StaticResource MaterialDesignBody}"
-             TextElement.FontFamily="{StaticResource MaterialDesignFont}"
              TextElement.FontSize="14"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
@@ -23,31 +22,30 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <TextBox x:Name="textBoxFilter"
-                     Margin="4" Padding="4"
-                     VerticalContentAlignment="Center"
+            <ui:TextBox x:Name="textBoxFilter"
+                     Margin="8"
                      md:ValidationAssist.PopupPlacement="Bottom"
                      md:ValidationAssist.UsePopup="True"
                      md:ValidationAssist.OnlyShowOnFocus="True"
                      md:ValidationAssist.FontSize="14"
-                     FontSize="16"
-                     md:HintAssist.Hint="Filter"
-                     Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}">
-                <TextBox.Style>
-                    <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource MaterialDesignTextBox}">
+                     Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}"
+                        Icon="Search48"
+                        PlaceholderText="Filter">
+                <ui:TextBox.Style>
+                    <Style TargetType="{x:Type ui:TextBox}" BasedOn="{StaticResource {x:Type ui:TextBox}}">
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding FilterNeedsUpdate}" Value="True">
                                 <Setter Property="Foreground" Value="Gray" />
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
-                </TextBox.Style>
-                <TextBox.InputBindings>
+                </ui:TextBox.Style>
+                <ui:TextBox.InputBindings>
                     <KeyBinding Key="Return" Command="{Binding RefreshFilterCommand}" />
-                </TextBox.InputBindings>
-            </TextBox>
+                </ui:TextBox.InputBindings>
+            </ui:TextBox>
             <CheckBox Grid.Column="1"
-                      Margin="4"
+                      Margin="0,0,10,0"
                       VerticalAlignment="Center"
                       VerticalContentAlignment="Center"
                       Content="Query"
@@ -116,9 +114,24 @@
                                                     </Grid.ColumnDefinitions>
                                                     <Image Margin="2" Source="{Binding IconUrl, Mode=OneWay}" VerticalAlignment="Center" Stretch="None" />
                                                     <StackPanel Grid.Column="1" Margin="2">
-                                                        <TextBlock TextWrapping="Wrap" FontWeight="Bold">
-                                                            <Run Text="{Binding Name, Mode=OneWay}" /> (<Run Text="{Binding Identifier, Mode=OneWay}" /> / kind:<Run Text="{Binding Kind, Mode=OneWay}" />)
-                                                        </TextBlock>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBlock
+                                                                VerticalAlignment="Center"
+                                                                TextWrapping="Wrap"
+                                                                Text="{Binding Name, Mode=OneWay}"
+                                                                FontWeight="Bold"
+                                                            />
+                                                            <Border
+                                                                Margin="2" Padding="2" CornerRadius="4"
+                                                                VerticalAlignment="Center"
+                                                                Background="{DynamicResource AttentionToActionBrush}"
+                                                            >
+                                                                <TextBlock
+                                                                    Text="{Binding Identifier}"
+                                                                    FontFamily="Consolas"
+                                                                />
+                                                            </Border>
+                                                        </StackPanel>
                                                         <TextBlock TextWrapping="Wrap">
                                                             <Run Text="{Binding Description, Mode=OneWay}" />
                                                         </TextBlock>
@@ -148,7 +161,8 @@
                 </GridView>
             </ListView.View>
         </ListView>
-        <StackPanel Margin="4" Grid.Row="2" Orientation="Horizontal">
+        <StackPanel Margin="8,0" Grid.Row="2" Orientation="Horizontal"
+                    HorizontalAlignment="Right">
             <TextBlock Style="{StaticResource MaterialDesignBody1TextBlock}">
                 <Run Text="{Binding Items.Count, ElementName=listViewFurni, Mode=OneWay}" />
                 furni

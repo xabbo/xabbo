@@ -5,9 +5,9 @@
 		<TargetFramework>net6.0-windows</TargetFramework>
 		<UseWPF>true</UseWPF>
 		<Nullable>enable</Nullable>
-		<Version>1.0.3</Version>
+		<Version>1.1.0</Version>
 		<DebugType>embedded</DebugType>
-		<ApplicationIcon>Resources\app.ico</ApplicationIcon>
+		<ApplicationIcon>Resources\Icon\app.ico</ApplicationIcon>
 		<StartupObject>b7.Xabbo.App</StartupObject>
 	</PropertyGroup>
 
@@ -52,8 +52,17 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="View\Inventory\" />
-		<Folder Include="View\Navigator\" />
+	  <Page Remove="Resources\Theme\Expander.xaml" />
+	  <Page Remove="Resources\Theme\TabControl.xaml" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Resource Update="Resources\Theme\Expander.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Resource>
+	  <Resource Update="Resources\Theme\TabControl.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Resource>
 	</ItemGroup>
 
 </Project>
