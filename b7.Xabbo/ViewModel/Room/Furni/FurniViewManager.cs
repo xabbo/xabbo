@@ -24,7 +24,7 @@ using Xabbo.Core.Events;
 
 using b7.Xabbo.Services;
 
-namespace b7.Xabbo.ViewModel
+namespace b7.Xabbo.ViewModel;
 {
     public class FurniViewManager : ComponentViewModel, INotifyDataErrorInfo
     {
@@ -528,11 +528,15 @@ namespace b7.Xabbo.ViewModel
 
         private void OnFloorItemsLoaded(object? sender, FloorItemsEventArgs e)
         {
+            if (Texts is null || FurniData is null) return;
+
             AddItems(e.Items.Select(item => WrapItem(item)));
         }
 
         private void OnFloorItemAdded(object? sender, FloorItemEventArgs e)
         {
+            if (Texts is null || FurniData is null) return;
+
             AddItem(WrapItem(e.Item));
         }
 
@@ -543,11 +547,15 @@ namespace b7.Xabbo.ViewModel
 
         private void OnWallItemsLoaded(object? sender, WallItemsEventArgs e)
         {
+            if (Texts is null || FurniData is null) return;
+
             AddItems(e.Items.Select(item => WrapItem(item)));
         }
 
         private void OnWallItemAdded(object? sender, WallItemEventArgs e)
         {
+            if (Texts is null || FurniData is null) return;
+
             var view = WrapItem(e.Item);
             AddItem(view);
         }
