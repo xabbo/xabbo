@@ -233,7 +233,7 @@ namespace b7.Xabbo.ViewModel
 
                 Clear();
 
-                await Interceptor.SendAsync(Out.GetBannedUsers, (LegacyLong)_roomManager.CurrentRoomId);
+                await Interceptor.SendAsync(Out.GetBannedUsers, _roomManager.CurrentRoomId);
                 var packet = await Interceptor.ReceiveAsync(In.UsersBannedFromRoom, 4000);
 
                 long roomId = packet.ReadLegacyLong();
@@ -251,11 +251,10 @@ namespace b7.Xabbo.ViewModel
                         AddUser(userViewModel);
                 }
             }
-            catch (OperationCanceledException)
+            catch (Exception)
             {
                 _snackbarMq.Enqueue("Failed to load the banned users list.");
             }
-            catch { }
             finally
             {
                 _cts.Dispose();
@@ -285,12 +284,11 @@ namespace b7.Xabbo.ViewModel
                 for (int i = 0; i < array.Length; i++)
                 {
                     var user = array[i];
-                    await Interceptor.SendAsync(Out.RoomUnbanUser, (LegacyLong)user.Id, (LegacyLong)roomId);
+                    await Interceptor.SendAsync(Out.RoomUnbanUser, user.Id, roomId);
                     await Task.Delay(_banInterval, _cts.Token);
                 }
             }
-            catch (OperationCanceledException)
-            when (_cts.IsCancellationRequested)
+            catch when (_cts.IsCancellationRequested)
             { }
             catch (Exception ex)
             {
