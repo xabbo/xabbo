@@ -144,7 +144,7 @@ public class FlattenRoomComponent : Component
         foreach (var entity in entities)
             entity.Location = AdjustTile(entity.Location);
 
-        e.Packet = new Packet(e.Packet.Protocol, e.Packet.Header);
+        e.Packet = new Packet(e.Packet.Header, e.Packet.Protocol);
         Entity.ComposeAll(e.Packet, entities);
     }
 
@@ -166,7 +166,7 @@ public class FlattenRoomComponent : Component
                 update.ActionHeight -= GetOffset(update.Location);
         }
 
-        e.Packet = new Packet(e.Packet.Protocol, e.Packet.Header);
+        e.Packet = new Packet(e.Packet.Header, e.Packet.Protocol);
         EntityStatusUpdate.ComposeAll(e.Packet, updates);
     }
 
@@ -179,7 +179,7 @@ public class FlattenRoomComponent : Component
         foreach (var item in floorItems)
             item.Location = AdjustTile(item.Location);
 
-        e.Packet = new Packet(e.Packet.Protocol, e.Packet.Header);
+        e.Packet = new Packet(e.Packet.Header, e.Packet.Protocol);
         FloorItem.ComposeAll(e.Packet, floorItems);
     }
 
@@ -190,7 +190,7 @@ public class FlattenRoomComponent : Component
 
         var floorItem = FloorItem.Parse(e.Packet);
         floorItem.Location = AdjustTile(floorItem.Location);
-        e.Packet = new Packet(e.Packet.Protocol, e.Packet.Header)
+        e.Packet = new Packet(e.Packet.Header, e.Packet.Protocol)
             .Write(floorItem);
     }
 
@@ -202,7 +202,7 @@ public class FlattenRoomComponent : Component
         FloorItem floorItem = FloorItem.Parse(e.Packet);
         floorItem.Location = AdjustTile(floorItem.Location);
 
-        e.Packet = new Packet(e.Packet.Protocol, e.Packet.Header)
+        e.Packet = new Packet(e.Packet.Header, e.Packet.Protocol)
             .Write(floorItem);
     }
 
@@ -228,7 +228,7 @@ public class FlattenRoomComponent : Component
             update.EntityTargetZ -= targetOffset;
         }
 
-        e.Packet = new Packet(e.Packet.Protocol, e.Packet.Header)
+        e.Packet = new Packet(e.Packet.Header, e.Packet.Protocol)
             .Write(update);
     }
 }

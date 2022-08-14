@@ -70,7 +70,7 @@ public class RoomEntryComponent : Component
             (DontAskToRingDoorbell && roomData.Access == RoomAccess.Doorbell))
         {
             roomData.IsGroupMember = true;
-            e.Packet = new Packet(Client, e.Packet.Header)
+            e.Packet = new Packet(e.Packet.Header, Client)
                 .Write(roomData);
         }
     }

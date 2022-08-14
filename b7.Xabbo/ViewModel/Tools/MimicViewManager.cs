@@ -636,14 +636,13 @@ public class MimicViewManager : ComponentViewModel
 
     private void SendChat(ChatType type, string message, int chatBubbleStyle = 0)
     {
-        var packet = new Packet();
-        switch (type)
+        var packet = new Packet(type switch
         {
-            case ChatType.Talk: packet.Header = Out.Chat; break;
-            case ChatType.Shout: packet.Header = Out.Shout; break;
-            case ChatType.Whisper: packet.Header = Out.Whisper; break;
-            default: return;
-        }
+            ChatType.Talk => Out.Chat,
+            ChatType.Shout => Out.Shout,
+            ChatType.Whisper => Out.Whisper,
+            _ => throw new InvalidOperationException("Invalid chat type.")
+        });
 
         packet.WriteString(message);
         packet.WriteInt(chatBubbleStyle);

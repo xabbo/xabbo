@@ -96,7 +96,7 @@ public class EntityOverlayComponent : Component
             Figure = self.Figure,
             Gender = self.Gender,
             AchievementScore = self.AchievementScore,
-            Location = self.Location.Add(32, 32, 32)
+            Location = self.Location + (32, 32, 32)
         };
 
         if (!_isInjected)
@@ -110,7 +110,7 @@ public class EntityOverlayComponent : Component
             Interceptor.Send(In.Status, 1, new EntityStatusUpdate(self.CurrentUpdate)
             {
                 Index = ghostUser.Index,
-                Location = self.CurrentUpdate.Location.Add(64, 64, 64)
+                Location = self.CurrentUpdate.Location + (64, 64, 64)
             });
         }
 
@@ -157,8 +157,8 @@ public class EntityOverlayComponent : Component
         EntityStatusUpdate overlayUpdate = new EntityStatusUpdate(selfUpdate)
         {
             Index = GHOST_INDEX,
-            Location = selfUpdate.Location.Add(32, 32, 32),
-            MovingTo = selfUpdate.MovingTo?.Add(32, 32, 32)
+            Location = selfUpdate.Location + (32, 32, 32),
+            MovingTo = selfUpdate.MovingTo + (32, 32, 32)
         };
 
         e.Packet.Position = 0;
