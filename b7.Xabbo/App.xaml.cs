@@ -14,6 +14,9 @@ using Microsoft.Extensions.Logging;
 
 using MaterialDesignThemes.Wpf;
 
+using Wpf.Ui.Mvvm.Contracts;
+using Wpf.Ui.Mvvm.Services;
+
 using Xabbo.Messages;
 using Xabbo.Interceptor;
 using Xabbo.GEarth;
@@ -27,6 +30,7 @@ using b7.Xabbo.Commands;
 using b7.Xabbo.Services;
 using b7.Xabbo.Configuration;
 using b7.Xabbo.Util;
+using b7.Xabbo.View.Pages;
 
 namespace b7.Xabbo
 {
@@ -73,8 +77,21 @@ namespace b7.Xabbo
 
             services.AddSingleton<IOperationManager, OperationManager>();
 
+            services.AddSingleton<INavigationService, NavigationService>();
+            services.AddSingleton<IPageService, PageService>();
+
             // UI
             services.AddSingleton<ISnackbarMessageQueue, SnackbarMessageQueue>();
+
+            // Pages
+            services.AddScoped<GeneralPage>();
+            services.AddScoped<ProfilePage>();
+            services.AddScoped<ChatPage>();
+            services.AddScoped<RoomPage>();
+            services.AddScoped<FriendsPage>();
+            services.AddScoped<NavigatorPage>();
+            services.AddScoped<GameDataPage>();
+            services.AddScoped<DebugPage>();
 
             // Interceptor
             services.AddGEarthOptions(options => options

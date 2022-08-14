@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Reflection;
 
+
+using Wpf.Ui.Mvvm.Contracts;
+
 using MaterialDesignThemes.Wpf;
 
 using GalaSoft.MvvmLight;
@@ -16,9 +19,15 @@ namespace b7.Xabbo.ViewModel
             set => Set(ref _title, value);
         }
 
+        public bool IsDebugBuild { get; }
+
+        public IPageService PageService { get; }
+
         public ISnackbarMessageQueue SnackbarMessageQueue { get; }
 
         public GeneralViewManager General { get; }
+        // Friends
+        public FriendListViewManager Friends { get; }
         // Chat
         public ChatLogViewManager Chat { get; }
         // Figure
@@ -37,8 +46,10 @@ namespace b7.Xabbo.ViewModel
         public FurniDataViewManager FurniData { get; }
 
         public MainViewManager(
+            IPageService pageService,
             ISnackbarMessageQueue snackbarMessageQueue,
             GeneralViewManager general,
+            FriendListViewManager friends,
             ChatLogViewManager chat,
             WardrobeViewManager wardrobe,
             FigureRandomizerViewManager figureRandomizer,
@@ -51,15 +62,22 @@ namespace b7.Xabbo.ViewModel
             MimicViewManager mimic,
             FurniDataViewManager furniData)
         {
+            #if DEBUG
+            IsDebugBuild = true;
+            #endif
+
             Version? version = Assembly.GetExecutingAssembly().GetName().Version;
             if (version is not null)
             {
                 Title = $"xabbo v{version.ToString(3)}";
             }
 
+            PageService = pageService;
+
             SnackbarMessageQueue = snackbarMessageQueue;
 
             General = general;
+            Friends = friends;
             Chat = chat;
             Wardrobe = wardrobe;
             FigureRandomizer = figureRandomizer;
