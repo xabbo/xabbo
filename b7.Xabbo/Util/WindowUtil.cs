@@ -3,84 +3,83 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
 
-namespace b7.Xabbo.Util
+namespace b7.Xabbo.Util;
+
+static class WindowUtil
 {
-    static class WindowUtil
+    [DllImport("user32.dll")]
+    static extern IntPtr GetForegroundWindow();
+
+    [DllImport("user32.dll", SetLastError = true)]
+    static extern IntPtr SetForegroundWindow(IntPtr hWnd);
+
+    [DllImport("user32.dll")]
+    static extern uint GetWindowThreadProcessId(IntPtr hWnd, IntPtr ProcessId);
+
+    [DllImport("user32.dll")]
+    static extern bool AttachThreadInput(uint idAttach, uint idAttachTo, bool fAttach);
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    static extern bool FlashWindowEx(ref FLASHWINFO pwfi);
+
+    [StructLayout(LayoutKind.Sequential)]
+    struct FLASHWINFO
     {
-        [DllImport("user32.dll")]
-        static extern IntPtr GetForegroundWindow();
+        public uint cbSize;
+        public IntPtr hwnd;
+        public uint dwFlags;
+        public uint uCount;
+        public uint dwTimeout;
+    }
 
-        [DllImport("user32.dll", SetLastError = true)]
-        static extern IntPtr SetForegroundWindow(IntPtr hWnd);
+    const uint FLASHW_ALL = 3;
 
-        [DllImport("user32.dll")]
-        static extern uint GetWindowThreadProcessId(IntPtr hWnd, IntPtr ProcessId);
+    /// <summary>
+    /// Flash continuously until the window comes to the foreground.
+    /// </summary>
+    const uint FLASHW_TIMERNOFG = 12;
 
-        [DllImport("user32.dll")]
-        static extern bool AttachThreadInput(uint idAttach, uint idAttachTo, bool fAttach);
+    public static bool FlashWindow(IntPtr windowHandle)
+    {
+        FLASHWINFO info = new();
 
-        [DllImport("user32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        static extern bool FlashWindowEx(ref FLASHWINFO pwfi);
+        info.cbSize = Convert.ToUInt32(Marshal.SizeOf(info));
+        info.hwnd = windowHandle;
+        info.dwFlags = FLASHW_ALL | FLASHW_TIMERNOFG;
+        info.uCount = uint.MaxValue;
+        info.dwTimeout = 0;
 
-        [StructLayout(LayoutKind.Sequential)]
-        struct FLASHWINFO
+        return FlashWindowEx(ref info);
+    }
+
+    public static void ActivateWindow(Window window)
+    {
+        var hwnd = new WindowInteropHelper(window).EnsureHandle();
+
+        var threadId1 = GetWindowThreadProcessId(GetForegroundWindow(), IntPtr.Zero);
+        var threadId2 = GetWindowThreadProcessId(hwnd, IntPtr.Zero);
+
+        if (threadId1 != threadId2)
         {
-            public uint cbSize;
-            public IntPtr hwnd;
-            public uint dwFlags;
-            public uint uCount;
-            public uint dwTimeout;
+            AttachThreadInput(threadId1, threadId2, true);
+            SetForegroundWindow(hwnd);
+            AttachThreadInput(threadId1, threadId2, false);
         }
-
-        const uint FLASHW_ALL = 3;
-
-        /// <summary>
-        /// Flash continuously until the window comes to the foreground.
-        /// </summary>
-        const uint FLASHW_TIMERNOFG = 12;
-
-        public static bool FlashWindow(IntPtr windowHandle)
+        else
         {
-            FLASHWINFO info = new();
-
-            info.cbSize = Convert.ToUInt32(Marshal.SizeOf(info));
-            info.hwnd = windowHandle;
-            info.dwFlags = FLASHW_ALL | FLASHW_TIMERNOFG;
-            info.uCount = uint.MaxValue;
-            info.dwTimeout = 0;
-
-            return FlashWindowEx(ref info);
+            SetForegroundWindow(hwnd);
         }
+    }
 
-        public static void ActivateWindow(Window window)
-        {
-            var hwnd = new WindowInteropHelper(window).EnsureHandle();
+    public static void Show(Window window)
+    {
+        ActivateWindow(window);
 
-            var threadId1 = GetWindowThreadProcessId(GetForegroundWindow(), IntPtr.Zero);
-            var threadId2 = GetWindowThreadProcessId(hwnd, IntPtr.Zero);
+        if (!window.IsVisible)
+            window.Show();
 
-            if (threadId1 != threadId2)
-            {
-                AttachThreadInput(threadId1, threadId2, true);
-                SetForegroundWindow(hwnd);
-                AttachThreadInput(threadId1, threadId2, false);
-            }
-            else
-            {
-                SetForegroundWindow(hwnd);
-            }
-        }
-
-        public static void Show(Window window)
-        {
-            ActivateWindow(window);
-
-            if (!window.IsVisible)
-                window.Show();
-
-            if (window.WindowState == WindowState.Minimized)
-                window.WindowState = WindowState.Normal;
-        }
+        if (window.WindowState == WindowState.Minimized)
+            window.WindowState = WindowState.Normal;
     }
 }

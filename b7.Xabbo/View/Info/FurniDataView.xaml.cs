@@ -13,16 +13,15 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace b7.Xabbo.View
+namespace b7.Xabbo.View;
+
+/// <summary>
+/// Interaction logic for FurniDataView.xaml
+/// </summary>
+public partial class FurniDataView : UserControl
 {
-    /// <summary>
-    /// Interaction logic for FurniDataView.xaml
-    /// </summary>
-    public partial class FurniDataView : UserControl
+    public FurniDataView()
     {
-        public FurniDataView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

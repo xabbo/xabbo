@@ -5,12 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace b7.Xabbo.ViewModel
+namespace b7.Xabbo.ViewModel;
+
+public class InventoryItemViewModel : ObservableObject
 {
-    public class InventoryItemViewModel : ObservableObject
-    {
 
 
 
-    }
 }

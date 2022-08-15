@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Windows.Controls;
 
-namespace b7.Xabbo.View
+namespace b7.Xabbo.View;
+
+public partial class RoomVisitorsView : UserControl
 {
-    public partial class RoomVisitorsView : UserControl
+    public RoomVisitorsView()
     {
-        public RoomVisitorsView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

@@ -5,243 +5,242 @@ using GalaSoft.MvvmLight;
 
 using Xabbo.Core;
 
-namespace b7.Xabbo.ViewModel
+namespace b7.Xabbo.ViewModel;
+
+public class EntityViewModel : ObservableObject
 {
-    public class EntityViewModel : ObservableObject
+    public IEntity Entity { get; }
+
+    public int Index => Entity.Index;
+    public long Id => Entity.Id;
+
+    private string _name;
+    public string Name
     {
-        public IEntity Entity { get; }
+        get => _name;
+        set => Set(ref _name, value);
+    }
 
-        public int Index => Entity.Index;
-        public long Id => Entity.Id;
-
-        private string _name;
-        public string Name
+    private string _figure;
+    public string Figure
+    {
+        get => _figure;
+        set
         {
-            get => _name;
-            set => Set(ref _name, value);
-        }
-
-        private string _figure;
-        public string Figure
-        {
-            get => _figure;
-            set
+            if (Set(ref _figure, value))
             {
-                if (Set(ref _figure, value))
-                {
-                    RaisePropertyChanged(nameof(AvatarImageUrl));
-                }
+                RaisePropertyChanged(nameof(AvatarImageUrl));
             }
         }
+    }
 
-        private string _motto;
-        public string Motto
-        {
-            get => _motto;
-            set => Set(ref _motto, value);
-        }
+    private string _motto;
+    public string Motto
+    {
+        get => _motto;
+        set => Set(ref _motto, value);
+    }
 
-        private bool _isStaff;
-        public bool IsStaff
+    private bool _isStaff;
+    public bool IsStaff
+    {
+        get => _isStaff;
+        set
         {
-            get => _isStaff;
-            set
+            if (Set(ref _isStaff, value))
             {
-                if (Set(ref _isStaff, value))
-                {
-                    UpdateVisualGroup();
-                }
+                UpdateVisualGroup();
             }
         }
+    }
 
-        private bool _isAmbassador;
-        public bool IsAmbassador
+    private bool _isAmbassador;
+    public bool IsAmbassador
+    {
+        get => _isAmbassador;
+        set
         {
-            get => _isAmbassador;
-            set
+            if (Set(ref _isAmbassador, value))
             {
-                if (Set(ref _isAmbassador, value))
-                {
-                    UpdateVisualGroup();
-                }
+                UpdateVisualGroup();
             }
         }
+    }
 
-        private bool _isRoomOwner;
-        public bool IsRoomOwner
+    private bool _isRoomOwner;
+    public bool IsRoomOwner
+    {
+        get => _isRoomOwner;
+        set
         {
-            get => _isRoomOwner;
-            set
+            if (Set(ref _isRoomOwner, value))
             {
-                if (Set(ref _isRoomOwner, value))
-                {
-                    UpdateVisualGroup();
-                }
+                UpdateVisualGroup();
             }
         }
+    }
 
-        private int _controlLevel;
-        public int ControlLevel
+    private int _controlLevel;
+    public int ControlLevel
+    {
+        get => _controlLevel;
+        set
         {
-            get => _controlLevel;
-            set
+            if (Set(ref _controlLevel, value))
             {
-                if (Set(ref _controlLevel, value))
-                {
-                    RaisePropertyChanged(nameof(HasRights));
-                    UpdateVisualGroup();
-                }
+                RaisePropertyChanged(nameof(HasRights));
+                UpdateVisualGroup();
             }
         }
+    }
 
-        public bool HasRights => ControlLevel > 0;
+    public bool HasRights => ControlLevel > 0;
 
-        private string _imageSource = string.Empty;
-        public string ImageSource
+    private string _imageSource = string.Empty;
+    public string ImageSource
+    {
+        get => _imageSource;
+        set => Set(ref _imageSource, value);
+    }
+
+    public string VisualGroupName
+    {
+        get
         {
-            get => _imageSource;
-            set => Set(ref _imageSource, value);
-        }
-
-        public string VisualGroupName
-        {
-            get
+            if (Entity.Type == EntityType.User)
             {
-                if (Entity.Type == EntityType.User)
+                if (IsRoomOwner)
                 {
-                    if (IsRoomOwner)
-                    {
-                        return "Room Owner";
-                    }
-                    else if (IsStaff)
-                    {
-                        return "Staff";
-                    }
-                    else if (IsAmbassador)
-                    {
-                        return "Ambassadors";
-                    }
-                    else if (HasRights)
-                    {
-                        return ControlLevel switch
-                        {
-                            4 => "Room Owner",
-                            3 => "Group Admins",
-                            1 => "Rights Holders",
-                            _ => "Users"
-                        };
-                    }
-                    else
-                    {
-                        return "Users";
-                    }
+                    return "Room Owner";
                 }
-                else if (Entity.Type == EntityType.Pet)
+                else if (IsStaff)
                 {
-                    return "Pets";
+                    return "Staff";
                 }
-                else if (Entity.Type == EntityType.PrivateBot || Entity.Type == EntityType.PublicBot)
+                else if (IsAmbassador)
                 {
-                    return "Bots";
+                    return "Ambassadors";
+                }
+                else if (HasRights)
+                {
+                    return ControlLevel switch
+                    {
+                        4 => "Room Owner",
+                        3 => "Group Admins",
+                        1 => "Rights Holders",
+                        _ => "Users"
+                    };
                 }
                 else
                 {
-                    return string.Empty;
+                    return "Users";
                 }
             }
-        }
-
-        public int VisualGroupSort
-        {
-            get
+            else if (Entity.Type == EntityType.Pet)
             {
-                if (Entity.Type == EntityType.User)
+                return "Pets";
+            }
+            else if (Entity.Type == EntityType.PrivateBot || Entity.Type == EntityType.PublicBot)
+            {
+                return "Bots";
+            }
+            else
+            {
+                return string.Empty;
+            }
+        }
+    }
+
+    public int VisualGroupSort
+    {
+        get
+        {
+            if (Entity.Type == EntityType.User)
+            {
+                if (IsRoomOwner)
                 {
-                    if (IsRoomOwner)
-                    {
-                        return -300;
-                    }
-                    else if (IsStaff)
-                    {
-                        return -200;
-                    }
-                    else if (IsAmbassador)
-                    {
-                        return -100;
-                    }
-                    else
-                    {
-                        return ControlLevel switch
-                        {
-                            2 => 0,
-                            _ => -ControlLevel
-                        };
-                    }
+                    return -300;
                 }
-                else if (Entity.Type == EntityType.PublicBot ||
-                         Entity.Type == EntityType.PrivateBot)
+                else if (IsStaff)
                 {
-                    return 100;
+                    return -200;
                 }
-                else if (Entity.Type == EntityType.Pet)
+                else if (IsAmbassador)
                 {
-                    return 200;
+                    return -100;
                 }
                 else
                 {
-                    return 1000;
+                    return ControlLevel switch
+                    {
+                        2 => 0,
+                        _ => -ControlLevel
+                    };
                 }
             }
-        }
-
-        private Color _headerColor = Colors.Red;
-        public Color HeaderColor
-        {
-            get => _headerColor;
-            set => Set(ref _headerColor, value);
-        }
-
-        private bool _isIdle;
-        public bool IsIdle
-        {
-            get => _isIdle;
-            set => Set(ref _isIdle, value);
-        }
-
-        private bool _isTrading;
-        public bool IsTrading
-        {
-            get => _isTrading;
-            set => Set(ref _isTrading, value);
-        }
-
-        public string AvatarImageUrl
-        {
-            get
+            else if (Entity.Type == EntityType.PublicBot ||
+                     Entity.Type == EntityType.PrivateBot)
             {
-                if (Entity.Type == EntityType.Pet)
-                    return "";
-
-                return $"https://www.habbo.com/habbo-imaging/avatarimage" +
-                    $"?size=m" +
-                    $"&figure={Figure}" +
-                    $"&direction=4" +
-                    $"&head_direction=4";
+                return 100;
+            }
+            else if (Entity.Type == EntityType.Pet)
+            {
+                return 200;
+            }
+            else
+            {
+                return 1000;
             }
         }
+    }
 
-        public EntityViewModel(IEntity entity)
-        {
-            _name = entity.Name;
-            Entity = entity;
-            _motto = entity.Motto;
-            _figure = entity.Figure;
-        }
+    private Color _headerColor = Colors.Red;
+    public Color HeaderColor
+    {
+        get => _headerColor;
+        set => Set(ref _headerColor, value);
+    }
 
-        private void UpdateVisualGroup()
+    private bool _isIdle;
+    public bool IsIdle
+    {
+        get => _isIdle;
+        set => Set(ref _isIdle, value);
+    }
+
+    private bool _isTrading;
+    public bool IsTrading
+    {
+        get => _isTrading;
+        set => Set(ref _isTrading, value);
+    }
+
+    public string AvatarImageUrl
+    {
+        get
         {
-            RaisePropertyChanged(nameof(VisualGroupName));
-            RaisePropertyChanged(nameof(VisualGroupSort));
+            if (Entity.Type == EntityType.Pet)
+                return "";
+
+            return $"https://www.habbo.com/habbo-imaging/avatarimage" +
+                $"?size=m" +
+                $"&figure={Figure}" +
+                $"&direction=4" +
+                $"&head_direction=4";
         }
+    }
+
+    public EntityViewModel(IEntity entity)
+    {
+        _name = entity.Name;
+        Entity = entity;
+        _motto = entity.Motto;
+        _figure = entity.Figure;
+    }
+
+    private void UpdateVisualGroup()
+    {
+        RaisePropertyChanged(nameof(VisualGroupName));
+        RaisePropertyChanged(nameof(VisualGroupSort));
     }
 }

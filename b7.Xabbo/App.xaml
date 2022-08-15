@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
              xmlns:local="clr-namespace:b7.Xabbo"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:converter="clr-namespace:b7.Xabbo.WPF.Converters"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:controls="clr-namespace:MaterialDesignExtensions.Controls;assembly=MaterialDesignExtensions">
@@ -14,8 +15,16 @@
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignExtensions;component/Themes/Generic.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignExtensions;component/Themes/MaterialDesignDarkTheme.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/Dragablz;component/Themes/materialdesign.xaml"/>
+                <ui:Resources Theme="Dark" />
+                <ResourceDictionary Source="pack://application:,,,/b7.Xabbo;component/Resources/Theme/Expander.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/b7.Xabbo;component/Resources/Theme/TabControl.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
+            <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource MaterialDesignAccentCheckBox}">
+                <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+            </Style>
+            
             <Style TargetType="{x:Type ListView}" BasedOn="{StaticResource MaterialDesignListView}">
                 <Style.Resources>
                     <Style TargetType="{x:Type GridViewColumnHeader}" BasedOn="{StaticResource {x:Type GridViewColumnHeader}}">
@@ -40,29 +49,18 @@
             <converter:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
             <converter:BooleanNotConverter x:Key="NotConverter" />
 
-            <Style x:Key="MaterialDesignTabablzSlimControlStyle"
-                   TargetType="{x:Type dragablz:TabablzControl}"
-                   BasedOn="{StaticResource MaterialDesignTabablzControlStyle}">
-                <Setter Property="BorderThickness" Value="0" />
-                <Setter Property="ItemContainerStyle">
-                    <Setter.Value>
-                        <Style TargetType="{x:Type dragablz:DragablzItem}" BasedOn="{StaticResource MaterialDesignDragableTabItemStyle}">
-                            <Setter Property="Margin" Value="0" />
-                            <Setter Property="Padding" Value="0" />
-                            <Setter Property="Height" Value="40" />
-                        </Style>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-
-            <Style x:Key="MaterialDesignAlternateTabablzSlimControlStyle"
-                   TargetType="{x:Type dragablz:TabablzControl}"
-                   BasedOn="{StaticResource MaterialDesignAlternateTabablzControlStyle}">
-                <Setter Property="BorderThickness" Value="0" />
+            
+            <Style TargetType="{x:Type DataGrid}" BasedOn="{StaticResource MaterialDesignDataGrid}" />
+            <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}">
                 
             </Style>
+            <Style TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource MaterialDesignDataGridCell}">
+                <Setter Property="Padding" Value="4" />
+                <Setter Property="BorderThickness" Value="0" />
+            </Style>
+            <Style TargetType="{x:Type DataGridRow}" BasedOn="{StaticResource MaterialDesignDataGridRow}">
 
-            <Style TargetType="{x:Type dragablz:TabablzControl}" BasedOn="{StaticResource MaterialDesignAlternateTabablzSlimControlStyle}" />
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

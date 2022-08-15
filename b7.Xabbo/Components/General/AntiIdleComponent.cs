@@ -10,113 +10,112 @@ using Xabbo.Core.Game;
 using Xabbo.Interceptor;
 using Xabbo.Messages;
 
-namespace b7.Xabbo.Components
+namespace b7.Xabbo.Components;
+
+public class AntiIdleComponent : Component
 {
-    public class AntiIdleComponent : Component
+    private readonly IConfiguration _config;
+    private readonly IHostApplicationLifetime _lifetime;
+
+    private readonly ProfileManager _profileManager;
+    private readonly RoomManager _roomManager;
+
+    private int _latencyCheckCount = -1;
+
+    private bool _isAntiIdleOutActive;
+    public bool IsAntiIdleOutActive
     {
-        private readonly IConfiguration _config;
-        private readonly IHostApplicationLifetime _lifetime;
+        get => _isAntiIdleOutActive;
+        set => Set(ref _isAntiIdleOutActive, value);
+    }
 
-        private readonly ProfileManager _profileManager;
-        private readonly RoomManager _roomManager;
+    public AntiIdleComponent(IInterceptor interceptor,
+        IConfiguration config,
+        IHostApplicationLifetime lifetime,
+        ProfileManager profileManager,
+        RoomManager roomManager)
+        : base(interceptor)
+    {
+        _config = config;
+        _lifetime = lifetime;
 
-        private int _latencyCheckCount = -1;
+        _profileManager = profileManager;
+        _roomManager = roomManager;
 
-        private bool _isAntiIdleOutActive;
-        public bool IsAntiIdleOutActive
+        IsActive = config.GetValue("AntiIdle:Active", true);
+        IsAntiIdleOutActive = config.GetValue("AntiIdle:AntiIdleOut", true);
+    }
+
+    protected override void OnDisconnected(object? sender, EventArgs e)
+    {
+        base.OnDisconnected(sender, e);
+
+        _latencyCheckCount = -1;
+    }
+
+    public override void RaisePropertyChanged([CallerMemberName] string propertyName = null)
+    {
+        base.RaisePropertyChanged(propertyName);
+
+        switch (propertyName)
         {
-            get => _isAntiIdleOutActive;
-            set => Set(ref _isAntiIdleOutActive, value);
+            case nameof(IsActive):
+            case nameof(IsAntiIdleOutActive):
+                {
+                    SendAntiIdlePacket();
+                }
+                break;
+            default:
+                break;
         }
+    }
 
-        public AntiIdleComponent(IInterceptor interceptor,
-            IConfiguration config,
-            IHostApplicationLifetime lifetime,
-            ProfileManager profileManager,
-            RoomManager roomManager)
-            : base(interceptor)
+    protected override void OnInitialized(object? sender, InterceptorInitializedEventArgs e)
+    {
+        base.OnInitialized(sender, e);
+
+        IsActive = _config.GetValue("AntiIdle:Active", true);
+        IsAntiIdleOutActive = _config.GetValue("AntiIdle:IdleOutActive", true);
+    }
+
+    [InterceptIn(nameof(Incoming.ClientLatencyPingResponse))]
+    protected void HandleClientLatencyPingResponse(InterceptArgs e)
+    {
+        _latencyCheckCount = e.Packet.ReadInt();
+
+        if (_latencyCheckCount > 0 &&
+            _latencyCheckCount % 12 == 0)
         {
-            _config = config;
-            _lifetime = lifetime;
-
-            _profileManager = profileManager;
-            _roomManager = roomManager;
-
-            IsActive = config.GetValue("AntiIdle:Active", true);
-            IsAntiIdleOutActive = config.GetValue("AntiIdle:AntiIdleOut", true);
+            SendAntiIdlePacket();
         }
+    }
 
-        protected override void OnDisconnected(object? sender, EventArgs e)
+    private void SendAntiIdlePacket()
+    {
+        if (_latencyCheckCount <= 0) return;
+
+        if (_profileManager.UserData is not null &&
+            _roomManager.Room is not null &&
+            _roomManager.Room.TryGetUserById(_profileManager.UserData.Id, out IRoomUser? self))
         {
-            base.OnDisconnected(sender, e);
-
-            _latencyCheckCount = -1;
-        }
-
-        public override void RaisePropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            base.RaisePropertyChanged(propertyName);
-
-            switch (propertyName)
+            if (self.IsIdle && IsAntiIdleOutActive)
             {
-                case nameof(IsActive):
-                case nameof(IsAntiIdleOutActive):
-                    {
-                        SendAntiIdlePacket();
-                    }
-                    break;
-                default:
-                    break;
+                Interceptor.Send(Out.Expression, 5);
+            }
+            else if (self.Dance != 0 && IsActive)
+            {
+                Interceptor.Send(Out.Move, 0, 0);
+            }
+            else if (IsActive)
+            {
+                Interceptor.Send(Out.Expression, 0);
             }
         }
-
-        protected override void OnInitialized(object? sender, InterceptorInitializedEventArgs e)
+        else
         {
-            base.OnInitialized(sender, e);
-
-            IsActive = _config.GetValue("AntiIdle:Active", true);
-            IsAntiIdleOutActive = _config.GetValue("AntiIdle:IdleOutActive", true);
-        }
-
-        [InterceptIn(nameof(Incoming.ClientLatencyPingResponse))]
-        protected void HandleClientLatencyPingResponse(InterceptArgs e)
-        {
-            _latencyCheckCount = e.Packet.ReadInt();
-
-            if (_latencyCheckCount > 0 &&
-                _latencyCheckCount % 12 == 0)
+            if (IsActive)
             {
-                SendAntiIdlePacket();
-            }
-        }
-
-        private void SendAntiIdlePacket()
-        {
-            if (_latencyCheckCount <= 0) return;
-
-            if (_profileManager.UserData is not null &&
-                _roomManager.Room is not null &&
-                _roomManager.Room.TryGetUserById(_profileManager.UserData.Id, out IRoomUser? self))
-            {
-                if (self.IsIdle && IsAntiIdleOutActive)
-                {
-                    Interceptor.Send(Out.Expression, 5);
-                }
-                else if (self.Dance != 0 && IsActive)
-                {
-                    Interceptor.Send(Out.Move, 0, 0);
-                }
-                else if (IsActive)
-                {
-                    Interceptor.Send(Out.Expression, 0);
-                }
-            }
-            else
-            {
-                if (IsActive)
-                {
-                    Interceptor.Send(Out.Expression, 0);
-                }
+                Interceptor.Send(Out.Expression, 0);
             }
         }
     }

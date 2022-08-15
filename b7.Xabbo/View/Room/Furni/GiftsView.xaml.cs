@@ -13,16 +13,15 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace b7.Xabbo.View
+namespace b7.Xabbo.View;
+
+/// <summary>
+/// Interaction logic for GiftsView.xaml
+/// </summary>
+public partial class GiftsView : UserControl
 {
-    /// <summary>
-    /// Interaction logic for GiftsView.xaml
-    /// </summary>
-    public partial class GiftsView : UserControl
+    public GiftsView()
     {
-        public GiftsView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

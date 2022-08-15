@@ -12,144 +12,143 @@ using Xabbo.Core;
 
 using b7.Xabbo.Util;
 
-namespace b7.Xabbo.Components
+namespace b7.Xabbo.Components;
+
+public class FlashWindowComponent : Component
 {
-    public class FlashWindowComponent : Component
+    private readonly ProfileManager _profileManager;
+    private readonly FriendManager _friendManager;
+    private readonly RoomManager _roomManager;
+
+    private Process? _currentProcess;
+
+    private bool _flashOnPrivateMessage;
+    public bool FlashOnPrivateMessage
     {
-        private readonly ProfileManager _profileManager;
-        private readonly FriendManager _friendManager;
-        private readonly RoomManager _roomManager;
+        get => _flashOnPrivateMessage;
+        set => Set(ref _flashOnPrivateMessage, value);
+    }
 
-        private Process? _currentProcess;
+    private bool _flashOnWhisper;
+    public bool FlashOnWhisper
+    {
+        get => _flashOnWhisper;
+        set => Set(ref _flashOnWhisper, value);
+    }
 
-        private bool _flashOnPrivateMessage;
-        public bool FlashOnPrivateMessage
+    private bool _flashOnUserChat;
+    public bool FlashOnUserChat
+    {
+        get => _flashOnUserChat;
+        set => Set(ref _flashOnUserChat, value);
+    }
+
+
+    private bool _flashOnFriendChat;
+    public bool FlashOnFriendChat
+    {
+        get => _flashOnFriendChat;
+        set => Set(ref _flashOnFriendChat, value);
+    }
+
+    private bool _flashOnUserEntered;
+    public bool FlashOnUserEntered
+    {
+        get => _flashOnUserEntered;
+        set => Set(ref _flashOnUserEntered, value);
+    }
+
+    private bool _flashOnFriendEntered;
+    public bool FlashOnFriendEntered
+    {
+        get => _flashOnFriendEntered;
+        set => Set(ref _flashOnFriendEntered, value);
+    }
+
+    public FlashWindowComponent(IInterceptor interceptor,
+        IConfiguration config,
+        ProfileManager profileManager,
+        FriendManager friendManager,
+        RoomManager roomManager)
+        : base(interceptor)
+    {
+        FlashOnPrivateMessage = config.GetValue("FlashWindow:OnPrivateMessage", true);
+        FlashOnWhisper = config.GetValue("FlashWindow:OnWhisper", true);
+        FlashOnUserChat = config.GetValue("FlashWindow:OnUserChat", false);
+        FlashOnFriendChat = config.GetValue("FlashWindow:OnFriendChat", false);
+        FlashOnUserEntered = config.GetValue("FlashWindow:OnUserEntered", false);
+        FlashOnFriendEntered = config.GetValue("FlashWindow:OnFriendEntered", true);
+
+        _profileManager = profileManager;
+        _friendManager = friendManager;
+        _roomManager = roomManager;
+
+        _friendManager.MessageReceived += OnReceivedPrivateMessage;
+
+        _roomManager.EntitiesAdded += OnEntitiesAdded;
+        _roomManager.EntityChat += OnEntityChat;
+    }
+
+    protected override void OnDisconnected(object? sender, EventArgs e)
+    {
+        base.OnDisconnected(sender, e);
+
+        _currentProcess = null;
+    }
+
+    private Process? FindProcess()
+    {
+        Process? process = null;
+
+        UserData? userData = _profileManager.UserData;
+        if (userData is not null)
         {
-            get => _flashOnPrivateMessage;
-            set => Set(ref _flashOnPrivateMessage, value);
+            process = Process.GetProcessesByName("habbo").FirstOrDefault(p =>
+                p.MainWindowTitle.StartsWith("Habbo") &&
+                p.MainWindowTitle.EndsWith(userData.Name)
+            );
         }
 
-        private bool _flashOnWhisper;
-        public bool FlashOnWhisper
+        return process;
+    }
+
+    private void FlashWindow()
+    {
+        _currentProcess ??= FindProcess();
+        if (_currentProcess is null) return;
+
+        WindowUtil.FlashWindow(_currentProcess.MainWindowHandle);
+    }
+
+    private void OnReceivedPrivateMessage(object? sender, FriendMessageEventArgs e)
+    {
+        if (FlashOnPrivateMessage)
         {
-            get => _flashOnWhisper;
-            set => Set(ref _flashOnWhisper, value);
+            FlashWindow();
         }
+    }
 
-        private bool _flashOnUserChat;
-        public bool FlashOnUserChat
+    private void OnEntityChat(object? sender, EntityChatEventArgs e)
+    {
+        if (e.Entity is not IRoomUser user) return;
+
+        if (FlashOnUserChat ||
+            (FlashOnWhisper && e.ChatType == ChatType.Whisper) ||
+            (FlashOnFriendChat && _friendManager.IsFriend(user.Id)))
         {
-            get => _flashOnUserChat;
-            set => Set(ref _flashOnUserChat, value);
+            FlashWindow();
         }
+    }
 
+    private void OnEntitiesAdded(object? sender, EntitiesEventArgs e)
+    {
+        IEnumerable<IRoomUser> users = e.Entities.OfType<IRoomUser>()
+            .Where(u => u.Id != _profileManager.UserData?.Id);
 
-        private bool _flashOnFriendChat;
-        public bool FlashOnFriendChat
+        if ((FlashOnUserEntered && users.Any(u => u.Id != _profileManager.UserData?.Id)) ||
+            (FlashOnFriendEntered && users.Any(u => _friendManager.IsFriend(u.Id))))
         {
-            get => _flashOnFriendChat;
-            set => Set(ref _flashOnFriendChat, value);
-        }
-
-        private bool _flashOnUserEntered;
-        public bool FlashOnUserEntered
-        {
-            get => _flashOnUserEntered;
-            set => Set(ref _flashOnUserEntered, value);
-        }
-
-        private bool _flashOnFriendEntered;
-        public bool FlashOnFriendEntered
-        {
-            get => _flashOnFriendEntered;
-            set => Set(ref _flashOnFriendEntered, value);
-        }
-
-        public FlashWindowComponent(IInterceptor interceptor,
-            IConfiguration config,
-            ProfileManager profileManager,
-            FriendManager friendManager,
-            RoomManager roomManager)
-            : base(interceptor)
-        {
-            FlashOnPrivateMessage = config.GetValue("FlashWindow:OnPrivateMessage", true);
-            FlashOnWhisper = config.GetValue("FlashWindow:OnWhisper", true);
-            FlashOnUserChat = config.GetValue("FlashWindow:OnUserChat", false);
-            FlashOnFriendChat = config.GetValue("FlashWindow:OnFriendChat", false);
-            FlashOnUserEntered = config.GetValue("FlashWindow:OnUserEntered", false);
-            FlashOnFriendEntered = config.GetValue("FlashWindow:OnFriendEntered", true);
-
-            _profileManager = profileManager;
-            _friendManager = friendManager;
-            _roomManager = roomManager;
-
-            _friendManager.MessageReceived += OnReceivedPrivateMessage;
-
-            _roomManager.EntitiesAdded += OnEntitiesAdded;
-            _roomManager.EntityChat += OnEntityChat;
-        }
-
-        protected override void OnDisconnected(object? sender, EventArgs e)
-        {
-            base.OnDisconnected(sender, e);
-
-            _currentProcess = null;
-        }
-
-        private Process? FindProcess()
-        {
-            Process? process = null;
-
-            UserData? userData = _profileManager.UserData;
-            if (userData is not null)
-            {
-                process = Process.GetProcesses().FirstOrDefault(p =>
-                    p.MainWindowTitle.StartsWith("Habbo") &&
-                    p.MainWindowTitle.EndsWith(userData.Name)
-                );
-            }
-
-            return process;
-        }
-
-        private void FlashWindow()
-        {
-            _currentProcess ??= FindProcess();
-            if (_currentProcess is null) return;
-
-            WindowUtil.FlashWindow(_currentProcess.MainWindowHandle);
-        }
-
-        private void OnReceivedPrivateMessage(object? sender, FriendMessageEventArgs e)
-        {
-            if (FlashOnPrivateMessage)
-            {
-                FlashWindow();
-            }
-        }
-
-        private void OnEntityChat(object? sender, EntityChatEventArgs e)
-        {
-            if (e.Entity is not IRoomUser user) return;
-
-            if (FlashOnUserChat ||
-                (FlashOnWhisper && e.ChatType == ChatType.Whisper) ||
-                (FlashOnFriendChat && _friendManager.IsFriend(user.Id)))
-            {
-                FlashWindow();
-            }
-        }
-
-        private void OnEntitiesAdded(object? sender, EntitiesEventArgs e)
-        {
-            IEnumerable<IRoomUser> users = e.Entities.OfType<IRoomUser>()
-                .Where(u => u.Id != _profileManager.UserData?.Id);
-
-            if ((FlashOnUserEntered && users.Any(u => u.Id != _profileManager.UserData?.Id)) ||
-                (FlashOnFriendEntered && users.Any(u => _friendManager.IsFriend(u.Id))))
-            {
-                FlashWindow();
-            }
+            FlashWindow();
         }
     }
 }

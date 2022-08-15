@@ -3,16 +3,15 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:local="clr-namespace:b7.Xabbo"
-             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:mde="clr-namespace:MaterialDesignExtensions.Controls;assembly=MaterialDesignExtensions"
              xmlns:viewModel="clr-namespace:b7.Xabbo.ViewModel"
              xmlns:svc="clr-namespace:b7.Xabbo.Services"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance Type={x:Type viewModel:WardrobeViewManager}}">
     <UserControl.Resources>
-        <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignFlatMidBgButton}">
+        <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
             <Setter Property="Margin" Value="4" />
         </Style>
     </UserControl.Resources>
@@ -22,30 +21,33 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <ListBox x:Name="figureItems" ItemsSource="{Binding Figures}"
-                 md:ScrollViewerAssist.IgnorePadding="True">
+                 Style="{StaticResource MaterialDesignListBox}"
+                 SelectionMode="Extended">
             <ListBox.Resources>
                 <RelativeSource x:Key="FindRoot" Mode="FindAncestor" AncestorType="{x:Type ListBox}" />
+                <Style TargetType="{x:Type ListBoxItem}"
+                       BasedOn="{StaticResource {x:Type ListBoxItem}}">
+                    <Setter Property="Margin" Value="0" />
+                </Style>
             </ListBox.Resources>
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <WrapPanel Margin="4" />
+                    <WrapPanel />
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
-            <ListBox.ItemContainerStyle>
-                <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource MaterialDesignCardsListBoxItem}">
-                    <Setter Property="Margin" Value="4" />
-                </Style>
-            </ListBox.ItemContainerStyle>
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <ListBoxItem PreviewMouseDown="ListItem_PreviewMouseDown"
-                          PreviewMouseUp="ListItem_PreviewMouseUp">
-                        <ListBoxItem.InputBindings>
-                            <MouseBinding Gesture="LeftDoubleClick"
-                                              Command="{Binding Source={x:Reference layoutRoot}, Path=DataContext.SetFigureCommand}"
-                                              CommandParameter="{Binding}" />
-                        </ListBoxItem.InputBindings>
-                        <ListBoxItem.ContextMenu>
+                    <!--<ListBoxItem PreviewMouseDown="ListItem_PreviewMouseDown"
+                          PreviewMouseUp="ListItem_PreviewMouseUp">-->
+                    <ui:Card Margin="0" Padding="0">
+                        <ui:Card.InputBindings>
+                            <MouseBinding
+                                Gesture="LeftDoubleClick"
+                                Command="{Binding Source={x:Reference layoutRoot}, Path=DataContext.SetFigureCommand}"
+                                CommandParameter="{Binding}"
+                            />
+                        </ui:Card.InputBindings>
+                        <ui:Card.ContextMenu>
                             <ContextMenu x:Name="contextMenu">
                                 <ContextMenu.Resources>
                                     <RelativeSource x:Key="FindRoot" Mode="FindAncestor" AncestorType="{x:Type ContextMenu}" />
@@ -61,24 +63,33 @@
                                     Command="{Binding Source={x:Reference layoutRoot}, Path=DataContext.RemoveFigureCommand}"
                                 />
                             </ContextMenu>
-                        </ListBoxItem.ContextMenu>
+                        </ui:Card.ContextMenu>
                         <Image x:Name="imageView" Stretch="None" SnapsToDevicePixels="True"
                                Width="64" Height="110">
                             <Image.Source>
-                                <BitmapImage UriCachePolicy="CacheIfAvailable"
-                                             UriSource="{Binding ImageUrl}" />
+                                <BitmapImage
+                                    UriCachePolicy="CacheIfAvailable"
+                                    UriSource="{Binding ImageUrl}"
+                                />
                             </Image.Source>
                         </Image>
-                    </ListBoxItem>
+                    </ui:Card>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-        <StackPanel Grid.Row="1"
-                    Margin="4" Orientation="Horizontal" HorizontalAlignment="Right"
-                    IsEnabled="{Binding IsAvailable}">
+        <Grid
+            Grid.Row="1"
+            Margin="4" HorizontalAlignment="Right"
+            IsEnabled="{Binding IsAvailable}"
+        >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
             <Button Content="Import wardrobe" Command="{Binding ImportWardrobeCommand}"  />
-            <Button Content="Add from clipboard" Command="{Binding AddFromClipboardCommand}"  />
-            <Button Content="Add current figure" Command="{Binding AddCurrentFigureCommand}" />
-        </StackPanel>
+            <Button Grid.Column="1" Content="Add from clipboard" Command="{Binding AddFromClipboardCommand}"  />
+            <Button Grid.Column="2" Content="Add current figure" Command="{Binding AddCurrentFigureCommand}" />
+        </Grid>
     </Grid>
 </UserControl>

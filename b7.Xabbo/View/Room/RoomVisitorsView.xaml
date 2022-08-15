@@ -3,33 +3,31 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:local="clr-namespace:b7.Xabbo"
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mde="clr-namespace:MaterialDesignExtensions.Controls;assembly=MaterialDesignExtensions"
              xmlns:viewModel="clr-namespace:b7.Xabbo.ViewModel"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
-             d:DataContext="{d:DesignInstance Type={x:Type viewModel:VisitorsViewManager}}"
-             TextElement.Foreground="{StaticResource MaterialDesignBody}">
+             d:DataContext="{d:DesignInstance Type={x:Type viewModel:VisitorsViewManager}}">
     <Grid x:Name="layoutRoot">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="1*" />
+            <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <TextBox
+            <ui:TextBox
                 Grid.Column="1" 
-                Margin="4" Padding="4"
+                Margin="8"
                 Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}"
-                Style="{StaticResource MaterialDesignTextBox}"
-                VerticalContentAlignment="Center"
-                FontSize="16"
-                md:HintAssist.Hint="Filter"
+                Icon="Search48"
+                PlaceholderText="Filter"
             />
         </Grid>
         <ListView Grid.Row="1" x:Name="listViewVisitors"

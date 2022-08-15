@@ -8,42 +8,41 @@ using Xabbo.Messages;
 
 using Xabbo.Core.Game;
 
-namespace b7.Xabbo.Components
+namespace b7.Xabbo.Components;
+
+public class DoorbellComponent : Component
 {
-    public class DoorbellComponent : Component
+    private readonly FriendManager _friendManager;
+
+    private bool _acceptFriends;
+    public bool AcceptFriends
     {
-        private readonly FriendManager _friendManager;
+        get => _acceptFriends;
+        set => Set(ref _acceptFriends, value);
+    }
 
-        private bool _acceptFriends;
-        public bool AcceptFriends
+    public DoorbellComponent(
+        IInterceptor interceptor,
+        IConfiguration config,
+        FriendManager friendManager)
+        : base(interceptor)
+    {
+        _friendManager = friendManager;
+
+        AcceptFriends = config.GetValue("Doorbell:AcceptFriends", false);
+    }
+
+    [InterceptIn(nameof(Incoming.DoorbellRinging), RequiredClient = ClientType.Flash)]
+    protected void HandleDoorbellRinging(InterceptArgs e)
+    {
+        if (Client != ClientType.Flash)
+            return;
+
+        string name = e.Packet.ReadString();
+        if (AcceptFriends && _friendManager.IsFriend(name))
         {
-            get => _acceptFriends;
-            set => Set(ref _acceptFriends, value);
-        }
-
-        public DoorbellComponent(
-            IInterceptor interceptor,
-            IConfiguration config,
-            FriendManager friendManager)
-            : base(interceptor)
-        {
-            _friendManager = friendManager;
-
-            AcceptFriends = config.GetValue("Doorbell:AcceptFriends", false);
-        }
-
-        [InterceptIn(nameof(Incoming.DoorbellRinging), RequiredClient = ClientType.Flash)]
-        protected void HandleDoorbellRinging(InterceptArgs e)
-        {
-            if (Client != ClientType.Flash)
-                return;
-
-            string name = e.Packet.ReadString();
-            if (AcceptFriends && _friendManager.IsFriend(name))
-            {
-                e.Block();
-                Interceptor.Send(Out["LetUserIn"], name, true);
-            }
+            e.Block();
+            Interceptor.Send(Out["LetUserIn"], name, true);
         }
     }
 }

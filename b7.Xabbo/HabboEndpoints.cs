@@ -1,11 +1,10 @@
 ﻿using System;
 
-namespace b7.Xabbo
+namespace b7.Xabbo;
+
+public enum HabboEndpoints
 {
-    public enum HabboEndpoints
-    {
-        UserProfile,
-        GameDataHashes,
-        GameDataHashes2
-    }
+    UserProfile,
+    GameDataHashes,
+    GameDataHashes2
 }

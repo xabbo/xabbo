@@ -5,9 +5,9 @@
 		<TargetFramework>net6.0-windows</TargetFramework>
 		<UseWPF>true</UseWPF>
 		<Nullable>enable</Nullable>
-		<Version>1.0.3</Version>
+		<Version>1.1.0</Version>
 		<DebugType>embedded</DebugType>
-		<ApplicationIcon>Resources\app.ico</ApplicationIcon>
+		<ApplicationIcon>Resources\Icon\app.ico</ApplicationIcon>
 		<StartupObject>b7.Xabbo.App</StartupObject>
 	</PropertyGroup>
 
@@ -29,6 +29,7 @@
 		<PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
 		<PackageReference Include="MvvmLightLibsStd10" Version="5.4.1.1" />
 		<PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.13" />
+		<PackageReference Include="WPF-UI" Version="2.0.1" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -51,8 +52,25 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="View\Inventory\" />
-		<Folder Include="View\Navigator\" />
+	  <Page Remove="Resources\Theme\Expander.xaml" />
+	  <Page Remove="Resources\Theme\TabControl.xaml" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Resource Update="Resources\Theme\Expander.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Resource>
+	  <Resource Update="Resources\Theme\TabControl.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Resource>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EditorConfigFiles Remove="C:\Dev\b7\b7.Xabbo\b7.Xabbo\View\.editorconfig" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="C:\Dev\b7\b7.Xabbo\b7.Xabbo\View\.editorconfig" />
 	</ItemGroup>
 
 </Project>

@@ -13,16 +13,15 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace b7.Xabbo.View
+namespace b7.Xabbo.View;
+
+/// <summary>
+/// Interaction logic for InventoryView.xaml
+/// </summary>
+public partial class InventoryView : UserControl
 {
-    /// <summary>
-    /// Interaction logic for InventoryView.xaml
-    /// </summary>
-    public partial class InventoryView : UserControl
+    public InventoryView()
     {
-        public InventoryView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

@@ -1,13 +1,12 @@
 ﻿using System;
 
-namespace b7.Xabbo.Commands
-{
-    public class InvalidArgsException : Exception
-    {
-        public InvalidArgsException() { }
+namespace b7.Xabbo.Commands;
 
-        public InvalidArgsException(string message)
-            : base(message)
-        { }
-    }
+public class InvalidArgsException : Exception
+{
+    public InvalidArgsException() { }
+
+    public InvalidArgsException(string message)
+        : base(message)
+    { }
 }

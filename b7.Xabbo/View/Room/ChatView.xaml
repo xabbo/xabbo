@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:b7.Xabbo"
              xmlns:viewModel="clr-namespace:b7.Xabbo.ViewModel"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
              TextElement.Foreground="{StaticResource MaterialDesignBody}"
              TextElement.FontFamily="{StaticResource MaterialDesignFont}"
@@ -16,35 +17,38 @@
         <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource MaterialDesignAccentCheckBox}">
             <Setter Property="Margin" Value="4" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="FontSize" Value="14" />
         </Style>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <TextBox
             x:Name="textBoxLog"
             Padding="0" BorderThickness="0"
             md:TextFieldAssist.TextBoxViewMargin="8"
-            VerticalScrollBarVisibility="Auto"
+            VerticalScrollBarVisibility="Visible"
             HorizontalScrollBarVisibility="Auto"
             IsReadOnly="True" FontFamily="Consolas" FontSize="14"
             TextAlignment="Left" TextWrapping="Wrap"
             Text="{Binding LogText}"
-        />
-        <WrapPanel Grid.Row="1" Margin="4" HorizontalAlignment="Right">
-            <WrapPanel>
-                <CheckBox Content="Normal" IsChecked="{Binding IncludeNormalChat}" />
-                <CheckBox Content="Whispers" IsChecked="{Binding IncludeWhispers}" />
-                <CheckBox Content="Wired" IsChecked="{Binding IncludeWiredMessages}" />
-                <CheckBox Content="Bots" IsChecked="{Binding IncludeBotMessages}" />
-            </WrapPanel>
-            <WrapPanel>
-                <CheckBox Content="Log to file" IsChecked="{Binding LogToFile}" />
-                <CheckBox Content="Autoscroll" IsChecked="{Binding ElementName=root, Path=AutoScroll}" />
-            </WrapPanel>
+        >
+            <TextBox.Style>
+                <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource MaterialDesignTextBox}">
+                    <Setter Property="md:TextFieldAssist.DecorationVisibility" Value="Hidden" />
+                </Style>
+            </TextBox.Style>
+        </TextBox>
+        <WrapPanel Grid.Row="1" HorizontalAlignment="Right" Orientation="Horizontal" Margin="4">
+            <CheckBox Content="Normal" IsChecked="{Binding IncludeNormalChat}" />
+            <CheckBox Content="Whispers" IsChecked="{Binding IncludeWhispers}" />
+            <CheckBox Content="Wired" IsChecked="{Binding IncludeWiredMessages}" />
+            <CheckBox Content="Bots" IsChecked="{Binding IncludeBotMessages}" />
+            <CheckBox Content="Log to file" IsChecked="{Binding LogToFile}" />
+            <CheckBox Content="Autoscroll" IsChecked="{Binding ElementName=root, Path=AutoScroll}" />
         </WrapPanel>
     </Grid>
 </UserControl>

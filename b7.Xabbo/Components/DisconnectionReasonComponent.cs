@@ -6,25 +6,24 @@ using Xabbo.Core;
 using Xabbo.Interceptor;
 using Xabbo.Messages;
 
-namespace b7.Xabbo.Components
+namespace b7.Xabbo.Components;
+
+public class DisconnectionReasonComponent : Component
 {
-    public class DisconnectionReasonComponent : Component
+    public DisconnectionReasonComponent(IInterceptor interceptor)
+        : base(interceptor)
+    { }
+
+    [InterceptIn(nameof(Incoming.DisconnectionReason))]
+    protected void HandleDisconnectionReason(InterceptArgs e)
     {
-        public DisconnectionReasonComponent(IInterceptor interceptor)
-            : base(interceptor)
-        { }
+        e.Block();
 
-        [InterceptIn(nameof(Incoming.DisconnectionReason))]
-        protected void HandleDisconnectionReason(InterceptArgs e)
-        {
-            e.Block();
+        DisconnectReason reason = (DisconnectReason)e.Packet.ReadInt();
 
-            DisconnectReason reason = (DisconnectReason)e.Packet.ReadInt();
+        string reasonText = Enum.IsDefined(reason) ? reason.Humanize() : $"unknown ({(int)reason})";
+        string message = $"[xabbo] You were disconnected by the server.\n\nReason: {reasonText}";
 
-            string reasonText = Enum.IsDefined(reason) ? reason.Humanize() : $"unknown ({(int)reason})";
-            string message = $"[xabbo] You were disconnected by the server.\n\nReason: {reasonText}";
-
-            Interceptor.Send(In.SystemBroadcast, message);
-        }
+        Interceptor.Send(In.SystemBroadcast, message);
     }
 }

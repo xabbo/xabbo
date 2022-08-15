@@ -1,37 +1,36 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace b7.Xabbo.Commands
+namespace b7.Xabbo.Commands;
+
+public class InfoCommands : CommandModule
 {
-    public class InfoCommands : CommandModule
+    public InfoCommands() { }
+
+    [Command("profile", "prof", "p")]
+    public Task ShowProfileAsync(CommandArgs args)
     {
-        public InfoCommands() { }
-
-        [Command("profile", "prof", "p")]
-        public Task ShowProfileAsync(CommandArgs args)
+        string name = string.Join(' ', args);
+        if (name.StartsWith("id:"))
         {
-            string name = string.Join(' ', args);
-            if (name.StartsWith("id:"))
-            {
-                name = name[3..].Trim();
+            name = name[3..].Trim();
 
-                if (long.TryParse(name, out long id))
-                {
-                    return SendAsync(Out.GetExtendedProfile, id, true).AsTask();
-                }
-                else
-                {
-                    ShowMessage($"Invalid ID specified: '{name}'.");
-                    return Task.CompletedTask;
-                }
+            if (long.TryParse(name, out long id))
+            {
+                return SendAsync(Out.GetExtendedProfile, id, true).AsTask();
             }
             else
             {
-                return SendAsync(Out.GetExtendedProfileByUsername, name).AsTask();
+                ShowMessage($"Invalid ID specified: '{name}'.");
+                return Task.CompletedTask;
             }
         }
-
-        [Command("group", "grp", "g")]
-        public Task ShowGroupInfoAsync(CommandArgs args) => SendAsync(Out.GetHabboGroupDetails, long.Parse(args[0]), true).AsTask();
+        else
+        {
+            return SendAsync(Out.GetExtendedProfileByUsername, name).AsTask();
+        }
     }
+
+    [Command("group", "grp", "g")]
+    public Task ShowGroupInfoAsync(CommandArgs args) => SendAsync(Out.GetHabboGroupDetails, long.Parse(args[0]), true).AsTask();
 }
