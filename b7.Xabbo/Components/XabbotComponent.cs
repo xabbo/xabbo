@@ -56,7 +56,7 @@ public class XabbotComponent : Component, IHostedService
 
     public void ShowMessage(string message)
     {
-        (int X, int Y) location = (0, 0);
+        Point location = (0, 0);
 
         IUserData? userData = _profileManager.UserData;
         IRoom? room = _roomManager.Room;
@@ -70,7 +70,7 @@ public class XabbotComponent : Component, IHostedService
         ShowMessage(message, location);
     }
 
-    public void ShowMessage(string message, (int X, int Y) location)
+    public void ShowMessage(string message, Point location)
     {
         Interceptor.Send(In.Status, 1, new EntityStatusUpdate
         {

@@ -35,17 +35,17 @@ public class FlattenRoomComponent : Component
         _isActivated = IsActive;
     }
 
-    private float GetOffset(int x, int y)
+    private float GetOffset(Point location)
     {
         if (_originalFloorPlan is null) return 0;
 
-        if (_originalFloorPlan.IsWalkable(x, y))
-            return _originalFloorPlan[x, y];
+        if (_originalFloorPlan.IsWalkable(location.X, location.Y))
+            return _originalFloorPlan[location.X, location.Y];
         else
             return 0;
     }
 
-    private double GetOffset((int X, int Y) location) => GetOffset(location.X, location.Y);
+    private float GetOffset(int x, int y) => GetOffset((x, y));
 
     private Tile AdjustTile(Tile tile)
     {
