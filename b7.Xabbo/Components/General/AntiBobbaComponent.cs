@@ -34,6 +34,13 @@ public class AntiBobbaComponent : Component
         set => Set(ref _isAutoEnabled, value);
     }
 
+    private bool _isAvailable;
+    public bool IsAvailable
+    {
+        get => _isAvailable;
+        set => Set(ref _isAvailable, value);
+    }
+
     public AntiBobbaComponent(IInterceptor interceptor,
         IOptions<AntiBobbaOptions> options)
         : base(interceptor)
@@ -43,6 +50,8 @@ public class AntiBobbaComponent : Component
         IsActive = _options.Active;
         IsLocalized = _options.Localized;
         IsAutoEnabled = _options.Auto;
+
+        IsAvailable = !string.IsNullOrWhiteSpace(_options.Inject);
 
         string autoPattern = "(" + string.Join('|', _options.AutoList.Select(x => Regex.Escape(x))) + ")";
         _regexAuto = new Regex(autoPattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);

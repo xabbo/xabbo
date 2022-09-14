@@ -192,7 +192,10 @@
                     </StackPanel>
                 </Expander.Header>
                 <StackPanel>
-                    <StackPanel DataContext="{Binding AntiBobba}">
+                    <StackPanel
+                        DataContext="{Binding AntiBobba}"
+                        Visibility="{Binding IsAvailable, Converter={StaticResource BooleanToVisibilityConverter}}"
+                    >
                         <CheckBox Content="Anti-bobba" IsChecked="{Binding IsActive}" />
                         <StackPanel Margin="20,0,0,0">
                             <CheckBox Content="Localized" ToolTip="Only apply anti-bobba to text between [square brackets]."
