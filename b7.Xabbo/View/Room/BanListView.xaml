@@ -52,9 +52,9 @@
         </ListView>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Row="2" Margin="4">
-            <Button Margin="4" CommandParameter="{Binding Source={x:Reference listViewUsers}, Path=SelectedItems}">
+            <ui:Button Margin="4" Icon="Checkmark48" CommandParameter="{Binding Source={x:Reference listViewUsers}, Path=SelectedItems}">
                 <Button.Style>
-                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+                    <Style TargetType="{x:Type ui:Button}" BasedOn="{StaticResource {x:Type ui:Button}}">
                         <Setter Property="Command" Value="{Binding UnbanCommand}" />
                         <Setter Property="Content" Value="Unban" />
                         <Style.Triggers>
@@ -75,10 +75,10 @@
                         </Style.Triggers>
                     </Style>
                 </Button.Style>
-            </Button>
-            <Button Margin="4" Command="{Binding LoadCommand}">
+            </ui:Button>
+            <ui:Button Margin="4" Icon="ArrowDownload48" Command="{Binding LoadCommand}">
                 <Button.Style>
-                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+                    <Style TargetType="{x:Type ui:Button}" BasedOn="{StaticResource {x:Type ui:Button}}">
                         <Setter Property="Content" Value="Load" />
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding IsInRoom}" Value="False">
@@ -93,7 +93,7 @@
                         </Style.Triggers>
                     </Style>
                 </Button.Style>
-            </Button>
+            </ui:Button>
         </StackPanel>
 
         <mde:BusyOverlay

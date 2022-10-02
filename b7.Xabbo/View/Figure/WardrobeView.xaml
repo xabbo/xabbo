@@ -11,7 +11,7 @@
              d:DesignHeight="450" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance Type={x:Type viewModel:WardrobeViewManager}}">
     <UserControl.Resources>
-        <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+        <Style TargetType="{x:Type ui:Button}" BasedOn="{StaticResource {x:Type ui:Button}}">
             <Setter Property="Margin" Value="4" />
         </Style>
     </UserControl.Resources>
@@ -87,9 +87,9 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <Button Content="Import wardrobe" Command="{Binding ImportWardrobeCommand}"  />
-            <Button Grid.Column="1" Content="Add from clipboard" Command="{Binding AddFromClipboardCommand}"  />
-            <Button Grid.Column="2" Content="Add current figure" Command="{Binding AddCurrentFigureCommand}" />
+            <ui:Button Icon="ArrowImport24" Content="Import wardrobe" Command="{Binding ImportWardrobeCommand}"  />
+            <ui:Button Grid.Column="1" Icon="ClipboardPaste24" Content="Add from clipboard" Command="{Binding AddFromClipboardCommand}"  />
+            <ui:Button Grid.Column="2" Icon="Add28" Content="Add current figure" Command="{Binding AddCurrentFigureCommand}" />
         </Grid>
     </Grid>
 </UserControl>
