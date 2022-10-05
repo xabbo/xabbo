@@ -2,7 +2,7 @@
 
 using Microsoft.Extensions.Configuration;
 
-using Xabbo.Interceptor;
+using Xabbo.Extension;
 using Xabbo.Messages;
 
 namespace b7.Xabbo.Components;
@@ -16,9 +16,9 @@ public class AntiWalkComponent : Component
         set => Set(ref _faceDirection, value);
     }
 
-    public AntiWalkComponent(IInterceptor interceptor,
+    public AntiWalkComponent(IExtension extension,
         IConfiguration config)
-        : base(interceptor)
+        : base(extension)
     {
         IsActive = config.GetValue("AntiWalk:Active", false);
         FaceDirection = config.GetValue("AntiWalk:FaceDirection", false);
@@ -33,7 +33,7 @@ public class AntiWalkComponent : Component
         {
             int x = e.Packet.ReadInt();
             int y = e.Packet.ReadInt();
-            Interceptor.Send(Out.LookTo, x, y);
+            Extension.Send(Out.LookTo, x, y);
         }
     }
 }

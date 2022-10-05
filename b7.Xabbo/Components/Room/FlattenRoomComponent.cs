@@ -1,10 +1,10 @@
 ﻿using System;
 
 using Xabbo.Messages;
-using Xabbo.Interceptor;
-
+using Xabbo.Extension;
 using Xabbo.Core;
 using Xabbo.Core.Game;
+
 using System.Linq;
 
 namespace b7.Xabbo.Components;
@@ -17,13 +17,13 @@ public class FlattenRoomComponent : Component
     private Heightmap? _heightmap;
     private FloorPlan? _originalFloorPlan;
 
-    public FlattenRoomComponent(IInterceptor interceptor, RoomManager roomManager)
-        : base(interceptor)
+    public FlattenRoomComponent(IExtension extension, RoomManager roomManager)
+        : base(extension)
     {
         _roomManager = roomManager;
     }
 
-    protected override void OnInitialized(object? sender, InterceptorInitializedEventArgs e)
+    protected override void OnInitialized(object? sender, ExtensionInitializedEventArgs e)
     {
         base.OnInitialized(sender, e);
 
@@ -103,8 +103,8 @@ public class FlattenRoomComponent : Component
             }
         }
 
-        Interceptor.Send(In.StackingHeightmap, _heightmap);
-        Interceptor.Send(e.Packet);
+        Extension.Send(In.StackingHeightmap, _heightmap);
+        Extension.Send(e.Packet);
     }
 
     [InterceptIn(nameof(Incoming.StackingHeightmapDiff))]

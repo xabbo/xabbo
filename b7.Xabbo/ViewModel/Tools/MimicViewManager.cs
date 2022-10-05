@@ -13,6 +13,7 @@ using Xabbo.Interceptor;
 using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.Events;
+using Xabbo.Extension;
 
 namespace b7.Xabbo.ViewModel;
 
@@ -156,11 +157,11 @@ public class MimicViewManager : ComponentViewModel
 
     public ICommand EnableDisableCommand { get; }
 
-    public MimicViewManager(IInterceptor interceptor,
+    public MimicViewManager(IExtension extension,
         IHostApplicationLifetime lifetime,
         ProfileManager profileManager,
         RoomManager roomManager)
-        : base(interceptor)
+        : base(extension)
     {
         _profileManager = profileManager;
         _roomManager = roomManager;
@@ -284,7 +285,7 @@ public class MimicViewManager : ComponentViewModel
             target = null;
             Attach(null);
             if (followTarget)
-                Interceptor.Send(Out.Move, entity.X, entity.Y);
+                Extension.Send(Out.Move, entity.X, entity.Y);
             SendInfoMessage("Mimic target left the room");
         }
     }
@@ -466,7 +467,7 @@ public class MimicViewManager : ComponentViewModel
             user.Y != user.PreviousUpdate.Location.Y)
         {
             if (followTarget)
-                Interceptor.Send(Out.Move, user.PreviousUpdate.Location.X, user.PreviousUpdate.Location.Y);
+                Extension.Send(Out.Move, user.PreviousUpdate.Location.X, user.PreviousUpdate.Location.Y);
         }
     }
 
@@ -492,7 +493,7 @@ public class MimicViewManager : ComponentViewModel
         {
             if (target.PreviousUpdate != null && (user.CurrentUpdate.Location != target.PreviousUpdate.Location))
             {
-                Interceptor.Send(Out.Move, target.PreviousUpdate.Location.X, target.PreviousUpdate.Location.Y);
+                Extension.Send(Out.Move, target.PreviousUpdate.Location.X, target.PreviousUpdate.Location.Y);
             }
         }
     }
@@ -500,7 +501,7 @@ public class MimicViewManager : ComponentViewModel
 
     #region /* Mimic functions */
     private void SendInfoMessage(string message)
-        => Interceptor.Send(In.Whisper, self?.Index ?? -1, message, 0, 34, 0, 0);
+        => Extension.Send(In.Whisper, self?.Index ?? -1, message, 0, 34, 0, 0);
 
     private void SetFigure(IRoomUser? user)
     {
@@ -511,7 +512,7 @@ public class MimicViewManager : ComponentViewModel
             self.Figure.Equals(user.Figure))
             return;
 
-        Interceptor.Send(Out.UpdateAvatar,
+        Extension.Send(Out.UpdateAvatar,
             user.Gender.ToShortString(),
             user.Figure
         );
@@ -524,14 +525,14 @@ public class MimicViewManager : ComponentViewModel
         if (self != null &&
             self.Motto.Equals(user.Motto))
             return;
-        Interceptor.Send(Out.ChangeAvatarMotto, user.Motto);
+        Extension.Send(Out.ChangeAvatarMotto, user.Motto);
     }
 
     private void DoActionAsync(int action)
     {
         if (!mimicAction)
             return;
-        Interceptor.Send(Out.Expression, action);
+        Extension.Send(Out.Expression, action);
     }
 
     private void SetIdle(IRoomUser? user)
@@ -549,7 +550,7 @@ public class MimicViewManager : ComponentViewModel
         if (self != null && self.IsIdle == idle)
             return;
 
-        Interceptor.Send(Out.Expression, idle ? 5 : 0);
+        Extension.Send(Out.Expression, idle ? 5 : 0);
     }
 
     private void SetDance(IRoomUser? user)
@@ -567,14 +568,14 @@ public class MimicViewManager : ComponentViewModel
         if (self != null && self.Dance.Equals(dance))
             return;
 
-        Interceptor.Send(Out.Dance, dance);
+        Extension.Send(Out.Dance, dance);
     }
 
     private void SendSign(int sign)
     {
         if (!mimicSign)
             return;
-        Interceptor.Send(Out.ShowSign, sign);
+        Extension.Send(Out.ShowSign, sign);
     }
 
     private void SetEffect(IRoomUser? user)
@@ -598,7 +599,7 @@ public class MimicViewManager : ComponentViewModel
         {
             if (SendSpecialEffect(self?.Effect ?? 0) && effect == -1)
                 return;
-            Interceptor.Send(Out.UseAvatarEffect, effect);
+            Extension.Send(Out.UseAvatarEffect, effect);
         }
     }
 
@@ -629,7 +630,7 @@ public class MimicViewManager : ComponentViewModel
         if (self != null && self.IsTyping.Equals(typing))
             return;
 
-        Interceptor.Send(typing ? Out.UserStartTyping : Out.UserCancelTyping);
+        Extension.Send(typing ? Out.UserStartTyping : Out.UserCancelTyping);
     }
 
     private void SendChat(string message) => SendChat(ChatType.Talk, message);
@@ -649,7 +650,7 @@ public class MimicViewManager : ComponentViewModel
         if (type == ChatType.Talk)
             packet.WriteInt(-1);
 
-        Interceptor.Send(packet);
+        Extension.Send(packet);
     }
 
     private void SetSitting(IEntity? e)
@@ -667,7 +668,7 @@ public class MimicViewManager : ComponentViewModel
         if (self?.CurrentUpdate != null && self.CurrentUpdate.SittingOnFloor == sitting)
             return;
 
-        Interceptor.Send(Out.Posture, sitting ? 1 : 0);
+        Extension.Send(Out.Posture, sitting ? 1 : 0);
     }
 
     private void SetTarget(IRoomUser? user)

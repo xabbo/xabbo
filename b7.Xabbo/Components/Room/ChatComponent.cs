@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Configuration;
 
 using Xabbo.Messages;
-using Xabbo.Interceptor;
+using Xabbo.Extension;
 
 using Xabbo.Core;
 using Xabbo.Core.Game;
@@ -63,11 +63,11 @@ public class ChatComponent : Component, INotifyPropertyChanged
         set => Set(ref _muteScratches, value);
     }
 
-    public ChatComponent(IInterceptor interceptor,
+    public ChatComponent(IExtension extension,
         IConfiguration config,
         IOptions<GameOptions> gameOptions,
         RoomManager roomManager)
-        : base(interceptor)
+        : base(extension)
     {
         _roomManager = roomManager;
         _roomManager.EntityChat += OnEntityChat;

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 using Microsoft.Extensions.Configuration;
 
-using Xabbo.Interceptor;
+using Xabbo.Extension;
 using Xabbo.Messages;
 
 using Xabbo.Core;
@@ -28,12 +28,12 @@ public class AntiTradeComponent : Component
     }
 
     public AntiTradeComponent(
-        IInterceptor interceptor,
+        IExtension extension,
         IConfiguration config,
         ProfileManager profileManager,
         RoomManager roomManager,
         TradeManager tradeManager)
-        : base(interceptor)
+        : base(extension)
     {
         _config = config;
         _profileManager = profileManager;
@@ -67,7 +67,7 @@ public class AntiTradeComponent : Component
 
         if (CanTrade())
         {
-            Interceptor.Send(Out.TradeOpen, self.Index);
+            Extension.Send(Out.TradeOpen, self.Index);
         }
     }
 
@@ -106,7 +106,7 @@ public class AntiTradeComponent : Component
                     _tradeManager.Partner is not null &&
                     _tradeManager.Partner.Id == userData.Id)
                 {
-                    Interceptor.Send(Out.TradeClose);
+                    Extension.Send(Out.TradeClose);
                 }
             }
         }

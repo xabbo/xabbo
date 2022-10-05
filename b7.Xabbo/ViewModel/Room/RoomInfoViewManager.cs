@@ -1,6 +1,6 @@
 ﻿using System;
 
-using Xabbo.Interceptor;
+using Xabbo.Extension;
 using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.Events;
@@ -25,13 +25,13 @@ public class RoomInfoViewManager : ComponentViewModel
         set => Set(ref _data, value);
     }
 
-    public RoomInfoViewManager(IInterceptor interceptor,
+    public RoomInfoViewManager(IExtension extension,
         RoomManager roomManager)
-        : base(interceptor)
+        : base(extension)
     {
         _roomManager = roomManager;
 
-        interceptor.Disconnected += OnGameDisconnected;
+        extension.Disconnected += OnGameDisconnected;
 
         roomManager.Entered += OnEnteredRoom;
         roomManager.RoomDataUpdated += OnRoomDataUpdated;

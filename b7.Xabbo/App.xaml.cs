@@ -94,18 +94,15 @@ public partial class App : Application
         services.AddScoped<DebugPage>();
 
         // Interceptor
+        services.AddRemoteExtension<GEarthExtension>();
         services.AddGEarthOptions(options => options
-            .WithName("xabbo")
+            .WithTitle("xabbo")
             .WithDescription("enhanced habbo")
             .WithAuthor("b7")
             .WithConfiguration(context.Configuration)
         );
 
         services.AddSingleton<IMessageManager, UnifiedMessageManager>();
-
-        services.AddSingleton<GEarthExtension>();
-        services.AddSingleton<IInterceptor>(x => x.GetRequiredService<GEarthExtension>());
-        services.AddSingleton<IRemoteInterceptor>(x => x.GetRequiredService<GEarthExtension>());
 
         // Web
         services.AddHttpClient("habbo")

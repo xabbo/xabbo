@@ -2,19 +2,19 @@
 
 using GalaSoft.MvvmLight;
 
-using Xabbo.Common;
+using Xabbo;
 using Xabbo.Messages;
-using Xabbo.Interceptor;
+using Xabbo.Extension;
 
 namespace b7.Xabbo.Components;
 
-public abstract class Component : ObservableObject, IInterceptHandler
+public abstract class Component : ObservableObject, IMessageHandler
 {
-    protected IInterceptor Interceptor { get; }
-    protected ClientType Client => Interceptor.Client;
-    protected IMessageManager Messages => Interceptor.Messages;
-    protected Incoming In => Interceptor.Messages.In;
-    protected Outgoing Out => Interceptor.Messages.Out;
+    protected IExtension Extension { get; }
+    protected ClientType Client => Extension.Client;
+    protected IMessageManager Messages => Extension.Messages;
+    protected Incoming In => Extension.Messages.In;
+    protected Outgoing Out => Extension.Messages.Out;
 
     private bool _isActive;
     public bool IsActive
@@ -23,26 +23,26 @@ public abstract class Component : ObservableObject, IInterceptHandler
         set => Set(ref _isActive, value);
     }
 
-    public Component(IInterceptor interceptor)
+    public Component(IExtension extension)
     {
-        Interceptor = interceptor;
-        Interceptor.Initialized += OnInitialized;
-        Interceptor.Connected += OnConnected;
-        Interceptor.Disconnected += OnDisconnected;
+        Extension = extension;
+        Extension.Initialized += OnInitialized;
+        Extension.Connected += OnConnected;
+        Extension.Disconnected += OnDisconnected;
     }
 
-    protected virtual void OnInitialized(object? sender, InterceptorInitializedEventArgs e) { }
+    protected virtual void OnInitialized(object? sender, ExtensionInitializedEventArgs e) { }
 
     protected virtual void OnConnected(object? sender, EventArgs e)
     {
-        if (!Interceptor.Dispatcher.IsBound(this))
+        if (!Extension.Dispatcher.IsBound(this))
         {
-            Interceptor.Dispatcher.Bind(this, Interceptor.Client);
+            Extension.Dispatcher.Bind(this, Extension.Client);
         }
     }
 
     protected virtual void OnDisconnected(object? sender, EventArgs e)
     {
-        Interceptor.Dispatcher.Release(this);
+        Extension.Dispatcher.Release(this);
     }
 }

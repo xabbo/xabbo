@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 
 using Xabbo.Messages;
-using Xabbo.Interceptor;
+using Xabbo.Extension;
 
 using Xabbo.Core;
 using Xabbo.Core.Game;
@@ -19,8 +19,8 @@ public class RoomModeratorComponent : Component
     public bool CanBan => _roomManager.CanBan;
     public bool IsOwner => _roomManager.IsOwner;
 
-    public RoomModeratorComponent(IInterceptor interceptor, RoomManager roomManager)
-        : base(interceptor)
+    public RoomModeratorComponent(IExtension extension, RoomManager roomManager)
+        : base(extension)
     {
         _roomManager = roomManager;
 
@@ -44,7 +44,7 @@ public class RoomModeratorComponent : Component
     {
         if (!_roomManager.CanMute || e == null)
             return false;
-        Interceptor.Send(Out.RoomMuteUser, e.Id, _roomManager.CurrentRoomId, minutes);
+        Extension.Send(Out.RoomMuteUser, e.Id, _roomManager.CurrentRoomId, minutes);
         return true;
     }
 
@@ -53,7 +53,7 @@ public class RoomModeratorComponent : Component
     {
         if (!_roomManager.CanKick || e == null)
             return false;
-        Interceptor.Send(Out.KickUser, e.Id);
+        Extension.Send(Out.KickUser, e.Id);
         return true;
     }
 
@@ -62,7 +62,7 @@ public class RoomModeratorComponent : Component
     {
         if (!_roomManager.CanBan || e == null)
             return false;
-        Interceptor.Send(Out.RoomBanWithDuration, e.Id, _roomManager.CurrentRoomId, duration.GetValue());
+        Extension.Send(Out.RoomBanWithDuration, e.Id, _roomManager.CurrentRoomId, duration.GetValue());
         return true;
     }
 
@@ -71,7 +71,7 @@ public class RoomModeratorComponent : Component
     {
         if (!_roomManager.IsOwner || e == null)
             return false;
-        Interceptor.Send(Out.RoomUnbanUser, e.Id, _roomManager.CurrentRoomId);
+        Extension.Send(Out.RoomUnbanUser, e.Id, _roomManager.CurrentRoomId);
         return true;
     }
 }

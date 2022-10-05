@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 using Xabbo.Core;
 using Xabbo.Core.Game;
-using Xabbo.Interceptor;
+using Xabbo.Extension;
 using Xabbo.Messages;
 
 namespace b7.Xabbo.Components;
@@ -39,11 +39,11 @@ public class AntiHandItemComponent : Component
         set => Set(ref _maintainDirection, value);
     }
 
-    public AntiHandItemComponent(IInterceptor interceptor,
+    public AntiHandItemComponent(IExtension extension,
         IConfiguration config,
         ProfileManager profileManager,
         RoomManager roomManager)
-        : base(interceptor)
+        : base(extension)
     {
         _profileManager = profileManager;
         _roomManager = roomManager;
@@ -63,13 +63,13 @@ public class AntiHandItemComponent : Component
                 _roomManager.Room.TryGetUserByIndex(index, out IRoomUser? user))
             {
                 e.Block();
-                Interceptor.Send(Out.PassHandItem, (LegacyLong)user.Id);
+                Extension.Send(Out.PassHandItem, (LegacyLong)user.Id);
             }
         }
         else if (DropHandItem)
         {
             e.Block();
-            Interceptor.Send(Out.DropHandItem);
+            Extension.Send(Out.DropHandItem);
         }
 
         if (MaintainDirection)
@@ -97,9 +97,9 @@ public class AntiHandItemComponent : Component
                         (int invX, int invY) = H.GetMagicVector(dir + 4);
 
                         await Task.Delay(100);
-                        Interceptor.Send(Out.LookTo, invX, invY);
+                        Extension.Send(Out.LookTo, invX, invY);
                         await Task.Delay(100);
-                        Interceptor.Send(Out.LookTo, x, y);
+                        Extension.Send(Out.LookTo, x, y);
                     }
                 }
                 finally { semaphore.Release(); }

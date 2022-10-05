@@ -11,7 +11,7 @@ using GalaSoft.MvvmLight.Command;
 using MaterialDesignThemes.Wpf;
 using Xabbo.Core;
 using Xabbo.Core.Tasks;
-using Xabbo.Interceptor;
+using Xabbo.Extension;
 
 namespace b7.Xabbo.ViewModel;
 
@@ -39,9 +39,9 @@ public class NavigatorViewManager : ComponentViewModel
     public ICollection<NavigatorRoomViewModel> Rooms => _rooms;
 
     public NavigatorViewManager(
-        IInterceptor interceptor,
+        IExtension extension,
         ISnackbarMessageQueue snackbar)
-        : base(interceptor)
+        : base(extension)
     {
         _snackbar = snackbar;
 
@@ -55,7 +55,7 @@ public class NavigatorViewManager : ComponentViewModel
 
         try
         {
-            NavigatorSearchResults results = await new SearchNavigatorTask(Interceptor, "query", _searchText)
+            NavigatorSearchResults results = await new SearchNavigatorTask(Extension, "query", _searchText)
                 .ExecuteAsync(5000, CancellationToken.None);
 
             _rooms.Clear();

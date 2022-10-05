@@ -2,26 +2,27 @@
 
 using GalaSoft.MvvmLight;
 
-using Xabbo.Interceptor;
 using Xabbo.Messages;
+using Xabbo.Interceptor;
+using Xabbo.Extension;
 
 namespace b7.Xabbo.ViewModel;
 
-public abstract class ComponentViewModel : ObservableObject, IInterceptHandler
+public abstract class ComponentViewModel : ObservableObject, IMessageHandler
 {
-    public IInterceptor Interceptor { get; }
+    public IExtension Extension { get; }
 
-    protected Incoming In => Interceptor.Messages.In;
-    protected Outgoing Out => Interceptor.Messages.Out;
+    protected Incoming In => Extension.Messages.In;
+    protected Outgoing Out => Extension.Messages.Out;
 
-    public ComponentViewModel(IInterceptor interceptor)
+    public ComponentViewModel(IExtension extension)
     {
-        Interceptor = interceptor;
-        Interceptor.Connected += Interceptor_Connected;
+        Extension = extension;
+        Extension.Connected += OnGameConnected;
     }
 
-    private void Interceptor_Connected(object? sender, GameConnectedEventArgs e)
+    private void OnGameConnected(object? sender, GameConnectedEventArgs e)
     {
-        Interceptor.Bind(this);
+        Extension.Bind(this);
     }
 }

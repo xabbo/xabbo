@@ -13,7 +13,7 @@ using System.Windows.Input;
 using GalaSoft.MvvmLight.Command;
 
 using Xabbo.Messages;
-using Xabbo.Interceptor;
+using Xabbo.Extension;
 using Xabbo.Core.Game;
 
 using b7.Xabbo.Services;
@@ -88,12 +88,12 @@ public class BanListViewManager : ComponentViewModel
     public ICommand UnbanCommand { get; }
 
     public BanListViewManager(
-        IInterceptor interceptor,
+        IExtension extension,
         IConfiguration config,
         ISnackbarMessageQueue snackbarMq,
         IUiContext context,
         RoomManager roomManager)
-        : base(interceptor)
+        : base(extension)
     {
         _context = context;
         _snackbarMq = snackbarMq;
@@ -101,7 +101,7 @@ public class BanListViewManager : ComponentViewModel
 
         _banInterval = config.GetValue("BanList:Interval", 600);
 
-        Interceptor.Disconnected += OnGameDisconnected;
+        Extension.Disconnected += OnGameDisconnected;
         _roomManager.Entered += RoomManager_Entered;
         _roomManager.Left += RoomManager_Left;
 
@@ -233,8 +233,8 @@ public class BanListViewManager : ComponentViewModel
 
             Clear();
 
-            await Interceptor.SendAsync(Out.GetBannedUsers, _roomManager.CurrentRoomId);
-            var packet = await Interceptor.ReceiveAsync(In.UsersBannedFromRoom, 4000);
+            await Extension.SendAsync(Out.GetBannedUsers, _roomManager.CurrentRoomId);
+            var packet = await Extension.ReceiveAsync(In.UsersBannedFromRoom, 4000);
 
             long roomId = packet.ReadLegacyLong();
             if (roomId != _roomManager.CurrentRoomId)
@@ -284,7 +284,7 @@ public class BanListViewManager : ComponentViewModel
             for (int i = 0; i < array.Length; i++)
             {
                 var user = array[i];
-                await Interceptor.SendAsync(Out.RoomUnbanUser, user.Id, roomId);
+                await Extension.SendAsync(Out.RoomUnbanUser, user.Id, roomId);
                 await Task.Delay(_banInterval, _cts.Token);
             }
         }

@@ -1,12 +1,11 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
-using Xabbo.Common;
 using Xabbo.Messages;
 using Xabbo.Interceptor;
 using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.GameData;
+using Xabbo.Extension;
 
 namespace b7.Xabbo.Components;
 
@@ -54,10 +53,10 @@ public class FurniActionsComponent : Component
         set => Set(ref _useToShowInfo, value);
     }
 
-    public FurniActionsComponent(IInterceptor interceptor,
+    public FurniActionsComponent(IExtension extension,
         IGameDataManager gameDataManager, RoomManager roomManager,
         XabbotComponent xabbot)
-        : base(interceptor)
+        : base(extension)
     {
         _gameDataManager = gameDataManager;
         _roomManager = roomManager;
@@ -107,15 +106,15 @@ public class FurniActionsComponent : Component
             {
                 if (Client == ClientType.Flash)
                 {
-                    Interceptor.Send(In.StuffDataUpdate, linkedItem.Id.ToString(), 0, "2");
+                    Extension.Send(In.StuffDataUpdate, linkedItem.Id.ToString(), 0, "2");
                     await Task.Delay(500);
-                    Interceptor.Send(In.StuffDataUpdate, linkedItem.Id.ToString(), 0, "0");
+                    Extension.Send(In.StuffDataUpdate, linkedItem.Id.ToString(), 0, "0");
                 }
                 else
                 {
-                    Interceptor.Send(In.StuffDataUpdate, linkedItem.Id, 0, "2");
+                    Extension.Send(In.StuffDataUpdate, linkedItem.Id, 0, "2");
                     await Task.Delay(500);
-                    Interceptor.Send(In.StuffDataUpdate, linkedItem.Id, 0, "0");
+                    Extension.Send(In.StuffDataUpdate, linkedItem.Id, 0, "0");
                 }
             }
         }

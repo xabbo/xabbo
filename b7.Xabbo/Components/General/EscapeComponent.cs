@@ -8,7 +8,7 @@ using Microsoft.Extensions.Options;
 using Xabbo.Core;
 using Xabbo.Core.Events;
 using Xabbo.Core.Game;
-using Xabbo.Interceptor;
+using Xabbo.Extension;
 using Xabbo.Messages;
 
 using b7.Xabbo.Configuration;
@@ -49,11 +49,11 @@ public class EscapeComponent : Component
         set => Set(ref _escapeAmbassadors, value);
     }
 
-    public EscapeComponent(IInterceptor interceptor,
+    public EscapeComponent(IExtension extension,
         IConfiguration config,
         IOptions<GameOptions> gameOptions,
         RoomManager roomManager)
-        : base(interceptor)
+        : base(extension)
     {
         _gameOptions = gameOptions.Value;
         _roomManager = roomManager;
@@ -93,8 +93,8 @@ public class EscapeComponent : Component
         if (escape)
         {
             await Task.Delay(500);
-            Interceptor.Send(Out.FlatOpc, (LegacyLong)0, "", -1L);
-            Interceptor.Send(In.SystemBroadcast, escapeMessage);
+            Extension.Send(Out.FlatOpc, (LegacyLong)0, "", -1L);
+            Extension.Send(In.SystemBroadcast, escapeMessage);
             return;
         }
     }

@@ -8,11 +8,12 @@ using System.Windows.Threading;
 
 using Microsoft.Extensions.Hosting;
 
-using Xabbo.Interceptor;
+using Wpf.Ui.Mvvm.Contracts;
+
+using Xabbo.Extension;
 using Xabbo.GEarth;
 
 using b7.Xabbo.Util;
-using Wpf.Ui.Mvvm.Contracts;
 
 namespace b7.Xabbo.Services;
 
@@ -109,7 +110,9 @@ public class GEarthWpfExtensionLifetime : IHostLifetime
     private void OnWindowActivated(object? sender, EventArgs e)
     {
         Window.Activated -= OnWindowActivated;
+#pragma warning disable CA1416 // Validate platform compatibility
         _navigation.Navigate(typeof(View.Pages.GeneralPage));
+#pragma warning restore CA1416 // Validate platform compatibility
     }
 
     private async Task RunExtensionAsync()

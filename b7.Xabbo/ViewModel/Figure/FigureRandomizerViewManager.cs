@@ -17,6 +17,7 @@ using Xabbo.Interceptor;
 using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.GameData;
+using Xabbo.Extension;
 
 namespace b7.Xabbo.ViewModel;
 
@@ -98,10 +99,10 @@ public class FigureRandomizerViewManager : ComponentViewModel
 
     public FigureRandomizerViewManager(
         IHostApplicationLifetime lifetime,
-        IInterceptor interceptor,
+        IExtension extension,
         IGameDataManager gameDataManager,
         ProfileManager profileManager)
-        : base(interceptor)
+        : base(extension)
     {
         _lifetime = lifetime;
         _gameData = gameDataManager;
@@ -130,8 +131,8 @@ public class FigureRandomizerViewManager : ComponentViewModel
         RandomizeLooksCommand = new RelayCommand(OnRandomizeLooks);
         StartStopTimerCommand = new RelayCommand(OnStartStopTimer);
 
-        Interceptor.Connected += OnGameConnected;
-        Interceptor.Disconnected += OnGameDisconnected;
+        Extension.Connected += OnGameConnected;
+        Extension.Disconnected += OnGameDisconnected;
     }
 
     private async void OnGameConnected(object? sender, GameConnectedEventArgs e)
@@ -367,6 +368,6 @@ public class FigureRandomizerViewManager : ComponentViewModel
         else
             figure = _figureRandomizer.Generate();
 
-        await Interceptor.SendAsync(Out.UpdateAvatar, figure.GetGenderString(), figure.GetFigureString());
+        await Extension.SendAsync(Out.UpdateAvatar, figure.GetGenderString(), figure.GetFigureString());
     }
 }

@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Xabbo.Core;
 using Xabbo.Core.Events;
 using Xabbo.Core.Game;
-using Xabbo.Interceptor;
+using Xabbo.Extension;
 
 namespace b7.Xabbo.ViewModel;
 
@@ -71,10 +71,10 @@ public class ChatLogViewManager : ComponentViewModel
 
     private readonly string? _antiBobba;
 
-    public ChatLogViewManager(IInterceptor interceptor,
+    public ChatLogViewManager(IExtension extension,
         IConfiguration config,
         RoomManager roomManager)
-        : base(interceptor)
+        : base(extension)
     {
         Directory.CreateDirectory(LogDirectory);
 

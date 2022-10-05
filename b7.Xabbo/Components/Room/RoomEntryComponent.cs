@@ -6,7 +6,7 @@ using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 
 using Xabbo.Messages;
-using Xabbo.Interceptor;
+using Xabbo.Extension;
 using Xabbo.Core;
 
 namespace b7.Xabbo.Components;
@@ -34,9 +34,9 @@ public class RoomEntryComponent : Component
         set => Set(ref _dontAskToRingDoorbell, value);
     }
 
-    public RoomEntryComponent(IInterceptor interceptor,
+    public RoomEntryComponent(IExtension extension,
         IConfiguration config)
-        : base(interceptor)
+        : base(extension)
     {
         RememberPasswords = config.GetValue("RoomEntry:RememberPasswords", true);
 

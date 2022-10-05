@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 
+using Xabbo.Messages;
+using Xabbo.Extension;
+using Xabbo.Interceptor;
+
 using Xabbo.Core;
 using Xabbo.Core.Game;
-using Xabbo.Interceptor;
-using Xabbo.Messages;
 
 namespace b7.Xabbo.Components;
 
@@ -29,12 +30,12 @@ public class AntiIdleComponent : Component
         set => Set(ref _isAntiIdleOutActive, value);
     }
 
-    public AntiIdleComponent(IInterceptor interceptor,
+    public AntiIdleComponent(IExtension extension,
         IConfiguration config,
         IHostApplicationLifetime lifetime,
         ProfileManager profileManager,
         RoomManager roomManager)
-        : base(interceptor)
+        : base(extension)
     {
         _config = config;
         _lifetime = lifetime;
@@ -70,7 +71,7 @@ public class AntiIdleComponent : Component
         }
     }
 
-    protected override void OnInitialized(object? sender, InterceptorInitializedEventArgs e)
+    protected override void OnInitialized(object? sender, ExtensionInitializedEventArgs e)
     {
         base.OnInitialized(sender, e);
 
@@ -100,22 +101,22 @@ public class AntiIdleComponent : Component
         {
             if (self.IsIdle && IsAntiIdleOutActive)
             {
-                Interceptor.Send(Out.Expression, 5);
+                Extension.Send(Out.Expression, 5);
             }
             else if (self.Dance != 0 && IsActive)
             {
-                Interceptor.Send(Out.Move, 0, 0);
+                Extension.Send(Out.Move, 0, 0);
             }
             else if (IsActive)
             {
-                Interceptor.Send(Out.Expression, 0);
+                Extension.Send(Out.Expression, 0);
             }
         }
         else
         {
             if (IsActive)
             {
-                Interceptor.Send(Out.Expression, 0);
+                Extension.Send(Out.Expression, 0);
             }
         }
     }

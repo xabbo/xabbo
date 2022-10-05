@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Xabbo.Messages;
 using Xabbo.Core;
 using Xabbo.Core.Game;
-using Xabbo.Interceptor;
+using Xabbo.Extension;
 using Microsoft.Extensions.Configuration;
 
 namespace b7.Xabbo.Components;
@@ -112,12 +112,12 @@ public class ClickToComponent : Component, IDataErrorInfo
     private bool _disableForFriends;
     private int _bounceUnbanDelay;
 
-    public ClickToComponent(IInterceptor interceptor,
+    public ClickToComponent(IExtension extension,
         IConfiguration config,
         ProfileManager profileManager,
         FriendManager friendManager,
         RoomManager roomManager)
-        : base(interceptor)
+        : base(extension)
     {
         _profileManager = profileManager;
         _friendManager = friendManager;
@@ -195,7 +195,7 @@ public class ClickToComponent : Component, IDataErrorInfo
                 muteMinutes = 30000;
 
             SendInfoMessage($"(click-muting user for {MuteValue} {(MuteInMinutes ? "minute(s)" : "hour(s)")})", user.Index);
-            Interceptor.Send(Out.RoomMuteUser, (LegacyLong)user.Id, (LegacyLong)_roomManager.CurrentRoomId, muteMinutes);
+            Extension.Send(Out.RoomMuteUser, (LegacyLong)user.Id, (LegacyLong)_roomManager.CurrentRoomId, muteMinutes);
         }
         else if (Kick)
         {
@@ -203,7 +203,7 @@ public class ClickToComponent : Component, IDataErrorInfo
                 return;
 
             SendInfoMessage("(click-kicking user)", user.Index);
-            Interceptor.Send(Out.KickUser, (LegacyLong)user.Id);
+            Extension.Send(Out.KickUser, (LegacyLong)user.Id);
         }
         else if (Ban)
         {
@@ -231,7 +231,7 @@ public class ClickToComponent : Component, IDataErrorInfo
                 return;
 
             SendInfoMessage($"(click-banning user {banText})", user.Index);
-            Interceptor.Send(Out.RoomBanWithDuration, (LegacyLong)user.Id, (LegacyLong)_roomManager.CurrentRoomId, banType);
+            Extension.Send(Out.RoomBanWithDuration, (LegacyLong)user.Id, (LegacyLong)_roomManager.CurrentRoomId, banType);
         }
         else if (Bounce)
         {
@@ -239,14 +239,14 @@ public class ClickToComponent : Component, IDataErrorInfo
                 return;
 
             SendInfoMessage($"(click-bouncing user)", user.Index);
-            Interceptor.Send(Out.RoomBanWithDuration, (LegacyLong)user.Id, (LegacyLong)_roomManager.CurrentRoomId, BAN_HOUR);
+            Extension.Send(Out.RoomBanWithDuration, (LegacyLong)user.Id, (LegacyLong)_roomManager.CurrentRoomId, BAN_HOUR);
             await Task.Delay(_bounceUnbanDelay);
-            Interceptor.Send(Out.RoomUnbanUser, (LegacyLong)user.Id, (LegacyLong)_roomManager.CurrentRoomId);
+            Extension.Send(Out.RoomUnbanUser, (LegacyLong)user.Id, (LegacyLong)_roomManager.CurrentRoomId);
         }
     }
 
     private void SendInfoMessage(string message, int entityIndex = -1)
     {
-        Interceptor.Send(In.Whisper, entityIndex, message, 0, 0, 0, 0);
+        Extension.Send(In.Whisper, entityIndex, message, 0, 0, 0, 0);
     }
 }

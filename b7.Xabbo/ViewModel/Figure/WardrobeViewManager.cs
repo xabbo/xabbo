@@ -15,7 +15,7 @@ using Microsoft.Extensions.Hosting;
 
 using GalaSoft.MvvmLight.Command;
 
-using Xabbo.Interceptor;
+using Xabbo.Extension;
 using Xabbo.Core;
 using Xabbo.Core.Game;
 
@@ -51,11 +51,11 @@ public class WardrobeViewManager : ComponentViewModel
     }
 
     public WardrobeViewManager(IHostApplicationLifetime _lifetime,
-        IInterceptor interceptor,
+        IExtension extension,
         IUiContext context,
         IWardrobeRepository repository,
         ProfileManager profileManager)
-        : base(interceptor)
+        : base(extension)
     {
         _uiContext = context;
         _repository = repository;
@@ -221,7 +221,7 @@ public class WardrobeViewManager : ComponentViewModel
     {
         if (!IsAvailable) return;
 
-        await Interceptor.SendAsync(Out.UpdateAvatar,
+        await Extension.SendAsync(Out.UpdateAvatar,
             figureViewModel.Figure.GetGenderString(),
             figureViewModel.Figure.GetFigureString()
         );
@@ -249,8 +249,8 @@ public class WardrobeViewManager : ComponentViewModel
     {
         try
         {
-            await Interceptor.SendAsync(Out.GetWardrobe);
-            var packet = await Interceptor.ReceiveAsync(In.UserWardrobe, 5000);
+            await Extension.SendAsync(Out.GetWardrobe);
+            var packet = await Extension.ReceiveAsync(In.UserWardrobe, 5000);
             int state = packet.ReadInt();
             short n = packet.ReadLegacyShort();
             for (int i = 0; i < n; i++)

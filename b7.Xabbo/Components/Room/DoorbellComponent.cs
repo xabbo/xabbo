@@ -1,10 +1,7 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
 
-using Microsoft.Extensions.Configuration;
-
-using Xabbo.Common;
-using Xabbo.Interceptor;
 using Xabbo.Messages;
+using Xabbo.Extension;
 
 using Xabbo.Core.Game;
 
@@ -22,10 +19,10 @@ public class DoorbellComponent : Component
     }
 
     public DoorbellComponent(
-        IInterceptor interceptor,
+        IExtension extension,
         IConfiguration config,
         FriendManager friendManager)
-        : base(interceptor)
+        : base(extension)
     {
         _friendManager = friendManager;
 
@@ -42,7 +39,7 @@ public class DoorbellComponent : Component
         if (AcceptFriends && _friendManager.IsFriend(name))
         {
             e.Block();
-            Interceptor.Send(Out["LetUserIn"], name, true);
+            Extension.Send(Out["LetUserIn"], name, true);
         }
     }
 }

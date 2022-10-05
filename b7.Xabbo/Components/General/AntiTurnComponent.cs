@@ -2,7 +2,7 @@
 
 using Microsoft.Extensions.Configuration;
 
-using Xabbo.Interceptor;
+using Xabbo.Extension;
 using Xabbo.Messages;
 
 namespace b7.Xabbo.Components;
@@ -22,9 +22,9 @@ public class AntiTurnComponent : Component
         set => Set(ref _turnOnReselect, value);
     }
 
-    public AntiTurnComponent(IInterceptor interceptor,
+    public AntiTurnComponent(IExtension extension,
         IConfiguration config)
-        : base(interceptor)
+        : base(extension)
     {
         _reselectThreshold = config.GetValue("AntiTurn:ReselectThreshold", 1.0);
 
@@ -48,7 +48,7 @@ public class AntiTurnComponent : Component
         if (IsActive && TurnOnReselect && (DateTime.Now - _lastSelection).TotalSeconds < _reselectThreshold)
         {
             if (userId == _lastSelectedUser)
-                Interceptor.Send(Out.LookTo, _lastLookAtX, _lastLookAtY);
+                Extension.Send(Out.LookTo, _lastLookAtX, _lastLookAtY);
         }
 
         _lastSelection = DateTime.Now;

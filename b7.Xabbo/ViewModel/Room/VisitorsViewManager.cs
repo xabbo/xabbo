@@ -15,6 +15,7 @@ using Xabbo.Core.Game;
 using Xabbo.Core.Events;
 
 using b7.Xabbo.Services;
+using Xabbo.Extension;
 
 namespace b7.Xabbo.ViewModel;
 
@@ -62,10 +63,10 @@ public class VisitorsViewManager : ComponentViewModel
     long lastRoomId;
 #endif
 
-    public VisitorsViewManager(IInterceptor interceptor, IHostApplicationLifetime lifetime,
+    public VisitorsViewManager(IExtension extension, IHostApplicationLifetime lifetime,
         IUiContext context,
         ProfileManager profileManager, RoomManager roomManager)
-        : base(interceptor)
+        : base(extension)
     {
         _context = context;
         _profileManager = profileManager;
@@ -99,7 +100,7 @@ public class VisitorsViewManager : ComponentViewModel
         }
         catch { return; }
 
-        Interceptor.Disconnected += OnGameDisconnected;
+        Extension.Disconnected += OnGameDisconnected;
 
         _roomManager.Left += OnLeftRoom;
         _roomManager.EntitiesAdded += OnEntitiesAdded;

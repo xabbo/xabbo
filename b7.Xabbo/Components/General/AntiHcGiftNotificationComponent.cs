@@ -1,16 +1,16 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System;
 
-using Xabbo.Interceptor;
+using Xabbo.Extension;
 using Xabbo.Messages;
 
 namespace b7.Xabbo.Components;
 
 public class AntiHcGiftNotificationComponent : Component
 {
-    public AntiHcGiftNotificationComponent(IInterceptor interceptor,
+    public AntiHcGiftNotificationComponent(IExtension extension,
         IConfiguration config)
-        : base(interceptor)
+        : base(extension)
     {
         IsActive = config.GetValue("AntiHcGiftNotification:Active", true);
     }

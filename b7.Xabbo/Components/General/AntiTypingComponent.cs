@@ -2,16 +2,16 @@
 
 using Microsoft.Extensions.Configuration;
 
-using Xabbo.Interceptor;
+using Xabbo.Extension;
 using Xabbo.Messages;
 
 namespace b7.Xabbo.Components;
 
 public class AntiTypingComponent : Component
 {
-    public AntiTypingComponent(IInterceptor interceptor,
+    public AntiTypingComponent(IExtension extension,
         IConfiguration config)
-        : base(interceptor)
+        : base(extension)
     {
         IsActive = config.GetValue("AntiTyping:Active", true);
     }

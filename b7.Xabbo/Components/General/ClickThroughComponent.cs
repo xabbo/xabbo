@@ -4,8 +4,8 @@ using System.Runtime.CompilerServices;
 
 using Microsoft.Extensions.Configuration;
 
+using Xabbo.Extension;
 using Xabbo.Messages;
-using Xabbo.Interceptor;
 
 using b7.Xabbo.Commands;
 
@@ -15,10 +15,10 @@ public class ClickThroughComponent : Component
 {
     protected readonly CommandManager _commandManager;
 
-    public ClickThroughComponent(IInterceptor interceptor,
+    public ClickThroughComponent(IExtension extension,
         IConfiguration config,
         CommandManager commandManager)
-        : base(interceptor)
+        : base(extension)
     {
         _commandManager = commandManager;
         _commandManager.Register(OnToggle, "ct", null);
@@ -26,7 +26,7 @@ public class ClickThroughComponent : Component
         IsActive = config.GetValue("ClickThrough:Active", false);
     }
 
-    protected override void OnInitialized(object? sender, InterceptorInitializedEventArgs e)
+    protected override void OnInitialized(object? sender, ExtensionInitializedEventArgs e)
     {
         base.OnInitialized(sender, e);
     }
@@ -46,7 +46,7 @@ public class ClickThroughComponent : Component
 
         if (propertyName.Equals(nameof(IsActive)))
         {
-            Interceptor.Send(In.GameYouArePlayer, IsActive);
+            Extension.Send(In.GameYouArePlayer, IsActive);
         }
     }
 
@@ -56,7 +56,7 @@ public class ClickThroughComponent : Component
     {
         if (IsActive)
         {
-            Interceptor.Send(In.GameYouArePlayer, true);
+            Extension.Send(In.GameYouArePlayer, true);
         }
     }
 }

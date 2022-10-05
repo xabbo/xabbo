@@ -1,15 +1,14 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
+using Xabbo.Extension;
 using Xabbo.Interceptor;
 using Xabbo.Messages;
 
 using b7.Xabbo.Configuration;
-using Microsoft.Extensions.Options;
 
 namespace b7.Xabbo.Components;
 
@@ -41,9 +40,9 @@ public class AntiBobbaComponent : Component
         set => Set(ref _isAvailable, value);
     }
 
-    public AntiBobbaComponent(IInterceptor interceptor,
+    public AntiBobbaComponent(IExtension extension,
         IOptions<AntiBobbaOptions> options)
-        : base(interceptor)
+        : base(extension)
     {
         _options = options.Value;
 
@@ -57,7 +56,7 @@ public class AntiBobbaComponent : Component
         _regexAuto = new Regex(autoPattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
     }
 
-    protected override void OnInitialized(object? sender, InterceptorInitializedEventArgs e)
+    protected override void OnInitialized(object? sender, ExtensionInitializedEventArgs e)
     {
         base.OnInitialized(sender, e);
     }

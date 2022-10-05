@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Xabbo.Interceptor;
+using Xabbo.Extension;
 
 namespace b7.Xabbo.ViewModel;
 
@@ -12,8 +12,8 @@ public class InventoryViewManager : ComponentViewModel
 
     
 
-    public InventoryViewManager(IInterceptor interceptor)
-        : base(interceptor)
+    public InventoryViewManager(IExtension extension)
+        : base(extension)
     {
 
     }

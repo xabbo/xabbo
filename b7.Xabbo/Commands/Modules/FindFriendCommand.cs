@@ -53,7 +53,7 @@ public class FindFriendCommand : CommandModule
         if (packet.Header == In.RoomForward)
         {
             int roomId = packet.ReadInt();
-            var roomData = await new GetRoomDataTask(Interceptor, roomId)
+            var roomData = await new GetRoomDataTask(Extension, roomId)
                 .ExecuteAsync(5000, CancellationToken.None);
             ShowMessage($"{friend.Name} is in room '{roomData.Name}' by {roomData.OwnerName} (id:{roomData.Id}){(roomData.IsInvisible ? "*" : "")}");
         }

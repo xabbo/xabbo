@@ -6,17 +6,18 @@ using System.Reflection;
 using System.Threading.Tasks;
 
 using Xabbo.Messages;
+using Xabbo.Messages.Dispatcher;
 using Xabbo.Interceptor;
-using Xabbo.Interceptor.Dispatcher;
 
 using Xabbo.Core;
 using Xabbo.Core.Game;
 
 using b7.Xabbo.Components;
+using Xabbo.Extension;
 
 namespace b7.Xabbo.Commands;
 
-public class CommandManager : IInterceptHandler
+public class CommandManager : IMessageHandler
 {
     public const string PREFIX = "/";
 
@@ -32,13 +33,13 @@ public class CommandManager : IInterceptHandler
 
     public bool IsAvailable { get; private set; }
 
-    public IInterceptor Interceptor { get; }
-    private IInterceptDispatcher Dispatcher => Interceptor.Dispatcher;
-    private IMessageManager Messages => Interceptor.Messages;
+    public IExtension Extension { get; }
+    private IMessageDispatcher Dispatcher => Extension.Dispatcher;
+    private IMessageManager Messages => Extension.Messages;
     private Incoming In => Messages.In;
     private Outgoing Out => Messages.Out;
 
-    public CommandManager(IInterceptor interceptor,
+    public CommandManager(IExtension extension,
         IEnumerable<CommandModule> modules,
         ProfileManager profileManager,
         RoomManager roomManager,
@@ -46,26 +47,26 @@ public class CommandManager : IInterceptHandler
     {
         _bindings = new Dictionary<string, CommandBinding>(StringComparer.OrdinalIgnoreCase);
 
-        Interceptor = interceptor;
+        Extension = extension;
         _modules = modules.ToArray();
         _profileManager = profileManager;
         _roomManager = roomManager;
         _xabbot = xabbot;
 
-        Interceptor.Connected += OnConnected;
+        Extension.Connected += OnConnected;
     }
 
     private void OnConnected(object? sender, GameConnectedEventArgs e)
     {
         Initialize();
 
-        Interceptor.Dispatcher.Bind(this, Interceptor.Client);
+        Extension.Dispatcher.Bind(this, Extension.Client);
 
         foreach (CommandModule module in _modules)
         {
             try
             {
-                Dispatcher.Bind(module, Interceptor.Client);
+                Dispatcher.Bind(module, Extension.Client);
                 module.IsAvailable = true;
             }
             catch

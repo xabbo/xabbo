@@ -5,7 +5,7 @@ using System.Diagnostics;
 
 using Microsoft.Extensions.Configuration;
 
-using Xabbo.Interceptor;
+using Xabbo.Extension;
 using Xabbo.Core.Game;
 using Xabbo.Core.Events;
 using Xabbo.Core;
@@ -65,12 +65,12 @@ public class FlashWindowComponent : Component
         set => Set(ref _flashOnFriendEntered, value);
     }
 
-    public FlashWindowComponent(IInterceptor interceptor,
+    public FlashWindowComponent(IExtension extension,
         IConfiguration config,
         ProfileManager profileManager,
         FriendManager friendManager,
         RoomManager roomManager)
-        : base(interceptor)
+        : base(extension)
     {
         FlashOnPrivateMessage = config.GetValue("FlashWindow:OnPrivateMessage", true);
         FlashOnWhisper = config.GetValue("FlashWindow:OnWhisper", true);

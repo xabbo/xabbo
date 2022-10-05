@@ -35,7 +35,7 @@ public class RoomCommands : CommandModule
 
         try
         {
-            var results = await new SearchNavigatorTask(Interceptor, "query", searchText).ExecuteAsync(10000, CancellationToken.None);
+            var results = await new SearchNavigatorTask(Extension, "query", searchText).ExecuteAsync(10000, CancellationToken.None);
             var room = results.GetRooms().FirstOrDefault();
             if (room == null)
             {

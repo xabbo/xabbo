@@ -6,16 +6,16 @@ using System.Windows.Data;
 using GalaSoft.MvvmLight;
 
 using Xabbo.Interceptor;
+using Xabbo.Extension;
 using Xabbo.Core.GameData;
 
 using b7.Xabbo.Services;
-
 
 namespace b7.Xabbo.ViewModel;
 
 public class FurniDataViewManager : ObservableObject
 {
-    private readonly IInterceptor _interceptor;
+    private readonly IExtension _extension;
     private readonly IUiContext _uiContext;
     private readonly IGameDataManager _gameDataManager;
 
@@ -50,19 +50,19 @@ public class FurniDataViewManager : ObservableObject
     }
 
     public FurniDataViewManager(
-        IInterceptor interceptor,
+        IExtension extension,
         IUiContext uiContext,
         IGameDataManager gameDataManager)
     {
-        _interceptor = interceptor;
+        _extension = extension;
         _uiContext = uiContext;
         _gameDataManager = gameDataManager;
 
         Furni = CollectionViewSource.GetDefaultView(_furni);
         Furni.Filter = Filter;
 
-        _interceptor.Connected += OnGameConnected;
-        _interceptor.Disconnected += OnGameDisconnected;
+        _extension.Connected += OnGameConnected;
+        _extension.Disconnected += OnGameDisconnected;
     }
 
     private async void OnGameConnected(object? sender, GameConnectedEventArgs e)
@@ -71,7 +71,7 @@ public class FurniDataViewManager : ObservableObject
         {
             IsLoading = true;
 
-            await _gameDataManager.WaitForLoadAsync(_interceptor.DisconnectToken);
+            await _gameDataManager.WaitForLoadAsync(_extension.DisconnectToken);
 
             FurniData? furniData = _gameDataManager.Furni;
             if (furniData is null) return;

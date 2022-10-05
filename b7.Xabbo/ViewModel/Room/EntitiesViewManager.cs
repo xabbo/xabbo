@@ -21,7 +21,7 @@ using MaterialDesignThemes.Wpf;
 using GalaSoft.MvvmLight.Command;
 
 using Xabbo.Messages;
-using Xabbo.Interceptor;
+using Xabbo.Extension;
 using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.Events;
@@ -102,7 +102,7 @@ public class EntitiesViewManager : ComponentViewModel
     public ICommand BanCommand { get; }
     public ICommand BounceCommand { get; }
 
-    public EntitiesViewManager(IInterceptor interceptor,
+    public EntitiesViewManager(IExtension extension,
         ILogger<EntitiesViewManager> logger,
         IUiContext uiContext,
         ISnackbarMessageQueue snackbar,
@@ -110,7 +110,7 @@ public class EntitiesViewManager : ComponentViewModel
         IOptions<GameOptions> gameOptions,
         RoomManager roomManager,
         RoomModeratorComponent moderation)
-        : base(interceptor)
+        : base(extension)
     {
         _logger = logger;
         _uiContext = uiContext;
@@ -137,7 +137,7 @@ public class EntitiesViewManager : ComponentViewModel
         BanCommand = new RelayCommand<string>(OnBan);
         BounceCommand = new RelayCommand(OnBounce);
 
-        Interceptor.Disconnected += OnGameDisconnected;
+        Extension.Disconnected += OnGameDisconnected;
 
         _roomManager.RoomDataUpdated += OnRoomDataUpdated;
         _roomManager.Left += OnLeftRoom;
@@ -397,7 +397,7 @@ public class EntitiesViewManager : ComponentViewModel
     {
         if (SelectedEntity == null) return;
 
-        Interceptor.Send(In.Whisper,
+        Extension.Send(In.Whisper,
             (LegacyLong)SelectedEntity.Index,
             "(click here to find)", 0, 0, 0, 0
         );
@@ -441,9 +441,9 @@ public class EntitiesViewManager : ComponentViewModel
                 case "game":
                     try
                     {
-                        Interceptor.Send(Out.GetExtendedProfile, (LegacyLong)user.Id, true);
+                        Extension.Send(Out.GetExtendedProfile, (LegacyLong)user.Id, true);
                         UserProfile profile = UserProfile.Parse(
-                            await Interceptor.ReceiveAsync(In.ExtendedProfile, 5000)
+                            await Extension.ReceiveAsync(In.ExtendedProfile, 5000)
                         );
 
                         if (!profile.DisplayInClient)
@@ -477,7 +477,7 @@ public class EntitiesViewManager : ComponentViewModel
         if (!int.TryParse(arg, out int minutes))
             return;
        
-        await Interceptor.SendAsync(Out.RoomMuteUser,
+        await Extension.SendAsync(Out.RoomMuteUser,
             (LegacyLong)SelectedEntity.Id,
             (LegacyLong)_roomManager.CurrentRoomId,
             minutes
@@ -489,7 +489,7 @@ public class EntitiesViewManager : ComponentViewModel
         if (SelectedEntity == null ||
             SelectedEntity.Entity.Type != EntityType.User) return;
 
-        await Interceptor.SendAsync(Out.KickUser, (LegacyLong)SelectedEntity.Id);
+        await Extension.SendAsync(Out.KickUser, (LegacyLong)SelectedEntity.Id);
     }
 
     private async void OnBan(string arg)
@@ -507,7 +507,7 @@ public class EntitiesViewManager : ComponentViewModel
             default: return;
         }
 
-        await Interceptor.SendAsync(Out.RoomBanWithDuration,
+        await Extension.SendAsync(Out.RoomBanWithDuration,
             (LegacyLong)SelectedEntity.Id,
             (LegacyLong)_roomManager.CurrentRoomId,
             banDuration.GetValue()
@@ -522,9 +522,9 @@ public class EntitiesViewManager : ComponentViewModel
         long userId = SelectedEntity.Id;
         long roomId = _roomManager.CurrentRoomId;
 
-        await Interceptor.SendAsync(Out.RoomBanWithDuration, (LegacyLong)userId, (LegacyLong)roomId, BanDuration.Hour.GetValue());
+        await Extension.SendAsync(Out.RoomBanWithDuration, (LegacyLong)userId, (LegacyLong)roomId, BanDuration.Hour.GetValue());
         await Task.Delay(200);
-        await Interceptor.SendAsync(Out.RoomUnbanUser, (LegacyLong)userId, (LegacyLong)roomId);
+        await Extension.SendAsync(Out.RoomUnbanUser, (LegacyLong)userId, (LegacyLong)roomId);
     }
 #endregion
 }

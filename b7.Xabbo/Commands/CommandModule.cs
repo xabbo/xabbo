@@ -1,33 +1,29 @@
-﻿using System;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Xabbo.Core;
-using Xabbo.Core.Tasks;
-using Xabbo.Interceptor;
-using Xabbo.Interceptor.Dispatcher;
-using Xabbo.Interceptor.Tasks;
+using Xabbo.Extension;
 using Xabbo.Messages;
+using Xabbo.Messages.Dispatcher;
 
 namespace b7.Xabbo.Commands;
 
-public abstract class CommandModule : IInterceptHandler
+public abstract class CommandModule : IMessageHandler
 {
     public bool IsAvailable { get; set; }
     public CommandManager Commands { get; private set; } = null!;
 
-    protected IInterceptor Interceptor => Commands.Interceptor;
-    protected IInterceptDispatcher Dispatcher => Interceptor.Dispatcher;
-    protected IMessageManager Messages => Interceptor.Messages;
+    protected IExtension Extension => Commands.Extension;
+    protected IMessageDispatcher Dispatcher => Extension.Dispatcher;
+    protected IMessageManager Messages => Extension.Messages;
     protected Incoming In => Messages.In;
     protected Outgoing Out => Messages.Out;
 
-    protected void Send(Header header, params object[] values) => Interceptor.Send(header, values);
-    protected void Send(IReadOnlyPacket packet) => Interceptor.Send(packet);
+    protected void Send(Header header, params object[] values) => Extension.Send(header, values);
+    protected void Send(IReadOnlyPacket packet) => Extension.Send(packet);
 
-    protected ValueTask SendAsync(Header header, params object[] values) => Interceptor.SendAsync(header, values);
-    protected ValueTask SendAsync(IReadOnlyPacket packet) => Interceptor.SendAsync(packet);
+    protected ValueTask SendAsync(Header header, params object[] values) => Extension.SendAsync(header, values);
+    protected ValueTask SendAsync(IReadOnlyPacket packet) => Extension.SendAsync(packet);
 
     public CommandModule() { }
 
@@ -45,12 +41,12 @@ public abstract class CommandModule : IInterceptHandler
     protected Task<IPacket> ReceiveAsync(Header header, int timeout = -1, bool block = false,
         CancellationToken cancellationToken = default)
     {
-        return Interceptor.ReceiveAsync(header, timeout, block, cancellationToken);
+        return Extension.ReceiveAsync(header, timeout, block, cancellationToken);
     }
 
     protected Task<IPacket> ReceiveAsync(ITuple tuple, int timeout = -1, bool block = false,
         CancellationToken cancellationToken = default)
     {
-        return Interceptor.ReceiveAsync(tuple, timeout, block, cancellationToken);
+        return Extension.ReceiveAsync(HeaderSet.FromTuple(tuple), timeout, block, cancellationToken);
     }
 }

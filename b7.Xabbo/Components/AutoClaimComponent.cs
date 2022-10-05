@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.Extensions.Configuration;
 
-using Microsoft.Extensions.Configuration;
-
-using Xabbo.Interceptor;
+using Xabbo.Extension;
 using Xabbo.Messages;
 
 namespace b7.Xabbo.Components;
@@ -16,10 +10,10 @@ public class AutoClaimComponent : Component
     private readonly XabbotComponent _xabbot;
 
     public AutoClaimComponent(
-        IInterceptor interceptor,
+        IExtension extension,
         IConfiguration config,
         XabbotComponent xabbot)
-        : base(interceptor)
+        : base(extension)
     {
         _xabbot = xabbot;
 
@@ -50,7 +44,7 @@ public class AutoClaimComponent : Component
 
         if (claimReward)
         {
-            Interceptor.Send(Out.ClaimEarning, (byte)1);
+            Extension.Send(Out.ClaimEarning, (byte)1);
             _xabbot.ShowMessage("Claimed daily reward.");
         }
     }

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 
 using Xabbo.Messages;
-using Xabbo.Interceptor;
+using Xabbo.Extension;
 
 using Xabbo.Core.Game;
 using Xabbo.Core.Events;
@@ -25,9 +25,9 @@ public class XabbotComponent : Component, IHostedService
 
     public XabbotComponent(
         ILogger<XabbotComponent> logger,
-        IInterceptor interceptor,
+        IExtension extension,
         ProfileManager profileManager, RoomManager roomManager)
-        : base(interceptor)
+        : base(extension)
     {
         _logger = logger;
         _profileManager = profileManager;
@@ -51,7 +51,7 @@ public class XabbotComponent : Component, IHostedService
         };
 
         _logger.LogTrace("Injecting xabbo entity bot into room.");
-        Interceptor.Send(In.UsersInRoom, (LegacyShort)1, bot);
+        Extension.Send(In.UsersInRoom, (LegacyShort)1, bot);
     }
 
     public void ShowMessage(string message)
@@ -72,13 +72,13 @@ public class XabbotComponent : Component, IHostedService
 
     public void ShowMessage(string message, Point location)
     {
-        Interceptor.Send(In.Status, 1, new EntityStatusUpdate
+        Extension.Send(In.Status, 1, new EntityStatusUpdate
         {
             Index = UserIndex,
             Location = new Tile(location.X, location.Y, -100),
             Direction = 4,
             HeadDirection = 4
         });
-        Interceptor.Send(In.Whisper, UserIndex, message, 0, 30, 0, 0);
+        Extension.Send(In.Whisper, UserIndex, message, 0, 30, 0, 0);
     }
 }

@@ -3,7 +3,7 @@
 using Microsoft.Extensions.Configuration;
 
 using Xabbo.Messages;
-using Xabbo.Interceptor;
+using Xabbo.Extension;
 
 using Xabbo.Core;
 using Xabbo.Core.Game;
@@ -31,10 +31,10 @@ public class RespectedComponent : Component
         set => Set(ref _showTotalRespects, value);
     }
 
-    public RespectedComponent(IInterceptor interceptor,
+    public RespectedComponent(IExtension extension,
         IConfiguration config,
         RoomManager roomManager)
-        : base(interceptor)
+        : base(extension)
     {
         ShowWhoRespected = config.GetValue("Respect:ShowWhoRespected", true);
         ShowTotalRespects = config.GetValue("Respect:ShowTotalRespects", true);
@@ -99,6 +99,6 @@ public class RespectedComponent : Component
         if (ShowTotalRespects)
             message += $" ({totalRespects})";
 
-        Interceptor.Send(In.Whisper, respectee.Index, message, 0, 1, 0, 0);
+        Extension.Send(In.Whisper, respectee.Index, message, 0, 1, 0, 0);
     }
 }

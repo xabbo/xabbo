@@ -16,6 +16,7 @@ using Microsoft.Extensions.Hosting;
 
 using GalaSoft.MvvmLight.Command;
 
+using Xabbo.Extension;
 using Xabbo.Interceptor;
 using Xabbo.Core;
 using Xabbo.Core.Game;
@@ -244,13 +245,13 @@ public class FurniViewManager : ComponentViewModel, INotifyDataErrorInfo
     }
 
     public FurniViewManager(
-        IInterceptor interceptor,
+        IExtension extension,
         IHostApplicationLifetime lifetime,
         IUiContext uiContext,
         IGameDataManager gameDataManager,
         ProfileManager profileManager,
         RoomManager roomManager)
-        : base(interceptor)
+        : base(extension)
     {
         _uiContext = uiContext;
         _gameDataManager = gameDataManager;
@@ -282,8 +283,8 @@ public class FurniViewManager : ComponentViewModel, INotifyDataErrorInfo
         _roomManager.WallItemAdded += OnWallItemAdded;
         _roomManager.WallItemRemoved += OnWallItemRemoved;
 
-        Interceptor.Connected += OnGameConnected;
-        Interceptor.Disconnected += OnGameDisconnected;
+        Extension.Connected += OnGameConnected;
+        Extension.Disconnected += OnGameDisconnected;
     }
 
     public void RefreshCommandsCanExecute()
@@ -505,7 +506,7 @@ public class FurniViewManager : ComponentViewModel, INotifyDataErrorInfo
 
         try
         {
-            await _gameDataManager.WaitForLoadAsync(Interceptor.DisconnectToken);
+            await _gameDataManager.WaitForLoadAsync(Extension.DisconnectToken);
             await _profileManager.GetUserDataAsync();
         }
         catch (Exception ex)

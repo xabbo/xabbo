@@ -8,6 +8,7 @@ using Xabbo.Interceptor;
 using Xabbo.Core;
 using Xabbo.Core.Events;
 using Xabbo.Core.Game;
+using Xabbo.Extension;
 
 namespace b7.Xabbo.ViewModel;
 
@@ -112,9 +113,9 @@ public class AlignerViewManager : ComponentViewModel
     public ICommand ToggleOrientationCommand { get; }
     public ICommand ResetCommand { get; }
 
-    public AlignerViewManager(IInterceptor interceptor,
+    public AlignerViewManager(IExtension extension,
         RoomManager roomManager)
-        : base(interceptor)
+        : base(extension)
     {
         _roomManager = roomManager;
 
@@ -186,7 +187,7 @@ public class AlignerViewManager : ComponentViewModel
 
         if (HasCapturedItem)
         {
-            await Interceptor.SendAsync(Out.MoveWallItem, (LegacyLong)CurrentId, GetLocation().ToString());
+            await Extension.SendAsync(Out.MoveWallItem, (LegacyLong)CurrentId, GetLocation().ToString());
         }
     }
 
@@ -220,7 +221,7 @@ public class AlignerViewManager : ComponentViewModel
     {
         if (_originalLocation is null) return;
 
-        await Interceptor.SendAsync(Out.MoveWallItem, (LegacyLong)CurrentId, _originalLocation.ToString());
+        await Extension.SendAsync(Out.MoveWallItem, (LegacyLong)CurrentId, _originalLocation.ToString());
     }
 
     private void RoomManager_Entered(object? sender, EventArgs e)

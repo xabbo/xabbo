@@ -3,15 +3,15 @@
 using Humanizer;
 
 using Xabbo.Core;
-using Xabbo.Interceptor;
+using Xabbo.Extension;
 using Xabbo.Messages;
 
 namespace b7.Xabbo.Components;
 
 public class DisconnectionReasonComponent : Component
 {
-    public DisconnectionReasonComponent(IInterceptor interceptor)
-        : base(interceptor)
+    public DisconnectionReasonComponent(IExtension extension)
+        : base(extension)
     { }
 
     [InterceptIn(nameof(Incoming.DisconnectionReason))]
@@ -24,6 +24,6 @@ public class DisconnectionReasonComponent : Component
         string reasonText = Enum.IsDefined(reason) ? reason.Humanize() : $"unknown ({(int)reason})";
         string message = $"[xabbo] You were disconnected by the server.\n\nReason: {reasonText}";
 
-        Interceptor.Send(In.SystemBroadcast, message);
+        Extension.Send(In.SystemBroadcast, message);
     }
 }

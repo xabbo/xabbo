@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 
 using Xabbo.Interceptor;
+using Xabbo.Extension;
 using Xabbo.Core;
 using Xabbo.Core.GameData;
 using Xabbo.Core.Extensions;
@@ -22,11 +23,11 @@ public class HotelResourceManager : IHostedService
     private CancellationTokenSource? _ctsLoad;
 
     public HotelResourceManager(
-        IInterceptor interceptor,
+        IExtension extension,
         IUriProvider<HabboEndpoints> uriProvider,
         IGameDataManager gameDataManager)
     {
-        interceptor.Connected += OnGameConnected;
+        extension.Connected += OnGameConnected;
 
         _uriProvider = uriProvider;
         _gameDataManager = gameDataManager;

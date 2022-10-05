@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-using Xabbo.Interceptor;
+using Microsoft.Extensions.Configuration;
+
 using Xabbo.Messages;
+using Xabbo.Extension;
 
 using Xabbo.Core;
 using Xabbo.Core.Events;
 using Xabbo.Core.Game;
-using Microsoft.Extensions.Configuration;
 
 namespace b7.Xabbo.Components;
 
@@ -46,12 +47,12 @@ public class AntiKickComponent : Component
     private readonly ProfileManager _profileManager;
     private readonly RoomManager _roomManager;
 
-    public AntiKickComponent(IInterceptor interceptor,
+    public AntiKickComponent(IExtension extension,
         IConfiguration config,
         XabbotComponent xabbot,
         ProfileManager profileManager,
         RoomManager roomManager)
-        : base(interceptor)
+        : base(extension)
     {
         _xabbot = xabbot;
         _profileManager = profileManager;
@@ -62,7 +63,7 @@ public class AntiKickComponent : Component
         IsActive = config.GetValue("AntiKick:Active", true);
     }
 
-    protected override void OnInitialized(object? sender, InterceptorInitializedEventArgs e)
+    protected override void OnInitialized(object? sender, ExtensionInitializedEventArgs e)
     {
         base.OnInitialized(sender, e);
     }
@@ -79,7 +80,7 @@ public class AntiKickComponent : Component
         _preventRoomRefresh = true;
         _lastKick = DateTime.Now;
 
-        Interceptor.Send(Out.FlatOpc, (LegacyLong)_roomManager.CurrentRoomId, string.Empty, -1);
+        Extension.Send(Out.FlatOpc, (LegacyLong)_roomManager.CurrentRoomId, string.Empty, -1);
         _xabbot.ShowMessage(msg);
 
         if (_profileManager.UserData is not null)
@@ -88,7 +89,7 @@ public class AntiKickComponent : Component
                 _roomManager.Room.TryGetUserById(_profileManager.UserData.Id, out IRoomUser? self))
             {
                 await Task.Delay(500);
-                Interceptor.Send(Out.Move, self.X, self.Y);
+                Extension.Send(Out.Move, self.X, self.Y);
             }
         }
     }

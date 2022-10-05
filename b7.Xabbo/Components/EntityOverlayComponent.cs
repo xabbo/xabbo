@@ -7,7 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Configuration;
 
 using Xabbo.Messages;
-using Xabbo.Interceptor;
+using Xabbo.Extension;
 using Xabbo.Core;
 using Xabbo.Core.Events;
 using Xabbo.Core.Game;
@@ -30,11 +30,11 @@ public class EntityOverlayComponent : Component
         set => Set(ref _isAvailable, value);
     }
 
-    public EntityOverlayComponent(IInterceptor interceptor,
+    public EntityOverlayComponent(IExtension extension,
         IConfiguration config,
         ProfileManager profileManager,
         RoomManager roomManager)
-        : base(interceptor)
+        : base(extension)
     {
         _profileManager = profileManager;
         _roomManager = roomManager;
@@ -69,7 +69,7 @@ public class EntityOverlayComponent : Component
             e.Entity.Id == _profileManager.UserData?.Id &&
             e.Entity is IRoomUser self)
         {
-            Interceptor.Send(In.UpdateAvatar,
+            Extension.Send(In.UpdateAvatar,
                 GHOST_INDEX,
                 self.Figure,
                 self.Gender.ToShortString(),
@@ -101,13 +101,13 @@ public class EntityOverlayComponent : Component
 
         if (!_isInjected)
         {
-            Interceptor.Send(In.UsersInRoom, 1, ghostUser);
-            Interceptor.Send(In.RoomAvatarEffect, ghostUser.Index, 13, 0);
+            Extension.Send(In.UsersInRoom, 1, ghostUser);
+            Extension.Send(In.RoomAvatarEffect, ghostUser.Index, 13, 0);
         }
 
         if (self.CurrentUpdate is not null)
         {
-            Interceptor.Send(In.Status, 1, new EntityStatusUpdate(self.CurrentUpdate)
+            Extension.Send(In.Status, 1, new EntityStatusUpdate(self.CurrentUpdate)
             {
                 Index = ghostUser.Index,
                 Location = self.CurrentUpdate.Location + (64, 64, 64)
@@ -121,7 +121,7 @@ public class EntityOverlayComponent : Component
     {
         if (!_isInjected) return;
 
-        Interceptor.Send(In.Status, 1, new EntityStatusUpdate()
+        Extension.Send(In.Status, 1, new EntityStatusUpdate()
         {
             Index = GHOST_INDEX,
             Location = (0, 0, -1000)
