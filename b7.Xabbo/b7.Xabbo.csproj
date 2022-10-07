@@ -11,11 +11,13 @@
 		<StartupObject>b7.Xabbo.App</StartupObject>
 	</PropertyGroup>
 
+  <!-- Replace source paths -->
 	<PropertyGroup>
 		<AppOutputBase>$(MSBuildProjectDirectory)\</AppOutputBase>
 		<PathMap>$(AppOutputBase)=b7.Xabbo\</PathMap>
 	</PropertyGroup>
 
+  <!-- Include references -->
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="7.1.2" />
 		<PackageReference Include="Dragablz" Version="0.0.3.223" />
@@ -32,45 +34,19 @@
 		<PackageReference Include="WPF-UI" Version="2.0.1" />
 	</ItemGroup>
 
+  <!-- Include Xabbo references -->
 	<ItemGroup>
 		<ProjectReference Include="..\Xabbo.Common\Xabbo.Common\Xabbo.Common.csproj" />
 		<ProjectReference Include="..\Xabbo.GEarth\Xabbo.GEarth\Xabbo.GEarth.csproj" />
 		<ProjectReference Include="..\Xabbo.Core\Xabbo.Core\Xabbo.Core.csproj" />
 	</ItemGroup>
 
+  <!-- Include resources -->
 	<ItemGroup>
-		<None Update="appsettings.com.json">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
-		<None Update="appsettings.json">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-	</ItemGroup>
-
-	<ItemGroup>
-		<Resource Include="Resources\**" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Page Remove="Resources\Theme\Expander.xaml" />
-	  <Page Remove="Resources\Theme\TabControl.xaml" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Resource Update="Resources\Theme\Expander.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </Resource>
-	  <Resource Update="Resources\Theme\TabControl.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </Resource>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <EditorConfigFiles Remove="C:\Dev\b7\b7.Xabbo\b7.Xabbo\View\.editorconfig" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <None Include="C:\Dev\b7\b7.Xabbo\b7.Xabbo\View\.editorconfig" />
+    <None Update="appsettings*.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+		<Resource Include="Resources\**" Exclude="Resources\Theme\**" />
 	</ItemGroup>
 
 </Project>
