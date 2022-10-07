@@ -5,11 +5,15 @@
 		<TargetFramework>net6.0-windows</TargetFramework>
 		<UseWPF>true</UseWPF>
 		<Nullable>enable</Nullable>
-		<Version>1.1.0</Version>
 		<DebugType>embedded</DebugType>
 		<ApplicationIcon>Resources\Icon\app.ico</ApplicationIcon>
 		<StartupObject>b7.Xabbo.App</StartupObject>
 	</PropertyGroup>
+  
+  <!-- GitVersion -->
+  <ItemGroup Label="GitVersion">
+    <PackageReference Include="GitVersion.MsBuild" Version="5.10.3" PrivateAssets="all" />
+  </ItemGroup>
 
   <!-- Replace source paths -->
 	<PropertyGroup>

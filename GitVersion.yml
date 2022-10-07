@@ -1,0 +1,10 @@
+assembly-versioning-scheme: MajorMinorPatch
+assembly-file-versioning-scheme: MajorMinorPatch
+assembly-informational-format: '{InformationalVersion}'
+mode: ContinuousDelivery
+branches:
+  develop:
+    tag: beta
+ignore:
+  sha: []
+merge-message-formats: {}

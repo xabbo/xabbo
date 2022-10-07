@@ -66,10 +66,13 @@ public class MainViewManager : ObservableObject
         IsDebugBuild = true;
         #endif
 
-        Version? version = Assembly.GetExecutingAssembly().GetName().Version;
-        if (version is not null)
+        string? semVer = Assembly.GetExecutingAssembly()
+            .GetType("GitVersionInformation")
+            ?.GetField("SemVer")
+            ?.GetValue(null) as string;
+        if (semVer is not null)
         {
-            Title = $"xabbo v{version.ToString(3)}";
+            Title = $"xabbo v{semVer}";
         }
 
         PageService = pageService;
