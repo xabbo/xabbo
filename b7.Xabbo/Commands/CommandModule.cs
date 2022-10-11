@@ -1,14 +1,16 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Xabbo.Extension;
 using Xabbo.Messages;
 using Xabbo.Messages.Dispatcher;
+using Xabbo.Connection;
+using Xabbo.Extension;
 
 namespace b7.Xabbo.Commands;
 
-public abstract class CommandModule : IMessageHandler
+public abstract class CommandModule : ConnectionBase, IMessageHandler
 {
     public bool IsAvailable { get; set; }
     public CommandManager Commands { get; private set; } = null!;
@@ -19,11 +21,20 @@ public abstract class CommandModule : IMessageHandler
     protected Incoming In => Messages.In;
     protected Outgoing Out => Messages.Out;
 
-    protected void Send(Header header, params object[] values) => Extension.Send(header, values);
-    protected void Send(IReadOnlyPacket packet) => Extension.Send(packet);
+    public override void Send(IReadOnlyPacket packet) => Extension.Send(packet);
+    public override ValueTask SendAsync(IReadOnlyPacket packet) => Extension.SendAsync(packet);
+    public override Task<IPacket> ReceiveAsync(HeaderSet headers,
+        int timeout = -1, bool block = false, CancellationToken cancellationToken = default)
+        => Extension.ReceiveAsync(headers, timeout, block, cancellationToken);
+    public override Task<IPacket> ReceiveAsync(HeaderSet headers, Func<IReadOnlyPacket, bool> shouldCapture,
+        int timeout = -1, bool block = false, CancellationToken cancellationToken = default)
+        => Extension.ReceiveAsync(headers, shouldCapture, timeout, block, cancellationToken);
 
-    protected ValueTask SendAsync(Header header, params object[] values) => Extension.SendAsync(header, values);
-    protected ValueTask SendAsync(IReadOnlyPacket packet) => Extension.SendAsync(packet);
+    public override CancellationToken DisconnectToken => Extension.DisconnectToken;
+    public override ClientType Client => Extension.Client;
+    public override string ClientIdentifier => Extension.ClientIdentifier;
+    public override bool IsConnected => IsConnected;
+
 
     public CommandModule() { }
 
