@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 using Xabbo.Core;
 using Xabbo.Core.Game;
@@ -8,6 +9,7 @@ using Xabbo.Core.GameData;
 using Xabbo.Core.Extensions;
 
 using b7.Xabbo.Services;
+using b7.Xabbo.Util;
 
 namespace b7.Xabbo.Commands;
 
@@ -59,10 +61,12 @@ public class FurniCommands : CommandModule
         IRoom? room = _roomManager.Room;
         if (room is not null)
         {
-            string name = string.Join(" ", args.Skip(1));
-            if (!string.IsNullOrWhiteSpace(name))
+            string pattern = string.Join(' ', args.Skip(1));
+            Regex regex = StringUtil.CreateWildcardRegex(pattern);
+            foreach (IFurni furni in room.Furni)
             {
-                foreach (IFurni furni in room.Furni.NamedLike(name))
+                if (furni.TryGetName(out string? name) &&
+                    regex.IsMatch(name))
                 {
                     _roomManager.ShowFurni(furni);
                 }
@@ -77,10 +81,12 @@ public class FurniCommands : CommandModule
         IRoom? room = _roomManager.Room;
         if (room is not null)
         {
-            string name = string.Join(" ", args.Skip(1));
-            if (!string.IsNullOrWhiteSpace(name))
+            string pattern = string.Join(" ", args.Skip(1));
+            Regex regex = StringUtil.CreateWildcardRegex(pattern);
+            foreach (IFurni furni in room.Furni)
             {
-                foreach (IFurni furni in room.Furni.NamedLike(name))
+                if (furni.TryGetName(out string? name) &&
+                    regex.IsMatch(name))
                 {
                     _roomManager.HideFurni(furni);
                 }
@@ -99,8 +105,36 @@ public class FurniCommands : CommandModule
 
         await _operationManager.RunAsync(async ct =>
         {
-            string name = string.Join(" ", args.Skip(1));
-            foreach (IFurni furni in room.Furni.NamedLike(name))
+            string pattern = string.Join(" ", args.Skip(1));
+            if (string.IsNullOrWhiteSpace(pattern)) return;
+
+            bool matchAll = pattern.Equals("all", StringComparison.OrdinalIgnoreCase);
+            Regex regex = StringUtil.CreateWildcardRegex(pattern);
+
+            var allFurni = room.Furni.Where(x => eject == (x.OwnerId != userData.Id)).ToArray();
+            if (allFurni.Length == 0)
+            {
+                ShowMessage($"No furni to {(eject ? "eject" : "pick up")}.");
+                return;
+            }
+
+            var matched = allFurni.Where(furni =>
+                furni.TryGetName(out string? name) &&
+                (matchAll || regex.IsMatch(name))
+            ).ToArray();
+
+            if (matched.Length == allFurni.Length && !matchAll)
+            {
+                ShowMessage($"[Warning] Pattern matched all furni. Use '/{args.Command} {args[0]} all' to {(eject ? "eject" : "pick up")} all furni.");
+                return;
+            }
+
+            int totalDelay = 100 * matched.Length;
+            string message = $"Picking up {matched.Length} furni...";
+            if ((100 * matched.Length) > 3000)
+                message += " Use /c to cancel.";
+            ShowMessage(message);
+            foreach (var furni in matched)
             {
                 if (eject == (furni.OwnerId == userData.Id)) continue;
                 _roomManager.Pickup(furni);
