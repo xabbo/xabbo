@@ -3,17 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "b7.Xabbo", "b7.Xabbo\b7.Xabbo.csproj", "{79999CB6-9241-456B-B34F-1CA0907FC102}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "b7.Xabbo", "src\b7.Xabbo\b7.Xabbo.csproj", "{79999CB6-9241-456B-B34F-1CA0907FC102}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "lib", "lib", "{14D7B6A5-8AE8-4B6A-A081-ED55AC852490}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xabbo.Common", "Xabbo.Common\Xabbo.Common\Xabbo.Common.csproj", "{982C6F99-92CC-473E-979E-DFA9EA474E1C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xabbo.Common", "lib\Xabbo.Common\src\Xabbo.Common\Xabbo.Common.csproj", "{982C6F99-92CC-473E-979E-DFA9EA474E1C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xabbo.Core", "Xabbo.Core\Xabbo.Core\Xabbo.Core.csproj", "{1A5EEC6C-40EE-4AF0-AE07-56CC080D4D67}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xabbo.Core", "lib\Xabbo.Core\src\Xabbo.Core\Xabbo.Core.csproj", "{1A5EEC6C-40EE-4AF0-AE07-56CC080D4D67}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xabbo.GEarth", "Xabbo.GEarth\Xabbo.GEarth\Xabbo.GEarth.csproj", "{BB4210C8-AC76-4917-8715-257A484A9097}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xabbo.GEarth", "lib\Xabbo.GEarth\src\Xabbo.GEarth\Xabbo.GEarth.csproj", "{BB4210C8-AC76-4917-8715-257A484A9097}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xabbo.Common.SourceGeneration", "Xabbo.Common\Xabbo.Common.SourceGeneration\Xabbo.Common.SourceGeneration.csproj", "{63907450-0F0E-4659-A2F7-1DA0353BA190}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xabbo.Common.SourceGeneration", "lib\Xabbo.Common\src\Xabbo.Common.SourceGeneration\Xabbo.Common.SourceGeneration.csproj", "{63907450-0F0E-4659-A2F7-1DA0353BA190}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "vs", "vs", "{2A1782FE-86A9-4A41-8CE2-27A9187B0DAC}"
 	ProjectSection(SolutionItems) = preProject

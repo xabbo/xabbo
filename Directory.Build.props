@@ -1,5 +1,7 @@
 <Project>
-	<PropertyGroup>
-		<SolutionDir>$(MSBuildThisFileDirectory)</SolutionDir>
-	</PropertyGroup>
+  <PropertyGroup>
+    <XabboCommonDir>$(MSBuildThisFileDirectory)lib\Xabbo.Common\</XabboCommonDir>
+    <XabboCoreDir>$(MSBuildThisFileDirectory)lib\Xabbo.Core\</XabboCoreDir>
+    <XabboGEarthDir>$(MSBuildThisFileDirectory)lib\Xabbo.GEarth\</XabboGEarthDir>
+  </PropertyGroup>
 </Project>

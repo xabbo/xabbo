@@ -40,9 +40,9 @@
 
   <!-- Include Xabbo references -->
 	<ItemGroup>
-		<ProjectReference Include="..\Xabbo.Common\Xabbo.Common\Xabbo.Common.csproj" />
-		<ProjectReference Include="..\Xabbo.GEarth\Xabbo.GEarth\Xabbo.GEarth.csproj" />
-		<ProjectReference Include="..\Xabbo.Core\Xabbo.Core\Xabbo.Core.csproj" />
+		<ProjectReference Include="$(XabboCommonDir)src\Xabbo.Common\Xabbo.Common.csproj" />
+		<ProjectReference Include="$(XabboGEarthDir)src\Xabbo.GEarth\Xabbo.GEarth.csproj" />
+		<ProjectReference Include="$(XabboCoreDir)src\Xabbo.Core\Xabbo.Core.csproj" />
 	</ItemGroup>
 
   <!-- Include resources -->

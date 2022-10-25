@@ -95,11 +95,14 @@ public partial class App : Application
 
         // Interceptor
         services.AddRemoteExtension<GEarthExtension>();
-        services.AddGEarthOptions(options => options
-            .WithTitle("xabbo")
-            .WithDescription("enhanced habbo")
-            .WithAuthor("b7")
-            .WithConfiguration(context.Configuration)
+        services.AddGEarthOptions(
+            options => options.WithConfiguration(context.Configuration)
+            with
+            {
+                Title = "xabbo",
+                Description = "enhanced habbo",
+                Author = "b7"
+            }
         );
 
         services.AddSingleton<IMessageManager, UnifiedMessageManager>();
