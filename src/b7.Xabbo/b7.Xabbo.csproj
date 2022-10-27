@@ -39,11 +39,11 @@
 	</ItemGroup>
 
   <!-- Include Xabbo references -->
-	<ItemGroup>
-		<ProjectReference Include="$(XabboCommonDir)src\Xabbo.Common\Xabbo.Common.csproj" />
-		<ProjectReference Include="$(XabboGEarthDir)src\Xabbo.GEarth\Xabbo.GEarth.csproj" />
-		<ProjectReference Include="$(XabboCoreDir)src\Xabbo.Core\Xabbo.Core.csproj" />
-	</ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Xabbo.Common" Version="1.0.0-beta.3" />
+    <PackageReference Include="Xabbo.GEarth" Version="1.0.0-beta.3" />
+    <PackageReference Include="Xabbo.Core" Version="1.0.0-beta.4" />
+  </ItemGroup>
 
   <!-- Include resources -->
 	<ItemGroup>
