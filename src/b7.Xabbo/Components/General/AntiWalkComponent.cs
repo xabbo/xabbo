@@ -13,7 +13,7 @@ public class AntiWalkComponent : Component
     public bool FaceDirection
     {
         get => _faceDirection;
-        set => Set(ref _faceDirection, value);
+        set => SetProperty(ref _faceDirection, value);
     }
 
     public AntiWalkComponent(IExtension extension,

@@ -26,21 +26,21 @@ public class AntiKickComponent : Component
     public bool IsReady
     {
         get => _isReady;
-        set => Set(ref _isReady, value);
+        set => SetProperty(ref _isReady, value);
     }
 
     private bool _canReturnToPosition;
     public bool CanReturnToPosition
     {
         get => _canReturnToPosition;
-        set => Set(ref _canReturnToPosition, value);
+        set => SetProperty(ref _canReturnToPosition, value);
     }
 
     private bool returnToPosition;
     public bool ReturnToPosition
     {
         get => returnToPosition;
-        set => Set(ref returnToPosition, value);
+        set => SetProperty(ref returnToPosition, value);
     }
 
     private readonly XabbotComponent _xabbot;

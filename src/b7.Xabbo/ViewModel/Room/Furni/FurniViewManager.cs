@@ -14,10 +14,9 @@ using System.Diagnostics;
 
 using Microsoft.Extensions.Hosting;
 
-using GalaSoft.MvvmLight.Command;
+using CommunityToolkit.Mvvm.Input;
 
 using Xabbo.Extension;
-using Xabbo.Interceptor;
 using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.GameData;
@@ -93,21 +92,21 @@ public class FurniViewManager : ComponentViewModel, INotifyDataErrorInfo
     public bool IsAvailable
     {
         get => _isAvailable;
-        set => Set(ref _isAvailable, value);
+        set => SetProperty(ref _isAvailable, value);
     }
 
     private bool _isLoading;
     public bool IsLoading
     {
         get => _isLoading;
-        set => Set(ref _isLoading, value);
+        set => SetProperty(ref _isLoading, value);
     }
 
     private string _errorText = string.Empty;
     public string ErrorText
     {
         get => _errorText;
-        set => Set(ref _errorText, value);
+        set => SetProperty(ref _errorText, value);
     }
 
     private string _filterText = string.Empty;
@@ -116,7 +115,7 @@ public class FurniViewManager : ComponentViewModel, INotifyDataErrorInfo
         get => _filterText;
         set
         {
-            if (Set(ref _filterText, value))
+            if (SetProperty(ref _filterText, value))
                 FilterTextUpdated();
         }
     }
@@ -127,7 +126,7 @@ public class FurniViewManager : ComponentViewModel, INotifyDataErrorInfo
         get => _isQuery;
         set
         {
-            if (Set(ref _isQuery, value))
+            if (SetProperty(ref _isQuery, value))
                 UpdateFilter();
         }
     }
@@ -136,21 +135,21 @@ public class FurniViewManager : ComponentViewModel, INotifyDataErrorInfo
     public bool FilterNeedsUpdate
     {
         get => _filterNeedsUpdate;
-        set => Set(ref _filterNeedsUpdate, value);
+        set => SetProperty(ref _filterNeedsUpdate, value);
     }
 
     private bool _isWorking;
     public bool IsWorking
     {
         get => _isWorking;
-        set => Set(ref _isWorking, value);
+        set => SetProperty(ref _isWorking, value);
     }
 
     private IList<FurniViewModel> _selectedItems = Array.Empty<FurniViewModel>();
     public IList<FurniViewModel> SelectedItems
     {
         get => _selectedItems;
-        set => Set(ref _selectedItems, value);
+        set => SetProperty(ref _selectedItems, value);
     }
 
     public bool CanShow => !IsWorking && SelectedItems.Any(x => x.IsHidden);
@@ -289,10 +288,10 @@ public class FurniViewManager : ComponentViewModel, INotifyDataErrorInfo
 
     public void RefreshCommandsCanExecute()
     {
-        RaisePropertyChanged(nameof(CanShow));
-        RaisePropertyChanged(nameof(CanHide));
-        RaisePropertyChanged(nameof(CanPickUp));
-        RaisePropertyChanged(nameof(CanEject));
+        OnPropertyChanged(nameof(CanShow));
+        OnPropertyChanged(nameof(CanHide));
+        OnPropertyChanged(nameof(CanPickUp));
+        OnPropertyChanged(nameof(CanEject));
     }
 
     private void RoomManager_FurniVisibilityToggled(object? sender, FurniEventArgs e)
@@ -524,7 +523,7 @@ public class FurniViewManager : ComponentViewModel, INotifyDataErrorInfo
 
     private void OnRightsUpdated(object? sender, EventArgs e)
     {
-        RaisePropertyChanged(nameof(CanEject));
+        OnPropertyChanged(nameof(CanEject));
     }
 
     private void OnFloorItemsLoaded(object? sender, FloorItemsEventArgs e)

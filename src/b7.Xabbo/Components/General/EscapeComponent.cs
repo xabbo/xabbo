@@ -25,28 +25,28 @@ public class EscapeComponent : Component
     public bool CanEscapeStaff
     {
         get => _canEscapeStaff;
-        set => Set(ref _canEscapeStaff, value);
+        set => SetProperty(ref _canEscapeStaff, value);
     }
 
     private bool _escapeStaff;
     public bool EscapeStaff
     {
         get => _escapeStaff;
-        set => Set(ref _escapeStaff, value);
+        set => SetProperty(ref _escapeStaff, value);
     }
 
     private bool _canEscapeAmbassadors;
     public bool CanEscapeAmbassadors
     {
         get => _canEscapeAmbassadors;
-        set => Set(ref _canEscapeAmbassadors, value);
+        set => SetProperty(ref _canEscapeAmbassadors, value);
     }
 
     private bool _escapeAmbassadors;
     public bool EscapeAmbassadors
     {
         get => _escapeAmbassadors;
-        set => Set(ref _escapeAmbassadors, value);
+        set => SetProperty(ref _escapeAmbassadors, value);
     }
 
     public EscapeComponent(IExtension extension,

@@ -1,6 +1,6 @@
 ﻿using System;
 
-using GalaSoft.MvvmLight;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace b7.Xabbo.ViewModel;
 
@@ -14,21 +14,21 @@ public class VisitorViewModel : ObservableObject
     public DateTime? Entered
     {
         get => _entered;
-        set => Set(ref _entered, value);
+        set => SetProperty(ref _entered, value);
     }
 
     private DateTime? _left;
     public DateTime? Left
     {
         get => _left;
-        set => Set(ref _left, value);
+        set => SetProperty(ref _left, value);
     }
 
     private int _visits;
     public int Visits
     {
         get => _visits;
-        set => Set(ref _visits, value);
+        set => SetProperty(ref _visits, value);
     }
 
     public VisitorViewModel(int index, long id, string name)

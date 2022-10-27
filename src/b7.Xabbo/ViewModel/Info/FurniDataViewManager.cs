@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Data;
 
-using GalaSoft.MvvmLight;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 using Xabbo.Interceptor;
 using Xabbo.Extension;
@@ -26,7 +26,7 @@ public class FurniDataViewManager : ObservableObject
     public bool IsLoading
     {
         get => _isLoading;
-        set => Set(ref _isLoading, value);
+        set => SetProperty(ref _isLoading, value);
     }
 
     private string _filterText = string.Empty;
@@ -35,7 +35,7 @@ public class FurniDataViewManager : ObservableObject
         get => _filterText;
         set
         {
-            if (Set(ref _filterText, value))
+            if (SetProperty(ref _filterText, value))
             {
                 RefreshList();
             }
@@ -46,7 +46,7 @@ public class FurniDataViewManager : ObservableObject
     public string ErrorText
     {
         get => _errorText;
-        set => Set(ref _errorText, value);
+        set => SetProperty(ref _errorText, value);
     }
 
     public FurniDataViewManager(

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.Collections.Generic;
 
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Configuration;
@@ -16,7 +14,7 @@ using b7.Xabbo.Configuration;
 
 namespace b7.Xabbo.Components;
 
-public class ChatComponent : Component, INotifyPropertyChanged
+public class ChatComponent : Component
 {
     private readonly RoomManager _roomManager;
     private readonly HashSet<string> _petCommands;
@@ -25,42 +23,42 @@ public class ChatComponent : Component, INotifyPropertyChanged
     public bool MutePets
     {
         get => _mutePets;
-        set => Set(ref _mutePets, value);
+        set => SetProperty(ref _mutePets, value);
     }
 
     private bool _mutePetCommands;
     public bool MutePetCommands
     {
         get => _mutePetCommands;
-        set => Set(ref _mutePetCommands, value);
+        set => SetProperty(ref _mutePetCommands, value);
     }
 
     private bool _muteBots;
     public bool MuteBots
     {
         get => _muteBots;
-        set => Set(ref _muteBots, value);
+        set => SetProperty(ref _muteBots, value);
     }
 
     private bool _muteWired;
     public bool MuteWired
     {
         get => _muteWired;
-        set => Set(ref _muteWired, value);
+        set => SetProperty(ref _muteWired, value);
     }
 
     private bool _muteRespects;
     public bool MuteRespects
     {
         get => _muteRespects;
-        set => Set(ref _muteRespects, value);
+        set => SetProperty(ref _muteRespects, value);
     }
 
     private bool _muteScratches;
     public bool MuteScratches
     {
         get => _muteScratches;
-        set => Set(ref _muteScratches, value);
+        set => SetProperty(ref _muteScratches, value);
     }
 
     public ChatComponent(IExtension extension,

@@ -1,12 +1,10 @@
-﻿using System;
-using System.Reflection;
+﻿using System.Reflection;
 
+using CommunityToolkit.Mvvm.ComponentModel;
 
 using Wpf.Ui.Mvvm.Contracts;
 
 using MaterialDesignThemes.Wpf;
-
-using GalaSoft.MvvmLight;
 
 namespace b7.Xabbo.ViewModel;
 
@@ -16,7 +14,7 @@ public class MainViewManager : ObservableObject
     public string Title
     {
         get => _title;
-        set => Set(ref _title, value);
+        set => SetProperty(ref _title, value);
     }
 
     public bool IsDebugBuild { get; }

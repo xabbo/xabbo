@@ -18,7 +18,7 @@ using Microsoft.Extensions.Configuration;
 
 using MaterialDesignThemes.Wpf;
 
-using GalaSoft.MvvmLight.Command;
+using CommunityToolkit.Mvvm.Input;
 
 using Xabbo.Messages;
 using Xabbo.Extension;
@@ -61,9 +61,9 @@ public class EntitiesViewManager : ComponentViewModel
         get => selectedItem;
         set
         {
-            if (Set(ref selectedItem, value))
+            if (SetProperty(ref selectedItem, value))
             {
-                RaisePropertyChanged(nameof(IsSelectedEntityUser));
+                OnPropertyChanged(nameof(IsSelectedEntityUser));
             }
         }
     }
@@ -76,7 +76,7 @@ public class EntitiesViewManager : ComponentViewModel
         get => showBots;
         set
         {
-            if (Set(ref showBots, value))
+            if (SetProperty(ref showBots, value))
                 RefreshList();
         }
     }
@@ -87,7 +87,7 @@ public class EntitiesViewManager : ComponentViewModel
         get => showPets;
         set
         {
-            if (Set(ref showPets, value))
+            if (SetProperty(ref showPets, value))
                 RefreshList();
         }
     }

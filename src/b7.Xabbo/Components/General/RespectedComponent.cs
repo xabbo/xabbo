@@ -21,14 +21,14 @@ public class RespectedComponent : Component
     public bool ShowWhoRespected
     {
         get => _showWhoRespected;
-        set => Set(ref _showWhoRespected, value);
+        set => SetProperty(ref _showWhoRespected, value);
     }
 
     private bool _showTotalRespects = true;
     public bool ShowTotalRespects
     {
         get => _showTotalRespects;
-        set => Set(ref _showTotalRespects, value);
+        set => SetProperty(ref _showTotalRespects, value);
     }
 
     public RespectedComponent(IExtension extension,

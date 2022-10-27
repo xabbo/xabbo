@@ -35,7 +35,7 @@ public class VisitorsViewManager : ComponentViewModel
     public bool IsAvailable
     {
         get => _isAvailable;
-        set => Set(ref _isAvailable, value);
+        set => SetProperty(ref _isAvailable, value);
     }
 
     private string _filterText = string.Empty;
@@ -44,7 +44,7 @@ public class VisitorsViewManager : ComponentViewModel
         get => _filterText;
         set
         {
-            if (Set(ref _filterText, value))
+            if (SetProperty(ref _filterText, value))
                 RefreshList();
         }
     }
@@ -54,7 +54,7 @@ public class VisitorsViewManager : ComponentViewModel
     public bool IsLogging
     {
         get => _isLogging;
-        set => Set(ref _isLogging, value);
+        set => SetProperty(ref _isLogging, value);
     }
 
     const string LOG_DIRECTORY = @"logs\visitors";

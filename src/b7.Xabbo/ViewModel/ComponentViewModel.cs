@@ -1,9 +1,6 @@
-﻿using System;
-
-using GalaSoft.MvvmLight;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 
 using Xabbo.Messages;
-using Xabbo.Interceptor;
 using Xabbo.Extension;
 
 namespace b7.Xabbo.ViewModel;

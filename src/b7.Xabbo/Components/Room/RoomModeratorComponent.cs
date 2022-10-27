@@ -32,11 +32,11 @@ public class RoomModeratorComponent : Component
 
     private void UpdatePermissions()
     {
-        RaisePropertyChanged(nameof(HasRights));
-        RaisePropertyChanged(nameof(CanMute));
-        RaisePropertyChanged(nameof(CanKick));
-        RaisePropertyChanged(nameof(CanBan));
-        RaisePropertyChanged(nameof(IsOwner));
+        OnPropertyChanged(nameof(HasRights));
+        OnPropertyChanged(nameof(CanMute));
+        OnPropertyChanged(nameof(CanKick));
+        OnPropertyChanged(nameof(CanBan));
+        OnPropertyChanged(nameof(IsOwner));
     }
 
     [RequiredOut(nameof(Outgoing.RoomMuteUser))]

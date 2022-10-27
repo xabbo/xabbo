@@ -10,15 +10,17 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Input;
 
-using GalaSoft.MvvmLight.Command;
+using Microsoft.Extensions.Configuration;
+
+using CommunityToolkit.Mvvm.Input;
+
+using MaterialDesignThemes.Wpf;
 
 using Xabbo.Messages;
 using Xabbo.Extension;
 using Xabbo.Core.Game;
 
 using b7.Xabbo.Services;
-using Microsoft.Extensions.Configuration;
-using MaterialDesignThemes.Wpf;
 
 namespace b7.Xabbo.ViewModel;
 
@@ -41,35 +43,35 @@ public class BanListViewManager : ComponentViewModel
     public bool IsAvailable
     {
         get => _isAvailable;
-        set => Set(ref _isAvailable, value);
+        set => SetProperty(ref _isAvailable, value);
     }
 
     private bool _isInRoom;
     public bool IsInRoom
     {
         get => _isInRoom;
-        set => Set(ref _isInRoom, value);
+        set => SetProperty(ref _isInRoom, value);
     }
 
     private bool _isWorking;
     public bool IsWorking
     {
         get => _isWorking;
-        set => Set(ref _isWorking, value);
+        set => SetProperty(ref _isWorking, value);
     }
 
     private bool _isUnbanning;
     public bool IsUnbanning
     {
         get => _isUnbanning;
-        set => Set(ref _isUnbanning, value);
+        set => SetProperty(ref _isUnbanning, value);
     }
 
     private bool _isCancelling;
     public bool IsCancelling
     {
         get => _isCancelling;
-        set => Set(ref _isCancelling, value);
+        set => SetProperty(ref _isCancelling, value);
     }
 
     private string _filterText = string.Empty;
@@ -78,7 +80,7 @@ public class BanListViewManager : ComponentViewModel
         get => _filterText;
         set
         {
-            if (Set(ref _filterText, value))
+            if (SetProperty(ref _filterText, value))
                 RefreshUsers();
         }
     }

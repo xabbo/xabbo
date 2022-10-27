@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Media;
 
-using GalaSoft.MvvmLight;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 using Xabbo.Core;
 
@@ -18,7 +18,7 @@ public class EntityViewModel : ObservableObject
     public string Name
     {
         get => _name;
-        set => Set(ref _name, value);
+        set => SetProperty(ref _name, value);
     }
 
     private string _figure;
@@ -27,9 +27,9 @@ public class EntityViewModel : ObservableObject
         get => _figure;
         set
         {
-            if (Set(ref _figure, value))
+            if (SetProperty(ref _figure, value))
             {
-                RaisePropertyChanged(nameof(AvatarImageUrl));
+                OnPropertyChanged(nameof(AvatarImageUrl));
             }
         }
     }
@@ -38,7 +38,7 @@ public class EntityViewModel : ObservableObject
     public string Motto
     {
         get => _motto;
-        set => Set(ref _motto, value);
+        set => SetProperty(ref _motto, value);
     }
 
     private bool _isStaff;
@@ -47,7 +47,7 @@ public class EntityViewModel : ObservableObject
         get => _isStaff;
         set
         {
-            if (Set(ref _isStaff, value))
+            if (SetProperty(ref _isStaff, value))
             {
                 UpdateVisualGroup();
             }
@@ -60,7 +60,7 @@ public class EntityViewModel : ObservableObject
         get => _isAmbassador;
         set
         {
-            if (Set(ref _isAmbassador, value))
+            if (SetProperty(ref _isAmbassador, value))
             {
                 UpdateVisualGroup();
             }
@@ -73,7 +73,7 @@ public class EntityViewModel : ObservableObject
         get => _isRoomOwner;
         set
         {
-            if (Set(ref _isRoomOwner, value))
+            if (SetProperty(ref _isRoomOwner, value))
             {
                 UpdateVisualGroup();
             }
@@ -86,9 +86,9 @@ public class EntityViewModel : ObservableObject
         get => _controlLevel;
         set
         {
-            if (Set(ref _controlLevel, value))
+            if (SetProperty(ref _controlLevel, value))
             {
-                RaisePropertyChanged(nameof(HasRights));
+                OnPropertyChanged(nameof(HasRights));
                 UpdateVisualGroup();
             }
         }
@@ -100,7 +100,7 @@ public class EntityViewModel : ObservableObject
     public string ImageSource
     {
         get => _imageSource;
-        set => Set(ref _imageSource, value);
+        set => SetProperty(ref _imageSource, value);
     }
 
     public string VisualGroupName
@@ -198,21 +198,21 @@ public class EntityViewModel : ObservableObject
     public Color HeaderColor
     {
         get => _headerColor;
-        set => Set(ref _headerColor, value);
+        set => SetProperty(ref _headerColor, value);
     }
 
     private bool _isIdle;
     public bool IsIdle
     {
         get => _isIdle;
-        set => Set(ref _isIdle, value);
+        set => SetProperty(ref _isIdle, value);
     }
 
     private bool _isTrading;
     public bool IsTrading
     {
         get => _isTrading;
-        set => Set(ref _isTrading, value);
+        set => SetProperty(ref _isTrading, value);
     }
 
     public string AvatarImageUrl
@@ -240,7 +240,7 @@ public class EntityViewModel : ObservableObject
 
     private void UpdateVisualGroup()
     {
-        RaisePropertyChanged(nameof(VisualGroupName));
-        RaisePropertyChanged(nameof(VisualGroupSort));
+        OnPropertyChanged(nameof(VisualGroupName));
+        OnPropertyChanged(nameof(VisualGroupSort));
     }
 }

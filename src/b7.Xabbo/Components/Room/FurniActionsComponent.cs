@@ -22,35 +22,35 @@ public class FurniActionsComponent : Component
     public bool PreventUse
     {
         get => _preventUse;
-        set => Set(ref _preventUse, value);
+        set => SetProperty(ref _preventUse, value);
     }
 
     private bool _useToHide;
     public bool UseToHide
     {
         get => _useToHide;
-        set => Set(ref _useToHide, value);
+        set => SetProperty(ref _useToHide, value);
     }
 
     private bool _useToFindLink;
     public bool UseToFindLink
     {
         get => _useToFindLink;
-        set => Set(ref _useToFindLink, value);
+        set => SetProperty(ref _useToFindLink, value);
     }
 
     private bool _canShowInfo;
     public bool CanShowInfo
     {
         get => _canShowInfo;
-        set => Set(ref _canShowInfo, value);
+        set => SetProperty(ref _canShowInfo, value);
     }
 
     private bool _useToShowInfo;
     public bool UseToShowInfo
     {
         get => _useToShowInfo;
-        set => Set(ref _useToShowInfo, value);
+        set => SetProperty(ref _useToShowInfo, value);
     }
 
     public FurniActionsComponent(IExtension extension,

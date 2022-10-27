@@ -22,21 +22,21 @@ public class AntiHandItemComponent : Component
     public bool DropHandItem
     {
         get => _dropHandItem;
-        set => Set(ref _dropHandItem, value);
+        set => SetProperty(ref _dropHandItem, value);
     }
 
     private bool _returnHandItem;
     public bool ReturnHandItem
     {
         get => _returnHandItem;
-        set => Set(ref _returnHandItem, value);
+        set => SetProperty(ref _returnHandItem, value);
     }
 
     private bool _maintainDirection;
     public bool MaintainDirection
     {
         get => _maintainDirection;
-        set => Set(ref _maintainDirection, value);
+        set => SetProperty(ref _maintainDirection, value);
     }
 
     public AntiHandItemComponent(IExtension extension,

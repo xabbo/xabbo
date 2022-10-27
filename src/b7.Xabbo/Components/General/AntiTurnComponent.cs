@@ -19,7 +19,7 @@ public class AntiTurnComponent : Component
     public bool TurnOnReselect
     {
         get => _turnOnReselect;
-        set => Set(ref _turnOnReselect, value);
+        set => SetProperty(ref _turnOnReselect, value);
     }
 
     public AntiTurnComponent(IExtension extension,

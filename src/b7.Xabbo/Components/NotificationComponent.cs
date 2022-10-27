@@ -26,21 +26,21 @@ public class NotificationComponent : Component
     public bool FlashOnPrivateMessage
     {
         get => _flashOnPrivateMessage;
-        set => Set(ref _flashOnPrivateMessage, value);
+        set => SetProperty(ref _flashOnPrivateMessage, value);
     }
 
     private bool _flashOnWhisper;
     public bool FlashOnWhisper
     {
         get => _flashOnWhisper;
-        set => Set(ref _flashOnWhisper, value);
+        set => SetProperty(ref _flashOnWhisper, value);
     }
 
     private bool _flashOnUserChat;
     public bool FlashOnUserChat
     {
         get => _flashOnUserChat;
-        set => Set(ref _flashOnUserChat, value);
+        set => SetProperty(ref _flashOnUserChat, value);
     }
 
 
@@ -48,21 +48,21 @@ public class NotificationComponent : Component
     public bool FlashOnFriendChat
     {
         get => _flashOnFriendChat;
-        set => Set(ref _flashOnFriendChat, value);
+        set => SetProperty(ref _flashOnFriendChat, value);
     }
 
     private bool _flashOnUserEntered;
     public bool FlashOnUserEntered
     {
         get => _flashOnUserEntered;
-        set => Set(ref _flashOnUserEntered, value);
+        set => SetProperty(ref _flashOnUserEntered, value);
     }
 
     private bool _flashOnFriendEntered;
     public bool FlashOnFriendEntered
     {
         get => _flashOnFriendEntered;
-        set => Set(ref _flashOnFriendEntered, value);
+        set => SetProperty(ref _flashOnFriendEntered, value);
     }
 
     public NotificationComponent(IExtension extension,

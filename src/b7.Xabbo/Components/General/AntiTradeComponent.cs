@@ -1,6 +1,5 @@
-﻿using System;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using System.ComponentModel;
 
 using Microsoft.Extensions.Configuration;
 
@@ -24,7 +23,7 @@ public class AntiTradeComponent : Component
     public bool IsAvailable
     {
         get => _isAvailable;
-        set => Set(ref _isAvailable, value);
+        set => SetProperty(ref _isAvailable, value);
     }
 
     public AntiTradeComponent(
@@ -78,16 +77,16 @@ public class AntiTradeComponent : Component
         IsAvailable = true;
     }
 
-    public override void RaisePropertyChanged([CallerMemberName] string propertyName = null)
+    protected override void OnPropertyChanged(PropertyChangedEventArgs e)
     {
-        base.RaisePropertyChanged(propertyName);
+        base.OnPropertyChanged(e);
 
         UserData? userData = _profileManager.UserData;
         IRoom? room = _roomManager.Room;
 
         if (userData is null || room is null) return;
 
-        if (propertyName == nameof(IsActive))
+        if (e.PropertyName == nameof(IsActive))
         {
             if (IsActive)
             {

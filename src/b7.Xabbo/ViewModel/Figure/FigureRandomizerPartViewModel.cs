@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Windows.Media;
 
-using GalaSoft.MvvmLight;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 using Xabbo.Core;
 
@@ -14,35 +13,35 @@ public class FigureRandomizerPartViewModel : ObservableObject
     public FigurePartType Type
     {
         get => _type;
-        set => Set(ref _type, value);
+        set => SetProperty(ref _type, value);
     }
 
     private string _name = string.Empty;
     public string Name
     {
         get => _name;
-        set => Set(ref _name, value);
+        set => SetProperty(ref _name, value);
     }
 
     private string _shortString = string.Empty;
     public string ShortString
     {
         get => _shortString;
-        set => Set(ref _shortString, value);
+        set => SetProperty(ref _shortString, value);
     }
 
     private double _probability;
     public double Probability
     {
         get => _probability;
-        set => Set(ref _probability, value);
+        set => SetProperty(ref _probability, value);
     }
 
     private bool _lockPart;
     public bool IsLocked
     {
         get => _lockPart;
-        set => Set(ref _lockPart, value);
+        set => SetProperty(ref _lockPart, value);
     }
 
     public IReadOnlyList<FigurePartColorViewModel> Colors { get; }
@@ -63,33 +62,33 @@ public class FigureRandomizerPartViewModel : ObservableObject
     }
 }
 
-public class FigurePartColorViewModel : ViewModelBase
+public class FigurePartColorViewModel : ObservableObject
 {
     private bool _isVisible;
     public bool IsVisible
     {
         get => _isVisible;
-        set => Set(ref _isVisible, value);
+        set => SetProperty(ref _isVisible, value);
     }
 
     private bool _isLocked;
     public bool IsLocked
     {
         get => _isLocked;
-        set => Set(ref _isLocked, value);
+        set => SetProperty(ref _isLocked, value);
     }
 
     private SolidColorBrush _foreground = Brushes.Transparent;
     public SolidColorBrush Foreground
     {
         get => _foreground;
-        set => Set(ref _foreground, value);
+        set => SetProperty(ref _foreground, value);
     }
 
     private SolidColorBrush _background = Brushes.Transparent;
     public SolidColorBrush Background
     {
         get => _background;
-        set => Set(ref _background, value);
+        set => SetProperty(ref _background, value);
     }
 }

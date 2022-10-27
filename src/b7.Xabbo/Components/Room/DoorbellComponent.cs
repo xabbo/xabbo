@@ -15,7 +15,7 @@ public class DoorbellComponent : Component
     public bool AcceptFriends
     {
         get => _acceptFriends;
-        set => Set(ref _acceptFriends, value);
+        set => SetProperty(ref _acceptFriends, value);
     }
 
     public DoorbellComponent(

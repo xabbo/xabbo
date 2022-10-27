@@ -1,6 +1,6 @@
 ﻿using System;
 
-using GalaSoft.MvvmLight;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 using b7.Xabbo.Components;
 

@@ -1,6 +1,6 @@
 ﻿using System;
 
-using GalaSoft.MvvmLight;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 using Xabbo.Core;
 using Xabbo.Core.GameData;
@@ -24,7 +24,7 @@ public class FurniViewModel : ObservableObject
     public bool IsHidden
     {
         get => isHidden;
-        set => Set(ref isHidden, value);
+        set => SetProperty(ref isHidden, value);
     }
 
     public string IconUrl { get; }

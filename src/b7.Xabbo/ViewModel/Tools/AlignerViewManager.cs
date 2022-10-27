@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Windows.Input;
 
-using GalaSoft.MvvmLight.Command;
+using CommunityToolkit.Mvvm.Input;
 
 using Xabbo.Messages;
-using Xabbo.Interceptor;
+using Xabbo.Extension;
 using Xabbo.Core;
 using Xabbo.Core.Events;
 using Xabbo.Core.Game;
-using Xabbo.Extension;
+using System.ComponentModel;
 
 namespace b7.Xabbo.ViewModel;
 
@@ -23,14 +23,14 @@ public class AlignerViewManager : ComponentViewModel
     public bool IsInRoom
     {
         get => _isInRoom;
-        set => Set(ref _isInRoom, value);
+        set => SetProperty(ref _isInRoom, value);
     }
 
     private bool _isCapturing;
     public bool IsCapturing
     {
         get => _isCapturing;
-        set => Set(ref _isCapturing, value);
+        set => SetProperty(ref _isCapturing, value);
     }
 
     private bool _hasCapturedItem;
@@ -39,8 +39,8 @@ public class AlignerViewManager : ComponentViewModel
         get => _hasCapturedItem;
         set
         {
-            if (Set(ref _hasCapturedItem, value))
-                RaisePropertyChanged(nameof(CanMoveLocation));
+            if (SetProperty(ref _hasCapturedItem, value))
+                OnPropertyChanged(nameof(CanMoveLocation));
         }
     }
 
@@ -48,7 +48,7 @@ public class AlignerViewManager : ComponentViewModel
     public long CurrentId
     {
         get => _currentId;
-        set => Set(ref _currentId, value);
+        set => SetProperty(ref _currentId, value);
     }
 
     private string _locationString = string.Empty;
@@ -58,7 +58,7 @@ public class AlignerViewManager : ComponentViewModel
         set
         {
             if (!_haltAlignment) WallLocation.Parse(value);
-            Set(ref _locationString, value);
+            SetProperty(ref _locationString, value);
         }
     }
 
@@ -66,35 +66,35 @@ public class AlignerViewManager : ComponentViewModel
     public int WX
     {
         get => _wx;
-        set => Set(ref _wx, value);
+        set => SetProperty(ref _wx, value);
     }
 
     private int _wy;
     public int WY
     {
         get => _wy;
-        set => Set(ref _wy, value);
+        set => SetProperty(ref _wy, value);
     }
 
     private int _lx;
     public int LX
     {
         get => _lx;
-        set => Set(ref _lx, value);
+        set => SetProperty(ref _lx, value);
     }
 
     private int _ly;
     public int LY
     {
         get => _ly;
-        set => Set(ref _ly, value);
+        set => SetProperty(ref _ly, value);
     }
 
     private bool _isLeft = true;
     public bool IsLeft
     {
         get => _isLeft;
-        set => Set(ref _isLeft, value);
+        set => SetProperty(ref _isLeft, value);
     }
 
     private bool _lockLocation;
@@ -103,8 +103,8 @@ public class AlignerViewManager : ComponentViewModel
         get => _lockLocation;
         set
         {
-            if (Set(ref _lockLocation, value))
-                RaisePropertyChanged(nameof(CanMoveLocation));
+            if (SetProperty(ref _lockLocation, value))
+                OnPropertyChanged(nameof(CanMoveLocation));
         }
     }
 
@@ -131,9 +131,9 @@ public class AlignerViewManager : ComponentViewModel
     private bool ignoreChangeEvents = false;
     private int previousWallX, previousWallY;
 
-    public override async void RaisePropertyChanged(string propertyName)
+    protected override async void OnPropertyChanged(PropertyChangedEventArgs e)
     {
-        base.RaisePropertyChanged(propertyName);
+        base.OnPropertyChanged(e);
 
         bool isHaltingAlignment = _haltAlignment;
         if (ignoreChangeEvents) return;
@@ -144,7 +144,7 @@ public class AlignerViewManager : ComponentViewModel
         {
             _haltAlignment = true;
 
-            switch (propertyName)
+            switch (e.PropertyName)
             {
                 case nameof(WX):
                 case nameof(WY):

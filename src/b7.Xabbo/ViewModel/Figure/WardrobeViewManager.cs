@@ -13,7 +13,7 @@ using System.Diagnostics;
 
 using Microsoft.Extensions.Hosting;
 
-using GalaSoft.MvvmLight.Command;
+using CommunityToolkit.Mvvm.Input;
 
 using Xabbo.Extension;
 using Xabbo.Core;
@@ -47,7 +47,7 @@ public class WardrobeViewManager : ComponentViewModel
     public bool IsAvailable
     {
         get => _isAvailable;
-        set => Set(ref _isAvailable, value);
+        set => SetProperty(ref _isAvailable, value);
     }
 
     public WardrobeViewManager(IHostApplicationLifetime _lifetime,

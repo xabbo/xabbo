@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using System.Runtime.CompilerServices;
+using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Diagnostics.CodeAnalysis;
 
@@ -27,7 +27,7 @@ public class EntityOverlayComponent : Component
     public bool IsAvailable
     {
         get => _isAvailable;
-        set => Set(ref _isAvailable, value);
+        set => SetProperty(ref _isAvailable, value);
     }
 
     public EntityOverlayComponent(IExtension extension,
@@ -170,11 +170,11 @@ public class EntityOverlayComponent : Component
         e.Packet.Write(overlayUpdate);
     }
 
-    public override void RaisePropertyChanged([CallerMemberName] string propertyName = null)
+    protected override void OnPropertyChanged(PropertyChangedEventArgs e)
     {
-        base.RaisePropertyChanged(propertyName);
+        base.OnPropertyChanged(e);
 
-        if (propertyName == nameof(IsActive))
+        if (e.PropertyName == nameof(IsActive))
         {
             if (IsActive)
             {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-using GalaSoft.MvvmLight;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 using Xabbo;
 using Xabbo.Messages;
@@ -20,7 +20,7 @@ public abstract class Component : ObservableObject, IMessageHandler
     public bool IsActive
     {
         get => _isActive;
-        set => Set(ref _isActive, value);
+        set => SetProperty(ref _isActive, value);
     }
 
     public Component(IExtension extension)

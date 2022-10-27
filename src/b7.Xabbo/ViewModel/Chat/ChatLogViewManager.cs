@@ -30,7 +30,7 @@ public class ChatLogViewManager : ComponentViewModel
         set
         {
             _logText = new(value);
-            RaisePropertyChanged(nameof(LogText));
+            OnPropertyChanged(nameof(LogText));
         }
     }
 
@@ -38,35 +38,35 @@ public class ChatLogViewManager : ComponentViewModel
     public bool IncludeNormalChat
     {
         get => _includeNormalChat;
-        set => Set(ref _includeNormalChat, value);
+        set => SetProperty(ref _includeNormalChat, value);
     }
 
     private bool _includeWhispers;
     public bool IncludeWhispers
     {
         get => _includeWhispers;
-        set => Set(ref _includeWhispers, value);
+        set => SetProperty(ref _includeWhispers, value);
     }
 
     private bool _includeWiredMessages;
     public bool IncludeWiredMessages
     {
         get => _includeWiredMessages;
-        set => Set(ref _includeWiredMessages, value);
+        set => SetProperty(ref _includeWiredMessages, value);
     }
 
     private bool _includeBotMessages;
     public bool IncludeBotMessages
     {
         get => _includeBotMessages;
-        set => Set(ref _includeBotMessages, value);
+        set => SetProperty(ref _includeBotMessages, value);
     }
 
     private bool _logToFile;
     public bool LogToFile
     {
         get => _logToFile;
-        set => Set(ref _logToFile, value);
+        set => SetProperty(ref _logToFile, value);
     }
 
     private readonly string? _antiBobba;
@@ -95,7 +95,7 @@ public class ChatLogViewManager : ComponentViewModel
     private void Log(string text)
     {
         _logText.Append(text);
-        RaisePropertyChanged(nameof(LogText));
+        OnPropertyChanged(nameof(LogText));
     }
 
     private void RoomManager_EntityChat(object? sender, EntityChatEventArgs e)

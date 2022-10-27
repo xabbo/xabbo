@@ -15,14 +15,14 @@ public class RoomInfoViewManager : ComponentViewModel
     public bool IsInRoom
     {
         get => _isInRoom;
-        set => Set(ref _isInRoom, value);
+        set => SetProperty(ref _isInRoom, value);
     }
 
     private IRoomData? _data;
     public IRoomData? Data
     {
         get => _data;
-        set => Set(ref _data, value);
+        set => SetProperty(ref _data, value);
     }
 
     public RoomInfoViewManager(IExtension extension,

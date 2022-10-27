@@ -10,7 +10,7 @@ namespace b7.Xabbo.View;
 public partial class ChatView : UserControl, INotifyPropertyChanged
 {
     #region - INotifyPropertyChanged -
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
     protected virtual void OnPropertyChanged(string propertyName)
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     protected bool _set<T>(ref T field, T value, [CallerMemberName] string propertyName = null)

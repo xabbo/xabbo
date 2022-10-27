@@ -24,14 +24,14 @@ public class RoomEntryComponent : Component
     public bool RememberPasswords
     {
         get => _rememberPasswords;
-        set => Set(ref _rememberPasswords, value);
+        set => SetProperty(ref _rememberPasswords, value);
     }
 
     private bool _dontAskToRingDoorbell;
     public bool DontAskToRingDoorbell
     {
         get => _dontAskToRingDoorbell;
-        set => Set(ref _dontAskToRingDoorbell, value);
+        set => SetProperty(ref _dontAskToRingDoorbell, value);
     }
 
     public RoomEntryComponent(IExtension extension,

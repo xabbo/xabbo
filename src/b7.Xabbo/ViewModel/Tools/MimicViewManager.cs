@@ -5,15 +5,15 @@ using System.Windows.Input;
 
 using Microsoft.Extensions.Hosting;
 
-using GalaSoft.MvvmLight.Command;
+using CommunityToolkit.Mvvm.Input;
 
 using Xabbo.Messages;
-using Xabbo.Interceptor;
+using Xabbo.Extension;
 
 using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.Events;
-using Xabbo.Extension;
+using System.ComponentModel;
 
 namespace b7.Xabbo.ViewModel;
 
@@ -33,126 +33,126 @@ public class MimicViewManager : ComponentViewModel
     public bool IsAvailable
     {
         get => _isAvailable;
-        set => Set(ref _isAvailable, value);
+        set => SetProperty(ref _isAvailable, value);
     }
 
     private bool isInitialized;
     public bool IsInitialized
     {
         get => isInitialized;
-        set => Set(ref isInitialized, value);
+        set => SetProperty(ref isInitialized, value);
     }
 
     private bool mimicFigure;
     public bool MimicFigure
     {
         get => mimicFigure;
-        set => Set(ref mimicFigure, value);
+        set => SetProperty(ref mimicFigure, value);
     }
 
     private bool mimicMotto;
     public bool MimicMotto
     {
         get => mimicMotto;
-        set => Set(ref mimicMotto, value);
+        set => SetProperty(ref mimicMotto, value);
     }
 
     private bool mimicAction;
     public bool MimicAction
     {
         get => mimicAction;
-        set => Set(ref mimicAction, value);
+        set => SetProperty(ref mimicAction, value);
     }
 
     private bool mimicDance;
     public bool MimicDance
     {
         get => mimicDance;
-        set => Set(ref mimicDance, value);
+        set => SetProperty(ref mimicDance, value);
     }
 
     private bool mimicSign;
     public bool MimicSign
     {
         get => mimicSign;
-        set => Set(ref mimicSign, value);
+        set => SetProperty(ref mimicSign, value);
     }
 
     private bool mimicEffect;
     public bool MimicEffect
     {
         get => mimicEffect;
-        set => Set(ref mimicEffect, value);
+        set => SetProperty(ref mimicEffect, value);
     }
 
     private bool mimicSit;
     public bool MimicSit
     {
         get => mimicSit;
-        set => Set(ref mimicSit, value);
+        set => SetProperty(ref mimicSit, value);
     }
 
     private bool followTarget;
     public bool FollowTarget
     {
         get => followTarget;
-        set => Set(ref followTarget, value);
+        set => SetProperty(ref followTarget, value);
     }
 
     private bool mimicTyping;
     public bool MimicTyping
     {
         get => mimicTyping;
-        set => Set(ref mimicTyping, value);
+        set => SetProperty(ref mimicTyping, value);
     }
 
     private bool mimicTalk;
     public bool MimicTalk
     {
         get => mimicTalk;
-        set => Set(ref mimicTalk, value);
+        set => SetProperty(ref mimicTalk, value);
     }
 
     private bool mimicShout;
     public bool MimicShout
     {
         get => mimicShout;
-        set => Set(ref mimicShout, value);
+        set => SetProperty(ref mimicShout, value);
     }
 
     private bool mimicWhisper;
     public bool MimicWhisper
     {
         get => mimicWhisper;
-        set => Set(ref mimicWhisper, value);
+        set => SetProperty(ref mimicWhisper, value);
     }
 
     private bool delaySpeech;
     public bool DelaySpeech
     {
         get => delaySpeech;
-        set => Set(ref delaySpeech, value);
+        set => SetProperty(ref delaySpeech, value);
     }
 
     private int speechDelay;
     public int SpeechDelay
     {
         get => speechDelay;
-        set => Set(ref speechDelay, value);
+        set => SetProperty(ref speechDelay, value);
     }
 
     private string buttonText = "...";
     public string ButtonText
     {
         get => buttonText;
-        set => Set(ref buttonText, value);
+        set => SetProperty(ref buttonText, value);
     }
 
     private string statusText;
     public string StatusText
     {
         get => statusText;
-        set => Set(ref statusText, value);
+        set => SetProperty(ref statusText, value);
     }
 
     public ICommand EnableDisableCommand { get; }
@@ -202,36 +202,36 @@ public class MimicViewManager : ComponentViewModel
         IsAvailable = true;
     }
 
-    public override void RaisePropertyChanged(string propertyName)
+    protected override void OnPropertyChanged(PropertyChangedEventArgs e)
     {
-        base.RaisePropertyChanged(propertyName);
+        base.OnPropertyChanged(e);
 
         if (!Active)
             return;
 
-        switch (propertyName)
+        switch (e.PropertyName)
         {
-            case "MimicFigure":
+            case nameof(MimicFigure):
                 if (MimicFigure)
                     SetFigure(target);
                 break;
-            case "MimicMotto":
+            case nameof(MimicMotto):
                 if (MimicMotto)
                     SetMotto(target);
                 break;
-            case "MimicAction":
+            case nameof(MimicAction):
                 SetIdle(MimicAction ? target : null);
                 break;
-            case "MimicDance":
+            case nameof(MimicDance):
                 SetDance(MimicDance ? target : null);
                 break;
-            case "MimicEffect":
+            case nameof(MimicEffect):
                 SetEffect(MimicEffect ? target : null);
                 break;
-            case "MimicSit":
+            case nameof(MimicSit):
                 SetSitting(MimicSit ? target : null);
                 break;
-            case "MimicTyping":
+            case nameof(MimicTyping):
                 SetTyping(MimicTyping ? target : null);
                 break;
 

@@ -1,6 +1,5 @@
-﻿using System;
-using System.Threading.Tasks;
-using System.Runtime.CompilerServices;
+﻿using System.Threading.Tasks;
+using System.ComponentModel;
 
 using Microsoft.Extensions.Configuration;
 
@@ -8,6 +7,7 @@ using Xabbo.Extension;
 using Xabbo.Messages;
 
 using b7.Xabbo.Commands;
+
 
 namespace b7.Xabbo.Components;
 
@@ -40,11 +40,11 @@ public class ClickThroughComponent : Component
     }
 
     [RequiredIn(nameof(Incoming.GameYouArePlayer))]
-    public override void RaisePropertyChanged([CallerMemberName] string propertyName = null)
+    protected override void OnPropertyChanged(PropertyChangedEventArgs e)
     {
-        base.RaisePropertyChanged(propertyName);
+        base.OnPropertyChanged(e);
 
-        if (propertyName.Equals(nameof(IsActive)))
+        if (e.PropertyName == nameof(IsActive))
         {
             Extension.Send(In.GameYouArePlayer, IsActive);
         }

@@ -27,70 +27,70 @@ public class ClickToComponent : Component, IDataErrorInfo
     public bool Mute
     {
         get => mute;
-        set => Set(ref mute, value);
+        set => SetProperty(ref mute, value);
     }
 
     public int muteValue = 500;
     public int MuteValue
     {
         get => muteValue;
-        set => Set(ref muteValue, value);
+        set => SetProperty(ref muteValue, value);
     }
 
     private bool muteInMinutes;
     public bool MuteInMinutes
     {
         get => muteInMinutes;
-        set => Set(ref muteInMinutes, value);
+        set => SetProperty(ref muteInMinutes, value);
     }
 
     private bool muteInHours = true;
     public bool MuteInHours
     {
         get => muteInHours;
-        set => Set(ref muteInHours, value);
+        set => SetProperty(ref muteInHours, value);
     }
 
     private bool kick = true;
     public bool Kick
     {
         get => kick;
-        set => Set(ref kick, value);
+        set => SetProperty(ref kick, value);
     }
 
     private bool ban;
     public bool Ban
     {
         get => ban;
-        set => Set(ref ban, value);
+        set => SetProperty(ref ban, value);
     }
 
     private bool banHour;
     public bool BanHour
     {
         get => banHour;
-        set => Set(ref banHour, value);
+        set => SetProperty(ref banHour, value);
     }
 
     private bool banDay;
     public bool BanDay
     {
         get => banDay;
-        set => Set(ref banDay, value);
+        set => SetProperty(ref banDay, value);
     }
 
     private bool banPerm = true;
     public bool BanPerm
     {
         get => banPerm;
-        set => Set(ref banPerm, value);
+        set => SetProperty(ref banPerm, value);
     }
 
     private bool bounce;
     public bool Bounce
     {
         get => bounce;
-        set => Set(ref bounce, value);
+        set => SetProperty(ref bounce, value);
     }
 
     public string Error => "...";

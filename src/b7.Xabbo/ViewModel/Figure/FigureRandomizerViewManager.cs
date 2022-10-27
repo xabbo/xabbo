@@ -11,9 +11,8 @@ using System.Windows.Media;
 
 using Microsoft.Extensions.Hosting;
 
-using GalaSoft.MvvmLight.Command;
+using CommunityToolkit.Mvvm.Input;
 
-using Xabbo.Interceptor;
 using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.GameData;
@@ -44,28 +43,28 @@ public class FigureRandomizerViewManager : ComponentViewModel
     public bool IsReady
     {
         get => _isReady;
-        private set => Set(ref _isReady, value);
+        private set => SetProperty(ref _isReady, value);
     }
 
     private int _timerInterval = 5500;
     public int TimerInterval
     {
         get => _timerInterval;
-        set => Set(ref _timerInterval, value);
+        set => SetProperty(ref _timerInterval, value);
     }
 
     private bool _isTimerActive;
     public bool IsTimerActive
     {
         get => _isTimerActive;
-        private set => Set(ref _isTimerActive, value);
+        private set => SetProperty(ref _isTimerActive, value);
     }
 
     private bool _useBaseFigure;
     public bool UseBaseFigure
     {
         get => _useBaseFigure;
-        set => Set(ref _useBaseFigure, value);
+        set => SetProperty(ref _useBaseFigure, value);
     }
 
     private string _baseFigureString = string.Empty;
@@ -74,7 +73,7 @@ public class FigureRandomizerViewManager : ComponentViewModel
         get => _baseFigureString;
         set
         {
-            if (Set(ref _baseFigureString, value))
+            if (SetProperty(ref _baseFigureString, value))
                 UpdateBaseFigure();
         }
     }
@@ -83,14 +82,14 @@ public class FigureRandomizerViewManager : ComponentViewModel
     public Gender BaseFigureGender
     {
         get => _baseFigureGender;
-        set => Set(ref _baseFigureGender, value);
+        set => SetProperty(ref _baseFigureGender, value);
     }
 
     private bool _allowHC;
     public bool AllowHC
     {
         get => _allowHC;
-        set => Set(ref _allowHC, value);
+        set => SetProperty(ref _allowHC, value);
     }
 
     public ICommand GetCurrentFigureCommand { get; }

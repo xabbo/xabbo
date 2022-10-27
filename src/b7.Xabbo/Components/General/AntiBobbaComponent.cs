@@ -23,21 +23,21 @@ public class AntiBobbaComponent : Component
     public bool IsLocalized
     {
         get => _isLocalized;
-        set => Set(ref _isLocalized, value);
+        set => SetProperty(ref _isLocalized, value);
     }
 
     private bool _isAutoEnabled;
     public bool IsAutoEnabled
     {
         get => _isAutoEnabled;
-        set => Set(ref _isAutoEnabled, value);
+        set => SetProperty(ref _isAutoEnabled, value);
     }
 
     private bool _isAvailable;
     public bool IsAvailable
     {
         get => _isAvailable;
-        set => Set(ref _isAvailable, value);
+        set => SetProperty(ref _isAvailable, value);
     }
 
     public AntiBobbaComponent(IExtension extension,

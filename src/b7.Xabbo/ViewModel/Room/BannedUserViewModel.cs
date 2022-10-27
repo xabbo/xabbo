@@ -1,6 +1,6 @@
 ﻿using System;
 
-using GalaSoft.MvvmLight;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace b7.Xabbo.ViewModel;
 

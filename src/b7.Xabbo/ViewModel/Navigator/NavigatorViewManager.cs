@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
-using GalaSoft.MvvmLight.Command;
+using CommunityToolkit.Mvvm.Input;
+
 using MaterialDesignThemes.Wpf;
+
 using Xabbo.Core;
 using Xabbo.Core.Tasks;
 using Xabbo.Extension;
@@ -23,7 +22,7 @@ public class NavigatorViewManager : ComponentViewModel
     public string SearchText
     {
         get => _searchText;
-        set => Set(ref _searchText, value);
+        set => SetProperty(ref _searchText, value);
     }
 
     public ICommand Search { get; set; }
@@ -32,7 +31,7 @@ public class NavigatorViewManager : ComponentViewModel
     public bool IsLoading
     {
         get => _isLoading;
-        set => Set(ref _isLoading, value);
+        set => SetProperty(ref _isLoading, value);
     }
 
     private readonly ObservableCollection<NavigatorRoomViewModel> _rooms = new();

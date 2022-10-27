@@ -1,9 +1,8 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 
 using Xabbo.Core;
 
 using b7.Xabbo.Model;
-using GalaSoft.MvvmLight;
 
 namespace b7.Xabbo.ViewModel;
 
@@ -21,7 +20,7 @@ public class FigureViewModel : ObservableObject
         {
             if (Model.Order == value) return;
             Model.Order = value;
-            RaisePropertyChanged(nameof(Order));
+            OnPropertyChanged();
         }
     }
 

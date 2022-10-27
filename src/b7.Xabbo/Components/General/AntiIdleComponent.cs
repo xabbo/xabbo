@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
-
+using System.ComponentModel;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 
 using Xabbo.Messages;
 using Xabbo.Extension;
-using Xabbo.Interceptor;
 
 using Xabbo.Core;
 using Xabbo.Core.Game;
@@ -27,7 +25,7 @@ public class AntiIdleComponent : Component
     public bool IsAntiIdleOutActive
     {
         get => _isAntiIdleOutActive;
-        set => Set(ref _isAntiIdleOutActive, value);
+        set => SetProperty(ref _isAntiIdleOutActive, value);
     }
 
     public AntiIdleComponent(IExtension extension,
@@ -54,11 +52,11 @@ public class AntiIdleComponent : Component
         _latencyCheckCount = -1;
     }
 
-    public override void RaisePropertyChanged([CallerMemberName] string propertyName = null)
+    protected override void OnPropertyChanged(PropertyChangedEventArgs e)
     {
-        base.RaisePropertyChanged(propertyName);
+        base.OnPropertyChanged(e);
 
-        switch (propertyName)
+        switch (e.PropertyName)
         {
             case nameof(IsActive):
             case nameof(IsAntiIdleOutActive):

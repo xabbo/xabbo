@@ -33,7 +33,6 @@
 		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="6.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
 		<PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
-		<PackageReference Include="MvvmLightLibsStd10" Version="5.4.1.1" />
 		<PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.13" />
 		<PackageReference Include="WPF-UI" Version="2.0.1" />
 	</ItemGroup>
