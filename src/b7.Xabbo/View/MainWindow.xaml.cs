@@ -10,7 +10,7 @@ using Wpf.Ui.Controls;
 
 namespace b7.Xabbo.View;
 
-public partial class MainWindow : Window, INavigationWindow
+public partial class MainWindow : UiWindow, INavigationWindow
 {
     public MainWindow(MainViewManager manager,
         INavigationService navigation,
@@ -20,7 +20,7 @@ public partial class MainWindow : Window, INavigationWindow
 
         InitializeComponent();
 
-        navigation.SetNavigation(rootNavigation);
+        navigation.SetNavigationControl(rootNavigation);
         SetPageService(pageService);
 
         rootNavigation.PageService = manager.PageService;

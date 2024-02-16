@@ -1,4 +1,4 @@
-﻿<Window x:Class="b7.Xabbo.View.MainWindow"
+﻿<ui:UiWindow x:Class="b7.Xabbo.View.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -16,9 +16,12 @@
         d:DataContext="{d:DesignInstance Type={x:Type viewModel:MainViewManager}}"
         Height="650" Width="600"
         Title="{Binding Title}"
+        WindowStyle="None"
+        ExtendsContentIntoTitleBar="True"
+        WindowBackdropType="Auto"
+        WindowCornerPreference="Round"
         UseLayoutRounding="True" SnapsToDevicePixels="True"
         RenderOptions.BitmapScalingMode="NearestNeighbor"
-        Style="{StaticResource UiWindow}"
         TextOptions.TextFormattingMode="Ideal"
         TextOptions.TextRenderingMode="Auto">
     <Grid x:Name="layoutRoot">
@@ -90,4 +93,4 @@
         </Grid>
         <md:Snackbar Grid.RowSpan="2" Margin="16" MessageQueue="{Binding SnackbarMessageQueue}" />
     </Grid>
-</Window>
+</ui:UiWindow>

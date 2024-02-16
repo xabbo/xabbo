@@ -15,7 +15,8 @@
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignExtensions;component/Themes/Generic.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignExtensions;component/Themes/MaterialDesignDarkTheme.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/Dragablz;component/Themes/materialdesign.xaml"/>
-                <ui:Resources Theme="Dark" />
+                <ui:ThemesDictionary Theme="Dark" />
+                <ui:ControlsDictionary />
                 <ResourceDictionary Source="pack://application:,,,/b7.Xabbo;component/Resources/Theme/Expander.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/b7.Xabbo;component/Resources/Theme/TabControl.xaml" />
             </ResourceDictionary.MergedDictionaries>
