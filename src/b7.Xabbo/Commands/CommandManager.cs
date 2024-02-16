@@ -220,6 +220,12 @@ public class CommandManager : IMessageHandler
                 unexpected = true;
             }
 
+            if (ex is InvalidArgsException && !string.IsNullOrWhiteSpace(binding.Usage))
+            {
+                ShowMessage($"Usage: /{command} {binding.Usage}");
+                return;
+            }
+
             ShowMessage("An error occurred while executing that command");
 
             if (ex is null) return;
