@@ -4,11 +4,31 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:b7.Xabbo.View"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:viewModel="clr-namespace:b7.Xabbo.ViewModel"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
-             d:DataContext="{d:DesignInstance Type={x:Type viewModel:GiftViewModel}}">
+             d:DataContext="{d:DesignInstance Type={x:Type viewModel:GiftViewManager}}">
     <Grid>
-            
+        <ItemsControl Margin="8" Padding="0" ItemsSource="{Binding Gifts}"
+                                     VirtualizingPanel.ScrollUnit="Pixel">
+            <ItemsControl.Template>
+                <ControlTemplate>
+                    <ScrollViewer x:Name="ScrollViewer" Padding="{TemplateBinding Padding}">
+                        <ItemsPresenter />
+                    </ScrollViewer>
+                </ControlTemplate>
+            </ItemsControl.Template>
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <local:GiftView Margin="4" DataContext="{Binding}" />
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
     </Grid>
 </UserControl>

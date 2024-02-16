@@ -1,12 +1,14 @@
 ﻿using System;
-using System.Windows.Media.Imaging;
 
 using CommunityToolkit.Mvvm.ComponentModel;
+
+using Xabbo.Core;
 
 namespace b7.Xabbo.ViewModel;
 
 public class GiftViewModel : ObservableObject
 {
+    public IFloorItem Item { get; init; }
 
     private string _itemName;
     public string ItemName
@@ -22,8 +24,8 @@ public class GiftViewModel : ObservableObject
         set => SetProperty(ref _itemIdentifier, value);
     }
 
-    private BitmapImage _itemImage;
-    public BitmapImage ItemImage
+    private Uri _itemImage;
+    public Uri ItemImageUri
     {
         get => _itemImage;
         set => SetProperty(ref _itemImage, value);
@@ -43,13 +45,12 @@ public class GiftViewModel : ObservableObject
         set => SetProperty(ref _senderName, value);
     }
 
-    private BitmapImage _senderImage;
-    public BitmapImage SenderImage
+    private Uri _senderImage;
+    public Uri SenderImageUri
     {
         get => _senderImage;
         set => SetProperty(ref _senderImage, value);
     }
-
 
     private string _extraParameter;
     public string ExtraParameter
@@ -57,6 +58,4 @@ public class GiftViewModel : ObservableObject
         get => _extraParameter;
         set => SetProperty(ref _extraParameter, value);
     }
-
-
 }

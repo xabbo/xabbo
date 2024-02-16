@@ -11,13 +11,15 @@ public partial class RoomPage : Page
     public VisitorsViewManager Visitors { get; }
     public BanListViewManager BanList { get; }
     public FurniViewManager Furni { get; }
+    public GiftViewManager Gifts { get; }
 
     public RoomPage(
         RoomInfoViewManager info,
         EntitiesViewManager entities,
         VisitorsViewManager visitors,
         BanListViewManager banList,
-        FurniViewManager furni)
+        FurniViewManager furni,
+        GiftViewManager gifts)
     {
         DataContext = this;
 
@@ -26,6 +28,7 @@ public partial class RoomPage : Page
         Visitors = visitors;
         BanList = banList;
         Furni = furni;
+        Gifts = gifts;
 
         InitializeComponent();
     }
