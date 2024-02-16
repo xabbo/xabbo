@@ -18,11 +18,26 @@ public class NavigatorViewManager : ComponentViewModel
 {
     private readonly ISnackbarMessageQueue _snackbar;
 
+    public IReadOnlyList<string> SearchTypes { get; } = new[] {
+        "Anything",
+        "Room name",
+        "Owner",
+        "Tag",
+        "Group"
+    };
+
     private string _searchText = string.Empty;
     public string SearchText
     {
         get => _searchText;
         set => SetProperty(ref _searchText, value);
+    }
+
+    private string _searchType = "Anything";
+    public string SearchType
+    {
+        get => _searchType;
+        set => SetProperty(ref _searchType, value);
     }
 
     public ICommand Search { get; set; }
@@ -54,7 +69,17 @@ public class NavigatorViewManager : ComponentViewModel
 
         try
         {
-            NavigatorSearchResults results = await new SearchNavigatorTask(Extension, "query", _searchText)
+            string searchType = SearchType.ToUpperInvariant() switch
+            {
+                "ANYTHING" => "",
+                "ROOM NAME" => "roomname:",
+                "OWNER" => "owner:",
+                "TAG" => "tag:",
+                "GROUP" => "groupname:",
+                _ => ""
+            };
+
+            NavigatorSearchResults results = await new SearchNavigatorTask(Extension, "query", searchType + _searchText)
                 .ExecuteAsync(5000, CancellationToken.None);
 
             _rooms.Clear();

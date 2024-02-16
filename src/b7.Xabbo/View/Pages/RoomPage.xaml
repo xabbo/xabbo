@@ -58,6 +58,15 @@
                 </TabItem.Header>
                 <view:RoomFurniView DataContext="{Binding Furni}" />
             </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="Gift24" />
+                        <TextBlock Margin="4,0,0,0" Text="Gifts" />
+                    </StackPanel>
+                </TabItem.Header>
+                <view:GiftsView DataContext="{Binding Gifts}" />
+            </TabItem>
         </dragablz:TabablzControl>
     </Grid>
 </Page>
