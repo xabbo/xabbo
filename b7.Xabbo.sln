@@ -12,6 +12,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "vs", "vs", "{2A1782FE-86A9-
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "b7.Xabbo.Avalonia", "src\b7.Xabbo.Avalonia\b7.Xabbo.Avalonia.csproj", "{215A276F-73CB-4695-982A-BAF567DD70E4}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "lib", "lib", "{9F431937-CF1D-4798-B4C5-DC9F6C621E64}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xabbo.Common", "lib\Xabbo.Common\src\Xabbo.Common\Xabbo.Common.csproj", "{E5A6FEE4-C128-440A-892D-9D58F42F0072}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xabbo.Core", "lib\Xabbo.Core\src\Xabbo.Core\Xabbo.Core.csproj", "{17A799EC-CBDB-478C-9640-4CD32104106F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xabbo.GEarth", "lib\Xabbo.GEarth\src\Xabbo.GEarth\Xabbo.GEarth.csproj", "{06E636F3-5DB8-4083-A2CD-62085CE50E86}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,9 +34,26 @@ Global
 		{215A276F-73CB-4695-982A-BAF567DD70E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{215A276F-73CB-4695-982A-BAF567DD70E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{215A276F-73CB-4695-982A-BAF567DD70E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E5A6FEE4-C128-440A-892D-9D58F42F0072}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E5A6FEE4-C128-440A-892D-9D58F42F0072}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E5A6FEE4-C128-440A-892D-9D58F42F0072}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E5A6FEE4-C128-440A-892D-9D58F42F0072}.Release|Any CPU.Build.0 = Release|Any CPU
+		{17A799EC-CBDB-478C-9640-4CD32104106F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17A799EC-CBDB-478C-9640-4CD32104106F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17A799EC-CBDB-478C-9640-4CD32104106F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17A799EC-CBDB-478C-9640-4CD32104106F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{06E636F3-5DB8-4083-A2CD-62085CE50E86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06E636F3-5DB8-4083-A2CD-62085CE50E86}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06E636F3-5DB8-4083-A2CD-62085CE50E86}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06E636F3-5DB8-4083-A2CD-62085CE50E86}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{E5A6FEE4-C128-440A-892D-9D58F42F0072} = {9F431937-CF1D-4798-B4C5-DC9F6C621E64}
+		{17A799EC-CBDB-478C-9640-4CD32104106F} = {9F431937-CF1D-4798-B4C5-DC9F6C621E64}
+		{06E636F3-5DB8-4083-A2CD-62085CE50E86} = {9F431937-CF1D-4798-B4C5-DC9F6C621E64}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {75AC1C17-09AE-4B3C-B1B2-45DA0AA72A2C}

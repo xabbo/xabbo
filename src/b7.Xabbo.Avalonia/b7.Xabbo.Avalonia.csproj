@@ -24,4 +24,11 @@
     <PackageReference Include="Avalonia.ReactiveUI" Version="11.0.6" />
     <PackageReference Include="FluentAvaloniaUI" Version="2.0.5" />
   </ItemGroup>
+
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\lib\Xabbo.Common\src\Xabbo.Common\Xabbo.Common.csproj" />
+    <ProjectReference Include="..\..\lib\Xabbo.Core\src\Xabbo.Core\Xabbo.Core.csproj" />
+    <ProjectReference Include="..\..\lib\Xabbo.GEarth\src\Xabbo.GEarth\Xabbo.GEarth.csproj" />
+  </ItemGroup>
 </Project>
