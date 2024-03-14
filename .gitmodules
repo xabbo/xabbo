@@ -1,12 +1,9 @@
 [submodule "Xabbo.Common"]
 	path = ./lib/Xabbo.Common
 	url = https://github.com/b7c/Xabbo.Common 
-	branch = net8
 [submodule "Xabbo.GEarth"]
 	path = ./lib/Xabbo.GEarth
 	url = https://github.com/b7c/Xabbo.GEarth 
-	branch = net8
 [submodule "Xabbo.Core"]
 	path = ./lib/Xabbo.Core
 	url = https://github.com/b7c/Xabbo.Core
-	branch = net8
