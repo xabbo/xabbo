@@ -8,11 +8,6 @@
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
   </PropertyGroup>
 
-  <PropertyGroup Label="NativeAOT" Condition="$([MSBuild]::IsTargetFrameworkCompatible($(TargetFramework), 'net8.0'))">
-    <IsAotCompatible>true</IsAotCompatible>
-    <PublishAot>false</PublishAot>
-  </PropertyGroup>
-
   <ItemGroup Label="GitVersion">
     <PackageReference Include="GitVersion.MsBuild" Version="5.10.3" PrivateAssets="all" />
   </ItemGroup>
