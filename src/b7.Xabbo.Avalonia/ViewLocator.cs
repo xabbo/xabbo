@@ -1,9 +1,10 @@
-using System;
+﻿using System;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using b7.Xabbo.Avalonia.ViewModels;
 
 namespace b7.Xabbo.Avalonia;
+
 public class ViewLocator : IDataTemplate
 {
     public Control? Build(object? data)

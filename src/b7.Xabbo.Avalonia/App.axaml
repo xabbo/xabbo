@@ -1,15 +1,42 @@
-<Application xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             x:Class="b7.Xabbo.Avalonia.App"
-             xmlns:local="using:b7.Xabbo.Avalonia"
-             RequestedThemeVariant="Default">
-             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+<Application
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  x:Class="b7.Xabbo.Avalonia.App"
+  xmlns:local="using:b7.Xabbo.Avalonia"
+  xmlns:sty="using:FluentAvalonia.Styling"
+  xmlns:c="using:b7.Xabbo.Avalonia.Converters"
+  RequestedThemeVariant="Default"
+>
+    <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
     <Application.DataTemplates>
         <local:ViewLocator/>
     </Application.DataTemplates>
   
     <Application.Styles>
-        <FluentTheme />
+      <sty:FluentAvaloniaTheme />
+      <StyleInclude Source="avares://FluentAvalonia.ProgressRing/Styling/Controls/ProgressRing.axaml" />
+
+      <Style Selector="SelectableTextBlock">
+        <Setter Property="SelectionBrush" Value="Purple" />
+      </Style>
+
+      <Style Selector="DataGrid DataGridCell:current /template/ Grid#FocusVisual">
+        <Setter Property="IsVisible" Value="False" />
+      </Style>
     </Application.Styles>
+
+  <Application.Resources>
+    <Color x:Key="RadioButtonCheckGlyphFill">#5000AA</Color>
+    <Color x:Key="RadioButtonCheckGlyphFillPointerOver">#5000AA</Color>
+    <Color x:Key="RadioButtonCheckGlyphFillPressed">#5000AA</Color>
+    <Color x:Key="RadioButtonCheckGlyphFillDisabled">#333333</Color>
+
+    <c:HabboStringConverter x:Key="HabboStringConverter"/>
+    <c:MultiValueConverter x:Key="MultiValueConverter"/>
+    <c:BoolToOpacityConverter x:Key="BoolToOpacityConverter"/>
+    <c:HumanizerConverter x:Key="HumanizerConverter"/>
+    <c:WhitespaceNewlineConverter x:Key="WhitespaceNewlineConverter" />
+    <c:GtConverter x:Key="GtConverter" />
+  </Application.Resources>
 </Application>

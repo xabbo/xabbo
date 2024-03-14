@@ -1,0 +1,40 @@
+<UserControl
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:v="using:b7.Xabbo.Avalonia.Views"
+  xmlns:vm="using:b7.Xabbo.Avalonia.ViewModels"
+  mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+  x:Class="b7.Xabbo.Avalonia.Views.RoomFurniListView"
+  x:DataType="vm:RoomFurniViewModel"
+>
+  <DataGrid
+    Name="DataGridFurni"
+    Grid.Row="1"
+    ItemsSource="{Binding Furni}"
+    CanUserReorderColumns="True"
+    CanUserResizeColumns="True"
+    CanUserSortColumns="True"
+  >
+    <DataGrid.Columns>
+      <DataGridTextColumn Width="100" Header="id" Binding="{Binding Id}" />
+      <DataGridTemplateColumn
+        x:DataType="vm:FurniViewModel"
+        Width="250" Header="name"
+        SortMemberPath="Name"
+        ClipboardContentBinding="{Binding Name}"
+      >
+        <DataTemplate x:DataType="vm:FurniViewModel">
+          <TextBlock VerticalAlignment="Center" Text="{Binding Name}">
+            <ToolTip.Tip>
+              <v:FurniPopupView />
+            </ToolTip.Tip>
+          </TextBlock>
+        </DataTemplate>
+      </DataGridTemplateColumn>
+      <DataGridTextColumn Width="100" Header="owner id" Binding="{Binding OwnerId}" />
+      <DataGridTextColumn Width="150" Header="owner name" Binding="{Binding OwnerName}" />
+    </DataGrid.Columns>
+  </DataGrid>
+</UserControl>

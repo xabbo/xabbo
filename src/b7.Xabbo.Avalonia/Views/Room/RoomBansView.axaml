@@ -1,0 +1,44 @@
+<UserControl
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:ui="using:FluentAvalonia.UI.Controls"
+  xmlns:vm="using:b7.Xabbo.Avalonia.ViewModels"
+  mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+  x:Class="b7.Xabbo.Avalonia.Views.RoomBansView"
+  x:DataType="vm:RoomBansViewModel"
+>
+  <Grid RowDefinitions="Auto,*,Auto">
+    <ui:ProgressRing
+      HorizontalAlignment="Center"
+      VerticalAlignment="Center"
+      Grid.RowSpan="3"
+      IsIndeterminate="True"
+      Width="60" Height="60"
+      BorderThickness="4"
+      IsVisible="{Binding IsLoading}"
+    />
+    <TextBox
+      Margin="10,0,10,10"
+      Watermark="Filter"
+      Text="{Binding FilterText}"
+    />
+    <DataGrid Grid.Row="1">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="id" />
+        <DataGridTextColumn Header="name" />
+      </DataGrid.Columns>
+    </DataGrid>
+    <WrapPanel Grid.Row="2" Margin="10" HorizontalAlignment="Right">
+      <Button
+        Content="Unban"
+      />
+      <Button
+        Margin="10,0,0,0"
+        Content="Load"
+        Command="{Binding LoadBansCommand}"
+      />
+    </WrapPanel>
+  </Grid>
+</UserControl>

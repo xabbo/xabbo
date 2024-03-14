@@ -1,0 +1,19 @@
+<UserControl
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:vm="using:b7.Xabbo.Avalonia.ViewModels"
+  mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+  x:Class="b7.Xabbo.Avalonia.Views.UserPopupView"
+  x:DataType="vm:EntityViewModel"
+  FontSize="16"
+>
+  <Grid ColumnDefinitions="Auto,*">
+    <Image Width="64" Height="110" Source="{Binding AvatarImage^}" />
+    <StackPanel Grid.Column="1">
+      <TextBlock FontWeight="Bold" Text="{Binding Name}" />
+      <TextBlock Text="{Binding Motto, Converter={StaticResource HabboStringConverter}}" />
+    </StackPanel>
+  </Grid>
+</UserControl>
