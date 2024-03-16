@@ -60,11 +60,10 @@ public class RoomVisitorsViewModel : ViewModelBase
         _roomManager = roomManager ?? throw new ArgumentNullException(nameof(roomManager));
 
         _visitorCache.Connect()
-            //.Sort(SortExpressionComparer<VisitorViewModel>
-                //.Ascending(x => x.Entered ?? DateTime.MaxValue)
-                //.ThenByAscending(x => x.Index))
             .Filter(Filter)
-            .Sort(SortExpressionComparer<VisitorViewModel>.Ascending(x => x.Id))
+            .Sort(SortExpressionComparer<VisitorViewModel>
+                .Descending(x => x.Entered ?? DateTime.MinValue)
+                .ThenByDescending(x => x.Index))
             .Bind(out _visitors)
             .Subscribe();
 
