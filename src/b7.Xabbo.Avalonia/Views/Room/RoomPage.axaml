@@ -15,7 +15,7 @@
       <Setter Property="FontSize" Value="14" />
     </Style>
   </UserControl.Styles>
-  <TabControl Padding="0">
+  <TabControl Padding="0,4,0,0">
     <TabItem>
       <TabItem.Header>
         <StackPanel Orientation="Horizontal" Spacing="4">
@@ -23,7 +23,10 @@
           <TextBlock Text="Info" />
         </StackPanel>
       </TabItem.Header>
-      <v:RoomInfoView DataContext="{Binding Info}" />
+      <v:RoomInfoView
+        Padding="10,0,10,10"
+        DataContext="{Binding Info}"
+      />
     </TabItem>
     <TabItem>
       <TabItem.Header>
