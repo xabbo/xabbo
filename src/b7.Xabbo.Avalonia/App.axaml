@@ -24,6 +24,11 @@
       <Style Selector="DataGrid DataGridCell:current /template/ Grid#FocusVisual">
         <Setter Property="IsVisible" Value="False" />
       </Style>
+
+      <!-- Slimmer tab items -->
+      <Style Selector="TabItem">
+        <Setter Property="MinHeight" Value="40" />
+      </Style>
     </Application.Styles>
 
   <Application.Resources>
