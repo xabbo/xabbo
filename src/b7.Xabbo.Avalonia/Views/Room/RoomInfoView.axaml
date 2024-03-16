@@ -12,10 +12,8 @@
   FontSize="16"
 >
   <UserControl.Styles>
-    <Style Selector="TextBlock">
-      <Setter Property="HorizontalAlignment" Value="Right"/>
-      <Setter Property="FontWeight" Value="Bold"/>
-      <Setter Property="Margin" Value="0,0,10,0"/>
+    <Style Selector="SelectableTextBlock">
+      <Setter Property="TextWrapping" Value="Wrap" />
     </Style>
   </UserControl.Styles>
   <Panel>
@@ -31,7 +29,62 @@
       <TextBlock Margin="0" VerticalAlignment="Center" FontWeight="Light">Enter a room</TextBlock>
     </StackPanel>
     <ScrollViewer x:Name="layoutRoot" IsVisible="{Binding IsInRoom}">
+      <StackPanel>
+        <Border
+          Padding="10" CornerRadius="4"
+          Background="{DynamicResource ControlFillColorTertiary}"
+          BorderBrush="{DynamicResource AccentControlElevationBorderBrush}"
+          BorderThickness="1"
+        >
+          <Grid ColumnDefinitions="Auto,*">
+            <Border
+              Margin="0,0,10,0"
+              Width="110" Height="110"
+              VerticalAlignment="Top"
+              ClipToBounds="True"
+              CornerRadius="4"
+              BorderThickness="1"
+              BorderBrush="{DynamicResource ControlFillColorTertiary}"
+              Background="{DynamicResource ControlFillColorTertiary}"
+            >
+              <Panel>
+                <ic:SymbolIcon
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Symbol="Home"
+                />
+                <Image Width="110" Height="110" Source="{Binding Thumbnail^}" />
+              </Panel>
+            </Border>
+            <StackPanel Grid.Column="1">
+              <SelectableTextBlock>
+                <Run FontWeight="Bold" Text="{Binding Data.Name, Mode=OneWay, FallbackValue='Room name', Converter={StaticResource HabboStringConverter}}" />
+                by
+                <Run Text="{Binding Data.OwnerName, Mode=OneWay, FallbackValue='Owner name'}" />
+              </SelectableTextBlock>
+              <SelectableTextBlock>
+                  <TextBox.Text>
+                      <Binding Path="Data.Description" Mode="OneWay">
+                          <Binding.Converter>
+                              <c:MultiValueConverter>
+                                  <StaticResource ResourceKey="HabboStringConverter" />
+                                  <StaticResource ResourceKey="WhitespaceNewlineConverter" />
+                              </c:MultiValueConverter>
+                          </Binding.Converter>
+                      </Binding>
+                  </TextBox.Text>
+              </SelectableTextBlock>
+            </StackPanel>
+          </Grid>
+        </Border>
         <Grid x:Name="gridInfo" Margin="4" DataContext="{Binding Data}" HorizontalAlignment="Stretch">
+          <Grid.Styles>
+            <Style Selector="TextBlock">
+              <Setter Property="HorizontalAlignment" Value="Right"/>
+              <Setter Property="FontWeight" Value="Bold"/>
+              <Setter Property="Margin" Value="0,0,10,0"/>
+            </Style>
+          </Grid.Styles>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="1*" />
@@ -58,17 +111,9 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <!-- Room name -->
-            <TextBlock Text="Room name" />
-            <SelectableTextBlock Grid.Column="1" Text="{Binding Name, Mode=OneWay, Converter={StaticResource HabboStringConverter}}" TextWrapping="Wrap" />
-
             <!-- Room ID -->
             <TextBlock Grid.Row="1" Text="Room ID" />
             <SelectableTextBlock Grid.Column="1" Grid.Row="1" Text="{Binding Id, Mode=OneWay}" TextWrapping="Wrap" />
-
-            <!-- Owner name -->
-            <TextBlock Grid.Row="2" Text="Owner name" />
-            <SelectableTextBlock Grid.Column="1" Grid.Row="2" Text="{Binding OwnerName, Mode=OneWay, Converter={StaticResource HabboStringConverter}}" TextWrapping="Wrap" />
 
             <!-- Owner ID -->
             <TextBlock Grid.Row="3" Text="Owner ID" />
@@ -78,27 +123,12 @@
             <TextBlock Grid.Row="4" Text="Category" />
             <SelectableTextBlock Grid.Column="1" Grid.Row="4" Text="{Binding Category, Mode=OneWay, Converter={StaticResource HumanizerConverter}}" TextWrapping="Wrap" />
 
-            <!-- Description -->
-            <TextBlock Grid.Row="5" Text="Description" />
-            <SelectableTextBlock Grid.Column="1" Grid.Row="5" TextWrapping="Wrap">
-                <TextBox.Text>
-                    <Binding Path="Description" Mode="OneWay">
-                        <Binding.Converter>
-                            <c:MultiValueConverter>
-                                <StaticResource ResourceKey="HabboStringConverter" />
-                                <StaticResource ResourceKey="WhitespaceNewlineConverter" />
-                            </c:MultiValueConverter>
-                        </Binding.Converter>
-                    </Binding>
-                </TextBox.Text>
-            </SelectableTextBlock>
-
             <!-- Room access -->
-            <TextBlock Grid.Row="6" Text="Room access" />
+            <TextBlock Grid.Row="6" Text="Access" />
             <SelectableTextBlock Grid.Column="1" Grid.Row="6" Text="{Binding Access, Mode=OneWay, Converter={StaticResource HumanizerConverter}}" TextWrapping="Wrap" />
 
             <!-- Maximum visitors -->
-            <TextBlock Grid.Row="7" Text="Maximum visitors" />
+            <TextBlock Grid.Row="7" Text="Max users" />
             <SelectableTextBlock Grid.Column="1" Grid.Row="7" Text="{Binding MaxUsers, Mode=OneWay}" TextWrapping="Wrap" />
 
             <!-- Trading -->
@@ -149,6 +179,7 @@
             <TextBlock Grid.Row="18" Text="Flood protection" />
             <SelectableTextBlock Grid.Column="1" Grid.Row="18" Text="{Binding ChatSettings.FloodProtection, Mode=OneWay, Converter={StaticResource HumanizerConverter}}" TextWrapping="Wrap" />
         </Grid>
+      </StackPanel>
     </ScrollViewer>
   </Panel>
 </UserControl>
