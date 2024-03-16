@@ -19,7 +19,10 @@ public static class ImageHelper
     public static async Task<Bitmap?> LoadFromWeb(Uri url)
     {
         using var httpClient = new HttpClient();
-        httpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36");
+
+        httpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows; U; en-US) AppleWebKit/533.19.4 (KHTML, like Gecko) AdobeAIR/50.2");
+        httpClient.DefaultRequestHeaders.Add("Referer", "app:/HabboAir.swf");
+
         try
         {
             var response = await httpClient.GetAsync(url);

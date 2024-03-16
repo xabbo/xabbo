@@ -43,7 +43,7 @@ public abstract class ItemViewModelBase : ViewModelBase
         string identifier = _info.Identifier.Replace('*', '_');
         if (identifier == "poster" && _item is IWallItem wallItem)
             identifier += "_" + wallItem.Data;
-        return ImageHelper.LoadFromWeb(new Uri($"https://images.habbo.com/dcr/hof_furni/{_info.Revision}/{identifier}_icon.png"));
+        return ImageHelper.LoadFromWeb(new Uri($"http://images.habbo.com/dcr/hof_furni/{_info.Revision}/{identifier}_icon.png"));
     }
 }
 
