@@ -1,14 +1,14 @@
-﻿using System.Collections.ObjectModel;
-using System.Linq;
+﻿using System;
+using System.Collections.ObjectModel;
+
+using ReactiveUI;
+using DynamicData;
+using DynamicData.Kernel;
 
 using Xabbo.Core.Events;
 using Xabbo.Core.Game;
 
 using b7.Xabbo.Services;
-using DynamicData;
-using DynamicData.Kernel;
-using System;
-using ReactiveUI;
 
 namespace b7.Xabbo.Avalonia.ViewModels;
 
@@ -27,7 +27,7 @@ public class RoomEntitiesViewModel : ViewModelBase
         _uiContext = uiContext;
         _roomManager = roomManager;
 
-        _entityCache.Connect().Bind(out _entities).Subscribe();
+        _entityCache.Connect().SortBy(x => x.Name).Bind(out _entities).Subscribe();
 
         _roomManager.Left += OnLeftRoom;
         _roomManager.EntityAdded += OnEntityAdded;
