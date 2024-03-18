@@ -48,6 +48,8 @@ public static class ViewModelLocator
         Splatr.RegisterLazySingleton<RoomBansViewModel>();
         Splatr.RegisterLazySingleton<RoomFurniViewModel>();
 
+        Splatr.RegisterLazySingleton<FurniDataViewModel>();
+
         // Logic
         var ext = new GEarthExtension(
             GEarthOptions.Default.WithAssemblyVersion() with
@@ -74,7 +76,7 @@ public static class ViewModelLocator
         container.Register(() => Locator.Current.GetService<GameStateService>()!.Inventory);
         container.Register(() => Locator.Current.GetService<GameStateService>()!.Room);
 
-        container.Register<IGameDataManager>(() => new GameDataManager());
+        container.RegisterLazySingleton<IGameDataManager>(() => new GameDataManager());
 
         // Xabbo components
         Splatr.RegisterLazySingleton<XabbotComponent>();

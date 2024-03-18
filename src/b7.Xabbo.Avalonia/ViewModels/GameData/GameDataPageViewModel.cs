@@ -5,10 +5,10 @@ using FluentIcons.Avalonia.Fluent;
 
 namespace b7.Xabbo.Avalonia.ViewModels;
 
-public class GameDataPageViewModel : PageViewModel
+public class GameDataPageViewModel(FurniDataViewModel furniData) : PageViewModel
 {
     public override string Header => "Game data";
     public override IconSource? Icon { get; } = new SymbolIconSource { Symbol = Symbol.Database };
 
-    public GameDataPageViewModel() { }
+    public FurniDataViewModel FurniData { get; } = furniData;
 }

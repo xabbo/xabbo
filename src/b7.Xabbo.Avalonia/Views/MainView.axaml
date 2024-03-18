@@ -28,6 +28,9 @@
       <DataTemplate DataType="{x:Type vm:RoomPageViewModel}">
         <v:RoomPage />
       </DataTemplate>
+      <DataTemplate DataType="{x:Type vm:GameDataPageViewModel}">
+        <v:GameDataPage />
+      </DataTemplate>
     </ui:NavigationView.DataTemplates>
     <ui:NavigationView.MenuItemTemplate>
       <DataTemplate DataType="{x:Type vm:PageViewModel}">

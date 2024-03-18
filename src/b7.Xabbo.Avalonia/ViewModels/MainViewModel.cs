@@ -21,9 +21,10 @@ public class MainViewModel : ViewModelBase
     public MainViewModel(IControlledApplicationLifetime lt,
         GeneralPageViewModel general,
         ChatPageViewModel chat,
-        RoomPageViewModel room)
+        RoomPageViewModel room,
+        GameDataPageViewModel gameData)
     {
-        Pages = [general, chat, room];
+        Pages = [general, chat, room, gameData];
         CurrentPage = general;
     }
 }
