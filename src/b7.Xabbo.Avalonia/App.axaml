@@ -4,6 +4,7 @@
   x:Class="b7.Xabbo.Avalonia.App"
   xmlns:local="using:b7.Xabbo.Avalonia"
   xmlns:sty="using:FluentAvalonia.Styling"
+  xmlns:ui="using:FluentAvalonia.UI.Controls"
   xmlns:c="using:b7.Xabbo.Avalonia.Converters"
   RequestedThemeVariant="Default"
 >
@@ -28,6 +29,20 @@
       <!-- Slimmer tab items -->
       <Style Selector="TabItem">
         <Setter Property="MinHeight" Value="40" />
+        <Setter Property="FontSize" Value="14" />
+      </Style>
+
+      <!-- DataGrid -->
+      <Style Selector="TextBlock#CellTextBlock">
+        <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+      </Style>
+      <Style Selector="DataGridColumnHeader:sortascending /template/ ui|FontIcon#SortIcon">
+        <Setter Property="FontSize" Value="10" />
+        <Setter Property="Margin" Value="0" />
+      </Style>
+      <Style Selector="DataGridColumnHeader:sortdescending /template/ ui|FontIcon#SortIcon">
+        <Setter Property="FontSize" Value="10" />
+        <Setter Property="Margin" Value="0" />
       </Style>
     </Application.Styles>
 
