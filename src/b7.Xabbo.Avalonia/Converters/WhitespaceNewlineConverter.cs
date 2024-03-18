@@ -9,13 +9,15 @@ namespace b7.Xabbo.Avalonia.Converters;
 // [ValueConversion(typeof(string), typeof(string))]
 public class WhitespaceNewlineConverter : IValueConverter
 {
+    public int Threshold { get; set; } = 10;
+
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is not string s)
             return new BindingNotification(new ArgumentException("Input value must be a string."), BindingErrorType.Error);
 
         if (parameter is not int threshold)
-            threshold = 10;
+            threshold = Threshold;
 
         return Regex.Replace(s, $@"[^\S\r\n]{{{threshold},}}", "\r\n");
     }

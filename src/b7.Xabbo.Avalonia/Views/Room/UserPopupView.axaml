@@ -3,6 +3,7 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:c="using:b7.Xabbo.Avalonia.Converters"
   xmlns:vm="using:b7.Xabbo.Avalonia.ViewModels"
   mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
   x:Class="b7.Xabbo.Avalonia.Views.UserPopupView"
@@ -13,7 +14,18 @@
     <Image Width="64" Height="110" Source="{Binding AvatarImage^}" />
     <StackPanel Grid.Column="1">
       <TextBlock FontWeight="Bold" Text="{Binding Name}" />
-      <TextBlock Text="{Binding Motto, Converter={StaticResource HabboStringConverter}}" />
+      <TextBlock>
+        <TextBlock.Text>
+          <Binding Path="Motto" Mode="OneWay">
+            <Binding.Converter>
+              <c:MultiValueConverter>
+                <c:HabboStringConverter />
+                <c:WhitespaceNewlineConverter Threshold="5" />
+              </c:MultiValueConverter>
+            </Binding.Converter>
+          </Binding>
+        </TextBlock.Text>
+      </TextBlock>
     </StackPanel>
   </Grid>
 </UserControl>
