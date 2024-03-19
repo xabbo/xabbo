@@ -40,33 +40,43 @@
         >
           <DataGridTemplateColumn.CellTemplate>
             <DataTemplate DataType="{x:Type vm:EntityViewModel}">
-              <StackPanel
-                Orientation="Horizontal"
+              <DockPanel
+                HorizontalAlignment="Stretch"
+                Margin="12,0"
                 Classes.IsUser="{Binding IsUser}"
               >
-                <StackPanel.Styles>
-                  <Style Selector="StackPanel.IsUser">
+                <DockPanel.Styles>
+                  <Style Selector="DockPanel.IsUser">
                     <Setter Property="ToolTip.Tip">
                       <Template>
                         <v:UserPopupView />
                       </Template>
                     </Setter>
                   </Style>
-                </StackPanel.Styles>
-                <TextBlock VerticalAlignment="Center" Text="{Binding Name}" />
-                <ic:SymbolIcon
-                  Margin="0,0,0,4"
-                  FontSize="14"
+                </DockPanel.Styles>
+                <TextBlock
                   VerticalAlignment="Center"
-                  Symbol="Snooze"
-                  IsVisible="{Binding IsIdle, Mode=OneWay}"
+                  TextTrimming="CharacterEllipsis"
+                  Text="{Binding Name}"
                 />
-                <ic:SymbolIcon
-                  VerticalAlignment="Center"
-                  Symbol="Handshake"
-                  IsVisible="{Binding IsTrading, Mode=OneWay}"
-                />
-              </StackPanel>
+                <StackPanel
+                  DockPanel.Dock="Right"
+                  Orientation="Horizontal"
+                >
+                  <ic:SymbolIcon
+                    FontSize="14"
+                    VerticalAlignment="Center"
+                    Symbol="Snooze"
+                    IsVisible="{Binding IsIdle, Mode=OneWay}"
+                  />
+                  <ic:SymbolIcon
+                    Margin="4,0,0,0"
+                    VerticalAlignment="Center"
+                    Symbol="Handshake"
+                    IsVisible="{Binding IsTrading, Mode=OneWay}"
+                  />
+                </StackPanel>
+              </DockPanel>
             </DataTemplate>
           </DataGridTemplateColumn.CellTemplate>
         </DataGridTemplateColumn>

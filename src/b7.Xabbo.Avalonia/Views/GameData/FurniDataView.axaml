@@ -35,7 +35,7 @@
         >
           <DataTemplate>
             <TextBlock
-              Margin="0,8,0,0"
+              Margin="12,8,12,0"
               VerticalAlignment="Center"
               FontFamily="Consolas"
               FontSize="12"
@@ -52,7 +52,7 @@
         >
           <DataTemplate DataType="vm:FurniInfoViewModel">
             <TextBlock
-              Margin="0,8,0,0"
+              Margin="12,8,12,0"
               VerticalAlignment="Center"
               FontFamily="Consolas"
               FontSize="12"

@@ -26,7 +26,12 @@
         ClipboardContentBinding="{Binding Name}"
       >
         <DataTemplate x:DataType="vm:FurniViewModel">
-          <TextBlock VerticalAlignment="Center" Text="{Binding Name}">
+          <TextBlock
+            Margin="12,0"
+            VerticalAlignment="Center"
+            TextTrimming="CharacterEllipsis"
+            Text="{Binding Name}"
+          >
             <ToolTip.Tip>
               <v:FurniPopupView />
             </ToolTip.Tip>
