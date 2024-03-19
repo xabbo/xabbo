@@ -16,6 +16,7 @@ public class EntityViewModel : ViewModelBase
 
     private readonly IEntity _entity;
 
+    public EntityType Type => _entity.Type;
     public int Index => _entity.Index;
     public long Id => _entity.Id;
     public string Name => _entity.Name;

@@ -11,58 +11,66 @@
   x:Class="b7.Xabbo.Avalonia.Views.RoomEntitiesView"
   x:DataType="vm:RoomEntitiesViewModel"
 >
-  <DataGrid
-    x:Name="EntityDataGrid"
-    ItemsSource="{Binding Entities}"
-    CanUserReorderColumns="True"
-    CanUserResizeColumns="True"
-    CanUserSortColumns="True"
-  >
-    <DataGrid.ContextFlyout>
-      <MenuFlyout>
-        <MenuItem Header="Test" />
-      </MenuFlyout>
-    </DataGrid.ContextFlyout>
-    <DataGrid.Columns>
-      <DataGridTextColumn Header="index" Binding="{Binding Index}" />
-      <DataGridTextColumn Header="id" Binding="{Binding Id}" />
-      <DataGridTemplateColumn
-        x:DataType="vm:EntityViewModel"
-        Header="name" SortMemberPath="Name"
-        ClipboardContentBinding="{Binding Name}"
-      >
-        <DataGridTemplateColumn.CellTemplate>
-          <DataTemplate DataType="{x:Type vm:EntityViewModel}">
-            <StackPanel
-              Orientation="Horizontal"
-              Classes.IsUser="{Binding IsUser}"
-            >
-              <StackPanel.Styles>
-                <Style Selector="StackPanel.IsUser">
-                  <Setter Property="ToolTip.Tip">
-                    <Template>
-                      <v:UserPopupView />
-                    </Template>
-                  </Setter>
-                </Style>
-              </StackPanel.Styles>
-              <TextBlock VerticalAlignment="Center" Text="{Binding Name}" />
-              <ic:SymbolIcon
-                Margin="0,0,0,4"
-                FontSize="14"
-                VerticalAlignment="Center"
-                Symbol="Snooze"
-                IsVisible="{Binding IsIdle, Mode=OneWay}"
-              />
-              <ic:SymbolIcon
-                VerticalAlignment="Center"
-                Symbol="Handshake"
-                IsVisible="{Binding IsTrading, Mode=OneWay}"
-              />
-            </StackPanel>
-          </DataTemplate>
-        </DataGridTemplateColumn.CellTemplate>
-      </DataGridTemplateColumn>
-    </DataGrid.Columns>
-  </DataGrid>
+  <Grid RowDefinitions="Auto,*">
+    <TextBox
+      Margin="10,0,10,10"
+      Watermark="Filter"
+      Text="{Binding FilterText}"
+    />
+    <DataGrid
+      x:Name="EntityDataGrid"
+      Grid.Row="1"
+      ItemsSource="{Binding Entities}"
+      CanUserReorderColumns="True"
+      CanUserResizeColumns="True"
+      CanUserSortColumns="True"
+    >
+      <DataGrid.ContextFlyout>
+        <MenuFlyout>
+          <MenuItem Header="Test" />
+        </MenuFlyout>
+      </DataGrid.ContextFlyout>
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="index" Binding="{Binding Index}" />
+        <DataGridTextColumn Header="id" Binding="{Binding Id}" />
+        <DataGridTemplateColumn
+          x:DataType="vm:EntityViewModel"
+          Header="name" SortMemberPath="Name"
+          ClipboardContentBinding="{Binding Name}"
+        >
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate DataType="{x:Type vm:EntityViewModel}">
+              <StackPanel
+                Orientation="Horizontal"
+                Classes.IsUser="{Binding IsUser}"
+              >
+                <StackPanel.Styles>
+                  <Style Selector="StackPanel.IsUser">
+                    <Setter Property="ToolTip.Tip">
+                      <Template>
+                        <v:UserPopupView />
+                      </Template>
+                    </Setter>
+                  </Style>
+                </StackPanel.Styles>
+                <TextBlock VerticalAlignment="Center" Text="{Binding Name}" />
+                <ic:SymbolIcon
+                  Margin="0,0,0,4"
+                  FontSize="14"
+                  VerticalAlignment="Center"
+                  Symbol="Snooze"
+                  IsVisible="{Binding IsIdle, Mode=OneWay}"
+                />
+                <ic:SymbolIcon
+                  VerticalAlignment="Center"
+                  Symbol="Handshake"
+                  IsVisible="{Binding IsTrading, Mode=OneWay}"
+                />
+              </StackPanel>
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+      </DataGrid.Columns>
+    </DataGrid>
+  </Grid>
 </UserControl>
