@@ -1,18 +1,9 @@
 [submodule "Xabbo.Common"]
-	path = ./lib/Xabbo.Common
-	url = https://github.com/b7c/Xabbo.Common 
-[submodule "Xabbo.GEarth"]
-	path = ./lib/Xabbo.GEarth
-	url = https://github.com/b7c/Xabbo.GEarth 
-[submodule "Xabbo.Core"]
-	path = ./lib/Xabbo.Core
-	url = https://github.com/b7c/Xabbo.Core
-[submodule "lib/Xabbo.Common"]
 	path = lib/Xabbo.Common
-	url = https://github.com/b7c/Xabbo.Common
-[submodule "lib/Xabbo.Core"]
-	path = lib/Xabbo.Core
-	url = https://github.com/b7c/Xabbo.Core
-[submodule "lib/Xabbo.GEarth"]
+	url = https://github.com/xabbo/common
+[submodule "Xabbo.GEarth"]
 	path = lib/Xabbo.GEarth
-	url = https://github.com/b7c/Xabbo.GEarth
+	url = https://github.com/xabbo/gearth
+[submodule "Xabbo.Core"]
+	path = lib/Xabbo.Core
+	url = https://github.com/xabbo/core
