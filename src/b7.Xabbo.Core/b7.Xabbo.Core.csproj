@@ -20,9 +20,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\lib\Xabbo.Common\src\Xabbo.Common\Xabbo.Common.csproj" />
-    <ProjectReference Include="..\..\lib\Xabbo.Core\src\Xabbo.Core\Xabbo.Core.csproj" />
-    <ProjectReference Include="..\..\lib\Xabbo.GEarth\src\Xabbo.GEarth\Xabbo.GEarth.csproj" />
+    <ProjectReference Include="$(XabboCommonDir)src\Xabbo.Common\Xabbo.Common.csproj" />
+    <ProjectReference Include="$(XabboCoreDir)src\Xabbo.Core\Xabbo.Core.csproj" />
+    <ProjectReference Include="$(XabboGEarthDir)src\Xabbo.GEarth\Xabbo.GEarth.csproj" />
   </ItemGroup>
 
 </Project>

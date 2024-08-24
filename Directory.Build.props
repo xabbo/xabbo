@@ -1,7 +1,8 @@
 <Project>
   <PropertyGroup>
-    <XabboCommonDir>$(MSBuildThisFileDirectory)lib\Xabbo.Common\</XabboCommonDir>
-    <XabboCoreDir>$(MSBuildThisFileDirectory)lib\Xabbo.Core\</XabboCoreDir>
-    <XabboGEarthDir>$(MSBuildThisFileDirectory)lib\Xabbo.GEarth\</XabboGEarthDir>
+    <XabboCommonDir>$(MSBuildThisFileDirectory)lib/common/</XabboCommonDir>
+    <XabboCoreDir>$(MSBuildThisFileDirectory)lib/core/</XabboCoreDir>
+    <XabboGEarthDir>$(MSBuildThisFileDirectory)lib/gearth/</XabboGEarthDir>
+    <XabboMessagesDir>$(MSBuildThisFileDirectory)lib/messages/</XabboMessagesDir>
   </PropertyGroup>
 </Project>

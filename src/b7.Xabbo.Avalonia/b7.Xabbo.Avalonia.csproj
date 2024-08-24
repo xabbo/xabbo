@@ -46,14 +46,12 @@
     <PackageReference Include="Splat.Microsoft.Extensions.DependencyInjection" Version="14.8.12" />
   </ItemGroup>
 
-
   <ItemGroup>
-    <ProjectReference Include="..\..\lib\Xabbo.Common\src\Xabbo.Common\Xabbo.Common.csproj" />
-    <ProjectReference Include="..\..\lib\Xabbo.Core\src\Xabbo.Core\Xabbo.Core.csproj" />
-    <ProjectReference Include="..\..\lib\Xabbo.GEarth\src\Xabbo.GEarth\Xabbo.GEarth.csproj" />
+    <ProjectReference Include="$(XabboCommonDir)src\Xabbo.Common\Xabbo.Common.csproj" />
+    <ProjectReference Include="$(XabboCoreDir)src\Xabbo.Core\Xabbo.Core.csproj" />
+    <ProjectReference Include="$(XabboGEarthDir)src\Xabbo.GEarth\Xabbo.GEarth.csproj" />
     <ProjectReference Include="..\b7.Xabbo.Core\b7.Xabbo.Core.csproj" />
   </ItemGroup>
-
 
   <ItemGroup>
     <Resource Include="Assets\Icon\app.ico" />
@@ -65,7 +63,6 @@
     <Resource Include="Assets\Images\trading.png" />
     <Resource Include="Assets\Images\typing.png" />
   </ItemGroup>
-
 
   <ItemGroup>
     <Compile Update="Views\Pages\ProfilePage.axaml.cs">
