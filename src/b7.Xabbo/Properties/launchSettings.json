@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "b7.Xabbo": {
-      "commandName": "Project",
-      "commandLineArgs": "-p 9092"
-    }
-  }
-}
