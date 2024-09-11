@@ -2,11 +2,12 @@
 
 using Xabbo;
 using Xabbo.Extension;
-using Xabbo.Messages;
+using Xabbo.Core.Messages.Outgoing;
 
 namespace b7.Xabbo.Components;
 
-public class AntiWalkComponent : Component
+[Intercept]
+public partial class AntiWalkComponent : Component
 {
     private bool _faceDirection;
     public bool FaceDirection
@@ -23,16 +24,13 @@ public class AntiWalkComponent : Component
         FaceDirection = config.GetValue("AntiWalk:FaceDirection", false);
     }
 
-    [InterceptOut(nameof(Outgoing.Move)), RequiredOut(nameof(Outgoing.LookTo))]
-    private void OnMove(InterceptArgs e)
+    [Intercept]
+    // [RequiredOut(nameof(Out.LookTo))]
+    private void OnMove(Intercept e, WalkMsg walk)
     {
         if (IsActive) e.Block();
 
         if (FaceDirection)
-        {
-            int x = e.Packet.ReadInt();
-            int y = e.Packet.ReadInt();
-            Extension.Send(Out.LookTo, x, y);
-        }
+            Ext.Send(new LookToMsg(walk.X, walk.Y));
     }
 }

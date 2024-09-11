@@ -8,8 +8,8 @@
   xmlns:ui="using:FluentAvalonia.UI.Controls"
   xmlns:ic="using:FluentIcons.Avalonia.Fluent"
   mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-  x:Class="b7.Xabbo.Avalonia.Views.RoomEntitiesView"
-  x:DataType="vm:RoomEntitiesViewModel"
+  x:Class="b7.Xabbo.Avalonia.Views.RoomAvatarsView"
+  x:DataType="vm:RoomAvatarsViewModel"
 >
   <Grid RowDefinitions="Auto,*">
     <TextBox
@@ -18,9 +18,9 @@
       Text="{Binding FilterText}"
     />
     <DataGrid
-      x:Name="EntityDataGrid"
+      x:Name="AvatarDataGrid"
       Grid.Row="1"
-      ItemsSource="{Binding Entities}"
+      ItemsSource="{Binding Avatars}"
       CanUserReorderColumns="True"
       CanUserResizeColumns="True"
       CanUserSortColumns="True"
@@ -34,12 +34,12 @@
         <DataGridTextColumn Header="index" Binding="{Binding Index}" />
         <DataGridTextColumn Header="id" Binding="{Binding Id}" />
         <DataGridTemplateColumn
-          x:DataType="vm:EntityViewModel"
+          x:DataType="vm:AvatarViewModel"
           Header="name" SortMemberPath="Name"
           ClipboardContentBinding="{Binding Name}"
         >
           <DataGridTemplateColumn.CellTemplate>
-            <DataTemplate DataType="{x:Type vm:EntityViewModel}">
+            <DataTemplate DataType="{x:Type vm:AvatarViewModel}">
               <DockPanel
                 HorizontalAlignment="Stretch"
                 Margin="12,0"

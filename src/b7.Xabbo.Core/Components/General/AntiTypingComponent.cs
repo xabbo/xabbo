@@ -1,13 +1,13 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
 
-using Microsoft.Extensions.Configuration;
-
+using Xabbo;
 using Xabbo.Extension;
-using Xabbo.Messages;
+using Xabbo.Messages.Flash;
 
 namespace b7.Xabbo.Components;
 
-public class AntiTypingComponent : Component
+[Intercept(~ClientType.Shockwave)]
+public partial class AntiTypingComponent : Component
 {
     public AntiTypingComponent(IExtension extension,
         IConfiguration config)
@@ -16,8 +16,8 @@ public class AntiTypingComponent : Component
         IsActive = config.GetValue("AntiTyping:Active", true);
     }
 
-    [InterceptOut(nameof(Outgoing.UserStartTyping))]
-    private void OnUserStartTyping(InterceptArgs e)
+    [InterceptOut(nameof(Out.StartTyping))]
+    private void OnUserStartTyping(Intercept e)
     {
         if (IsActive) e.Block();
     }

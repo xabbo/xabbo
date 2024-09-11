@@ -1,10 +1,12 @@
-﻿using Xabbo;
-using Xabbo.Messages;
+﻿using ReactiveUI;
+
+using Xabbo;
+using Xabbo.Messages.Flash;
 using Xabbo.Extension;
 
 using Xabbo.Core;
 using Xabbo.Core.Game;
-using ReactiveUI;
+using Xabbo.Core.Messages.Outgoing;
 
 namespace b7.Xabbo.Components;
 
@@ -23,10 +25,10 @@ public class RoomModeratorComponent : Component
     {
         _roomManager = roomManager;
 
-        _roomManager.Entered += (s, e) => UpdatePermissions();
-        _roomManager.RoomDataUpdated += (s, e) => UpdatePermissions();
-        _roomManager.RightsUpdated += (s, e) => UpdatePermissions();
-        _roomManager.Left += (s, e) => UpdatePermissions();
+        _roomManager.Entered += (e) => UpdatePermissions();
+        _roomManager.RoomDataUpdated += (e) => UpdatePermissions();
+        _roomManager.RightsUpdated += UpdatePermissions;
+        _roomManager.Left += UpdatePermissions;
     }
 
     private void UpdatePermissions()
@@ -38,39 +40,43 @@ public class RoomModeratorComponent : Component
         this.RaisePropertyChanged(nameof(IsOwner));
     }
 
-    [RequiredOut(nameof(Outgoing.RoomMuteUser))]
-    public bool MuteUser(Entity e, int minutes)
+    // [RequiredOut(nameof(Out.RoomMuteUser))]
+    public bool MuteUser(Avatar e, int minutes)
     {
         if (!_roomManager.CanMute || e == null)
             return false;
-        Extension.Send(Out.RoomMuteUser, e.Id, _roomManager.CurrentRoomId, minutes);
+        Ext.Send(new MuteUserMsg(e.Id, _roomManager.CurrentRoomId, minutes));
         return true;
     }
 
-    [RequiredOut(nameof(Outgoing.KickUser))]
-    public bool KickUser(Entity e)
+    // [RequiredOut(nameof(Out.KickUser))]
+    public bool KickUser(Avatar user)
     {
-        if (!_roomManager.CanKick || e == null)
+        if (!_roomManager.CanKick || user == null)
             return false;
-        Extension.Send(Out.KickUser, e.Id);
+        Ext.Send(new KickUserMsg
+        {
+            Id = user.Id,
+            Name = user.Name,
+        });
         return true;
     }
 
-    [RequiredOut(nameof(Outgoing.RoomBanWithDuration))]
-    public bool BanUser(Entity e, BanDuration duration)
+    // [RequiredOut(nameof(Out.RoomBanWithDuration))]
+    public bool BanUser(Avatar user, BanDuration duration)
     {
-        if (!_roomManager.CanBan || e == null)
+        if (!_roomManager.CanBan || user == null)
             return false;
-        Extension.Send(Out.RoomBanWithDuration, e.Id, _roomManager.CurrentRoomId, duration.GetValue());
+        Ext.Send(new BanUserMsg(user.Id, _roomManager.CurrentRoomId, user.Name, duration));
         return true;
     }
 
-    [RequiredOut(nameof(Outgoing.RoomUnbanUser))]
-    public bool UnbanUser(Entity e)
+    // [RequiredOut(nameof(Out.RoomUnbanUser))]
+    public bool UnbanUser(Avatar e)
     {
         if (!_roomManager.IsOwner || e == null)
             return false;
-        Extension.Send(Out.RoomUnbanUser, e.Id, _roomManager.CurrentRoomId);
+        Ext.Send(Out.UnbanUserFromRoom, e.Id, _roomManager.CurrentRoomId);
         return true;
     }
 }

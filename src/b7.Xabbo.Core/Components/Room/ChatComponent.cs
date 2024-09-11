@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
-
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Configuration;
 
-using Xabbo.Messages;
+using Xabbo;
 using Xabbo.Extension;
-
+using Xabbo.Messages.Flash;
 using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.Events;
@@ -14,7 +12,8 @@ using b7.Xabbo.Configuration;
 
 namespace b7.Xabbo.Components;
 
-public class ChatComponent : Component
+[Intercept]
+public partial class ChatComponent : Component
 {
     private readonly RoomManager _roomManager;
     private readonly HashSet<string> _petCommands;
@@ -68,7 +67,7 @@ public class ChatComponent : Component
         : base(extension)
     {
         _roomManager = roomManager;
-        _roomManager.EntityChat += OnEntityChat;
+        _roomManager.AvatarChat += OnAvatarChat;
 
         _petCommands = gameOptions.Value.PetCommands;
 
@@ -80,9 +79,9 @@ public class ChatComponent : Component
         MuteScratches = config.GetValue("Chat:Mute:Scratches", false);
     }
 
-    private void OnEntityChat(object? sender, EntityChatEventArgs e)
+    private void OnAvatarChat(AvatarChatEventArgs e)
     {
-        if (MutePets && e.Entity.Type == EntityType.Pet)
+        if (MutePets && e.Avatar.Type == AvatarType.Pet)
         {
             e.Block();
             return;
@@ -90,8 +89,8 @@ public class ChatComponent : Component
 
         if (MuteBots)
         {
-            if (e.Entity.Type == EntityType.PublicBot ||
-                e.Entity.Type == EntityType.PrivateBot)
+            if (e.Avatar.Type == AvatarType.PublicBot ||
+                e.Avatar.Type == AvatarType.PrivateBot)
             {
                 e.Block();
                 return;
@@ -103,8 +102,8 @@ public class ChatComponent : Component
             int index = e.Message.IndexOf(' ');
             if (index > 0)
             {
-                string name = e.Message.Substring(0, index);
-                if (name == "bobba" || _roomManager.Room?.GetEntity<IPet>(name) is not null)
+                string name = e.Message[..index];
+                if (name == "bobba" || _roomManager.Room?.GetAvatar<IPet>(name) is not null)
                 {
                     string command = e.Message[(index + 1)..].ToLower();
                     if (_petCommands.Contains(command))
@@ -119,14 +118,16 @@ public class ChatComponent : Component
         if (MuteWired && e.BubbleStyle == 34) e.Block();
     }
 
-    [InterceptIn(nameof(Incoming.RespectNotification))]
-    private void OnRoomUserRespect(InterceptArgs e)
+    [Intercept(~ClientType.Shockwave)]
+    [InterceptIn(nameof(In.RespectNotification))]
+    private void OnUserRespect(Intercept e)
     {
         if (MuteRespects) e.Block();
     }
 
-    [InterceptIn(nameof(Incoming.PetRespectNotification))]
-    private void OnRoomPetRespect(InterceptArgs e)
+    [Intercept(~ClientType.Shockwave)]
+    [InterceptIn(nameof(In.PetRespectNotification))]
+    private void OnRoomPetRespect(Intercept e)
     {
         if (MuteScratches) e.Block();
     }

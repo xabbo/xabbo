@@ -1,14 +1,15 @@
-﻿using System;
-
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 
 using Xabbo;
 using Xabbo.Extension;
-using Xabbo.Messages;
+using Xabbo.Messages.Flash;
+
+using Xabbo.Core.Messages.Outgoing;
 
 namespace b7.Xabbo.Components;
 
-public class AntiTurnComponent : Component
+[Intercept]
+public partial class AntiTurnComponent : Component
 {
     private readonly double _reselectThreshold;
 
@@ -33,23 +34,40 @@ public class AntiTurnComponent : Component
         TurnOnReselect = config.GetValue("AntiTurn:TurnOnReselect", true);
     }
 
-    [InterceptOut(nameof(Outgoing.LookTo))]
-    private void OnLookTo(InterceptArgs e)
+    [Intercept]
+    private void OnLookTo(Intercept e, LookToMsg look)
     {
-        if (IsActive) e.Block();
-        _lastLookAtX = e.Packet.ReadInt();
-        _lastLookAtY = e.Packet.ReadInt();
+        if (!IsActive) return;
+
+        bool block = true;
+
+        if (Client is ClientType.Shockwave)
+        {
+            if (IsActive && TurnOnReselect && (DateTime.Now - _lastSelection).TotalSeconds < _reselectThreshold)
+            {
+                if (_lastLookAtX == look.X && _lastLookAtY == look.Y)
+                    block = false;
+            }
+
+            _lastSelection = DateTime.Now;
+        }
+
+        if (block) e.Block();
+
+        _lastLookAtX = look.X;
+        _lastLookAtY = look.Y;
     }
 
-    [InterceptOut(nameof(Outgoing.GetSelectedBadges))]
-    private void OnRequestWearingBadges(InterceptArgs e)
+    [Intercept(~ClientType.Shockwave)]
+    [InterceptOut(nameof(Out.GetSelectedBadges))]
+    private void OnRequestWearingBadges(Intercept e)
     {
-        long userId = e.Packet.ReadLegacyLong();
+        Id userId = e.Packet.Read<Id>();
 
         if (IsActive && TurnOnReselect && (DateTime.Now - _lastSelection).TotalSeconds < _reselectThreshold)
         {
             if (userId == _lastSelectedUser)
-                Extension.Send(Out.LookTo, _lastLookAtX, _lastLookAtY);
+                Ext.Send(new LookToMsg(_lastLookAtX, _lastLookAtY));
         }
 
         _lastSelection = DateTime.Now;

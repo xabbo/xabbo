@@ -1,72 +1,60 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-using Xabbo.Messages;
+﻿using Xabbo;
 using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.Events;
+using Xabbo.Messages.Flash;
+using Xabbo.Core.Messages.Outgoing;
 
 namespace b7.Xabbo.Commands;
 
-public class ModerationCommands : CommandModule
+public class ModerationCommands(RoomManager roomManager) : CommandModule
 {
-    private readonly RoomManager _roomManager;
+    private readonly RoomManager _roomManager = roomManager;
 
-    private readonly Dictionary<string, int> _muteList = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-    private readonly Dictionary<string, BanDuration> _banList = new Dictionary<string, BanDuration>(StringComparer.OrdinalIgnoreCase);
-
-    public ModerationCommands(RoomManager roomManager)
-    {
-        _roomManager = roomManager;
-    }
+    private readonly Dictionary<string, int> _muteList = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, BanDuration> _banList = new(StringComparer.OrdinalIgnoreCase);
 
     protected override void OnInitialize()
     {
         _roomManager.Left += RoomManager_Left;
-        _roomManager.EntitiesAdded += OnEntitiesAdded;
+        _roomManager.AvatarsAdded += OnAvatarsAdded;
 
         IsAvailable = true;
     }
 
-    private void MuteUser(IRoomUser user, int minutes)
-        => Send(Out.RoomMuteUser, (LegacyLong)user.Id, (LegacyLong)_roomManager.CurrentRoomId, minutes);
+    private void MuteUser(IUser user, int minutes) => Ext.Send(new MuteUserMsg(user, _roomManager.CurrentRoomId, minutes));
+    private void UnmuteUser(IUser user) => Ext.Send(new MuteUserMsg(user, _roomManager.CurrentRoomId, 0));
+    private void KickUser(IUser user) => Ext.Send(new KickUserMsg(user));
+    private void BanUser(IUser user, BanDuration duration) => Ext.Send(new BanUserMsg(user, _roomManager.CurrentRoomId, duration));
+    private void UnbanUser(Id userId) => Ext.Send(Out.UnbanUserFromRoom, userId, _roomManager.CurrentRoomId);
 
-    private void UnmuteUser(IRoomUser user) => MuteUser(user, 0);
-
-    private void KickUser(IRoomUser user) => Send(Out.KickUser, (LegacyLong)user.Id);
-
-    private void BanUser(IRoomUser user, BanDuration duration)
-        => Send(Out.RoomBanWithDuration, (LegacyLong)user.Id, (LegacyLong)_roomManager.CurrentRoomId, duration.GetValue());
-
-    private void UnbanUser(int userId) => Send(Out.RoomUnbanUser, userId, _roomManager.CurrentRoomId);
-
-    private void RoomManager_Left(object? sender, EventArgs e)
+    private void RoomManager_Left()
     {
         _muteList.Clear();
         _banList.Clear();
     }
 
-    private async void OnEntitiesAdded(object? sender, EntitiesEventArgs e)
+    private void OnAvatarsAdded(AvatarsEventArgs e)
     {
-        if (e.Entities.Length != 1) return;
-        if (e.Entities[0] is not IRoomUser user) return;
+        if (e.Avatars is not [User user]) return;
 
-        if (_banList.TryGetValue(user.Name, out BanDuration banDuration))
+        Task.Run(async () =>
         {
-            ShowMessage($"Banning user '{user.Name}'");
-            await Task.Delay(100);
-            BanUser(user, banDuration);
-            _banList.Remove(user.Name);
-        }
-        else if (_muteList.TryGetValue(user.Name, out int muteDuration))
-        {
-            ShowMessage($"Muting user '{user.Name}'");
-            await Task.Delay(100);
-            MuteUser(user, muteDuration);
-            _muteList.Remove(user.Name);
-        }
+            if (_banList.TryGetValue(user.Name, out BanDuration banDuration))
+            {
+                ShowMessage($"Banning user '{user.Name}'");
+                await Task.Delay(100);
+                BanUser(user, banDuration);
+                _banList.Remove(user.Name);
+            }
+            else if (_muteList.TryGetValue(user.Name, out int muteDuration))
+            {
+                ShowMessage($"Muting user '{user.Name}'");
+                await Task.Delay(100);
+                MuteUser(user, muteDuration);
+                _muteList.Remove(user.Name);
+            }
+        });
     }
 
     [Command("mute")]
@@ -89,7 +77,7 @@ public class ModerationCommands : CommandModule
             string userName = args[0];
 
             if (_roomManager.Room is not null &&
-                _roomManager.Room.TryGetUserByName(userName, out IRoomUser? user))
+                _roomManager.Room.TryGetUserByName(userName, out IUser? user))
             {
                 bool isHours = false;
                 string durationString = args[1];
@@ -131,26 +119,26 @@ public class ModerationCommands : CommandModule
     }
 
     [Command("unmute")]
-    protected async Task HandleUnmuteCommand(CommandArgs args)
+    protected Task HandleUnmuteCommand(CommandArgs args)
     {
-        if (args.Count < 1) return;
+        if (args.Count < 1) return Task.CompletedTask;
 
         if (!_roomManager.IsInRoom)
         {
             ShowMessage("Reload the room to initialize room state.");
-            return;
+            return Task.CompletedTask;
         }
 
         if (!_roomManager.CanMute)
         {
             ShowMessage("You do not have permission to unmute in this room.");
-            return;
+            return Task.CompletedTask;
         }
 
         string userName = args[0];
 
         if (_roomManager.Room is not null &&
-            _roomManager.Room.TryGetEntityByName(userName, out IRoomUser? user))
+            _roomManager.Room.TryGetAvatarByName(userName, out IUser? user))
         {
             ShowMessage($"Unmuting user '{user.Name}'");
             UnmuteUser(user);
@@ -159,29 +147,30 @@ public class ModerationCommands : CommandModule
         {
             ShowMessage($"Unable to find user '{userName}' to unmute.");
         }
+        return Task.CompletedTask;
     }
 
     [Command("kick")]
-    protected async Task HandleKickCommand(CommandArgs args)
+    protected Task HandleKickCommand(CommandArgs args)
     {
-        if (args.Count < 1) return;
+        if (args.Count < 1) return Task.CompletedTask;
 
         if (!_roomManager.IsInRoom)
         {
             ShowMessage("Reload the room to initialize room state.");
-            return;
+            return Task.CompletedTask;
         }
 
         if (!_roomManager.CanKick)
         {
             ShowMessage("You do not have permission to kick in this room.");
-            return;
+            return Task.CompletedTask;
         }
 
         string userName = args[0];
 
         if (_roomManager.Room is not null &&
-            _roomManager.Room.TryGetUserByName(userName, out IRoomUser? user))
+            _roomManager.Room.TryGetUserByName(userName, out IUser? user))
         {
             ShowMessage($"Kicking user '{user.Name}'");
             KickUser(user);
@@ -190,12 +179,13 @@ public class ModerationCommands : CommandModule
         {
             ShowMessage($"Unable to find user '{userName}' to kick.");
         }
+        return Task.CompletedTask;
     }
 
     [Command("ban")]
-    protected async Task HandleBanCommand(CommandArgs args)
+    protected Task HandleBanCommand(CommandArgs args)
     {
-        if (args.Count < 1) return;
+        if (args.Count < 1) return Task.CompletedTask;
 
         var banDuration = BanDuration.Hour;
         string durationString = "for an hour";
@@ -218,14 +208,14 @@ public class ModerationCommands : CommandModule
                     break;
                 default:
                     ShowMessage($"Unknown ban type '{args[1]}'.");
-                    return;
+                    return Task.CompletedTask;
             }
         }
 
         string userName = args[0];
 
         if (_roomManager.Room is not null &&
-            _roomManager.Room.TryGetUserByName(userName, out IRoomUser? user))
+            _roomManager.Room.TryGetUserByName(userName, out IUser? user))
         {
             ShowMessage($"Banning user '{user.Name}' {durationString}");
             BanUser(user, banDuration);
@@ -235,35 +225,36 @@ public class ModerationCommands : CommandModule
             ShowMessage($"User '{userName}' not found, will be banned {durationString} upon next entry to this room.");
             _banList[userName] = banDuration;
         }
+        return Task.CompletedTask;
     }
 
-    // [Command("unban"), RequiredOut(nameof(Outgoing.UnbanRoomUser))]
-    protected async Task HandleUnbanCommand(CommandArgs args)
-    {
-        if (args.Count < 1) return;
+    // [Command("unban"), RequiredOut(nameof(Out.UnbanUser))]
+    // protected async Task HandleUnbanCommand(CommandArgs args)
+    // {
+    //     if (args.Count < 1) return;
 
-        if (!_roomManager.IsInRoom)
-        {
-            ShowMessage("Reload the room to initialize room state.");
-            return;
-        }
+    //     if (!_roomManager.IsInRoom)
+    //     {
+    //         ShowMessage("Reload the room to initialize room state.");
+    //         return;
+    //     }
 
-        if (!_roomManager.IsOwner)
-        {
-            ShowMessage("You do not have permission to unban in this room.");
-            return;
-        }
+    //     if (!_roomManager.IsOwner)
+    //     {
+    //         ShowMessage("You do not have permission to unban in this room.");
+    //         return;
+    //     }
 
-        string userName = args[0];
+    //     string userName = args[0];
 
-        if (_banList.ContainsKey(userName))
-        {
-            _banList.Remove(userName);
-            ShowMessage($"Removing user '{userName}' from the ban list");
-        }
-        else
-        {
-            // ...
-        }
-    }
+    //     if (_banList.ContainsKey(userName))
+    //     {
+    //         _banList.Remove(userName);
+    //         ShowMessage($"Removing user '{userName}' from the ban list");
+    //     }
+    //     else
+    //     {
+    //         // ...
+    //     }
+    // }
 }

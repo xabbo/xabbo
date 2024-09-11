@@ -1,15 +1,17 @@
 ﻿using Microsoft.Extensions.Configuration;
 
 using Xabbo;
-using Xabbo.Messages;
 using Xabbo.Extension;
+using Xabbo.Messages.Flash;
 
 using Xabbo.Core;
 using Xabbo.Core.Game;
+using Xabbo.Core.Messages.Incoming;
 
 namespace b7.Xabbo.Components;
 
-public class RespectedComponent : Component
+[Intercept(~ClientType.Shockwave)]
+public partial class RespectedComponent : Component
 {
     private readonly RoomManager _roomManager;
 
@@ -42,20 +44,20 @@ public class RespectedComponent : Component
         roomManager.Left += Room_Left;
     }
 
-    private void Room_Left(object? sender, EventArgs e)
+    private void Room_Left()
     {
         _lastRespect = DateTime.MinValue;
         _lastRespecterIndex = -1;
     }
 
-    [Receive(nameof(Incoming.RoomExpression))]
-    private void InRoomUserAction(IReadOnlyPacket packet)
+    [InterceptIn(nameof(In.Expression))]
+    private void InUserAction(Intercept e)
     {
         if (!_roomManager.IsInRoom)
             return;
 
-        int index = packet.ReadInt();
-        Actions action = (Actions)packet.ReadInt();
+        int index = e.Packet.Read<int>();
+        Actions action = (Actions)e.Packet.Read<int>();
 
         if (action == Actions.ThumbsUp)
         {
@@ -64,17 +66,17 @@ public class RespectedComponent : Component
         }
     }
 
-    [InterceptIn(nameof(Incoming.RespectNotification))]
-    private void HandleRespectNotification(InterceptArgs e)
+    [InterceptIn(nameof(In.RespectNotification))]
+    private void HandleRespectNotification(Intercept e)
     {
         IRoom? room = _roomManager.Room;
         if (room is null || (!ShowWhoRespected && !ShowTotalRespects))
             return;
 
-        int id = e.Packet.ReadInt();
-        int totalRespects = e.Packet.ReadInt();
+        int id = e.Packet.Read<int>();
+        int totalRespects = e.Packet.Read<int>();
 
-        IRoomUser? respectee = room.GetEntityById<IRoomUser>(id);
+        IUser? respectee = room.GetAvatarById<IUser>(id);
         if (respectee == null)
             return;
 
@@ -86,7 +88,7 @@ public class RespectedComponent : Component
         {
             if (ShowWhoRespected)
             {
-                IRoomUser? respecter = room.GetEntity<IRoomUser>(_lastRespecterIndex);
+                IUser? respecter = room.GetAvatar<IUser>(_lastRespecterIndex);
                 if (respecter is not null)
                     message += $" by {respecter.Name}";
             }
@@ -98,6 +100,6 @@ public class RespectedComponent : Component
         if (ShowTotalRespects)
             message += $" ({totalRespects})";
 
-        Extension.Send(In.Whisper, respectee.Index, message, 0, 1, 0, 0);
+        Ext.Send(new AvatarWhisperMsg(respectee.Index, message, 1));
     }
 }

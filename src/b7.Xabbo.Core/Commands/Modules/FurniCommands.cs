@@ -1,36 +1,24 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
 using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.GameData;
-using Xabbo.Core.Extensions;
 
 using b7.Xabbo.Services;
 using b7.Xabbo.Util;
 
 namespace b7.Xabbo.Commands;
 
-public class FurniCommands : CommandModule
+public class FurniCommands(
+    IOperationManager operationManager,
+    IGameDataManager gameData,
+    ProfileManager profileManager,
+    RoomManager roomManager) : CommandModule
 {
-    private readonly IOperationManager _operationManager;
-    private readonly IGameDataManager _gameData;
-    private readonly ProfileManager _profileManager;
-    private readonly RoomManager _roomManager;
-
-    public FurniCommands(
-        IOperationManager operationManager,
-        IGameDataManager gameData,
-        ProfileManager profileManager,
-        RoomManager roomManager)
-    {
-        _operationManager = operationManager;
-        _gameData = gameData;
-        _profileManager = profileManager;
-        _roomManager = roomManager;
-    }
+    private readonly IOperationManager _operationManager = operationManager;
+    private readonly IGameDataManager _gameData = gameData;
+    private readonly ProfileManager _profileManager = profileManager;
+    private readonly RoomManager _roomManager = roomManager;
 
     [Command("furni", "f")]
     public async Task OnExecuteAsync(CommandArgs args)

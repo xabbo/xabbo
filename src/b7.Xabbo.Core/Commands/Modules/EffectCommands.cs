@@ -1,16 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-
+﻿using System.Text.RegularExpressions;
+using b7.Xabbo.Core.Commands;
+using Xabbo;
 using Xabbo.Core.GameData;
+using Xabbo.Messages.Flash;
 
 namespace b7.Xabbo.Commands;
 
-public class EffectCommands : CommandModule
+[CommandModule(SupportedClients = ~ClientType.Shockwave)]
+public partial class EffectCommands : CommandModule
 {
-    private static readonly Regex _regexEffect = new Regex(@"^fx_(\d+)$", RegexOptions.Compiled);
+
+    [GeneratedRegex(@"^fx_(\d+)$")]
+    private static partial Regex RegexEffect();
 
     private readonly IGameDataManager _gameDataManager;
 
@@ -42,7 +43,7 @@ public class EffectCommands : CommandModule
 
         foreach (var (key, value) in texts)
         {
-            var match = _regexEffect.Match(key);
+            var match = RegexEffect().Match(key);
             if (match.Success)
             {
                 int effectId = int.Parse(match.Groups[1].Value);
@@ -81,7 +82,7 @@ public class EffectCommands : CommandModule
 
         if (string.IsNullOrWhiteSpace(searchText))
         {
-            Send(Out.UseAvatarEffect, -1);
+            Ext.Send(Out.AvatarEffectSelected, -1);
             return;
         }
 
@@ -89,8 +90,8 @@ public class EffectCommands : CommandModule
         if (matches.Count > 0)
         {
             if (activate)
-                Send(Out.ActivateAvatarEffect, matches[0].Id);
-            Send(Out.UseAvatarEffect, matches[0].Id);
+                Ext.Send(Out.AvatarEffectActivated, matches[0].Id);
+            Ext.Send(Out.AvatarEffectSelected, matches[0].Id);
         }
         else
         {
@@ -115,8 +116,8 @@ public class EffectCommands : CommandModule
     [Command("dropfx")]
     protected Task OnDropEffect(CommandArgs args)
     {
-        Send(Out.Chat, ":yyxxabxa", 0, -1);
-        Send(Out.Shout, ":yyxxabxa", 0);
+        Ext.Send(Out.Chat, ":yyxxabxa", 0, -1);
+        Ext.Send(Out.Shout, ":yyxxabxa", 0);
         return Task.CompletedTask;
     }
 }

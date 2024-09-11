@@ -7,7 +7,7 @@ namespace b7.Xabbo.Avalonia.ViewModels;
 
 public class RoomPageViewModel(
     RoomInfoViewModel info,
-    RoomEntitiesViewModel entities,
+    RoomAvatarsViewModel avatars,
     RoomVisitorsViewModel visitors,
     RoomBansViewModel bans,
     RoomFurniViewModel furni) : PageViewModel
@@ -16,7 +16,7 @@ public class RoomPageViewModel(
     public override IconSource? Icon { get; } = new SymbolIconSource { Symbol = Symbol.Home };
 
     public RoomInfoViewModel Info { get; } = info;
-    public RoomEntitiesViewModel Entities { get; } = entities;
+    public RoomAvatarsViewModel Avatars { get; } = avatars;
     public RoomVisitorsViewModel Visitors { get; } = visitors;
     public RoomBansViewModel Bans { get; } = bans;
     public RoomFurniViewModel Furni { get; } = furni;

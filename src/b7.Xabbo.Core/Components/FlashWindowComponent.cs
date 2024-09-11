@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Diagnostics;
-
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 
 using Xabbo.Extension;
 using Xabbo.Core.Game;
 using Xabbo.Core.Events;
 using Xabbo.Core;
 
-using b7.Xabbo.Util;
 using b7.Xabbo.Core.Services;
 
 namespace b7.Xabbo.Components;
@@ -89,16 +83,11 @@ public class FlashWindowComponent : Component
 
         _friendManager.MessageReceived += OnReceivedPrivateMessage;
 
-        _roomManager.EntitiesAdded += OnEntitiesAdded;
-        _roomManager.EntityChat += OnEntityChat;
+        _roomManager.AvatarsAdded += OnAvatarsAdded;
+        _roomManager.AvatarChat += OnAvatarChat;
     }
 
-    protected override void OnDisconnected(object? sender, EventArgs e)
-    {
-        base.OnDisconnected(sender, e);
-    }
-
-    private void OnReceivedPrivateMessage(object? sender, FriendMessageEventArgs e)
+    private void OnReceivedPrivateMessage(FriendMessageEventArgs e)
     {
         if (FlashOnPrivateMessage)
         {
@@ -106,9 +95,9 @@ public class FlashWindowComponent : Component
         }
     }
 
-    private void OnEntityChat(object? sender, EntityChatEventArgs e)
+    private void OnAvatarChat(AvatarChatEventArgs e)
     {
-        if (e.Entity is not IRoomUser user) return;
+        if (e.Avatar is not IUser user) return;
 
         if (FlashOnUserChat ||
             (FlashOnWhisper && e.ChatType == ChatType.Whisper) ||
@@ -118,9 +107,9 @@ public class FlashWindowComponent : Component
         }
     }
 
-    private void OnEntitiesAdded(object? sender, EntitiesEventArgs e)
+    private void OnAvatarsAdded(AvatarsEventArgs e)
     {
-        IEnumerable<IRoomUser> users = e.Entities.OfType<IRoomUser>()
+        IEnumerable<IUser> users = e.Avatars.OfType<IUser>()
             .Where(u => u.Id != _profileManager.UserData?.Id);
 
         if ((FlashOnUserEntered && users.Any(u => u.Id != _profileManager.UserData?.Id)) ||

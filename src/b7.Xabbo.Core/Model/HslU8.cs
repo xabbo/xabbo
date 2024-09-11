@@ -2,7 +2,7 @@
 
 namespace b7.Xabbo.Model;
 
-public struct HslU8(byte h, byte s, byte l) : IComposable
+public struct HslU8(byte h, byte s, byte l) : IComposer
 {
     /// <summary>
     /// The hue value.
@@ -17,8 +17,10 @@ public struct HslU8(byte h, byte s, byte l) : IComposable
     /// </summary>
     public byte L = l;
 
-    public readonly void Compose(IPacket packet)
+    public readonly void Compose(in PacketWriter p)
     {
-        packet.WriteInt(H).WriteInt(S).WriteInt(L);
+        p.WriteInt(H);
+        p.WriteInt(S);
+        p.WriteInt(L);
     }
 }

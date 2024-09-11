@@ -30,7 +30,7 @@
           <TextBlock Text="Users" />
         </StackPanel>
       </TabItem.Header>
-      <v:RoomEntitiesView DataContext="{Binding Entities}" />
+      <v:RoomAvatarsView DataContext="{Binding Avatars}" />
     </TabItem>
     <TabItem>
       <TabItem.Header>

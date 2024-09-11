@@ -1,12 +1,13 @@
 ﻿using Microsoft.Extensions.Configuration;
-using System;
 
+using Xabbo;
 using Xabbo.Extension;
-using Xabbo.Messages;
+using Xabbo.Messages.Flash;
 
 namespace b7.Xabbo.Components;
 
-public class AntiHcGiftNotificationComponent : Component
+[Intercept(~ClientType.Shockwave)]
+public partial class AntiHcGiftNotificationComponent : Component
 {
     public AntiHcGiftNotificationComponent(IExtension extension,
         IConfiguration config)
@@ -15,8 +16,8 @@ public class AntiHcGiftNotificationComponent : Component
         IsActive = config.GetValue("AntiHcGiftNotification:Active", true);
     }
 
-    [InterceptIn(nameof(Incoming.CSubscriptionUserGifts))]
-    protected void HandleCSubscriptionUserGifts(InterceptArgs e)
+    [InterceptIn(nameof(In.ClubGiftNotification))]
+    protected void HandleClubGiftNotification(Intercept e)
     {
         if (IsActive)
             e.Block();

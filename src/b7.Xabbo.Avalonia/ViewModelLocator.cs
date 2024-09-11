@@ -43,7 +43,7 @@ public static class ViewModelLocator
         Splatr.RegisterLazySingleton<GameDataPageViewModel>();
 
         Splatr.RegisterLazySingleton<RoomInfoViewModel>();
-        Splatr.RegisterLazySingleton<RoomEntitiesViewModel>();
+        Splatr.RegisterLazySingleton<RoomAvatarsViewModel>();
         Splatr.RegisterLazySingleton<RoomVisitorsViewModel>();
         Splatr.RegisterLazySingleton<RoomBansViewModel>();
         Splatr.RegisterLazySingleton<RoomFurniViewModel>();
@@ -54,7 +54,7 @@ public static class ViewModelLocator
         var ext = new GEarthExtension(
             GEarthOptions.Default.WithAssemblyVersion() with
             {
-                Title = "xabbo",
+                Name = "xabbo",
                 Description = "enhanced habbo",
                 Author = "b7"
             }
@@ -82,9 +82,8 @@ public static class ViewModelLocator
         Splatr.RegisterLazySingleton<XabbotComponent>();
         Splatr.RegisterLazySingleton<NotificationComponent>();
         // Splatr.RegisterLazySingleton<FlashWindowComponent>();
-        Splatr.RegisterLazySingleton<EntityOverlayComponent>();
+        Splatr.RegisterLazySingleton<AvatarOverlayComponent>();
         // Splatr.RegisterLazySingleton<DisconnectionReasonComponent>();
-        Splatr.RegisterLazySingleton<AutoClaimComponent>();
 
         Splatr.RegisterLazySingleton<AntiHandItemComponent>();
         Splatr.RegisterLazySingleton<AntiHcGiftNotificationComponent>();
@@ -118,7 +117,6 @@ public static class ViewModelLocator
         Splatr.RegisterLazySingleton<MoodCommands>();
         // Splatr.RegisterLazySingleton<OperationCommands>();
         Splatr.RegisterLazySingleton<RoomCommands>();
-        Splatr.RegisterLazySingleton<SpoofChatCommands>();
         Splatr.RegisterLazySingleton<TurnCommand>();
         Splatr.RegisterLazySingleton<UserProfileCommands>();
 

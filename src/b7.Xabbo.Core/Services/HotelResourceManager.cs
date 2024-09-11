@@ -3,7 +3,6 @@
 using Xabbo;
 using Xabbo.Extension;
 using Xabbo.Core.GameData;
-using Xabbo.Core.Extensions;
 
 namespace b7.Xabbo.Services;
 
@@ -34,7 +33,7 @@ public class HotelResourceManager : IHostedService
 
     public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
-    private void OnGameConnected(object? sender, GameConnectedEventArgs e)
+    private void OnGameConnected(GameConnectedArgs e)
     {
         _ctsLoad?.Cancel();
         _ctsLoad = new CancellationTokenSource();
@@ -43,10 +42,10 @@ public class HotelResourceManager : IHostedService
         try
         {
             Hotel hotel = Hotel.FromGameHost(e.Host);
-            _uriProvider.Host = hotel.Host;
+            _uriProvider.Host = hotel.HostName;
             Task.Run(() => _gameDataManager.LoadAsync(hotel, ct));
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             // Failed to find hotel
         }
@@ -56,9 +55,5 @@ public class HotelResourceManager : IHostedService
     {
         FurniData? furni = _gameDataManager.Furni;
         ExternalTexts? texts = _gameDataManager.Texts;
-
-        if (furni is null || texts is null) return;
-
-        XabboCoreExtensions.Initialize(furni, texts);
     }
 }

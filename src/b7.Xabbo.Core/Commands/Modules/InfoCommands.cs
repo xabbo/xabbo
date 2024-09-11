@@ -1,5 +1,5 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using Xabbo;
+using Xabbo.Messages.Flash;
 
 namespace b7.Xabbo.Commands;
 
@@ -15,22 +15,26 @@ public class InfoCommands : CommandModule
         {
             name = name[3..].Trim();
 
-            if (long.TryParse(name, out long id))
+            if (Id.TryParse(name, out Id id))
             {
-                return SendAsync(Out.GetExtendedProfile, id, true).AsTask();
+                Ext.Send(Out.GetExtendedProfile, id, true);
             }
             else
             {
                 ShowMessage($"Invalid ID specified: '{name}'.");
-                return Task.CompletedTask;
             }
         }
         else
         {
-            return SendAsync(Out.GetExtendedProfileByUsername, name).AsTask();
+            Ext.Send(Out.GetExtendedProfileByName, name);
         }
+        return Task.CompletedTask;
     }
 
     [Command("group", "grp", "g")]
-    public Task ShowGroupInfoAsync(CommandArgs args) => SendAsync(Out.GetHabboGroupDetails, long.Parse(args[0]), true).AsTask();
+    public Task ShowGroupInfoAsync(CommandArgs args)
+    {
+        Ext.Send(Out.GetHabboGroupDetails, long.Parse(args[0]), true);
+        return Task.CompletedTask;
+    }
 }

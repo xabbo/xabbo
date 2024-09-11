@@ -1,15 +1,15 @@
-﻿using System;
-using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Globalization;
 
-using Xabbo.Messages;
+using Xabbo;
 using Xabbo.Core;
 using Xabbo.Core.Game;
-using Xabbo.Core.Extensions;
+
+using b7.Xabbo.Core.Commands;
+using Xabbo.Messages.Flash;
 
 namespace b7.Xabbo.Commands;
 
+[CommandModule(SupportedClients = ~ClientType.Shockwave)]
 public class MoodCommands : CommandModule
 {
     private static (double H, double S, double L) RgbToHsl(int r, int g, int b)
@@ -62,13 +62,13 @@ public class MoodCommands : CommandModule
         {
             switch (args[0].ToLower())
             {
-                case "settings": Send(Out.RoomDimmerEditPresets); break;
+                case "settings": Ext.Send(Out.RoomDimmerGetPresets); break;
                 default: break;
             }
         }
         else
         {
-            Send(Out.RoomDimmerChangeState);
+            Ext.Send(Out.RoomDimmerChangeState);
         }
 
         return Task.CompletedTask;
@@ -102,8 +102,8 @@ public class MoodCommands : CommandModule
                 color & 0xFF
             );
 
-            Send(Out.SetRoomBackgroundColorData,
-                (LegacyLong)toner.Id,
+            Ext.Send(Out.SetRoomBackgroundColorData,
+                toner.Id,
                 (int)Math.Round(h / 360.0 * 255),
                 (int)Math.Round(255 * s),
                 (int)Math.Round(255 * l)
@@ -111,7 +111,7 @@ public class MoodCommands : CommandModule
         }
         else
         {
-            Send(Out.UseStuff, (LegacyLong)toner.Id, 0);
+            Ext.Send(Out.UseFurniture, toner.Id, 0);
         }
 
         return Task.CompletedTask;

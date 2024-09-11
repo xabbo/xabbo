@@ -4,6 +4,7 @@ using Xabbo.Extension;
 using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.GameData;
+using Xabbo.Core.Messages.Outgoing;
 
 namespace b7.Xabbo.Components;
 
@@ -63,23 +64,21 @@ public class FurniActionsComponent : Component
         _gameDataManager.Loaded += () => CanShowInfo = true;
     }
 
-    [InterceptOut(nameof(Outgoing.UseStuff))]
-    private async void HandleUseStuff(InterceptArgs e)
+    [Intercept]
+    private void HandleUseStuff(Intercept e, UseFloorItemMsg use)
     {
         IRoom? room = _roomManager.Room;
         if (room is null) return;
 
-        long id = e.Packet.ReadLegacyLong();
-
         if (PreventUse) e.Block();
 
-        IFloorItem? item = room.GetFloorItem(id);
+        IFloorItem? item = room.GetFloorItem(use.Id);
         if (item == null) return;
 
         if (UseToHide)
         {
             e.Block();
-            _roomManager.HideFurni(ItemType.Floor, id);
+            _roomManager.HideFurni(ItemType.Floor, use.Id);
         }
 
         if (UseToShowInfo && CanShowInfo && FurniData is not null)
@@ -104,36 +103,35 @@ public class FurniActionsComponent : Component
             {
                 if (Client == ClientType.Flash)
                 {
-                    Extension.Send(In.StuffDataUpdate, linkedItem.Id.ToString(), 0, "2");
-                    await Task.Delay(500);
-                    Extension.Send(In.StuffDataUpdate, linkedItem.Id.ToString(), 0, "0");
+                    // TODO FloorItemDataUpdateMsg
+                    // Ext.Send(In.StuffDataUpdate, linkedItem.Id.ToString(), 0, "2");
+                    // await Task.Delay(500);
+                    // Extension.Send(In.StuffDataUpdate, linkedItem.Id.ToString(), 0, "0");
                 }
                 else
                 {
-                    Extension.Send(In.StuffDataUpdate, linkedItem.Id, 0, "2");
-                    await Task.Delay(500);
-                    Extension.Send(In.StuffDataUpdate, linkedItem.Id, 0, "0");
+                    // Extension.Send(In.StuffDataUpdate, linkedItem.Id, 0, "2");
+                    // await Task.Delay(500);
+                    // Extension.Send(In.StuffDataUpdate, linkedItem.Id, 0, "0");
                 }
             }
         }
     }
 
-    [InterceptOut(nameof(Outgoing.UseWallItem))]
-    private async void HandleUseWallItem(InterceptArgs e)
+    [Intercept]
+    private void HandleUseWallItem(Intercept e, UseWallItemMsg use)
     {
         IRoom? room = _roomManager.Room;
         if (room is null) return;
 
-        long id = e.Packet.ReadLegacyLong();
-
         if (PreventUse) e.Block();
 
-        IWallItem? item = room.GetWallItem(id);
+        IWallItem? item = room.GetWallItem(use.Id);
         if (item is null) return;
 
         if (UseToHide)
         {
-            _roomManager.HideFurni(ItemType.Wall, id);
+            _roomManager.HideFurni(ItemType.Wall, use.Id);
             e.Block();
         }
 

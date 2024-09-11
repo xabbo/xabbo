@@ -1,19 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Xabbo;
 
 namespace b7.Xabbo.Commands;
 
 [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
-public sealed class CommandAttribute : Attribute
+public sealed class CommandAttribute(string commandName, params string[] aliases) : Attribute
 {
-    public string CommandName { get; }
-    public IReadOnlyList<string> Aliases { get; }
+    public string CommandName { get; } = commandName;
+    public IReadOnlyList<string> Aliases { get; } = aliases;
 
-    public string Usage { get; set; }
-
-    public CommandAttribute(string commandName, params string[] aliases)
-    {
-        CommandName = commandName;
-        Aliases = aliases;
-    }
+    public string Usage { get; set; } = "";
+    public ClientType SupportedClients { get; set; } = ClientType.All;
 }

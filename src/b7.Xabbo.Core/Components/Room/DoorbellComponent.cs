@@ -1,13 +1,14 @@
 ﻿using Microsoft.Extensions.Configuration;
 
 using Xabbo;
-using Xabbo.Messages;
 using Xabbo.Extension;
+using Xabbo.Messages.Flash;
 using Xabbo.Core.Game;
 
 namespace b7.Xabbo.Components;
 
-public class DoorbellComponent : Component
+[Intercept(~ClientType.Shockwave)]
+public partial class DoorbellComponent : Component
 {
     private readonly FriendManager _friendManager;
 
@@ -29,17 +30,14 @@ public class DoorbellComponent : Component
         AcceptFriends = config.GetValue("Doorbell:AcceptFriends", false);
     }
 
-    [InterceptIn(nameof(Incoming.DoorbellRinging), RequiredClient = ClientType.Flash)]
-    protected void HandleDoorbellRinging(InterceptArgs e)
+    [InterceptIn(nameof(In.Doorbell))]
+    protected void HandleDoorbellRinging(Intercept e)
     {
-        if (Client != ClientType.Flash)
-            return;
-
-        string name = e.Packet.ReadString();
+        string name = e.Packet.Read<string>();
         if (AcceptFriends && _friendManager.IsFriend(name))
         {
             e.Block();
-            Extension.Send(Out["LetUserIn"], name, true);
+            Ext.Send(Out.LetUserIn, name, true);
         }
     }
 }

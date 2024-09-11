@@ -123,19 +123,19 @@ public class RoomFurniViewModel : ViewModelBase
         });
     }
 
-    private void OnLeftRoom(object? sender, EventArgs e) => ClearItems();
+    private void OnLeftRoom() => ClearItems();
 
-    private void OnFloorItemsLoaded(object? sender, FloorItemsEventArgs e)
+    private void OnFloorItemsLoaded(FloorItemsEventArgs e)
     {
         AddItems(e.Items);
     }
 
-    private void OnFloorItemAdded(object? sender, FloorItemEventArgs e)
+    private void OnFloorItemAdded(FloorItemEventArgs e)
     {
         AddItems([e.Item]);
     }
 
-    private void OnFloorItemRemoved(object? sender, FloorItemEventArgs e)
+    private void OnFloorItemRemoved(FloorItemEventArgs e)
     {
         RemoveItem(e.Item);
     }

@@ -1,17 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text.Json;
+﻿using System.Text.Json;
 
 using Microsoft.Extensions.Configuration;
 
+using Xabbo;
 using Xabbo.Messages;
 using Xabbo.Extension;
 using Xabbo.Core;
+using Xabbo.Messages.Flash;
+using System.Net;
 
 namespace b7.Xabbo.Components;
 
-public class RoomEntryComponent : Component
+[Intercept]
+public partial class RoomEntryComponent : Component
 {
     private Dictionary<long, string> _passwords = new();
 
@@ -61,25 +62,25 @@ public class RoomEntryComponent : Component
         catch { }
     }
 
-    [InterceptIn(nameof(Incoming.GetGuestRoomResult))]
-    private void HandleGetGuestRoomResult(InterceptArgs e)
+    [InterceptIn(nameof(In.GetGuestRoomResult))]
+    private void HandleGetGuestRoomResult(Intercept e)
     {
-        var roomData = RoomData.Parse(e.Packet);
+        var roomData = e.Packet.Read<RoomData>();
 
         if ((RememberPasswords && roomData.Access == RoomAccess.Password && _passwords.ContainsKey(roomData.Id)) ||
             (DontAskToRingDoorbell && roomData.Access == RoomAccess.Doorbell))
         {
             roomData.IsGroupMember = true;
-            e.Packet = new Packet(e.Packet.Header, Client)
-                .Write(roomData);
+            e.Packet.Clear();
+            e.Packet.Write(roomData);
         }
     }
 
-    [InterceptOut(nameof(Outgoing.FlatOpc))]
-    private void HandleFlatOpc(InterceptArgs e)
+    [InterceptOut(nameof(Out.OpenFlatConnection))]
+    private void HandleFlatOpc(Intercept e)
     {
-        _lastRequestedRoom = e.Packet.ReadInt();
-        string password = e.Packet.ReadString();
+        _lastRequestedRoom = e.Packet.Read<int>();
+        string password = e.Packet.Read<string>();
 
         if (!RememberPasswords) return;
 
@@ -93,17 +94,17 @@ public class RoomEntryComponent : Component
             if (_passwords.ContainsKey(_lastRequestedRoom))
             {
                 password = _passwords[_lastRequestedRoom];
-                e.Packet.ReplaceString(password, 4);
+                e.Packet.ReplaceAt<string>(4, password);
             }
         }
     }
 
-    [InterceptIn(nameof(Incoming.Error))]
-    private void HandleError(InterceptArgs e)
+    [InterceptIn(nameof(In.ErrorReport))]
+    private void HandleError(Intercept e)
     {
         if (!RememberPasswords) return;
 
-        if (e.Packet.ReadInt() == ERROR_INVALID_PW &&
+        if (e.Packet.Read<int>() == ERROR_INVALID_PW &&
             _lastRequestedRoom != -1 &&
             _passwords.Remove(_lastRequestedRoom))
         {

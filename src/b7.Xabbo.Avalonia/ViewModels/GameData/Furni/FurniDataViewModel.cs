@@ -9,6 +9,7 @@ using Xabbo.Core;
 using Xabbo.Core.GameData;
 
 using b7.Xabbo.Services;
+using Xabbo;
 
 namespace b7.Xabbo.Avalonia.ViewModels;
 
@@ -59,7 +60,7 @@ public class FurniDataViewModel : ViewModelBase
         });
     }
 
-    private async void OnGameConnected(object? sender, GameConnectedEventArgs e)
+    private async void OnGameConnected(GameConnectedArgs e)
     {
         try
         {
@@ -88,7 +89,7 @@ public class FurniDataViewModel : ViewModelBase
         }
     }
 
-    private void OnGameDisconnected(object? sender, EventArgs e)
+    private void OnGameDisconnected()
     {
         _uiContext.Invoke(() => _furniCache.Clear());
     }

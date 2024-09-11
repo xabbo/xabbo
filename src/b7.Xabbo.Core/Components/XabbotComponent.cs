@@ -2,11 +2,11 @@
 using Microsoft.Extensions.Logging;
 
 using Xabbo;
-using Xabbo.Messages;
 using Xabbo.Extension;
 using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.Events;
+using Xabbo.Core.Messages.Incoming;
 
 namespace b7.Xabbo.Components;
 
@@ -35,9 +35,9 @@ public class XabbotComponent : Component, IHostedService
 
     public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
-    private void OnEnteredRoom(object? sender, RoomEventArgs e)
+    private void OnEnteredRoom(RoomEventArgs e)
     {
-        Bot bot = new(EntityType.PublicBot, UserId, UserIndex)
+        Bot bot = new(AvatarType.PublicBot, UserId, UserIndex)
         {
             Name = "xabbo",
             Motto = "enhanced habbo",
@@ -46,8 +46,8 @@ public class XabbotComponent : Component, IHostedService
             Figure = "hr-100.hd-185-14.ch-805-71.lg-281-75.sh-305-80.ea-1406.cc-260-80"
         };
 
-        _logger.LogTrace("Injecting xabbo entity bot into room.");
-        Extension.Send(In.UsersInRoom, (LegacyShort)1, bot);
+        _logger.LogTrace("Injecting xabbo avatar bot into room.");
+        Ext.Send(new AvatarsAddedMsg { bot });
     }
 
     public void ShowMessage(string message)
@@ -58,7 +58,7 @@ public class XabbotComponent : Component, IHostedService
         IRoom? room = _roomManager.Room;
 
         if (userData is not null && room is not null &&
-            room.TryGetUserById(userData.Id, out IRoomUser? user))
+            room.TryGetUserById(userData.Id, out IUser? user))
         {
             location = user.Location;
         }
@@ -68,13 +68,14 @@ public class XabbotComponent : Component, IHostedService
 
     public void ShowMessage(string message, Point location)
     {
-        Extension.Send(In.Status, 1, new EntityStatusUpdate
-        {
-            Index = UserIndex,
-            Location = new Tile(location.X, location.Y, -100),
-            Direction = 4,
-            HeadDirection = 4
+        Ext.Send(new AvatarUpdatesMsg {
+            new AvatarStatusUpdate {
+                Index = UserIndex,
+                Location = new Tile(location.X, location.Y, -100),
+                Direction = 4,
+                HeadDirection = 4
+            }
         });
-        Extension.Send(In.Whisper, UserIndex, message, 0, 30, 0, 0);
+        Ext.Send(new AvatarWhisperMsg(UserIndex, message, 30));
     }
 }

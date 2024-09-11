@@ -3,20 +3,18 @@
 using Microsoft.Extensions.Configuration;
 
 using Xabbo;
-using Xabbo.Messages;
+using Xabbo.Extension;
+using Xabbo.Messages.Flash;
 using Xabbo.Core;
 using Xabbo.Core.Game;
-using Xabbo.Extension;
+using Xabbo.Core.Messages.Outgoing;
+using Xabbo.Core.Messages.Incoming;
 
 namespace b7.Xabbo.Components;
 
-public class ClickToComponent : Component, IDataErrorInfo
+[Intercept]
+public partial class ClickToComponent : Component, IDataErrorInfo
 {
-    private const string
-        BAN_HOUR = "RWUAM_BAN_USER_HOUR",
-        BAN_DAY = "RWUAM_BAN_USER_DAY",
-        BAN_PERM = "RWUAM_BAN_USER_PERM";
-
     private readonly ProfileManager _profileManager;
     private readonly FriendManager _friendManager;
     private readonly RoomManager _roomManager;
@@ -123,7 +121,7 @@ public class ClickToComponent : Component, IDataErrorInfo
 
         IsActive = config.GetValue("ClickTo:Active", false);
 
-        switch (config.GetValue("ClickTo:Mode", "kick").ToLower())
+        switch (config.GetValue("ClickTo:Mode", "kick")?.ToLower())
         {
             case "mute":
                 Mute = true;
@@ -145,7 +143,7 @@ public class ClickToComponent : Component, IDataErrorInfo
         BanHour = true;
 
         MuteValue = config.GetValue("ClickTo:MuteValue", 500);
-        switch (config.GetValue("ClickTo:MuteUnit", "hours").ToLower())
+        switch (config.GetValue("ClickTo:MuteUnit", "hours")?.ToLower())
         {
             case "m":
             case "mn":
@@ -165,15 +163,16 @@ public class ClickToComponent : Component, IDataErrorInfo
             _bounceUnbanDelay = 0;
     }
 
-    [InterceptOut(nameof(Outgoing.GetSelectedBadges))]
-    protected async void OnGetSelectedBadges(InterceptArgs e)
+    [Intercept(~ClientType.Shockwave)]
+    [InterceptOut(nameof(Out.GetSelectedBadges))]
+    protected void OnGetSelectedBadges(Intercept e)
     {
         IRoom? room = _roomManager.Room;
         if (!IsActive || room is null)
             return;
 
-        long userId = e.Packet.ReadLegacyLong();
-        IRoomUser? user = room.GetEntityById<IRoomUser>(userId);
+        Id userId = e.Packet.Read<Id>();
+        IUser? user = room.GetAvatarById<IUser>(userId);
         if (user is null || user.Id == _profileManager.UserData?.Id) return;
 
         if (_disableForFriends && _friendManager.IsFriend(user.Id)) return;
@@ -193,7 +192,7 @@ public class ClickToComponent : Component, IDataErrorInfo
                 muteMinutes = 30000;
 
             SendInfoMessage($"(click-muting user for {MuteValue} {(MuteInMinutes ? "minute(s)" : "hour(s)")})", user.Index);
-            Extension.Send(Out.RoomMuteUser, (LegacyLong)user.Id, (LegacyLong)_roomManager.CurrentRoomId, muteMinutes);
+            Ext.Send(new MuteUserMsg(user.Id, _roomManager.CurrentRoomId, muteMinutes));
         }
         else if (Kick)
         {
@@ -201,50 +200,50 @@ public class ClickToComponent : Component, IDataErrorInfo
                 return;
 
             SendInfoMessage("(click-kicking user)", user.Index);
-            Extension.Send(Out.KickUser, (LegacyLong)user.Id);
+            Ext.Send(new KickUserMsg(user.Id, user.Name));
         }
         else if (Ban)
         {
             if (!_roomManager.CanBan)
                 return;
 
-            string banType, banText;
+            BanDuration duration;
+            string banText;
 
             if (BanDay)
             {
-                banType = BAN_DAY;
+                duration = BanDuration.Day;
                 banText = "for a day";
             }
             else if (BanHour)
             {
-                banType = BAN_HOUR;
+                duration = BanDuration.Hour;
                 banText = "for an hour";
             }
             else if (BanPerm)
             {
-                banType = BAN_PERM;
+                duration = BanDuration.Permanent;
                 banText = "permanently";
             }
             else
                 return;
 
             SendInfoMessage($"(click-banning user {banText})", user.Index);
-            Extension.Send(Out.RoomBanWithDuration, (LegacyLong)user.Id, (LegacyLong)_roomManager.CurrentRoomId, banType);
+            Ext.Send(new BanUserMsg(user.Id, _roomManager.CurrentRoomId, user.Name, duration));
         }
         else if (Bounce)
         {
             if (!_roomManager.IsOwner)
                 return;
 
-            SendInfoMessage($"(click-bouncing user)", user.Index);
-            Extension.Send(Out.RoomBanWithDuration, (LegacyLong)user.Id, (LegacyLong)_roomManager.CurrentRoomId, BAN_HOUR);
-            await Task.Delay(_bounceUnbanDelay);
-            Extension.Send(Out.RoomUnbanUser, (LegacyLong)user.Id, (LegacyLong)_roomManager.CurrentRoomId);
+            Task.Run(async () => {
+                SendInfoMessage($"(click-bouncing user)", user.Index);
+                Ext.Send(new BanUserMsg(user.Id, _roomManager.CurrentRoomId, user.Name, BanDuration.Hour));
+                await Task.Delay(_bounceUnbanDelay);
+                Ext.Send(Out.UnbanUserFromRoom, user.Id, _roomManager.CurrentRoomId);
+            });
         }
     }
 
-    private void SendInfoMessage(string message, int entityIndex = -1)
-    {
-        Extension.Send(In.Whisper, entityIndex, message, 0, 0, 0, 0);
-    }
+    private void SendInfoMessage(string message, int avatarIndex = -1) => Ext.Send(new AvatarWhisperMsg(avatarIndex, message));
 }

@@ -10,8 +10,9 @@ using Xabbo;
 using Xabbo.Core.Game;
 using Xabbo.Extension;
 
+using Xabbo.Messages.Flash;
+
 using b7.Xabbo.Services;
-using System.Reactive.Linq;
 
 namespace b7.Xabbo.Avalonia.ViewModels;
 
@@ -47,7 +48,7 @@ public class RoomBansViewModel : ViewModelBase
 
     }
 
-    private void OnLeftRoom(object? sender, EventArgs e)
+    private void OnLeftRoom()
     {
         _uiCtx.Invoke(_banCache.Clear);
     }
@@ -61,23 +62,21 @@ public class RoomBansViewModel : ViewModelBase
         {
             IsLoading = true;
 
-            var receiver = _ext.ReceiveAsync(_ext.Messages.In.BannedUsersFromRoom, timeout: 3000, block: true);
-            _ext.Send(_ext.Messages.Out.GetBannedUsersFromRoom, currentRoomId);
+            var receiver = _ext.ReceiveAsync(In.BannedUsersFromRoom, timeout: 3000, block: true);
+            _ext.Send(Out.GetBannedUsersFromRoom, currentRoomId);
             var packet = await receiver;
-            long roomId = packet.ReadLegacyLong();
+            long roomId = packet.Read<Id>();
             if (roomId != currentRoomId)
             {
                 throw new Exception("Room ID mismatch");
             }
 
-            short n = packet.ReadLegacyShort();
+            int n = packet.Read<Length>();
             var viewModels = new RoomBanViewModel[n];
             for (int i = 0; i < n; i++)
             {
-                long userId = packet.ReadLegacyLong();
-                string userName = packet.ReadString();
-
-                viewModels[i] = new RoomBanViewModel(userId, userName);
+                var (id, name) = packet.Read<Id, string>();
+                viewModels[i] = new RoomBanViewModel(id, name);
             }
 
             _uiCtx.Invoke(() =>

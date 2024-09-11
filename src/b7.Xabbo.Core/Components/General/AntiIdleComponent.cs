@@ -1,26 +1,24 @@
-﻿using System;
-using System.ComponentModel;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
+using ReactiveUI;
 
 using Xabbo;
-using Xabbo.Messages;
 using Xabbo.Extension;
 
 using Xabbo.Core;
 using Xabbo.Core.Game;
-using ReactiveUI;
-using DynamicData.Binding;
+using Xabbo.Messages.Flash;
 
 namespace b7.Xabbo.Components;
 
-public class AntiIdleComponent : Component
+[Intercept]
+public partial class AntiIdleComponent : Component
 {
     private readonly IConfiguration _config;
 
     private readonly ProfileManager _profileManager;
     private readonly RoomManager _roomManager;
 
-    private int _latencyCheckCount = -1;
+    private int _pingCount = -1;
 
     private bool _isAntiIdleOutActive;
     public bool IsAntiIdleOutActive
@@ -47,30 +45,29 @@ public class AntiIdleComponent : Component
             .Subscribe(_ => OnActiveChanged());
     }
 
-    protected override void OnDisconnected(object? sender, EventArgs e)
+    protected override void OnDisconnected()
     {
-        base.OnDisconnected(sender, e);
+        base.OnDisconnected();
 
-        _latencyCheckCount = -1;
+        _pingCount = -1;
     }
 
     protected void OnActiveChanged() => SendAntiIdlePacket();
 
-    protected override void OnInitialized(object? sender, ExtensionInitializedEventArgs e)
+    protected override void OnInitialized(InitializedArgs e)
     {
-        base.OnInitialized(sender, e);
+        base.OnInitialized(e);
 
         IsActive = _config.GetValue("AntiIdle:Active", true);
         IsAntiIdleOutActive = _config.GetValue("AntiIdle:IdleOutActive", true);
     }
 
-    [InterceptIn(nameof(Incoming.ClientLatencyPingResponse))]
-    protected void HandleClientLatencyPingResponse(InterceptArgs e)
+    [InterceptIn(nameof(In.Ping))]
+    protected void HandlePing(Intercept e)
     {
-        _latencyCheckCount = e.Packet.ReadInt();
+        _pingCount = e.Packet.Read<int>();
 
-        if (_latencyCheckCount > 0 &&
-            _latencyCheckCount % 12 == 0)
+        if (_pingCount > 0 && _pingCount % 6 == 0)
         {
             SendAntiIdlePacket();
         }
@@ -78,30 +75,30 @@ public class AntiIdleComponent : Component
 
     private void SendAntiIdlePacket()
     {
-        if (_latencyCheckCount <= 0) return;
+        if (_pingCount <= 0) return;
 
         if (_profileManager.UserData is not null &&
             _roomManager.Room is not null &&
-            _roomManager.Room.TryGetUserById(_profileManager.UserData.Id, out IRoomUser? self))
+            _roomManager.Room.TryGetUserById(_profileManager.UserData.Id, out IUser? self))
         {
             if (self.IsIdle && IsAntiIdleOutActive)
             {
-                Extension.Send(Out.Expression, 5);
+                Ext.Send(Out.AvatarExpression, 5);
             }
             else if (self.Dance != 0 && IsActive)
             {
-                Extension.Send(Out.Move, 0, 0);
+                Ext.Send(Out.MoveAvatar, 0, 0);
             }
             else if (IsActive)
             {
-                Extension.Send(Out.Expression, 0);
+                Ext.Send(Out.AvatarExpression, 0);
             }
         }
         else
         {
             if (IsActive)
             {
-                Extension.Send(Out.Expression, 0);
+                Ext.Send(Out.AvatarExpression, 0);
             }
         }
     }

@@ -1,19 +1,20 @@
-﻿using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 
 using Microsoft.Extensions.Configuration;
 
+using ReactiveUI;
+
 using Xabbo;
-using Xabbo.Messages;
 using Xabbo.Extension;
+using Xabbo.Messages.Flash;
 using Xabbo.Core;
 using Xabbo.Core.Events;
 using Xabbo.Core.Game;
-using ReactiveUI;
+using Xabbo.Core.Messages.Incoming;
 
 namespace b7.Xabbo.Components;
 
-public class EntityOverlayComponent : Component
+public class AvatarOverlayComponent : Component
 {
     private const int GHOST_INDEX = int.MinValue;
 
@@ -22,26 +23,20 @@ public class EntityOverlayComponent : Component
 
     private bool _isInjected;
 
-    private bool _isAvailable;
-    public bool IsAvailable
-    {
-        get => _isAvailable;
-        set => Set(ref _isAvailable, value);
-    }
-
-    public EntityOverlayComponent(IExtension extension,
+    public AvatarOverlayComponent(IExtension extension,
         IConfiguration config,
         ProfileManager profileManager,
         RoomManager roomManager)
         : base(extension)
     {
         _profileManager = profileManager;
+
         _roomManager = roomManager;
         _roomManager.Entered += OnEnteredRoom;
-        _roomManager.EntityDataUpdated += OnEntityDataUpdated;
+        _roomManager.AvatarDataUpdated += OnAvatarDataUpdated;
         _roomManager.Left += OnLeftRoom;
 
-        IsActive = config.GetValue("EntityOverlay:Active", false);
+        IsActive = config.GetValue("AvatarOverlay:Active", false);
 
         Task initialization = Task.Run(InitializeAsync);
 
@@ -57,7 +52,7 @@ public class EntityOverlayComponent : Component
             RemoveGhostUser();
     }
 
-    private bool TryGetSelf([NotNullWhen(true)] out IRoomUser? self)
+    private bool TryGetSelf([NotNullWhen(true)] out IUser? self)
     {
         UserData? userData = _profileManager.UserData;
         IRoom? room = _roomManager.Room;
@@ -73,13 +68,13 @@ public class EntityOverlayComponent : Component
         }
     }
 
-    private void OnEntityDataUpdated(object? sender, EntityDataUpdatedEventArgs e)
+    private void OnAvatarDataUpdated(AvatarDataUpdatedEventArgs e)
     {
         if (_isInjected &&
-            e.Entity.Id == _profileManager.UserData?.Id &&
-            e.Entity is IRoomUser self)
+            e.Avatar.Id == _profileManager.UserData?.Id &&
+            e.Avatar is IUser self)
         {
-            Extension.Send(In.UpdateAvatar,
+            Ext.Send(In.UserChange,
                 GHOST_INDEX,
                 self.Figure,
                 self.Gender.ToShortString(),
@@ -98,9 +93,9 @@ public class EntityOverlayComponent : Component
 
     private void InjectGhostUser()
     {
-        if (!TryGetSelf(out IRoomUser? self)) return;
+        if (!TryGetSelf(out IUser? self)) return;
 
-        RoomUser ghostUser = new RoomUser(self.Id, GHOST_INDEX)
+        User ghostUser = new User(self.Id, GHOST_INDEX)
         {
             Name = self.Name,
             Figure = self.Figure,
@@ -111,16 +106,18 @@ public class EntityOverlayComponent : Component
 
         if (!_isInjected)
         {
-            Extension.Send(In.UsersInRoom, 1, ghostUser);
-            Extension.Send(In.RoomAvatarEffect, ghostUser.Index, 13, 0);
+            Ext.Send(new AvatarsAddedMsg { ghostUser });
+            Ext.Send(new AvatarEffectMsg(ghostUser.Index, 13));
         }
 
         if (self.CurrentUpdate is not null)
         {
-            Extension.Send(In.Status, 1, new EntityStatusUpdate(self.CurrentUpdate)
-            {
-                Index = ghostUser.Index,
-                Location = self.CurrentUpdate.Location + (64, 64, 64)
+            Ext.Send(new AvatarUpdatesMsg {
+                new AvatarStatusUpdate(self.CurrentUpdate)
+                {
+                    Index = ghostUser.Index,
+                    Location = self.CurrentUpdate.Location + (64, 64, 64)
+                }
             });
         }
 
@@ -131,14 +128,16 @@ public class EntityOverlayComponent : Component
     {
         if (!_isInjected) return;
 
-        Extension.Send(In.Status, 1, new EntityStatusUpdate()
-        {
-            Index = GHOST_INDEX,
-            Location = (0, 0, -1000)
+        Ext.Send(new AvatarUpdatesMsg {
+            new AvatarStatusUpdate
+            {
+                Index = GHOST_INDEX,
+                Location = (0, 0, -1000)
+            }
         });
     }
 
-    private void OnEnteredRoom(object? sender, RoomEventArgs e)
+    private void OnEnteredRoom(RoomEventArgs e)
     {
         if (IsAvailable && IsActive)
         {
@@ -146,37 +145,31 @@ public class EntityOverlayComponent : Component
         }
     }
 
-    private void OnLeftRoom(object? sender, EventArgs e)
+    private void OnLeftRoom()
     {
         _isInjected = false;
     }
 
-    [InterceptIn(nameof(Incoming.Status))]
-    protected void HandleStatus(InterceptArgs e)
+    [Intercept]
+    protected void HandleStatus(Intercept e, AvatarUpdatesMsg updates)
     {
         if (!IsActive || !_isInjected) return;
 
-        if (!TryGetSelf(out IRoomUser? self)) return;
+        if (!TryGetSelf(out IUser? self)) return;
 
-        EntityStatusUpdate? selfUpdate = EntityStatusUpdate
-            .ParseMany(e.Packet)
-            .FirstOrDefault(x => x.Index == self.Index);
+        AvatarStatusUpdate? selfUpdate = updates.FirstOrDefault(x => x.Index == self.Index);
 
         if (selfUpdate is null) return;
 
-        EntityStatusUpdate overlayUpdate = new EntityStatusUpdate(selfUpdate)
+        AvatarStatusUpdate overlayUpdate = new AvatarStatusUpdate(selfUpdate)
         {
             Index = GHOST_INDEX,
             Location = selfUpdate.Location + (32, 32, 32),
             MovingTo = selfUpdate.MovingTo + (32, 32, 32)
         };
 
-        e.Packet.Position = 0;
-        short n = e.Packet.ReadLegacyShort();
-
-        e.Packet.Position = 0;
-        e.Packet.WriteLegacyShort((short)(n + 1));
-        e.Packet.Position = e.Packet.Length;
-        e.Packet.Write(overlayUpdate);
+        // Append the overlay update
+        e.Packet.ModifyAt<Length>(0, n => n + 1);
+        e.Packet.WriteAt(e.Packet.Length, overlayUpdate);
     }
 }

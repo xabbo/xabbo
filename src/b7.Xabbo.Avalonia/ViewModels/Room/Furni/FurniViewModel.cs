@@ -5,7 +5,6 @@ using Avalonia.Media.Imaging;
 using ReactiveUI.Fody.Helpers;
 
 using Xabbo.Core;
-using Xabbo.Core.Extensions;
 using Xabbo.Core.GameData;
 
 using b7.Xabbo.Avalonia.Helpers;
@@ -47,20 +46,15 @@ public abstract class ItemViewModelBase : ViewModelBase
     }
 }
 
-public class FurniViewModel : ItemViewModelBase
+public class FurniViewModel(IFurni furni) : ItemViewModelBase(furni)
 {
-    private readonly IFurni _furni;
+    private readonly IFurni _furni = furni;
 
     public long Id => _furni.Id;
     public long OwnerId => _furni.OwnerId;
     public string OwnerName => _furni.OwnerName;
 
     [Reactive] public int Count { get; set; }
-
-    public FurniViewModel(IFurni furni) : base(furni)
-    {
-        _furni = furni;
-    }
 }
 
 public class FurniStackViewModel : ItemViewModelBase

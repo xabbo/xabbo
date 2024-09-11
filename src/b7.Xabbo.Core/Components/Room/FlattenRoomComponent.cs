@@ -1,33 +1,27 @@
 ﻿using Xabbo;
-using Xabbo.Messages;
 using Xabbo.Extension;
+using Xabbo.Messages.Flash;
 using Xabbo.Core;
 using Xabbo.Core.Game;
+using Xabbo.Core.Messages.Incoming;
 
 namespace b7.Xabbo.Components;
 
-public class FlattenRoomComponent : Component
+[Intercept(~ClientType.Shockwave)]
+public partial class FlattenRoomComponent(IExtension extension, RoomManager roomManager) : Component(extension)
 {
-    private readonly RoomManager _roomManager;
+    private readonly RoomManager _roomManager = roomManager;
 
     private bool _isActivated = false;
     private Heightmap? _heightmap;
     private FloorPlan? _originalFloorPlan;
 
-    public FlattenRoomComponent(IExtension extension, RoomManager roomManager)
-        : base(extension)
+    protected override void OnInitialized(InitializedArgs e)
     {
-        _roomManager = roomManager;
-    }
-
-    protected override void OnInitialized(object? sender, ExtensionInitializedEventArgs e)
-    {
-        base.OnInitialized(sender, e);
-
         _roomManager.Entering += RoomManager_Entering;
     }
 
-    private void RoomManager_Entering(object? sender, EventArgs e)
+    private void RoomManager_Entering()
     {
         _isActivated = IsActive;
     }
@@ -44,9 +38,15 @@ public class FlattenRoomComponent : Component
 
     private float GetOffset(int x, int y) => GetOffset((x, y));
 
+    private FloorItem AdjustTile(FloorItem it)
+    {
+        it.Location = AdjustTile(it.Location);
+        return it;
+    }
+
     private Tile AdjustTile(Tile tile)
     {
-        if (_originalFloorPlan is null) 
+        if (_originalFloorPlan is null)
             return tile;
 
         if (_originalFloorPlan.IsWalkable(tile.X, tile.Y))
@@ -55,8 +55,8 @@ public class FlattenRoomComponent : Component
             return tile;
     }
 
-    [InterceptIn(nameof(Incoming.StackingHeightmap))]
-    private void HandleStackingHeightmap(InterceptArgs e)
+    [InterceptIn("f:"+nameof(In.HeightMap))]
+    private void HandleHeightMap(Intercept e)
     {
         if (!_isActivated) return;
 
@@ -64,27 +64,26 @@ public class FlattenRoomComponent : Component
 
         // Height map comes before the floor plan so it must be saved
         // and modified after receiving the floor plan
-        e.OriginalPacket.Position = 0;
-        _heightmap = Heightmap.Parse(e.OriginalPacket);
+        _heightmap = e.Packet.Read<Heightmap>();
     }
 
-    [InterceptIn(nameof(Incoming.FloorHeightmap))]
-    private void HandleFloorHeightmap(InterceptArgs e)
+    [InterceptIn(nameof(In.FloorHeightMap))]
+    private void HandleFloorHeightMap(Intercept e)
     {
         if (!_isActivated || _heightmap is null) return;
 
         e.Block();
 
-        _originalFloorPlan = FloorPlan.Parse(e.OriginalPacket);
+        _originalFloorPlan = e.Packet.Read<FloorPlan>();
 
-        e.OriginalPacket.Position = 0;
-        FloorPlan floorPlan = FloorPlan.Parse(e.OriginalPacket);
+        e.Packet.Position = 0;
+        FloorPlan floorPlan = e.Packet.Read<FloorPlan>();
         for (int y = 0; y < floorPlan.Length; y++)
             for (int x = 0; x < floorPlan.Width; x++)
                 if (floorPlan.GetHeight(x, y) >= 0)
                     floorPlan.SetHeight(x, y, 0);
 
-        e.Packet.ReplaceString(floorPlan.ToString(), 5);
+        e.Packet.ReplaceAt(5, floorPlan.ToString());
 
         // Modify the heightmap
         for (int y = 0; y < _heightmap.Length; y++)
@@ -100,22 +99,22 @@ public class FlattenRoomComponent : Component
             }
         }
 
-        Extension.Send(In.StackingHeightmap, _heightmap);
-        Extension.Send(e.Packet);
+        Ext.Send(In.HeightMap, _heightmap);
+        Ext.Send(e.Packet);
     }
 
-    [InterceptIn(nameof(Incoming.StackingHeightmapDiff))]
-    private void HandleStackingHeightmapDiff(InterceptArgs e)
+    [InterceptIn(nameof(In.HeightMapUpdate))]
+    private void HandleHeightMapUpdate(Intercept e)
     {
         if (!_isActivated) return;
 
-        int n = e.Packet.ReadByte();
+        int n = e.Packet.Read<byte>();
         short[] values = new short[n];
         for (int i = 0; i < n; i++)
         {
-            int x = e.Packet.ReadByte();
-            int y = e.Packet.ReadByte();
-            values[i] = e.Packet.ReadShort();
+            int x = e.Packet.Read<byte>();
+            int y = e.Packet.Read<byte>();
+            values[i] = e.Packet.Read<short>();
             if ((values[i] & 0xC000) == 0)
             {
                 double height = (values[i] & 0x3FFF) / 256.0;
@@ -128,29 +127,29 @@ public class FlattenRoomComponent : Component
         for (int i = 0; i < n; i++)
         {
             e.Packet.Position += 2;
-            e.Packet.WriteShort(values[i]);
+            e.Packet.Write(values[i]);
         }
     }
 
-    [InterceptIn(nameof(Incoming.UsersInRoom))]
-    private void HandleUsersInRoom(InterceptArgs e)
+    [InterceptIn(nameof(In.Users))]
+    private void HandleUsers(Intercept e)
     {
         if (!_isActivated) return;
 
-        var entities = Entity.ParseAll(e.Packet);
-        foreach (var entity in entities)
-            entity.Location = AdjustTile(entity.Location);
+        var avatars = e.Packet.Read<Avatar[]>();
+        foreach (var avatar in avatars)
+            avatar.Location = AdjustTile(avatar.Location);
 
-        e.Packet = new Packet(e.Packet.Header, e.Packet.Protocol);
-        Entity.ComposeAll(e.Packet, entities);
+        e.Packet.Clear();
+        e.Packet.Write(avatars);
     }
 
-    [InterceptIn(nameof(Incoming.Status))]
-    private void HandleStatus(InterceptArgs e)
+    [InterceptIn(nameof(In.UserUpdate))]
+    private void HandleUserUpdate(Intercept e)
     {
         if (!_isActivated) return;
 
-        EntityStatusUpdate[] updates = EntityStatusUpdate.ParseMany(e.Packet).ToArray();
+        var updates = e.Packet.Read<AvatarStatusUpdate[]>();
         foreach (var update in updates)
         {
             update.Location = AdjustTile(update.Location);
@@ -163,69 +162,65 @@ public class FlattenRoomComponent : Component
                 update.ActionHeight -= GetOffset(update.Location);
         }
 
-        e.Packet = new Packet(e.Packet.Header, e.Packet.Protocol);
-        EntityStatusUpdate.ComposeAll(e.Packet, updates);
+        e.Packet.Clear();
+        e.Packet.Write(updates);
     }
 
-    [InterceptIn(nameof(Incoming.ActiveObjects))]
-    private void HandleActiveObjects(InterceptArgs e)
+    [InterceptIn("f:"+nameof(In.Objects))]
+    private void HandleObjects(Intercept e)
     {
         if (!_isActivated) return;
 
-        var floorItems = FloorItem.ParseAll(e.Packet);
+        var floorItems = e.Packet.Read<FloorItemsMsg>();
         foreach (var item in floorItems)
             item.Location = AdjustTile(item.Location);
 
-        e.Packet = new Packet(e.Packet.Header, e.Packet.Protocol);
-        FloorItem.ComposeAll(e.Packet, floorItems);
+        e.Packet.Clear();
+        e.Packet.Write(floorItems);
     }
 
-    [InterceptIn(nameof(Incoming.ActiveObjectAdd))]
-    private void HandleActiveObjectAdd(InterceptArgs e)
+    [InterceptIn(nameof(In.ObjectAdd))]
+    private void HandleObjectAdd(Intercept e)
     {
         if (!_isActivated) return;
 
-        var floorItem = FloorItem.Parse(e.Packet);
+        var floorItem = e.Packet.Read<FloorItem>();
         floorItem.Location = AdjustTile(floorItem.Location);
-        e.Packet = new Packet(e.Packet.Header, e.Packet.Protocol)
-            .Write(floorItem);
+        e.Packet.Clear();
+        e.Packet.Write(floorItem);
     }
 
-    [InterceptIn(nameof(Incoming.ActiveObjectUpdate))]
-    private void HandleActiveObjectUpdate(InterceptArgs e)
+    [InterceptIn(nameof(In.ObjectUpdate))]
+    private void HandleObjectUpdate(Intercept e)
     {
         if (!_isActivated) return;
 
-        FloorItem floorItem = FloorItem.Parse(e.Packet);
-        floorItem.Location = AdjustTile(floorItem.Location);
-
-        e.Packet = new Packet(e.Packet.Header, e.Packet.Protocol)
-            .Write(floorItem);
+        e.Packet.Modify<FloorItem>(AdjustTile);
     }
 
-    [InterceptIn(nameof(Incoming.QueueMoveUpdate))]
-    private void HandleQueueMoveUpdate(InterceptArgs e)
+    [Intercept]
+    private void HandleQueueMoveUpdate(Intercept e, SlideObjectBundleMsg msg)
     {
         if (!_isActivated) return;
 
-        var update = RollerUpdate.Parse(e.Packet);
+        var update = msg.Bundle;
 
-        float locationOffset = GetOffset(update.LocationX, update.LocationY);
-        float targetOffset = GetOffset(update.TargetX, update.TargetY);
+        float fromOffset = GetOffset(update.From);
+        float toOffset = GetOffset(update.To);
 
-        foreach (var objectUpdate in update.ObjectUpdates)
+        foreach (var objectUpdate in update.SlideObjects)
         {
-            objectUpdate.LocationZ -= locationOffset;
-            objectUpdate.TargetZ -= targetOffset;
+            objectUpdate.FromZ -= fromOffset;
+            objectUpdate.ToZ -= toOffset;
         }
 
-        if (update.Type != RollerUpdateType.None)
+        if (update.Avatar is not null)
         {
-            update.EntityLocationZ -= locationOffset;
-            update.EntityTargetZ -= targetOffset;
+            update.Avatar.FromZ -= fromOffset;
+            update.Avatar.ToZ -= toOffset;
         }
 
-        e.Packet = new Packet(e.Packet.Header, e.Packet.Protocol)
-            .Write(update);
+        e.Packet.Clear();
+        e.Packet.Write(update);
     }
 }

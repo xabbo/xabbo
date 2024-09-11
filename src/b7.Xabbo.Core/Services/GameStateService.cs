@@ -1,8 +1,7 @@
-﻿using Xabbo.Extension;
+﻿using Xabbo;
+using Xabbo.Extension;
 using Xabbo.Core.Game;
 using Xabbo.Core.GameData;
-using Xabbo;
-using Xabbo.Core.Extensions;
 
 namespace b7.Xabbo.Services;
 
@@ -32,13 +31,12 @@ public class GameStateService
         ext.Connected += OnConnected;
     }
 
-    private async void OnConnected(object? sender, GameConnectedEventArgs e)
+    private async void OnConnected(GameConnectedArgs e)
     {
         try
         {
             var hotel = Hotel.FromGameHost(e.Host);
             await GameData.LoadAsync(hotel);
-            XabboCoreExtensions.Initialize(GameData.Furni!, GameData.Texts!);
         }
         catch { }
     }

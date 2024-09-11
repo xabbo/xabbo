@@ -32,7 +32,7 @@ public class RoomVisitorsViewModel : ViewModelBase
     public ReadOnlyObservableCollection<VisitorViewModel> Visitors => _visitors;
 
     private readonly SourceCache<VisitorViewModel, long> _visitorCache = new(x => x.Id);
-    
+
     [Reactive] public bool IsAvailable { get; set; }
     [Reactive] public string FilterText { get; set; } = ""; // RefreshList on set
 
@@ -93,8 +93,8 @@ public class RoomVisitorsViewModel : ViewModelBase
         _ext.Disconnected += OnGameDisconnected;
 
         _roomManager.Left += OnLeftRoom;
-        _roomManager.EntitiesAdded += OnEntitiesAdded;
-        _roomManager.EntityRemoved += OnEntitiesRemoved;
+        _roomManager.AvatarsAdded += OnAvatarsAdded;
+        _roomManager.AvatarRemoved += OnAvatarsRemoved;
 
         IsAvailable = true;
     }
@@ -160,11 +160,11 @@ public class RoomVisitorsViewModel : ViewModelBase
     }
 #endif
 
-    private void OnGameDisconnected(object? sender, EventArgs e) => ClearVisitors();
+    private void OnGameDisconnected() => ClearVisitors();
 
-    private void OnLeftRoom(object? sender, EventArgs e) => ClearVisitors();
+    private void OnLeftRoom() => ClearVisitors();
 
-    private void OnEntitiesAdded(object? sender, EntitiesEventArgs e)
+    private void OnAvatarsAdded(AvatarsEventArgs e)
     {
         if (!_roomManager.IsLoadingRoom && !_roomManager.IsInRoom)
             return;
@@ -172,7 +172,7 @@ public class RoomVisitorsViewModel : ViewModelBase
         bool needsRefresh = false;
         var newLogs = new List<VisitorViewModel>();
 
-        foreach (var user in e.Entities.OfType<IRoomUser>())
+        foreach (var user in e.Avatars.OfType<IUser>())
         {
             if (_visitorMap.TryGetValue(user.Id, out VisitorViewModel? visitorLog))
             {
@@ -193,9 +193,9 @@ public class RoomVisitorsViewModel : ViewModelBase
                 visitorLog = new VisitorViewModel(user.Index, user.Id, user.Name);
                 if (_visitorMap.TryAdd(user.Id, visitorLog))
                 {
-                    /* Entities received when first loading the room were already in the room,
+                    /* Avatars received when first loading the room were already in the room,
                      * so we don't know when they entered, but we can see what order they
-                     * entered the room by their entity index */
+                     * entered the room by their avatar index */
                     if (_roomManager.IsLoadingRoom)
                     {
                         // Only set entry time for self
@@ -218,22 +218,22 @@ public class RoomVisitorsViewModel : ViewModelBase
 
         if (newLogs.Count > 0)
             _context.InvokeAsync(() => newLogs.ForEach(x => _visitorCache.AddOrUpdate(x)));
-        /* The list gets refreshed when adding new items, only refresh the list 
+        /* The list gets refreshed when adding new items, only refresh the list
          * if no new items were added and we need to re-order some items */
         if (newLogs.Count == 0 && needsRefresh)
             RefreshList();
     }
 
 
-    private void OnEntitiesRemoved(object? sender, EntityEventArgs e)
+    private void OnAvatarsRemoved(AvatarEventArgs e)
     {
-        if (_visitorMap.TryGetValue(e.Entity.Id, out VisitorViewModel? visitor))
+        if (_visitorMap.TryGetValue(e.Avatar.Id, out VisitorViewModel? visitor))
         {
             visitor.Left = DateTime.Now;
 #if ENABLE_LOGGING
-            if (e.Entity.Id != profileManager.UserData?.Id)
+            if (e.Avatar.Id != profileManager.UserData?.Id)
             {
-                Log($"[{DateTime.UtcNow:O}] Out: {e.Entity.Name}\r\n");
+                Log($"[{DateTime.UtcNow:O}] Out: {e.Avatar.Name}\r\n");
             }
 #endif
         }

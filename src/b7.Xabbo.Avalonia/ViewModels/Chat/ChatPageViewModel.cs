@@ -94,7 +94,7 @@ public class ChatPageViewModel : PageViewModel
         _ext = extension;
 
         _roomManager = roomManager;
-        _roomManager.EntityChat += RoomManager_EntityChat;
+        _roomManager.AvatarChat += RoomManager_AvatarChat;
 
         _stringBuffer = new StringBuilder();
 
@@ -113,13 +113,13 @@ public class ChatPageViewModel : PageViewModel
         this.RaisePropertyChanged(nameof(LogText));
     }
 
-    private void RoomManager_EntityChat(object? sender, EntityChatEventArgs e)
+    private void RoomManager_AvatarChat(AvatarChatEventArgs e)
     {
-        if (!IncludeNormalChat && e.Entity.Type == EntityType.User && e.ChatType != ChatType.Whisper) return;
+        if (!IncludeNormalChat && e.Avatar.Type == AvatarType.User && e.ChatType != ChatType.Whisper) return;
         if (!IncludeWhispers && e.ChatType == ChatType.Whisper && e.BubbleStyle != 34) return;
-        if (!IncludeBotMessages && (e.Entity.Type == EntityType.PublicBot || e.Entity.Type == EntityType.PrivateBot)) return;
+        if (!IncludeBotMessages && (e.Avatar.Type == AvatarType.PublicBot || e.Avatar.Type == AvatarType.PrivateBot)) return;
         if (!IncludeWiredMessages && e.ChatType == ChatType.Whisper && e.BubbleStyle == 34) return;
-        if (e.Entity.Type == EntityType.Pet) return;
+        if (e.Avatar.Type == AvatarType.Pet) return;
 
         IRoom? room = _roomManager.Room;
         if (room is null) return;
@@ -154,7 +154,7 @@ public class ChatPageViewModel : PageViewModel
             "[{0:HH:mm:ss}] {1}{2}: {3}",
             DateTime.Now,
             e.ChatType == ChatType.Whisper ? "* " : "",
-            e.Entity.Name,
+            e.Avatar.Name,
             message
         );
         _stringBuffer.AppendLine();

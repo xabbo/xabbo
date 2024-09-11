@@ -10,35 +10,35 @@ using b7.Xabbo.Avalonia.Helpers;
 
 namespace b7.Xabbo.Avalonia.ViewModels;
 
-public class EntityViewModel : ViewModelBase
+public class AvatarViewModel : ViewModelBase
 {
     private Lazy<Task<Bitmap?>> _avatarImageLoader;
 
-    private readonly IEntity _entity;
+    private readonly IAvatar _avatar;
 
-    public EntityType Type => _entity.Type;
-    public int Index => _entity.Index;
-    public long Id => _entity.Id;
-    public string Name => _entity.Name;
-    public string Motto => _entity.Motto;
-    public string AvatarImageUrl => $"https://www.habbo.com/habbo-imaging/avatarimage?figure=${_entity.Figure}";
+    public AvatarType Type => _avatar.Type;
+    public int Index => _avatar.Index;
+    public long Id => _avatar.Id;
+    public string Name => _avatar.Name;
+    public string Motto => _avatar.Motto;
+    public string AvatarImageUrl => $"https://www.habbo.com/habbo-imaging/avatarimage?figure=${_avatar.Figure}";
     public Task<Bitmap?> AvatarImage => _avatarImageLoader.Value;
 
     [Reactive] public bool IsIdle { get; set; }
     [Reactive] public bool IsTrading { get; set; }
 
-    public bool IsUser => _entity.Type == EntityType.User;
+    public bool IsUser => _avatar.Type == AvatarType.User;
 
-    public EntityViewModel(IEntity entity)
+    public AvatarViewModel(IAvatar avatar)
     {
-        _entity = entity;
+        _avatar = avatar;
 
-        IsIdle = entity.IsIdle;
-        IsTrading = entity.CurrentUpdate?.IsTrading ?? false;
+        IsIdle = avatar.IsIdle;
+        IsTrading = avatar.CurrentUpdate?.IsTrading ?? false;
 
         _avatarImageLoader = new Lazy<Task<Bitmap?>>(() =>
         {
-            if (entity.Type == EntityType.User)
+            if (avatar.Type == AvatarType.User)
             {
                 return ImageHelper.LoadFromWeb(new Uri(AvatarImageUrl));
             }

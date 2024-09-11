@@ -1,18 +1,17 @@
-﻿using System.ComponentModel;
+﻿using Microsoft.Extensions.Configuration;
 
-using Microsoft.Extensions.Configuration;
+using ReactiveUI;
 
 using Xabbo;
 using Xabbo.Extension;
-using Xabbo.Messages;
+using Xabbo.Messages.Flash;
 
 using b7.Xabbo.Commands;
-using ReactiveUI;
-
 
 namespace b7.Xabbo.Components;
 
-public class ClickThroughComponent : Component
+[Intercept(~ClientType.Shockwave)]
+public partial class ClickThroughComponent : Component
 {
     protected readonly CommandManager _commandManager;
 
@@ -30,9 +29,11 @@ public class ClickThroughComponent : Component
             .Subscribe(x => OnIsActiveChanged(x.Value));
     }
 
-    protected override void OnInitialized(object? sender, ExtensionInitializedEventArgs e)
+    protected override void OnConnected(GameConnectedArgs e)
     {
-        base.OnInitialized(sender, e);
+        base.OnConnected(e);
+
+        IsAvailable = Client is not ClientType.Shockwave;
     }
 
     private Task OnToggle(CommandArgs args)
@@ -43,19 +44,17 @@ public class ClickThroughComponent : Component
         return Task.CompletedTask;
     }
 
-    [RequiredIn(nameof(Incoming.GameYouArePlayer))]
+    // [RequiredIn(nameof(In.GameYouArePlayer))]
     protected void OnIsActiveChanged(bool isActive)
     {
-        Extension.Send(In.GameYouArePlayer, isActive);
+        Ext.Send(In.YouArePlayingGame, isActive);
     }
 
-    [InterceptIn(nameof(Incoming.RoomEntryInfo))]
-    [RequiredIn(nameof(Incoming.GameYouArePlayer))]
-    private void OnEnterRoom(InterceptArgs e)
+    [InterceptIn(nameof(In.RoomEntryInfo))]
+    // [RequiredIn(nameof(In.GameYouArePlayer))]
+    private void OnEnterRoom(Intercept e)
     {
         if (IsActive)
-        {
-            Extension.Send(In.GameYouArePlayer, true);
-        }
+            Ext.Send(In.YouArePlayingGame, true);
     }
 }

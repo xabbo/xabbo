@@ -91,7 +91,7 @@
                 ToolTip.Tip="Allows you to click on tiles behind users to walk"
                 IsChecked="{Binding ClickThrough.IsActive}"
               />
-            </StackPanel> 
+            </StackPanel>
           </Expander>
           <Expander
             Margin="0,5"
@@ -164,11 +164,11 @@
                 </ToolTip.Tip>
               </RadioButton>
               <StackPanel Orientation="Horizontal">
-                <TextBlock 
+                <TextBlock
                   Margin="0,0,10,0"
                   VerticalAlignment="Center"
                   Text="Exclude"
-                /> 
+                />
                 <CheckBox
                   Content="Friends"
                   IsEnabled="False"
@@ -269,7 +269,7 @@
         <StackPanel>
           <CheckBox Content="Drop received hand item" IsChecked="{Binding HandItem.DropHandItem}" />
           <CheckBox Content="Return received hand item" IsChecked="{Binding HandItem.ReturnHandItem}" />
-          <CheckBox Content="Try maintain direction when given hand item" IsChecked="{Binding HandItem.MaintainDirection}" />
+          <CheckBox Content="Try maintain direction when given hand item" IsChecked="{Binding HandItem.ShouldMaintainDirection}" />
         </StackPanel>
       </Expander>
 

@@ -1,26 +1,22 @@
 ﻿using Xabbo;
 using Xabbo.Core;
 using Xabbo.Extension;
-using Xabbo.Messages;
+using Xabbo.Messages.Flash;
 
 namespace b7.Xabbo.Components;
 
-public class DisconnectionReasonComponent : Component
+public class DisconnectionReasonComponent(IExtension extension) : Component(extension)
 {
-    public DisconnectionReasonComponent(IExtension extension)
-        : base(extension)
-    { }
-
-    [InterceptIn(nameof(Incoming.DisconnectionReason))]
-    protected void HandleDisconnectionReason(InterceptArgs e)
+    [InterceptIn(nameof(In.DisconnectReason))]
+    protected void HandleDisconnectionReason(Intercept e)
     {
         e.Block();
 
-        DisconnectReason reason = (DisconnectReason)e.Packet.ReadInt();
+        DisconnectReason reason = (DisconnectReason)e.Packet.Read<int>();
 
         string reasonText = Enum.IsDefined(reason) ? reason.ToString() : $"unknown ({(int)reason})";
         string message = $"[xabbo] You were disconnected by the server.\n\nReason: {reasonText}";
 
-        Extension.Send(In.SystemBroadcast, message);
+        Ext.Send(In.HabboBroadcast, message);
     }
 }

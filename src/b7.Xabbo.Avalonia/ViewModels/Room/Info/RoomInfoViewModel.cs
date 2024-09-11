@@ -54,7 +54,7 @@ public class RoomInfoViewModel : ViewModelBase
         this.RaisePropertyChanged(nameof(Thumbnail));
     }
 
-    private void OnEnteredRoom(object? sender, EventArgs e)
+    private void OnEnteredRoom(RoomEventArgs e)
     {
         Data = _roomManager.Data;
 
@@ -64,7 +64,7 @@ public class RoomInfoViewModel : ViewModelBase
         }
     }
 
-    private void OnRoomDataUpdated(object? sender, RoomDataEventArgs e)
+    private void OnRoomDataUpdated(RoomDataEventArgs e)
     {
         Data = e.Data;
         IsInRoom = true;
@@ -72,14 +72,14 @@ public class RoomInfoViewModel : ViewModelBase
         UpdateThumbnail(e.Data.Id);
     }
 
-    private void OnLeftRoom(object? sender, EventArgs e)
+    private void OnLeftRoom()
     {
         UpdateThumbnail(0);
         IsInRoom = false;
         Data = null;
     }
 
-    private void OnGameDisconnected(object? sender, EventArgs e)
+    private void OnGameDisconnected()
     {
         IsInRoom = false;
         Data = null;

@@ -1,19 +1,17 @@
-﻿using System.Drawing;
-using System.Reactive.Linq;
+﻿using System.Reactive.Linq;
 
 using ReactiveUI;
 
 using Xabbo;
 using Xabbo.Extension;
+using Xabbo.Messages.Flash;
+using Xabbo.Core;
 using Xabbo.Core.Events;
 using Xabbo.Core.Game;
 using Xabbo.Core.GameData;
 
-using Xabbo.Core;
-using Xabbo.Messages;
-
 using b7.Xabbo.Model;
-using Xabbo.Core.Extensions;
+using Xabbo.Interceptor;
 
 namespace b7.Xabbo.Components;
 
@@ -24,7 +22,7 @@ public class LightingComponent : Component
     private readonly IGameDataManager _gameData;
     private readonly RoomManager _roomManager;
 
-    private long _currentBgTonerId = -1;
+    private Id _currentBgTonerId = -1;
 
     private bool? _lastTonerActiveUpdate;
     private HslU8? _lastTonerColorUpdate;
@@ -34,7 +32,8 @@ public class LightingComponent : Component
     [Reactive] public bool TonerActive { get; set; }
     [Reactive] public HslU8 TonerColor { get; set; }
 
-    public LightingComponent(IExtension extension, IGameDataManager gameData, RoomManager room) : base(extension)
+    public LightingComponent(IExtension ext, IGameDataManager gameData, RoomManager room)
+        : base(ext)
     {
         _gameData = gameData;
         _roomManager = room;
@@ -50,7 +49,7 @@ public class LightingComponent : Component
     private IFloorItem? GetBgToner(long id)
     {
         IFloorItem? toner = null;
-        if (XabboCoreExtensions.IsInitialized)
+        if (Extensions.IsInitialized)
         {
             var room = _roomManager.Room;
             if (room is not null)
@@ -71,8 +70,8 @@ public class LightingComponent : Component
     private void UpdateToner(HslU8 color)
     {
         if (_lastTonerColorUpdate.Equals(color)) return;
-        if (!Extension.IsConnected && _currentBgTonerId > 0) return;
-        Extension.Send(Out.SetRoomBackgroundColorData, (LegacyLong)_currentBgTonerId, color);
+        if (!Ext.IsConnected || _currentBgTonerId <= 0) return;
+        Ext.Send(Out.SetRoomBackgroundColorData, _currentBgTonerId, color);
     }
 
     private void OnGameDataLoaded()
@@ -97,9 +96,9 @@ public class LightingComponent : Component
         }
     }
 
-    private void OnFloorItemAdded(object? sender, FloorItemEventArgs e)
+    private void OnFloorItemAdded(FloorItemEventArgs e)
     {
-        if (!XabboCoreExtensions.IsInitialized) return;
+        if (!Extensions.IsInitialized) return;
 
         string identifier = e.Item.GetIdentifier();
         if (identifier == TonerIdentifier)

@@ -1,29 +1,22 @@
-﻿using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-
+﻿using Xabbo;
 using Xabbo.Messages;
-using Xabbo.Interceptor;
 using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.Tasks;
-using b7.Xabbo.Components;
+
+using b7.Xabbo.Core.Commands;
+using Xabbo.Messages.Flash;
 
 namespace b7.Xabbo.Commands;
 
-public class FindFriendCommand : CommandModule
+[CommandModule(SupportedClients = ~ClientType.Shockwave)]
+public class FindFriendCommand(FriendManager friendManager) : CommandModule
 {
-    private readonly FriendManager _friendManager;
-
-    public FindFriendCommand(FriendManager friendManager)
-    {
-        _friendManager = friendManager;
-    }
+    private readonly FriendManager _friendManager = friendManager;
 
     [Command("find", Usage = "<friendName>")]
-    [RequiredOut(nameof(Outgoing.FollowFriend))]
-    [RequiredIn(nameof(Incoming.RoomForward), nameof(Incoming.FollowFriendFailed))]
+    // [RequiredOut(nameof(Out.FollowFriend))]
+    // [RequiredIn(nameof(In.RoomForward), nameof(In.FollowFriendFailed))]
     protected async Task OnFind(CommandArgs args)
     {
         if (args.Count < 1)
@@ -46,20 +39,20 @@ public class FindFriendCommand : CommandModule
             return;
         }
 
-        Task<IPacket> receiveAsync = ReceiveAsync((In.RoomForward, In.FollowFriendFailed), 2000, true);
-        Send(Out.FollowFriend, (LegacyLong)friend.Id);
+        Task<IPacket> receiveAsync = Ext.ReceiveAsync([In.RoomForward, In.FollowFriendFailed], 2000, true);
+        Ext.Send(Out.FollowFriend, friend.Id);
         var packet = await receiveAsync;
 
-        if (packet.Header == In.RoomForward)
+        if (Ext.Messages.Is(packet.Header, In.RoomForward))
         {
-            int roomId = packet.ReadInt();
-            var roomData = await new GetRoomDataTask(Extension, roomId)
+            int roomId = packet.Read<int>();
+            var roomData = await new GetRoomDataTask(Ext, roomId)
                 .ExecuteAsync(5000, CancellationToken.None);
             ShowMessage($"{friend.Name} is in room '{roomData.Name}' by {roomData.OwnerName} (id:{roomData.Id}){(roomData.IsInvisible ? "*" : "")}");
         }
         else
         {
-            var error = (FollowFriendError)packet.ReadInt();
+            var error = (FollowFriendError)packet.Read<int>();
             switch (error)
             {
                 case FollowFriendError.NotFriend:

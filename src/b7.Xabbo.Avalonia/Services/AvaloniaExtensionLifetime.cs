@@ -36,21 +36,21 @@ public class AvaloniaExtensionLifetime : IHostLifetime
     {
         _hostAppLifetime = hostAppLifetime;
         _navigation = navigation;
-        
+
         Application = application;
         Window = window;
 
         Extension = extension;
-        Extension.InterceptorConnectionFailed += OnInterceptorConnectionFailed;
-        Extension.InterceptorConnected += OnInterceptorConnected;
-        Extension.Clicked += OnExtensionClicked;
-        Extension.InterceptorDisconnected += OnInterceptorDisconnected;
+        // Extension.InterceptorConnectionFailed += OnInterceptorConnectionFailed;
+        // Extension.InterceptorConnected += OnInterceptorConnected;
+        // Extension.Activated += OnExtensionClicked;
+        // Extension.InterceptorDisconnected += OnInterceptorDisconnected;
 
         // _hostAppLifetime.ApplicationStopping.Register(() => application.Shutdown());
     }
-    
-    private void OnInterceptorConnectionFailed(object? sender, ConnectionFailedEventArgs e)
-    {
+
+    // private void OnInterceptorConnectionFailed(object? sender, ConnectionFailedEventArgs e)
+    // {
         /*
         Dispatcher.UIThread.Invoke(() =>
         {
@@ -62,7 +62,7 @@ public class AvaloniaExtensionLifetime : IHostLifetime
             Application.Shutdown();
         });
         */
-    }
+    // }
 
     private void OnInterceptorConnected(object? sender, EventArgs e)
     {
@@ -82,17 +82,17 @@ public class AvaloniaExtensionLifetime : IHostLifetime
 
     private void OnWindowClosing(object? sender, CancelEventArgs e)
     {
-        if (Extension.IsInterceptorConnected)
+        // if (Extension.IsInterceptorConnected)
         {
             e.Cancel = true;
             Window.Hide();
         }
     }
 
-    private void OnInterceptorDisconnected(object? sender, DisconnectedEventArgs e)
-    {
-        // Application.Dispatcher.Invoke(() => Application.Shutdown());
-    }
+    // private void OnInterceptorDisconnected(object? sender, DisconnectedEventArgs e)
+    // {
+    //     // Application.Dispatcher.Invoke(() => Application.Shutdown());
+    // }
 
     public Task StopAsync(CancellationToken cancellationToken)
     {

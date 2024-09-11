@@ -2,14 +2,9 @@
 
 namespace b7.Xabbo.Commands;
 
-public class AppCommands : CommandModule
+public class AppCommands(IApplicationManager app) : CommandModule
 {
-    private readonly IApplicationManager _app;
-
-    public AppCommands(IApplicationManager app)
-    {
-        _app = app;
-    }
+    private readonly IApplicationManager _app = app;
 
     [Command("x")]
     public Task OnShowWindow()

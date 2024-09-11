@@ -18,8 +18,6 @@ public class NotificationComponent : Component
     private readonly FriendManager _friendManager;
     private readonly RoomManager _roomManager;
 
-    private Process? _currentProcess;
-
     private bool _flashOnPrivateMessage;
     public bool FlashOnPrivateMessage
     {
@@ -85,18 +83,11 @@ public class NotificationComponent : Component
 
         _friendManager.MessageReceived += OnReceivedPrivateMessage;
 
-        _roomManager.EntitiesAdded += OnEntitiesAdded;
-        _roomManager.EntityChat += OnEntityChat;
+        _roomManager.AvatarsAdded += OnAvatarsAdded;
+        _roomManager.AvatarChat += OnAvatarChat;
     }
 
-    protected override void OnDisconnected(object? sender, EventArgs e)
-    {
-        base.OnDisconnected(sender, e);
-
-        _currentProcess = null;
-    }
-
-    private void OnReceivedPrivateMessage(object? sender, FriendMessageEventArgs e)
+    private void OnReceivedPrivateMessage(FriendMessageEventArgs e)
     {
         if (FlashOnPrivateMessage)
         {
@@ -104,9 +95,9 @@ public class NotificationComponent : Component
         }
     }
 
-    private void OnEntityChat(object? sender, EntityChatEventArgs e)
+    private void OnAvatarChat(AvatarChatEventArgs e)
     {
-        if (e.Entity is not IRoomUser user) return;
+        if (e.Avatar is not User user) return;
 
         if (FlashOnUserChat ||
             (FlashOnWhisper && e.ChatType == ChatType.Whisper) ||
@@ -116,9 +107,9 @@ public class NotificationComponent : Component
         }
     }
 
-    private void OnEntitiesAdded(object? sender, EntitiesEventArgs e)
+    private void OnAvatarsAdded(AvatarsEventArgs e)
     {
-        IEnumerable<IRoomUser> users = e.Entities.OfType<IRoomUser>()
+        IEnumerable<User> users = e.Avatars.OfType<User>()
             .Where(u => u.Id != _profileManager.UserData?.Id);
 
         if ((FlashOnUserEntered && users.Any(u => u.Id != _profileManager.UserData?.Id)) ||

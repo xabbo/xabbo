@@ -1,19 +1,23 @@
-﻿using FluentIcons.Common;
+﻿using System;
+using System.Reactive.Linq;
+using System.Diagnostics;
+
+using Avalonia.Media;
+
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
+
+using FluentIcons.Common;
 using FluentIcons.Avalonia.Fluent;
 
 using IconSource = FluentAvalonia.UI.Controls.IconSource;
 
 using Splat;
 
-using b7.Xabbo.Components;
-using ReactiveUI.Fody.Helpers;
-using Avalonia.Media;
-using ReactiveUI;
-using System.Reactive.Linq;
-using System;
 using Xabbo.Extension;
-using Xabbo;
-using System.Diagnostics;
+using Xabbo.Messages.Flash;
+
+using b7.Xabbo.Components;
 
 namespace b7.Xabbo.Avalonia.ViewModels;
 
@@ -34,7 +38,7 @@ public class GeneralPageViewModel : PageViewModel
             {
                 var color = change.Value.ToHsl();
                 Debug.WriteLine(color.ToString());
-                _ext.Send(_ext.Messages.Out.SetRoomBackgroundColorData,
+                _ext.Send(Out.SetRoomBackgroundColorData,
                     831085267, (int)Math.Round(color.H / 360 * 255), (int)Math.Round(color.S * 255), (int)Math.Round(color.L * 255));
             });
     }
@@ -67,6 +71,6 @@ public class GeneralPageViewModel : PageViewModel
     [DependencyInjectionProperty] public RoomEntryComponent? RoomEntry { get; internal set; }
     [DependencyInjectionProperty] public DoorbellComponent? Doorbell { get; internal set; }
     [DependencyInjectionProperty] public FlattenRoomComponent? Flatten { get; internal set; }
-    [DependencyInjectionProperty] public EntityOverlayComponent? Overlay { get; internal set; }
+    [DependencyInjectionProperty] public AvatarOverlayComponent? Overlay { get; internal set; }
     [DependencyInjectionProperty] public AntiHcGiftNotificationComponent? AntiHcNotification { get; internal set; }
 }

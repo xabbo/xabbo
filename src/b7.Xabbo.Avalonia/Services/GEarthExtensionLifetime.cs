@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+
 using Avalonia.Controls.ApplicationLifetimes;
+
 using Xabbo.GEarth;
 
 namespace b7.Xabbo.Avalonia.Services;
@@ -27,17 +26,23 @@ public class GEarthExtensionLifetime
 
     public async Task RunAsync()
     {
-        _ext.InterceptorDisconnected += OnInterceptorDisconnected;
-        await _ext.RunAsync();
+        try
+        {
+            await _ext.RunAsync();
+        }
+        finally
+        {
+            OnInterceptorDisconnected();
+        }
     }
 
-    private void OnInterceptorDisconnected(object? sender, global::Xabbo.Extension.DisconnectedEventArgs e)
+    private void OnInterceptorDisconnected()
     {
         try
         {
-
-        _lifetime.Shutdown();
-        } catch (Exception ex)
+            _lifetime.Shutdown();
+        }
+        catch (Exception ex)
         {
             Debug.WriteLine(ex.Message);
         }

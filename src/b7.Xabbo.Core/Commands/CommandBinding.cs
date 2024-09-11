@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-using Xabbo.Messages;
+﻿using Xabbo.Messages;
 
 namespace b7.Xabbo.Commands;
 

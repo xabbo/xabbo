@@ -1,25 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+﻿using System.Diagnostics;
 using System.Reflection;
-using System.Threading.Tasks;
 
+using Xabbo;
 using Xabbo.Messages;
-using Xabbo.Messages.Dispatcher;
 using Xabbo.Interceptor;
-
+using Xabbo.Extension;
 using Xabbo.Core;
 using Xabbo.Core.Game;
+using Xabbo.Core.Messages.Outgoing;
 
 using b7.Xabbo.Components;
-using Xabbo.Extension;
 
 namespace b7.Xabbo.Commands;
 
-public class CommandManager : IMessageHandler
+[Intercept]
+public partial class CommandManager
 {
-    public const string PREFIX = "/";
+    public const string CommandPrefix = "/";
 
     private bool _isInitialized = false;
 
@@ -36,8 +33,6 @@ public class CommandManager : IMessageHandler
     public IExtension Extension { get; }
     private IMessageDispatcher Dispatcher => Extension.Dispatcher;
     private IMessageManager Messages => Extension.Messages;
-    private Incoming In => Messages.In;
-    private Outgoing Out => Messages.Out;
 
     public CommandManager(IExtension extension,
         IEnumerable<CommandModule> modules,
@@ -56,17 +51,23 @@ public class CommandManager : IMessageHandler
         Extension.Connected += OnConnected;
     }
 
-    private void OnConnected(object? sender, GameConnectedEventArgs e)
+    public IDisposable Attach(IInterceptor interceptor)
+    {
+        return null!;
+    }
+
+    private void OnConnected(GameConnectedArgs e)
     {
         Initialize();
 
-        Extension.Dispatcher.Bind(this, Extension.Client);
+        Attach(Extension);
 
         foreach (CommandModule module in _modules)
         {
             try
             {
-                Dispatcher.Bind(module, Extension.Client);
+                if (module is IMessageHandler handler)
+                    handler.Attach(Extension);
                 module.IsAvailable = true;
             }
             catch
@@ -149,55 +150,26 @@ public class CommandManager : IMessageHandler
             _bindings.Add(name, binding);
     }
 
-    [RequiredIn(nameof(Incoming.Whisper))]
     public void ShowMessage(string message)
     {
         _xabbot.ShowMessage(message);
     }
 
-    [InterceptOut(
-        nameof(Outgoing.Whisper),
-        nameof(Outgoing.Chat),
-        nameof(Outgoing.Shout)
-    )]
-    private async void HandleChat(InterceptArgs e)
+    [Intercept]
+    private void HandleChat(Intercept e, ChatMsg chat)
     {
-        var packet = e.OriginalPacket;
-
-        ChatType chatType;
-        if (packet.Header == Out.Whisper) chatType = ChatType.Whisper;
-        else if (packet.Header == Out.Chat) chatType = ChatType.Talk;
-        else if (packet.Header == Out.Shout) chatType = ChatType.Shout;
-        else return;
-
-        string message = packet.ReadString().Trim();
-        int bubbleStyle = packet.ReadInt();
-
-        string? whisperTarget = null;
-
-        if (packet.Header == Out.Whisper)
-        {
-            int index = message.IndexOf(' ');
-            if (index > 0)
-            {
-                whisperTarget = message.Substring(0, index);
-                message = message.Substring(index + 1).Trim();
-            }
-        }
-
-        if (!message.StartsWith(PREFIX)) return;
+        if (!chat.Message.StartsWith(CommandPrefix)) return;
 
         e.Block();
 
-        message = message.Substring(PREFIX.Length);
+        string message = chat.Message[CommandPrefix.Length..];
         if (string.IsNullOrWhiteSpace(message)) return;
 
-        string[] split = message.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+        string[] split = message.Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        if (split.Length == 0) return;
 
         string command = split[0].ToLower();
-        string[] args = split.Skip(1).ToArray();
-
-        if (string.IsNullOrWhiteSpace(command)) return;
+        string[] args = split[1..];
 
         if (!_bindings.TryGetValue(command, out CommandBinding? binding)) return;
 
@@ -206,7 +178,12 @@ public class CommandManager : IMessageHandler
             ShowMessage($"Command module '{binding.Module.GetType().Name}' is unavailable");
             return;
         }
-        
+
+        Task.Run(() => ExecuteCommand(binding, command, args, chat.Type, chat.BubbleStyle, chat.Recipient));
+    }
+
+    private async Task ExecuteCommand(CommandBinding binding, string command, string[] args, ChatType chatType, int bubbleStyle, string whisperTarget)
+    {
         try
         {
             await binding.Handler.Invoke(new CommandArgs(command, args, chatType, bubbleStyle, whisperTarget));
@@ -233,5 +210,6 @@ public class CommandManager : IMessageHandler
                 $"({binding.Handler.Target?.GetType().FullName ?? "?"}.{binding.Handler.Method.Name})\r\n" +
                 $"{ex.Message}\r\n{ex.StackTrace}");
         }
+
     }
 }

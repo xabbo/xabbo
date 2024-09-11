@@ -7,7 +7,7 @@
   xmlns:vm="using:b7.Xabbo.Avalonia.ViewModels"
   mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
   x:Class="b7.Xabbo.Avalonia.Views.UserPopupView"
-  x:DataType="vm:EntityViewModel"
+  x:DataType="vm:AvatarViewModel"
   FontSize="16"
 >
   <Grid ColumnDefinitions="Auto,*">

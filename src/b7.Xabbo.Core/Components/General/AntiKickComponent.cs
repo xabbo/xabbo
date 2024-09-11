@@ -1,16 +1,17 @@
 ﻿using Microsoft.Extensions.Configuration;
 
 using Xabbo;
-using Xabbo.Messages;
 using Xabbo.Extension;
 
 using Xabbo.Core;
 using Xabbo.Core.Events;
 using Xabbo.Core.Game;
+using Xabbo.Messages.Flash;
 
 namespace b7.Xabbo.Components;
 
-public class AntiKickComponent : Component
+[Intercept(~ClientType.Shockwave)]
+public partial class AntiKickComponent : Component
 {
     private const int ERROR_KICKED = 4008;
 
@@ -61,12 +62,12 @@ public class AntiKickComponent : Component
         IsActive = config.GetValue("AntiKick:Active", true);
     }
 
-    protected override void OnInitialized(object? sender, ExtensionInitializedEventArgs e)
+    protected override void OnInitialized(InitializedArgs e)
     {
-        base.OnInitialized(sender, e);
+        base.OnInitialized(e);
     }
 
-    private void OnEnteredRoom(object? sender, RoomEventArgs e)
+    private void OnEnteredRoom(RoomEventArgs e)
     {
         _blockHotelView = false;
         IsReady = true;
@@ -78,48 +79,48 @@ public class AntiKickComponent : Component
         _preventRoomRefresh = true;
         _lastKick = DateTime.Now;
 
-        Extension.Send(Out.FlatOpc, (LegacyLong)_roomManager.CurrentRoomId, string.Empty, -1);
+        Ext.Send(Out.OpenFlatConnection, _roomManager.CurrentRoomId, string.Empty, -1);
         _xabbot.ShowMessage(msg);
 
         if (_profileManager.UserData is not null)
         {
             if (_roomManager.Room is not null &&
-                _roomManager.Room.TryGetUserById(_profileManager.UserData.Id, out IRoomUser? self))
+                _roomManager.Room.TryGetUserById(_profileManager.UserData.Id, out IUser? self))
             {
                 await Task.Delay(500);
-                Extension.Send(Out.Move, self.X, self.Y);
+                Ext.Send(Out.MoveAvatar, self.X, self.Y);
             }
         }
     }
 
-    [InterceptIn(nameof(Incoming.Notification))]
-    public async void HandleNotification(InterceptArgs e)
+    [InterceptIn(nameof(In.NotificationDialog))]
+    public void HandleNotification(Intercept e)
     {
         if (!IsActive || _roomManager.CurrentRoomId <= 0) return;
 
-        if (e.Packet.ReadString().Contains("room.kick.cannonball"))
+        if (e.Packet.Read<string>().Contains("room.kick.cannonball"))
         {
             e.Block();
-            await HandleKickAsync("You were kicked by a cannon!");
+            Task.Run(() => HandleKickAsync("You were kicked by a cannon!"));
         }
     }
 
-    [InterceptIn(nameof(Incoming.Error))]
-    public async void HandleError(InterceptArgs e)
+    [InterceptIn(nameof(In.ErrorReport))]
+    public void HandleErrorReport(Intercept e)
     {
         if (!IsActive || _roomManager.CurrentRoomId <= 0)
             return;
 
-        int errorCode = e.Packet.ReadInt();
+        int errorCode = e.Packet.Read<int>();
         if (errorCode == ERROR_KICKED)
         {
             e.Block();
-            await HandleKickAsync("You were kicked from the room!");
+            Task.Run(() => HandleKickAsync("You were kicked from the room!"));
         }
     }
 
-    [InterceptIn(nameof(Incoming.CloseConnection))]
-    public void HandleCloseConnection(InterceptArgs e)
+    [InterceptIn(nameof(In.CloseConnection))]
+    public void HandleCloseConnection(Intercept e)
     {
         if (_blockHotelView)
         {
@@ -129,8 +130,8 @@ public class AntiKickComponent : Component
         }
     }
 
-    [InterceptIn(nameof(Incoming.RoomEntryInfo))]
-    public void HandleRoomEntryInfo(InterceptArgs e)
+    [InterceptIn(nameof(In.RoomEntryInfo))]
+    public void HandleRoomEntryInfo(Intercept e)
     {
         if (_preventRoomRefresh)
         {

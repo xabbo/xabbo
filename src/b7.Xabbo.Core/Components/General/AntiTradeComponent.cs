@@ -1,31 +1,24 @@
-﻿using System.ComponentModel;
+﻿using Microsoft.Extensions.Configuration;
 
-using Microsoft.Extensions.Configuration;
+using ReactiveUI;
 
 using Xabbo;
 using Xabbo.Extension;
-using Xabbo.Messages;
+using Xabbo.Messages.Flash;
 
 using Xabbo.Core;
 using Xabbo.Core.Events;
 using Xabbo.Core.Game;
-using ReactiveUI;
 
 namespace b7.Xabbo.Components;
 
-public class AntiTradeComponent : Component
+[Intercept(~ClientType.Shockwave)]
+public partial class AntiTradeComponent : Component
 {
     private readonly IConfiguration _config;
     private readonly RoomManager _roomManager;
     private readonly ProfileManager _profileManager;
     private readonly TradeManager _tradeManager;
-
-    private bool _isAvailable;
-    public bool IsAvailable
-    {
-        get => _isAvailable;
-        set => Set(ref _isAvailable, value);
-    }
 
     public AntiTradeComponent(
         IExtension extension,
@@ -65,12 +58,12 @@ public class AntiTradeComponent : Component
     private void TradeSelf(IRoom? room)
     {
         if (room is null) return;
-        if (!room.TryGetUserById(_profileManager.UserData?.Id ?? -1, out IRoomUser? self))
+        if (!room.TryGetUserById(_profileManager.UserData?.Id ?? -1, out IUser? self))
             return;
 
         if (CanTrade())
         {
-            Extension.Send(Out.TradeOpen, self.Index);
+            Ext.Send(Out.OpenTrading, self.Index);
         }
     }
 
@@ -105,19 +98,19 @@ public class AntiTradeComponent : Component
                 _tradeManager.Partner is not null &&
                 _tradeManager.Partner.Id == userData.Id)
             {
-                Extension.Send(Out.TradeClose);
+                Ext.Send(Out.CloseTrading);
             }
         }
     }
 
-    private void OnRoomEntered(object? sender, RoomEventArgs e)
+    private void OnRoomEntered(RoomEventArgs e)
     {
         if (!IsActive) return;
 
         TradeSelf(e.Room);
     }
 
-    private void OnRoomDataUpdated(object? sender, RoomDataEventArgs e)
+    private void OnRoomDataUpdated(RoomDataEventArgs e)
     {
         if (IsActive && !_tradeManager.IsTrading)
         {
@@ -125,8 +118,8 @@ public class AntiTradeComponent : Component
         }
     }
 
-    [InterceptIn(nameof(Incoming.TradeOpen))]
-    protected void HandleTradeOpen(InterceptArgs e)
+    [InterceptIn(nameof(In.TradingOpen))]
+    protected void HandleTradeOpen(Intercept e)
     {
         if (IsActive)
         {
@@ -134,10 +127,10 @@ public class AntiTradeComponent : Component
         }
     }
 
-    [InterceptIn(nameof(Incoming.NotificationDialog))]
-    protected void HandleNotificationDialog(InterceptArgs e)
+    [InterceptIn(nameof(In.NotificationDialog))]
+    protected void HandleNotificationDialog(Intercept e)
     {
-        if (e.Packet.ReadString() == "trade.trading_perk")
+        if (e.Packet.Read<string>() == "trade.trading_perk")
         {
             IsActive = false;
         }

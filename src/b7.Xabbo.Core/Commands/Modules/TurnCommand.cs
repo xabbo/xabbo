@@ -1,25 +1,16 @@
-﻿using System;
-using System.Threading.Tasks;
-
-using Xabbo.Messages;
-using Xabbo.Interceptor;
+﻿using Xabbo;
 using Xabbo.Core;
 using Xabbo.Core.Game;
+using Xabbo.Core.Messages.Outgoing;
 
 namespace b7.Xabbo.Commands;
 
-public class TurnCommand : CommandModule
+public class TurnCommand(ProfileManager profileManager, RoomManager roomManager) : CommandModule
 {
-    private readonly ProfileManager _profileManager;
-    private readonly RoomManager _roomManager;
+    private readonly ProfileManager _profileManager = profileManager;
+    private readonly RoomManager _roomManager = roomManager;
 
-    public TurnCommand(ProfileManager profileManager, RoomManager roomManager)
-    {
-        _profileManager = profileManager;
-        _roomManager = roomManager;
-    }
-
-    [Command("turn", "t"), RequiredOut(nameof(Outgoing.LookTo))]
+    [Command("turn", "t")]
     protected async Task HandleLookCommand(CommandArgs args)
     {
         if (args.Count == 0) return;
@@ -43,7 +34,7 @@ public class TurnCommand : CommandModule
             bool sendInverse = true;
 
             if (_roomManager.Room is not null &&
-                _roomManager.Room.TryGetUserById(_profileManager.UserData?.Id ?? -1, out IRoomUser? user))
+                _roomManager.Room.TryGetUserById(_profileManager.UserData?.Id ?? -1, out IUser? user))
             {
                 if (user.Direction == dir)
                     return;
@@ -57,11 +48,11 @@ public class TurnCommand : CommandModule
             if (sendInverse)
             {
                 (x, y) = H.GetMagicVector((dir + 4) % 8);
-                Send(Out.LookTo, x, y);
+                Ext.Send(new LookToMsg(x, y));
                 await Task.Delay(100);
             }
             (x, y) = H.GetMagicVector(dir);
-            Send(Out.LookTo, x, y);
+            Ext.Send(new LookToMsg(x, y));
         }
     }
 }

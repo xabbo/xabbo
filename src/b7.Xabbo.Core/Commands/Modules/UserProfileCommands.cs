@@ -1,18 +1,23 @@
-﻿using System;
-using System.Threading.Tasks;
-
-using Xabbo.Messages;
-using Xabbo.Interceptor;
+﻿using Xabbo;
+using Xabbo.Messages.Flash;
 
 namespace b7.Xabbo.Commands;
 
 public class UserProfileCommands : CommandModule
 {
-    [Command("motto"), RequiredOut(nameof(Outgoing.ChangeAvatarMotto))]
+    const short FieldMotto = 6;
+
+    [Command("motto")]
     private Task SetMotto(CommandArgs args)
     {
-        Send(Out.ChangeAvatarMotto, string.Join(" ", args));
-
+        if (Client is ClientType.Shockwave)
+        {
+            Ext.Send(global::Xabbo.Messages.Shockwave.Out.UPDATE, FieldMotto, string.Join(" ", args));
+        }
+        else
+        {
+            Ext.Send(Out.ChangeMotto, string.Join(" ", args));
+        }
         return Task.CompletedTask;
     }
 }
