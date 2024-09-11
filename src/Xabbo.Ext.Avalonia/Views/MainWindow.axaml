@@ -57,7 +57,11 @@
         />
         <ui:ProgressRing Width="128" Height="128" />
         </Grid>
-        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center">
+        <TextBlock
+          FontSize="16"
+          HorizontalAlignment="Center"
+          VerticalAlignment="Center"
+        >
           Waiting for connection...
         </TextBlock>
       </StackPanel>
