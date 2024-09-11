@@ -1,0 +1,77 @@
+<UserControl
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:vm="using:Xabbo.Ext.Avalonia.ViewModels"
+  mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+  x:Class="Xabbo.Ext.Avalonia.Views.FurniDataView"
+  x:DataType="vm:FurniDataViewModel"
+> 
+  <Grid RowDefinitions="Auto,*">
+    <TextBox
+      Margin="10,4,10,10"
+      Text="{Binding FilterText}"
+      Watermark="Filter"
+    />
+    <DataGrid
+      Grid.Row="1"
+      ItemsSource="{Binding Furni}"
+      CanUserReorderColumns="True"
+      CanUserResizeColumns="True"
+      CanUserSortColumns="True"
+    >
+      <DataGrid.Columns>
+        <DataGridTextColumn
+          Width="200"
+          Header="name"
+          Binding="{Binding Name}"
+        />
+        <DataGridTemplateColumn
+          x:DataType="vm:FurniInfoViewModel"
+          Width="150"
+          Header="identifier"
+          ClipboardContentBinding="{Binding Identifier}"
+        >
+          <DataTemplate>
+            <TextBlock
+              Margin="12,8,12,0"
+              VerticalAlignment="Center"
+              FontFamily="Consolas"
+              FontSize="12"
+              Text="{Binding Identifier}"
+              TextTrimming="CharacterEllipsis"
+            />
+          </DataTemplate>
+        </DataGridTemplateColumn>
+        <DataGridTemplateColumn
+          x:DataType="vm:FurniInfoViewModel"
+          Width="100"
+          Header="type/kind"
+          ClipboardContentBinding="{Binding TypeKind}"
+        >
+          <DataTemplate DataType="vm:FurniInfoViewModel">
+            <TextBlock
+              Margin="12,8,12,0"
+              VerticalAlignment="Center"
+              FontFamily="Consolas"
+              FontSize="12"
+              Text="{Binding TypeKind}"
+              TextTrimming="CharacterEllipsis"
+            />
+          </DataTemplate>
+        </DataGridTemplateColumn>
+        <DataGridTextColumn
+          Width="100"
+          Header="line"
+          Binding="{Binding Line}"
+        />
+        <DataGridTextColumn
+          Width="100"
+          Header="category"
+          Binding="{Binding Category}"
+        />
+      </DataGrid.Columns>
+    </DataGrid>
+  </Grid>
+</UserControl>

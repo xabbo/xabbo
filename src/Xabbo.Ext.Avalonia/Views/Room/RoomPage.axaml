@@ -1,0 +1,63 @@
+<UserControl
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:v="using:Xabbo.Ext.Avalonia.Views"
+  xmlns:vm="using:Xabbo.Ext.Avalonia.ViewModels"
+  xmlns:ic="using:FluentIcons.Avalonia.Fluent"
+  mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+  x:Class="Xabbo.Ext.Avalonia.Views.RoomPage"
+  x:DataType="vm:RoomPageViewModel"
+>
+  <TabControl Padding="0,4,0,0">
+    <TabItem>
+      <TabItem.Header>
+        <StackPanel Orientation="Horizontal" Spacing="4">
+          <ic:SymbolIcon Symbol="Info" />
+          <TextBlock Text="Info" />
+        </StackPanel>
+      </TabItem.Header>
+      <v:RoomInfoView
+        Padding="10,0,10,10"
+        DataContext="{Binding Info}"
+      />
+    </TabItem>
+    <TabItem>
+      <TabItem.Header>
+        <StackPanel Orientation="Horizontal" Spacing="4">
+          <ic:SymbolIcon Symbol="People" />
+          <TextBlock Text="Users" />
+        </StackPanel>
+      </TabItem.Header>
+      <v:RoomAvatarsView DataContext="{Binding Avatars}" />
+    </TabItem>
+    <TabItem>
+      <TabItem.Header>
+        <StackPanel Orientation="Horizontal" Spacing="4">
+          <ic:SymbolIcon Symbol="Guest" />
+          <TextBlock Text="Visitors" />
+        </StackPanel>
+      </TabItem.Header>
+      <v:RoomVisitorsView DataContext="{Binding Visitors}" />
+    </TabItem>
+    <TabItem>
+      <TabItem.Header>
+        <StackPanel Orientation="Horizontal" Spacing="4">
+          <ic:SymbolIcon Symbol="Warning" />
+          <TextBlock Text="Bans" />
+        </StackPanel>
+      </TabItem.Header>
+      <v:RoomBansView DataContext="{Binding Bans}" />
+    </TabItem>
+    <TabItem>
+      <TabItem.Header>
+        <StackPanel Orientation="Horizontal" Spacing="4">
+          <ic:SymbolIcon Symbol="Couch" />
+          <TextBlock Text="Furni" />
+        </StackPanel>
+      </TabItem.Header>
+      <v:RoomFurniView DataContext="{Binding Furni}" />
+    </TabItem>
+  </TabControl>
+</UserControl>

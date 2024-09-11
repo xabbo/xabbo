@@ -1,0 +1,51 @@
+<wnd:AppWindow
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:v="using:Xabbo.Ext.Avalonia.Views"
+  xmlns:vm="using:Xabbo.Ext.Avalonia.ViewModels"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:ic="using:FluentIcons.Avalonia.Fluent"
+  xmlns:wnd="using:FluentAvalonia.UI.Windowing"
+  xmlns:ui="using:FluentAvalonia.UI.Controls"
+  mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+  x:Class="Xabbo.Ext.Avalonia.Views.MainWindow"
+  x:DataType="vm:MainViewModel"
+  Icon="/Assets/xabbo-skull-64.png"
+  WindowStartupLocation="CenterScreen"
+  SystemDecorations="None"
+  Title="xabbo"
+  Width="650" Height="700"
+  MinWidth="400" MinHeight="400"
+>
+
+  <Design.DataContext>
+    <vm:MainViewModel />
+  </Design.DataContext>
+
+  <Grid RowDefinitions="32,*">
+    <Grid Name="TitleBarHost" ColumnDefinitions="48,*,Auto,0">
+      <Image
+        Margin="0,8,0,-8"
+        Source="avares://Xabbo.Ext.Avalonia/Assets/xabbo-skull-64.png"
+        Width="30" Height="30"
+        HorizontalAlignment="Center" 
+        VerticalAlignment="Center"
+      />
+      <TextBlock
+        Grid.Column="1"
+        VerticalAlignment="Center" FontSize="14" Text="{Binding Title}"
+      />
+      <ToggleButton
+        Grid.Column="2" HorizontalAlignment="Right" BorderBrush="Transparent" Background="Transparent"
+        Margin="0,0,4,0" Padding="4"
+        Theme="{StaticResource TransparentButton}"
+        IsChecked="{Binding Mode=TwoWay, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Path=Topmost}"
+      >
+        <ic:SymbolIcon Symbol="Pin" FontSize="14" IsFilled="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}, Path=Topmost}" />
+      </ToggleButton>
+    </Grid>
+    <v:MainView Grid.Row="1" />
+  </Grid>
+
+</wnd:AppWindow>

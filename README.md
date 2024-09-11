@@ -1,5 +1,5 @@
-# b7.Xabbo
-[enhanced habbo] A multi feature extension for G-Earth.
+# xabbo extension
+A multi feature extension for G-Earth.
 
 # Features
 
