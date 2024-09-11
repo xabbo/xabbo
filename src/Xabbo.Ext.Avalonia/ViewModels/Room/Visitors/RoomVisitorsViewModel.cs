@@ -44,7 +44,7 @@ public class RoomVisitorsViewModel : ViewModelBase
         set => SetProperty(ref _isLogging, value);
     }
 
-    const string LOG_DIRECTORY = @"logs\visitors";
+    const string LOG_DIRECTORY = "logs/visitors";
     string _currentFilePath;
     DateTime _lastDate;
     long lastRoomId;

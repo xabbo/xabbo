@@ -23,7 +23,7 @@ public class ChatPageViewModel : PageViewModel
 
     private IExtension _ext;
 
-    const string LogDirectory = @"logs\chat";
+    const string LogDirectory = "logs/chat";
     private string? _currentFilePath;
 
     private readonly RoomManager _roomManager;
