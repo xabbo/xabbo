@@ -1,6 +1,8 @@
 # xabbo extension
 A multi feature extension for G-Earth.
 
+<img src="https://github.com/user-attachments/assets/11225be4-a8db-4422-8fec-68583d39f320" width="500">
+
 # Features
 
 ## General
