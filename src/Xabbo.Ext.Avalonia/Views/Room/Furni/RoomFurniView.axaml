@@ -30,8 +30,8 @@
       <TabItem>
         <TabItem.Header>
           <StackPanel Orientation="Horizontal" Spacing="4">
-            <ic:SymbolIcon Symbol="List" />
-            <TextBlock Text="List" />
+            <ic:SymbolIcon VerticalAlignment="Center" Symbol="List" />
+            <TextBlock VerticalAlignment="Center" Text="List" />
           </StackPanel>
         </TabItem.Header>
         <v:RoomFurniListView />
@@ -39,8 +39,8 @@
       <TabItem>
         <TabItem.Header>
           <StackPanel Orientation="Horizontal" Spacing="4">
-            <ic:SymbolIcon Symbol="Grid" />
-            <TextBlock Text="Grid" />
+            <ic:SymbolIcon VerticalAlignment="Center" Symbol="Grid" />
+            <TextBlock VerticalAlignment="Center" Text="Grid" />
           </StackPanel>
         </TabItem.Header>
         <v:RoomFurniGridView Margin="0,-8,0,0" />
