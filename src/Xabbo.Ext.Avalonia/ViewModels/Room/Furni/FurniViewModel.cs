@@ -21,7 +21,7 @@ public abstract class ItemViewModelBase : ViewModelBase
     public ItemType Type => _info?.Type ?? (ItemType)(-1);
     public int Kind => _info?.Kind ?? 0;
     public string Identifier => _info?.Identifier ?? "?";
-    public string Name => _info?.Name ?? "?";
+    public string Name => _info?.Name ?? _item.Identifier ?? "?";
     public string Description => _info?.Description ?? "";
     public bool HasDescription { get; }
 
@@ -32,7 +32,7 @@ public abstract class ItemViewModelBase : ViewModelBase
     {
         _item = item;
         if (Extensions.IsInitialized)
-            _info = _item.GetInfo();
+            _item.TryGetInfo(out _info);
         _icon = new Lazy<Task<Bitmap?>>(LoadIconAsync);
 
         HasDescription =
@@ -68,12 +68,13 @@ public class FurniStackViewModel : ItemViewModelBase
     public static StackDescriptor GetDescriptor(IFurni item)
     {
         if (!Extensions.IsInitialized)
-            return default;
+            return new StackDescriptor(item.Type, 0, item.Identifier, "", false, false);
 
+        item.TryGetIdentifier(out string? identifier);
         string variant = "";
-        if (item.GetIdentifier() == "poster" && item is IWallItem wallItem)
+        if (identifier == "poster" && item is IWallItem wallItem)
             variant = wallItem.Data;
-        return new StackDescriptor(item.Type, item.Kind, variant, false, false);
+        return new StackDescriptor(item.Type, item.Kind, identifier, variant, false, false);
     }
 
     public StackDescriptor Descriptor { get; }

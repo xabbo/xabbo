@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
+
 using DynamicData;
+using DynamicData.Kernel;
 
 using Xabbo.Core;
 using Xabbo.Core.Events;
@@ -10,8 +11,7 @@ using Xabbo.Core.Game;
 using Xabbo.Core.GameData;
 
 using Xabbo.Ext.Services;
-using DynamicData.Kernel;
-using Avalonia.Rendering.Composition;
+
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
