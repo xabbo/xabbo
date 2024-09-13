@@ -77,7 +77,7 @@ public class AvatarOverlayComponent : Component
             Ext.Send(In.UserChange,
                 GHOST_INDEX,
                 self.Figure,
-                self.Gender.ToShortString(),
+                self.Gender.ToClientString(),
                 self.Motto,
                 self.AchievementScore
             );

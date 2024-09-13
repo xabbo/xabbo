@@ -65,11 +65,18 @@ public partial class AntiIdleComponent : Component
     [InterceptIn(nameof(In.Ping))]
     protected void HandlePing(Intercept e)
     {
-        _pingCount = e.Packet.Read<int>();
-
-        if (_pingCount > 0 && _pingCount % 6 == 0)
+        if (Client is ClientType.Shockwave)
         {
-            SendAntiIdlePacket();
+            // SendAntiIdlePacket();
+        }
+        else
+        {
+            _pingCount = e.Packet.Read<int>();
+
+            if (_pingCount > 0 && _pingCount % 6 == 0)
+            {
+                SendAntiIdlePacket();
+            }
         }
     }
 

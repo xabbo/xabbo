@@ -15,6 +15,7 @@ using Xabbo.Ext.Commands;
 using Xabbo.Ext.Components;
 using Xabbo.Ext.Configuration;
 using Xabbo.Ext.Services;
+using Xabbo.Ext.Core.Services;
 
 namespace Xabbo.Ext.Avalonia;
 
@@ -28,6 +29,7 @@ public static class ViewModelLocator
         Splatr.RegisterConstant<IConfiguration>(configRoot);
 
         // Services
+        Splatr.RegisterLazySingleton<IApplicationManager, AvaloniaAppManager>();
         Splatr.RegisterLazySingleton<IUiContext, AvaloniaUiContext>();
 
         // ViewModels

@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Threading.Tasks;
+
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.ReactiveUI;
+
 using ReactiveUI;
+using Xabbo.Ext.Avalonia.Views;
 
 namespace Xabbo.Ext.Avalonia;
 
 public class SettingsBase { }
 
 /// <summary>
-/// Handles application startup in a generic way. Static methods must still exist in Program.cs, but they can call these implementations. 
+/// Handles application startup in a generic way. Static methods must still exist in Program.cs, but they can call these implementations.
 /// </summary>
 public static class AppStarter
 {
@@ -17,7 +21,7 @@ public static class AppStarter
     /// Gets or sets the task to initialize ViewModelLocator, settings, and return the configured theme.
     /// </summary>
     public static Task<SettingsBase>? AppSettingsLoader { get; set; }
-    
+
     /// <summary>
     /// Call this from Program.Main.
     /// </summary>
@@ -30,7 +34,7 @@ public static class AppStarter
             // GlobalErrorHandler.LogPath = logPath?.Invoke();
             // Initialize ViewModelLocator and load settings in parallel.
             AppSettingsLoader = Task.Run(getSettings);
-            
+
             BuildAvaloniaApp<TApp>()
                 .StartWithClassicDesktopLifetime(args);
         }

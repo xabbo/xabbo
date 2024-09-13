@@ -1,6 +1,4 @@
-﻿using Xabbo;
-using Xabbo.Messages;
-using Xabbo.Extension;
+﻿using Xabbo.Extension;
 using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.GameData;
@@ -8,7 +6,8 @@ using Xabbo.Core.Messages.Outgoing;
 
 namespace Xabbo.Ext.Components;
 
-public class FurniActionsComponent : Component
+[Intercept]
+public partial class FurniActionsComponent : Component
 {
     private readonly IGameDataManager _gameDataManager;
     private readonly RoomManager _roomManager;
@@ -67,10 +66,10 @@ public class FurniActionsComponent : Component
     [Intercept]
     private void HandleUseStuff(Intercept e, UseFloorItemMsg use)
     {
+        if (PreventUse) e.Block();
+
         IRoom? room = _roomManager.Room;
         if (room is null) return;
-
-        if (PreventUse) e.Block();
 
         IFloorItem? item = room.GetFloorItem(use.Id);
         if (item == null) return;

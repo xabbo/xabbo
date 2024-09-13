@@ -18,8 +18,8 @@ public partial class ChatPage : UserControl
 
     private void ChatScrollViewer_ScrollChanged(object? sender, ScrollChangedEventArgs e)
     {
-        Console.WriteLine(e.OffsetDelta);
-        Console.WriteLine(e.ViewportDelta);
+        // Console.WriteLine(e.OffsetDelta);
+        // Console.WriteLine(e.ViewportDelta);
     }
 
     protected override void OnDataContextChanged(EventArgs e)

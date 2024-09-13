@@ -1,7 +1,5 @@
-﻿using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 
-using Xabbo;
 using Xabbo.Extension;
 using Xabbo.Core;
 using Xabbo.Core.Game;
@@ -10,14 +8,14 @@ using Xabbo.Core.Messages.Incoming;
 
 namespace Xabbo.Ext.Components;
 
-public class XabbotComponent : Component, IHostedService
+public class XabbotComponent : Component
 {
     private readonly ILogger _logger;
     private readonly ProfileManager _profileManager;
     private readonly RoomManager _roomManager;
 
-    public long UserId { get; private set; } = 0xb7;
-    public int UserIndex { get; private set; } = -0xb7;
+    public long UserId { get; private set; } = 2_000_000_000;
+    public int UserIndex { get; private set; } = 2_000_000_000;
 
     public XabbotComponent(
         ILoggerFactory logger,
@@ -31,10 +29,6 @@ public class XabbotComponent : Component, IHostedService
         _roomManager.Entered += OnEnteredRoom;
     }
 
-    public Task StartAsync(CancellationToken cancellationToken) => Task.CompletedTask;
-
-    public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
-
     private void OnEnteredRoom(RoomEventArgs e)
     {
         Bot bot = new(AvatarType.PublicBot, UserId, UserIndex)
@@ -47,7 +41,7 @@ public class XabbotComponent : Component, IHostedService
         };
 
         _logger.LogTrace("Injecting xabbo avatar bot into room.");
-        Ext.Send(new AvatarsAddedMsg { bot });
+        // Ext.Send(new AvatarsAddedMsg { bot });
     }
 
     public void ShowMessage(string message)
@@ -68,14 +62,14 @@ public class XabbotComponent : Component, IHostedService
 
     public void ShowMessage(string message, Point location)
     {
-        Ext.Send(new AvatarUpdatesMsg {
-            new AvatarStatusUpdate {
-                Index = UserIndex,
-                Location = new Tile(location.X, location.Y, -100),
-                Direction = 4,
-                HeadDirection = 4
-            }
-        });
-        Ext.Send(new AvatarWhisperMsg(UserIndex, message, 30));
+        // Ext.Send(new AvatarUpdatesMsg {
+        //     new AvatarStatusUpdate {
+        //         Index = UserIndex,
+        //         Location = new Tile(location.X, location.Y, -100),
+        //         Direction = 4,
+        //         HeadDirection = 4
+        //     }
+        // });
+        // Ext.Send(new AvatarWhisperMsg(UserIndex, message, 30));
     }
 }

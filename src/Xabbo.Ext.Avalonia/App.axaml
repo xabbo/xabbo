@@ -11,9 +11,9 @@
     <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
     <Application.DataTemplates>
-        <local:ViewLocator/>
+      <local:ViewLocator/>
     </Application.DataTemplates>
-  
+
     <Application.Styles>
       <sty:FluentAvaloniaTheme />
       <StyleInclude Source="avares://FluentAvalonia.ProgressRing/Styling/Controls/ProgressRing.axaml" />

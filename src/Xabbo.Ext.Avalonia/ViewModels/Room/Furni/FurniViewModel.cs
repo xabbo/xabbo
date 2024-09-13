@@ -16,13 +16,13 @@ namespace Xabbo.Ext.Avalonia.ViewModels;
 public abstract class ItemViewModelBase : ViewModelBase
 {
     protected readonly IItem _item;
-    protected readonly FurniInfo _info;
+    protected readonly FurniInfo? _info;
 
-    public ItemType Type => _info.Type;
-    public int Kind => _info.Kind;
-    public string Identifier => _info.Identifier;
-    public string Name => _info.Name;
-    public string Description => _info.Description;
+    public ItemType Type => _info?.Type ?? (ItemType)(-1);
+    public int Kind => _info?.Kind ?? 0;
+    public string Identifier => _info?.Identifier ?? "?";
+    public string Name => _info?.Name ?? "?";
+    public string Description => _info?.Description ?? "";
     public bool HasDescription { get; }
 
     private readonly Lazy<Task<Bitmap?>> _icon;
@@ -31,14 +31,20 @@ public abstract class ItemViewModelBase : ViewModelBase
     public ItemViewModelBase(IItem item)
     {
         _item = item;
-        _info = _item.GetInfo();
+        if (Extensions.IsInitialized)
+            _info = _item.GetInfo();
         _icon = new Lazy<Task<Bitmap?>>(LoadIconAsync);
 
-        HasDescription = !string.IsNullOrWhiteSpace(_info.Description) && !_info.Description.EndsWith(" desc");
+        HasDescription =
+            _info is not null &&
+            !string.IsNullOrWhiteSpace(_info.Description) &&
+            !_info.Description.EndsWith(" desc");
     }
 
     protected virtual Task<Bitmap?> LoadIconAsync()
     {
+        if (_info is null)
+            return Task.FromResult<Bitmap?>(null);
         string identifier = _info.Identifier.Replace('*', '_');
         if (identifier == "poster" && _item is IWallItem wallItem)
             identifier += "_" + wallItem.Data;
@@ -61,6 +67,9 @@ public class FurniStackViewModel : ItemViewModelBase
 {
     public static StackDescriptor GetDescriptor(IFurni item)
     {
+        if (!Extensions.IsInitialized)
+            return default;
+
         string variant = "";
         if (item.GetIdentifier() == "poster" && item is IWallItem wallItem)
             variant = wallItem.Data;

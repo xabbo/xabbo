@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Threading.Tasks;
 
 using Splat;
@@ -8,10 +7,12 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using FluentAvalonia.Styling;
+using Avalonia.Styling;
+
 using Live.Avalonia;
 
 using Xabbo.Ext.Avalonia.Services;
+using Xabbo.Ext.Avalonia.Views;
 
 namespace Xabbo.Ext.Avalonia;
 
@@ -19,13 +20,7 @@ public partial class App : Application, ILiveView
 {
     public override void Initialize() => AvaloniaXamlLoader.Load(this);
 
-    protected void BackgroundInit()
-    {
-        var lifetime = Locator.Current.GetService<GEarthExtensionLifetime>()!;
-        Task.Run(() => lifetime.RunAsync());
-    }
-
-    public override async void OnFrameworkInitializationCompleted()
+    public override void OnFrameworkInitializationCompleted()
     {
 #if DEBUG
         if (Design.IsDesignMode)
@@ -35,7 +30,13 @@ public partial class App : Application, ILiveView
         }
 #endif
 
-        var vm = ViewModelLocator.Main;
+        var container = Locator.CurrentMutable;
+        container.RegisterConstant<Application>(this);
+        container.RegisterConstant(ApplicationLifetime);
+
+        var mainViewModel = ViewModelLocator.Main;
+
+        RequestedThemeVariant = ThemeVariant.Dark;
 
         // We must initialize the ViewModelLocator before setting GlobalErrorHandler.
         // We must set GlobalErrorHandler before View is created.
@@ -43,9 +44,11 @@ public partial class App : Application, ILiveView
         // Set DefaultExceptionHelper now but we want to initialize ViewModelLocator later in parallel with View for faster startup.
         // GlobalErrorHandler.BeginInit();
 
-        var tBackground = Task.Run(BackgroundInit);
+        if (Locator.Current.GetService<GEarthExtensionLifetime>() is not { } lifetime)
+            throw new Exception($"Failed to obtain {nameof(GEarthExtensionLifetime)}.");
+        var tBackground = Task.Run(lifetime.RunAsync);
+
         // var dialogService = Locator.Current.GetService<IDialogService>()!;
-        var themeManager = Locator.Current.GetService<FluentAvaloniaTheme>()!;
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
@@ -55,53 +58,19 @@ public partial class App : Application, ILiveView
             // themeManager.RequestedTheme = settings.Theme.ToString();
             AppStarter.AppSettingsLoader = null;
 
-            // dialogService.Show(null, vm);
-            // desktop.MainWindow = desktop.Windows[0];
-            // desktop.MainWindow = new MainWindow();
+            desktop.MainWindow = new MainWindow { DataContext = mainViewModel };
+
+            desktop.ShutdownRequested += (s, e) =>
+            {
+                desktop.MainWindow?.Close();
+            };
         }
 
         // GlobalErrorHandler.EndInit(dialogService, desktop?.MainWindow?.DataContext as INotifyPropertyChanged);
         // RxApp.DefaultExceptionHandler = GlobalErrorHandler.Instance;
 
-        try
-        {
-            await tBackground.ConfigureAwait(true);
-        }
-        catch (Exception ex)
-        {
-            // GlobalErrorHandler.ShowErrorLog(tBackground.Exception?.InnerException!);
-        }
         base.OnFrameworkInitializationCompleted();
     }
 
-    public object CreateView(Window window)
-    {
-        throw new NotImplementedException();
-    }
-
-    /*
-    private IHost _host;
-    public IServiceProvider Container { get; private set; } 
-
-    public App() { }
-
-    public override void Initialize() => AvaloniaXamlLoader.Load(this);
-
-    public override void OnFrameworkInitializationCompleted()
-    {
-        _host = Bootstrapper.CreateHost(Environment.GetCommandLineArgs());
-        Container = _host.Services;
-
-        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-        {
-            desktop.MainWindow = Container.GetRequiredService<MainWindow>();
-            desktop.Exit += (s, e) =>
-            {
-                _host.StopAsync();
-            };
-        }
-
-        base.OnFrameworkInitializationCompleted();
-    }
-    */
+    public object CreateView(Window window) { throw new NotImplementedException(); }
 }

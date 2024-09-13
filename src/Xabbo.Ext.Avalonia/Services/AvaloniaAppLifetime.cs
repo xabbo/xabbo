@@ -18,6 +18,5 @@ internal class AvaloniaAppLifetime : IHostApplicationLifetime
 
     public void StopApplication()
     {
-        throw new NotImplementedException();
     }
 }
