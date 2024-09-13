@@ -5,14 +5,17 @@ using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.Events;
 using Xabbo.Core.Messages.Incoming;
+using Xabbo.Core.Messages.Outgoing;
 
 namespace Xabbo.Ext.Components;
 
-public class XabbotComponent : Component
+[Intercept]
+public partial class XabbotComponent : Component
 {
     private readonly ILogger _logger;
     private readonly ProfileManager _profileManager;
     private readonly RoomManager _roomManager;
+    private Point _currentLocation = (0, 0);
 
     public long UserId { get; private set; } = 2_000_000_000;
     public int UserIndex { get; private set; } = 2_000_000_000;
@@ -29,19 +32,33 @@ public class XabbotComponent : Component
         _roomManager.Entered += OnEnteredRoom;
     }
 
+    [Intercept]
+    void HandleLookTo(Intercept<LookToMsg> e)
+    {
+        if (e.Msg.Point == _currentLocation)
+            e.Block();
+    }
+
     private void OnEnteredRoom(RoomEventArgs e)
     {
-        Bot bot = new(AvatarType.PublicBot, UserId, UserIndex)
+        Avatar avatar = Ext.Session.Client.Type switch
         {
-            Name = "xabbo",
-            Motto = "enhanced habbo",
-            Location = new Tile(0, 0, -100),
-            Gender = Gender.Male,
-            Figure = "hr-100.hd-185-14.ch-805-71.lg-281-75.sh-305-80.ea-1406.cc-260-80"
+            ClientType.Shockwave => new User(UserId, UserIndex) { Gender = Gender.Male },
+            not ClientType.Shockwave => new Bot(AvatarType.PublicBot, UserId, UserIndex)
         };
 
-        _logger.LogTrace("Injecting xabbo avatar bot into room.");
-        // Ext.Send(new AvatarsAddedMsg { bot });
+        avatar.Name = "xabbo";
+        avatar.Motto = "enhanced habbo";
+        avatar.Location = new Tile(0, 0, -100);
+        avatar.Figure = Ext.Session.Client.Type switch
+        {
+            ClientType.Shockwave => "1500225504295101800127534",
+            not ClientType.Shockwave => "hr-100.hd-185-14.ch-805-71.lg-281-75.sh-305-80.ea-1406.cc-260-80"
+        };
+
+        _logger.LogTrace("Injecting xabbo avatar into room.");
+        _currentLocation = avatar.Location;
+        Ext.Send(new AvatarsAddedMsg { avatar });
     }
 
     public void ShowMessage(string message)
@@ -62,14 +79,15 @@ public class XabbotComponent : Component
 
     public void ShowMessage(string message, Point location)
     {
-        // Ext.Send(new AvatarUpdatesMsg {
-        //     new AvatarStatusUpdate {
-        //         Index = UserIndex,
-        //         Location = new Tile(location.X, location.Y, -100),
-        //         Direction = 4,
-        //         HeadDirection = 4
-        //     }
-        // });
-        // Ext.Send(new AvatarWhisperMsg(UserIndex, message, 30));
+        _currentLocation = location;
+        Ext.Send(new AvatarUpdatesMsg {
+            new AvatarStatusUpdate {
+                Index = UserIndex,
+                Location = new Tile(location.X, location.Y, -100),
+                Direction = 4,
+                HeadDirection = 4
+            }
+        });
+        Ext.Send(new AvatarTalkMsg(UserIndex, message, 30));
     }
 }
