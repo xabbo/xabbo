@@ -1,12 +1,13 @@
 ﻿using Microsoft.Extensions.Configuration;
+
 using ReactiveUI;
 
-using Xabbo;
+using Xabbo.Messages;
+using Xabbo.Messages.Flash;
 using Xabbo.Extension;
-
 using Xabbo.Core;
 using Xabbo.Core.Game;
-using Xabbo.Messages.Flash;
+using Xabbo.Core.Messages.Outgoing;
 
 namespace Xabbo.Ext.Components;
 
@@ -45,6 +46,11 @@ public partial class AntiIdleComponent : Component
             .Subscribe(_ => OnActiveChanged());
     }
 
+    protected override void OnConnected(GameConnectedArgs e)
+    {
+        base.OnConnected(e);
+    }
+
     protected override void OnDisconnected()
     {
         base.OnDisconnected();
@@ -65,48 +71,41 @@ public partial class AntiIdleComponent : Component
     [InterceptIn(nameof(In.Ping))]
     protected void HandlePing(Intercept e)
     {
-        if (Client is ClientType.Shockwave)
-        {
-            // SendAntiIdlePacket();
-        }
-        else
-        {
-            _pingCount = e.Packet.Read<int>();
-
-            if (_pingCount > 0 && _pingCount % 6 == 0)
-            {
-                SendAntiIdlePacket();
-            }
-        }
+        SendAntiIdlePacket();
+        _pingCount++;
     }
 
     private void SendAntiIdlePacket()
     {
         if (_pingCount <= 0) return;
 
-        if (_profileManager.UserData is not null &&
-            _roomManager.Room is not null &&
-            _roomManager.Room.TryGetUserById(_profileManager.UserData.Id, out IUser? self))
+        IMessage? antiIdleMsg = null;
+
+        if (Ext.Session.Client.Type is ClientType.Shockwave)
         {
-            if (self.IsIdle && IsAntiIdleOutActive)
-            {
-                Ext.Send(Out.AvatarExpression, 5);
-            }
-            else if (self.Dance != 0 && IsActive)
-            {
-                Ext.Send(Out.MoveAvatar, 0, 0);
-            }
-            else if (IsActive)
-            {
-                Ext.Send(Out.AvatarExpression, 0);
-            }
+            if (IsActive)
+                antiIdleMsg = new WalkMsg(0, 0);
         }
         else
         {
-            if (IsActive)
+            if (_profileManager.UserData is not null &&
+                _roomManager.Room is not null &&
+                _roomManager.Room.TryGetUserById(_profileManager.UserData.Id, out IUser? self))
             {
-                Ext.Send(Out.AvatarExpression, 0);
+                if (self.IsIdle && IsAntiIdleOutActive)
+                    antiIdleMsg = new ActionMsg(Actions.Idle);
+                else if (self.Dance != 0 && IsActive)
+                    antiIdleMsg = new WalkMsg(0, 0);
+                else if (IsActive)
+                    antiIdleMsg = new ActionMsg(Actions.None);
+            }
+            else
+            {
+                antiIdleMsg = new ActionMsg(Actions.None);
             }
         }
+
+        if (antiIdleMsg is not null)
+            Ext.Send(antiIdleMsg);
     }
 }
