@@ -29,6 +29,10 @@
         <Setter Property="IconVariant" Value="Filled" />
       </Style>
 
+      <Style Selector="RadioButton">
+        <Setter Property="Margin" Value="0,0,5,0" />
+      </Style>
+
       <!-- Slimmer tab items -->
       <Style Selector="TabItem">
         <Setter Property="MinHeight" Value="40" />
@@ -60,6 +64,9 @@
     <Color x:Key="RadioButtonCheckGlyphFillPointerOver">#5000AA</Color>
     <Color x:Key="RadioButtonCheckGlyphFillPressed">#5000AA</Color>
     <Color x:Key="RadioButtonCheckGlyphFillDisabled">#333333</Color>
+
+    <!-- Fix: make checkbox padding consistent across different platforms -->
+    <Thickness x:Key="CheckBoxPadding">8,5,8,5</Thickness>
 
     <c:HabboStringConverter x:Key="HabboStringConverter"/>
     <c:MultiValueConverter x:Key="MultiValueConverter"/>

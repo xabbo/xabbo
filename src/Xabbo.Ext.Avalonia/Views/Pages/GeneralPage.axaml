@@ -23,12 +23,6 @@
     <Style Selector=":is(Control)">
       <Setter Property="ToolTip.ShowDelay" Value="800" />
     </Style>
-    <Style Selector=":is(CheckBox)">
-      <Setter Property="Margin" Value="0,0,8,0" />
-    </Style>
-    <Style Selector=":is(RadioButton)">
-      <Setter Property="Margin" Value="0,0,8,0" />
-    </Style>
   </UserControl.Styles>
   <ScrollViewer
     VerticalScrollBarVisibility="Auto"
