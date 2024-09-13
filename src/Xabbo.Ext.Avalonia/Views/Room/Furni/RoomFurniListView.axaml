@@ -3,6 +3,7 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:ic="using:FluentIcons.Avalonia.Fluent"
   xmlns:v="using:Xabbo.Ext.Avalonia.Views"
   xmlns:vm="using:Xabbo.Ext.Avalonia.ViewModels"
   mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
@@ -26,16 +27,25 @@
         ClipboardContentBinding="{Binding Name}"
       >
         <DataTemplate x:DataType="vm:FurniViewModel">
-          <TextBlock
-            Margin="12,0"
-            VerticalAlignment="Center"
-            TextTrimming="CharacterEllipsis"
-            Text="{Binding Name}"
-          >
-            <ToolTip.Tip>
-              <v:FurniPopupView />
-            </ToolTip.Tip>
-          </TextBlock>
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock
+              Grid.Column="0"
+              Margin="12,0"
+              HorizontalAlignment="Stretch"
+              VerticalAlignment="Center"
+              TextTrimming="CharacterEllipsis"
+              Text="{Binding Name}"
+            >
+              <ToolTip.Tip>
+                <v:FurniPopupView />
+              </ToolTip.Tip>
+            </TextBlock>
+            <ic:SymbolIcon Grid.Column="1" Symbol="EyeOff" Opacity="0.5" IsVisible="{Binding IsHidden}" />
+          </Grid>
         </DataTemplate>
       </DataGridTemplateColumn>
       <DataGridTextColumn Width="100" Header="owner id" Binding="{Binding OwnerId}" IsVisible="{DynamicResource IsModern}" />

@@ -43,6 +43,8 @@ public class RoomFurniViewModel : ViewModelBase
         _gameData = gameData;
         _roomManager = roomManager;
 
+        _roomManager.FurniVisibilityToggled += OnFurniVisibilityToggled;
+
         _roomManager.Left += OnLeftRoom;
         _roomManager.FloorItemsLoaded += OnFloorItemsLoaded;
         _roomManager.FloorItemAdded += OnFloorItemAdded;
@@ -67,6 +69,13 @@ public class RoomFurniViewModel : ViewModelBase
             _furniCache.Refresh();
             _furniStackCache.Refresh();
         });
+    }
+
+    private void OnFurniVisibilityToggled(FurniEventArgs e)
+    {
+        _furniCache
+            .Lookup((e.Item.Type, e.Item.Id))
+            .IfHasValue(vm => vm.IsHidden = e.Item.IsHidden);
     }
 
     private bool FilterFurni(FurniViewModel vm)
@@ -94,7 +103,9 @@ public class RoomFurniViewModel : ViewModelBase
             _furniCache.Edit(cache =>
             {
                 foreach (var item in items)
+                {
                     cache.AddOrUpdate(new FurniViewModel(item));
+                }
             });
             _furniStackCache.Edit(cache =>
             {

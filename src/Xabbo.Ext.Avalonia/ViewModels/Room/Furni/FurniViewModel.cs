@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Threading.Tasks;
+using System.Reactive.Linq;
 
 using Avalonia.Media.Imaging;
+
+using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 using Xabbo.Core;
 using Xabbo.Core.GameData;
 
 using Xabbo.Ext.Avalonia.Helpers;
-using ReactiveUI;
-using System.Reactive.Linq;
 
 namespace Xabbo.Ext.Avalonia.ViewModels;
 
@@ -24,6 +25,8 @@ public abstract class ItemViewModelBase : ViewModelBase
     public string Name => _info?.Name ?? _item.Identifier ?? "?";
     public string Description => _info?.Description ?? "";
     public bool HasDescription { get; }
+
+    [Reactive] public bool IsHidden { get; set; }
 
     private readonly Lazy<Task<Bitmap?>> _icon;
     public Task<Bitmap?> Icon => _icon.Value;
