@@ -6,16 +6,14 @@
   xmlns:sty="using:FluentAvalonia.Styling"
   xmlns:ui="using:FluentAvalonia.UI.Controls"
   xmlns:c="using:Xabbo.Ext.Avalonia.Converters"
-  RequestedThemeVariant="Default"
+  RequestedThemeVariant="Dark"
 >
-    <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
-
     <Application.DataTemplates>
       <local:ViewLocator/>
     </Application.DataTemplates>
 
     <Application.Styles>
-      <sty:FluentAvaloniaTheme />
+      <sty:FluentAvaloniaTheme  />
       <StyleInclude Source="avares://FluentAvalonia.ProgressRing/Styling/Controls/ProgressRing.axaml" />
 
       <Style Selector="SelectableTextBlock">
