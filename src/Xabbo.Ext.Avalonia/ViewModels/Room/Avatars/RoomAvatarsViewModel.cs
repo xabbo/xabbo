@@ -11,6 +11,7 @@ using Xabbo.Core.Events;
 using Xabbo.Core.Game;
 
 using Xabbo.Ext.Services;
+using Xabbo.Ext.Components;
 
 namespace Xabbo.Ext.Avalonia.ViewModels;
 

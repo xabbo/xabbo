@@ -32,6 +32,8 @@ public static class ViewModelLocator
         Splatr.RegisterLazySingleton<IApplicationManager, AvaloniaAppManager>();
         Splatr.RegisterLazySingleton<IUiContext, AvaloniaUiContext>();
 
+        Splatr.RegisterLazySingleton<AppSessionManager>();
+
         // ViewModels
         Splatr.RegisterLazySingleton<MainViewModel>();
 

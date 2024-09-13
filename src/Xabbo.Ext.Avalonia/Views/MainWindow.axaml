@@ -46,7 +46,7 @@
       </ToggleButton>
     </Grid>
     <v:MainView Grid.Row="1" />
-    <Grid Grid.Row="1" Background="{DynamicResource SolidBackgroundFillColorBase}" IsVisible="{Binding !IsConnected}">
+    <Grid Grid.Row="1" Background="{DynamicResource SolidBackgroundFillColorBase}" IsVisible="{DynamicResource IsConnecting}">
       <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
         <Grid>
         <Image

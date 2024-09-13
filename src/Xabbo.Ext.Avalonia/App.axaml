@@ -47,6 +47,12 @@
     </Application.Styles>
 
   <Application.Resources>
+    <!-- Session -->
+    <x:Boolean x:Key="IsConnecting">True</x:Boolean>
+    <x:Boolean x:Key="IsConnected">False</x:Boolean>
+    <x:Boolean x:Key="IsOrigins">False</x:Boolean>
+    <x:Boolean x:Key="IsModern">False</x:Boolean>
+
     <Color x:Key="RadioButtonCheckGlyphFill">#5000AA</Color>
     <Color x:Key="RadioButtonCheckGlyphFillPointerOver">#5000AA</Color>
     <Color x:Key="RadioButtonCheckGlyphFillPressed">#5000AA</Color>

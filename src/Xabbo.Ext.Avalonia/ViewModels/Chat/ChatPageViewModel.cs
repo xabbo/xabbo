@@ -1,17 +1,24 @@
-﻿using IconSource = FluentAvalonia.UI.Controls.IconSource;
+﻿using System;
+using System.IO;
+using System.Text;
+
+using Microsoft.Extensions.Configuration;
 
 using FluentIcons.Common;
 using FluentIcons.Avalonia.Fluent;
-using Splat;
-using Xabbo.Extension;
-using Microsoft.Extensions.Configuration;
-using Xabbo.Core.Game;
-using System.IO;
-using Xabbo.Core.Events;
-using Xabbo.Core;
-using System;
+
 using ReactiveUI;
-using System.Text;
+
+using Splat;
+
+using Xabbo.Extension;
+using Xabbo.Core;
+using Xabbo.Core.Game;
+using Xabbo.Core.Events;
+
+using Xabbo.Ext.Components;
+
+using IconSource = FluentAvalonia.UI.Controls.IconSource;
 
 namespace Xabbo.Ext.Avalonia.ViewModels;
 
@@ -19,9 +26,6 @@ public class ChatPageViewModel : PageViewModel
 {
     public override string Header => "Chat";
     public override IconSource? Icon { get; } = new SymbolIconSource { Symbol = Symbol.Chat };
-
-
-    private IExtension _ext;
 
     const string LogDirectory = "logs/chat";
     private string? _currentFilePath;
@@ -79,26 +83,17 @@ public class ChatPageViewModel : PageViewModel
         set => this.RaiseAndSetIfChanged(ref _logToFile, value);
     }
 
-    private readonly string? _antiBobba;
-
-    public ChatPageViewModel() { }
-
     [DependencyInjectionConstructor]
-    public ChatPageViewModel(IExtension extension,
+    public ChatPageViewModel(
         IConfiguration config,
         RoomManager roomManager)
-        // : base(extension)
     {
         Directory.CreateDirectory(LogDirectory);
-
-        _ext = extension;
 
         _roomManager = roomManager;
         _roomManager.AvatarChat += RoomManager_AvatarChat;
 
         _stringBuffer = new StringBuilder();
-
-        _antiBobba = config.GetValue<string>("AntiBobba:Inject");
 
         _includeNormalChat = config.GetValue("ChatLog:Normal", true);
         _includeWhispers = config.GetValue("ChatLog:Whispers", true);
@@ -147,8 +142,6 @@ public class ChatPageViewModel : PageViewModel
         }
 
         string message = H.RenderText(e.Message);
-        if (!string.IsNullOrWhiteSpace(_antiBobba))
-            message = message.Replace(_antiBobba, "");
 
         _stringBuffer.AppendFormat(
             "[{0:HH:mm:ss}] {1}{2}: {3}",

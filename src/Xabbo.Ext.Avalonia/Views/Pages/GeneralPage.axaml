@@ -55,6 +55,7 @@
             <CheckBox
               Content="Idle-out"
               ToolTip.Tip="Allows you to idle, but prevents you from leaving the room"
+              IsVisible="{DynamicResource IsModern}"
               IsChecked="{Binding AntiIdle.IsAntiIdleOutActive}"
             />
             <CheckBox
@@ -95,6 +96,7 @@
                 Content="Click through users"
                 ToolTip.ShowDelay="100"
                 ToolTip.Tip="Allows you to click on tiles behind users to walk"
+                IsVisible="{DynamicResource IsModern}"
                 IsChecked="{Binding ClickThrough.IsActive}"
               />
             </StackPanel>
@@ -110,7 +112,7 @@
               />
             </Expander.Header>
             <StackPanel>
-              <StackPanel Orientation="Horizontal">
+              <StackPanel Orientation="Horizontal" IsVisible="{DynamicResource IsModern}">
                 <RadioButton
                   GroupName="ClickTo"
                   Content="Mute for"
@@ -181,6 +183,7 @@
                 />
                 <CheckBox
                   Content="Group members"
+                  IsVisible="{DynamicResource IsModern}"
                   IsEnabled="False"
                 />
               </StackPanel>
@@ -204,10 +207,12 @@
           </Expander>
           <CheckBox
             Content="Flatten floor plan"
+            IsVisible="{DynamicResource IsModern}"
             IsChecked="{Binding Flatten.IsActive}"
           />
           <CheckBox
             Content="Show self through furni"
+            IsVisible="{DynamicResource IsModern}"
             IsChecked="{Binding Overlay.IsActive}"
           />
         </StackPanel>
@@ -225,6 +230,7 @@
         <StackPanel>
           <CheckBox
             Content="No typing indicator"
+            IsVisible="{DynamicResource IsModern}"
             IsChecked="{Binding AntiTyping.IsActive}"
           />
           <Expander
@@ -235,14 +241,14 @@
             <WrapPanel>
               <CheckBox Content="Bots" IsChecked="{Binding Chat.MuteBots}" />
               <CheckBox Content="Pets" IsChecked="{Binding Chat.MutePets}" />
-              <CheckBox Content="Pet commands" IsChecked="{Binding Chat.MutePetCommands}" />
-              <CheckBox Content="Wired messages" IsChecked="{Binding Chat.MuteWired}" />
-              <CheckBox Content="Respects" IsChecked="{Binding Chat.MuteRespects}" />
-              <CheckBox Content="Scratches" IsChecked="{Binding Chat.MuteScratches}" />
+              <CheckBox Content="Pet commands" IsVisible="{DynamicResource IsModern}" IsChecked="{Binding Chat.MutePetCommands}" />
+              <CheckBox Content="Wired messages" IsVisible="{DynamicResource IsModern}" IsChecked="{Binding Chat.MuteWired}" />
+              <CheckBox Content="Respects" IsVisible="{DynamicResource IsModern}" IsChecked="{Binding Chat.MuteRespects}" />
+              <CheckBox Content="Scratches" IsVisible="{DynamicResource IsModern}" IsChecked="{Binding Chat.MuteScratches}" />
             </WrapPanel>
           </Expander>
-          <CheckBox Content="Show who respected" IsChecked="{Binding Respected.ShowWhoRespected}" />
-          <CheckBox Content="Show total respect count" IsChecked="{Binding Respected.ShowTotalRespects}" />
+          <CheckBox Content="Show who respected" IsVisible="{DynamicResource IsModern}" IsChecked="{Binding Respected.ShowWhoRespected}" />
+          <CheckBox Content="Show total respect count" IsVisible="{DynamicResource IsModern}" IsChecked="{Binding Respected.ShowTotalRespects}" />
         </StackPanel>
       </Expander>
 
@@ -264,7 +270,7 @@
       </Expander>
 
       <!-- Hand item -->
-      <Expander IsExpanded="{Binding IsHandItemExpanded}">
+      <Expander IsExpanded="{Binding IsHandItemExpanded}" IsVisible="{DynamicResource IsModern}">
         <Expander.Header>
           <StackPanel Orientation="Horizontal" Spacing="5">
             <ic:SymbolIcon Symbol="HandRight" />
@@ -304,7 +310,7 @@
       </Expander>
 
       <!-- Misc -->
-      <Expander IsExpanded="{Binding IsMiscExpanded}">
+      <Expander IsExpanded="{Binding IsMiscExpanded}" IsVisible="{DynamicResource IsModern}">
         <Expander.Header>
           <StackPanel Orientation="Horizontal" Spacing="5">
             <ic:SymbolIcon Symbol="GridDots" />

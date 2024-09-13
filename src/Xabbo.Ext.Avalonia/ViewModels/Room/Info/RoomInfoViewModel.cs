@@ -11,6 +11,7 @@ using Xabbo.Core.Game;
 using Xabbo.Core.Events;
 
 using Xabbo.Ext.Avalonia.Helpers;
+using Xabbo.Ext.Components;
 
 namespace Xabbo.Ext.Avalonia.ViewModels;
 
@@ -20,7 +21,6 @@ public class RoomInfoViewModel : ViewModelBase
 
     [Reactive] public bool IsInRoom { get; set; }
     [Reactive] public IRoomData? Data { get; set; }
-
 
     private long _currentThumbnailId = -1;
     private Lazy<Task<Bitmap?>> _loadImage = new(() => LoadImage(-1));
@@ -62,6 +62,8 @@ public class RoomInfoViewModel : ViewModelBase
         {
             UpdateThumbnail(Data.Id);
         }
+
+        IsInRoom = true;
     }
 
     private void OnRoomDataUpdated(RoomDataEventArgs e)

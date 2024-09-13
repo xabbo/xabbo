@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 using DynamicData;
 using DynamicData.Binding;
+
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
@@ -16,6 +17,7 @@ using Xabbo.Core.Game;
 using Xabbo.Extension;
 
 using Xabbo.Ext.Services;
+using Xabbo.Ext.Components;
 
 namespace Xabbo.Ext.Avalonia.ViewModels;
 
@@ -51,11 +53,12 @@ public class RoomVisitorsViewModel : ViewModelBase
 #endif
 
     public RoomVisitorsViewModel(
-        IExtension extension, IUiContext context,
+        IUiContext context,
+        IExtension extension,
         ProfileManager profileManager, RoomManager roomManager)
     {
-        _ext = extension;
         _context = context;
+        _ext = extension;
         _profileManager = profileManager;
         _roomManager = roomManager ?? throw new ArgumentNullException(nameof(roomManager));
 
@@ -238,6 +241,4 @@ public class RoomVisitorsViewModel : ViewModelBase
 #endif
         }
     }
-
-
 }

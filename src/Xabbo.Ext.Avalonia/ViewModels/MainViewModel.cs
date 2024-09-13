@@ -1,9 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+
 using Avalonia.Controls.ApplicationLifetimes;
-using ReactiveUI;
+
 using ReactiveUI.Fody.Helpers;
+
 using Splat;
+
 using Xabbo.GEarth;
 
 namespace Xabbo.Ext.Avalonia.ViewModels;
@@ -21,7 +23,11 @@ public class MainViewModel : ViewModelBase
 
     [Reactive] public bool IsConnected { get; set; }
 
-    public MainViewModel() { Pages = []; }
+    public MainViewModel()
+    {
+        _extension = null!;
+        Pages = [];
+    }
 
     [DependencyInjectionConstructor]
     public MainViewModel(IControlledApplicationLifetime lt,

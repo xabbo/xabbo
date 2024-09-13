@@ -32,7 +32,7 @@
       </DataGrid.ContextFlyout>
       <DataGrid.Columns>
         <DataGridTextColumn Header="index" Binding="{Binding Index}" />
-        <DataGridTextColumn Header="id" Binding="{Binding Id}" />
+        <DataGridTextColumn Header="id" Binding="{Binding Id}" IsVisible="{DynamicResource IsModern}" />
         <DataGridTemplateColumn
           x:DataType="vm:AvatarViewModel"
           Header="name" SortMemberPath="Name"

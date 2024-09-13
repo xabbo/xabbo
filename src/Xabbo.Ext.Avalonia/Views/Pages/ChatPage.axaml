@@ -27,16 +27,17 @@
       <CheckBox
         IsChecked="{Binding IncludeNormalChat}"
         Content="Normal" />
-      <CheckBox 
+      <CheckBox
         IsChecked="{Binding IncludeWhispers}"
         Content="Whispers" />
       <CheckBox
         IsChecked="{Binding IncludeWiredMessages}"
+        IsVisible="{DynamicResource IsModern}"
         Content="Wired" />
       <CheckBox
         IsChecked="{Binding IncludeBotMessages}"
         Content="Bots" />
-      <CheckBox 
+      <CheckBox
         IsChecked="{Binding LogToFile}"
         Content="Log to file" />
       <CheckBox

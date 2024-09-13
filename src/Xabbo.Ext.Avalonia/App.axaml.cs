@@ -13,6 +13,8 @@ using Live.Avalonia;
 
 using Xabbo.Ext.Avalonia.Services;
 using Xabbo.Ext.Avalonia.Views;
+using System.Linq;
+using Xabbo.Ext.Components;
 
 namespace Xabbo.Ext.Avalonia;
 
@@ -29,7 +31,6 @@ public partial class App : Application, ILiveView
             return;
         }
 #endif
-
         var container = Locator.CurrentMutable;
         container.RegisterConstant<Application>(this);
         container.RegisterConstant(ApplicationLifetime);
@@ -43,6 +44,8 @@ public partial class App : Application, ILiveView
 
         // Set DefaultExceptionHelper now but we want to initialize ViewModelLocator later in parallel with View for faster startup.
         // GlobalErrorHandler.BeginInit();
+
+        Locator.Current.GetService<AppSessionManager>();
 
         if (Locator.Current.GetService<GEarthExtensionLifetime>() is not { } lifetime)
             throw new Exception($"Failed to obtain {nameof(GEarthExtensionLifetime)}.");
