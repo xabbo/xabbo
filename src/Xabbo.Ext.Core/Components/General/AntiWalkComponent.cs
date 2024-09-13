@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
 
-using Xabbo;
 using Xabbo.Extension;
 using Xabbo.Core.Messages.Outgoing;
 
@@ -31,6 +30,6 @@ public partial class AntiWalkComponent : Component
         if (IsActive) e.Block();
 
         if (FaceDirection)
-            Ext.Send(new LookToMsg(walk.X, walk.Y));
+            Ext.Send(new LookToMsg(walk.Point));
     }
 }
