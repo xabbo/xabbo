@@ -5,6 +5,7 @@
   xmlns:local="using:Xabbo.Ext.Avalonia"
   xmlns:sty="using:FluentAvalonia.Styling"
   xmlns:ui="using:FluentAvalonia.UI.Controls"
+  xmlns:ic="using:FluentIcons.Avalonia.Fluent"
   xmlns:c="using:Xabbo.Ext.Avalonia.Converters"
   RequestedThemeVariant="Dark"
 >
@@ -22,6 +23,10 @@
 
       <Style Selector="DataGrid DataGridCell:current /template/ Grid#FocusVisual">
         <Setter Property="IsVisible" Value="False" />
+      </Style>
+
+      <Style Selector="ic|SymbolIcon.filled">
+        <Setter Property="IconVariant" Value="Filled" />
       </Style>
 
       <!-- Slimmer tab items -->

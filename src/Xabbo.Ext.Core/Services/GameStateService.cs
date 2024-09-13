@@ -1,5 +1,4 @@
-﻿using Xabbo;
-using Xabbo.Extension;
+﻿using Xabbo.Extension;
 using Xabbo.Core.Game;
 using Xabbo.Core.GameData;
 

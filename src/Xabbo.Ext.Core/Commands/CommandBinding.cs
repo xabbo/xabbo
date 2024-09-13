@@ -10,8 +10,8 @@ public class CommandBinding
     public string? Usage { get; }
     public CommandHandler Handler { get; }
 
-    public IReadOnlyList<Type> UnavailableDependencies { get; set; }
-    public Identifiers UnresolvedHeaders { get; set; }
+    public IReadOnlyList<Type> UnavailableDependencies { get; set; } = [];
+    public Identifiers UnresolvedHeaders { get; set; } = [];
 
     public CommandBinding(CommandModule? module, string commandName, IEnumerable<string> aliases, string? usage,
         CommandHandler handler)

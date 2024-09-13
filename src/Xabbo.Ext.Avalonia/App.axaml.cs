@@ -15,6 +15,7 @@ using Xabbo.Ext.Avalonia.Services;
 using Xabbo.Ext.Avalonia.Views;
 using System.Linq;
 using Xabbo.Ext.Components;
+using ReactiveUI;
 
 namespace Xabbo.Ext.Avalonia;
 
@@ -31,36 +32,23 @@ public partial class App : Application, ILiveView
             return;
         }
 #endif
+
         var container = Locator.CurrentMutable;
         container.RegisterConstant<Application>(this);
         container.RegisterConstant(ApplicationLifetime);
 
         var mainViewModel = ViewModelLocator.Main;
 
-        RequestedThemeVariant = ThemeVariant.Dark;
-
-        // We must initialize the ViewModelLocator before setting GlobalErrorHandler.
-        // We must set GlobalErrorHandler before View is created.
-
-        // Set DefaultExceptionHelper now but we want to initialize ViewModelLocator later in parallel with View for faster startup.
-        // GlobalErrorHandler.BeginInit();
-
+        // Initialize background session manager
         Locator.Current.GetService<AppSessionManager>();
 
+        // Initialize and run G-Earth extension lifetime
         if (Locator.Current.GetService<GEarthExtensionLifetime>() is not { } lifetime)
             throw new Exception($"Failed to obtain {nameof(GEarthExtensionLifetime)}.");
-        var tBackground = Task.Run(lifetime.RunAsync);
-
-        // var dialogService = Locator.Current.GetService<IDialogService>()!;
+        Task.Run(lifetime.RunAsync);
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            // var settings = await AppStarter.AppSettingsLoader!.ConfigureAwait(true);
-            // InitSettings(settings);
-
-            // themeManager.RequestedTheme = settings.Theme.ToString();
-            AppStarter.AppSettingsLoader = null;
-
             desktop.MainWindow = new MainWindow { DataContext = mainViewModel };
 
             desktop.ShutdownRequested += (s, e) =>
@@ -68,9 +56,6 @@ public partial class App : Application, ILiveView
                 desktop.MainWindow?.Close();
             };
         }
-
-        // GlobalErrorHandler.EndInit(dialogService, desktop?.MainWindow?.DataContext as INotifyPropertyChanged);
-        // RxApp.DefaultExceptionHandler = GlobalErrorHandler.Instance;
 
         base.OnFrameworkInitializationCompleted();
     }

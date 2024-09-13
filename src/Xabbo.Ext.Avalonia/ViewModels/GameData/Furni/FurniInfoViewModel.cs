@@ -3,9 +3,9 @@ using Xabbo.Core.GameData;
 
 namespace Xabbo.Ext.Avalonia.ViewModels;
 
-public class FurniInfoViewModel
+public class FurniInfoViewModel(FurniInfo info)
 {
-    public FurniInfo Info { get; }
+    public FurniInfo Info { get; } = info;
 
     public string Name => Info.Name;
     public string Identifier => Info.Identifier;
@@ -14,9 +14,4 @@ public class FurniInfoViewModel
     public string Line => Info.Line;
     public string Category => Info.CategoryName;
     public string TypeKind => $"{Type}/{Kind}";
-
-    public FurniInfoViewModel(FurniInfo info)
-    {
-        Info = info;
-    }
 }

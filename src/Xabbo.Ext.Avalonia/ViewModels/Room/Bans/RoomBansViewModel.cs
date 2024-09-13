@@ -6,11 +6,9 @@ using DynamicData;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-using Xabbo;
-using Xabbo.Core.Game;
 using Xabbo.Extension;
-
 using Xabbo.Messages.Flash;
+using Xabbo.Core.Game;
 
 using Xabbo.Ext.Services;
 
@@ -43,9 +41,9 @@ public class RoomBansViewModel : ViewModelBase
         LoadBansCommand = ReactiveCommand.CreateFromTask(LoadBansAsync);
     }
 
-    private async Task UnbanAsync()
+    private Task UnbanAsync()
     {
-
+        return Task.CompletedTask;
     }
 
     private void OnLeftRoom()

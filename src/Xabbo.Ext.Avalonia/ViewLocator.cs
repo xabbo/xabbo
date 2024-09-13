@@ -1,6 +1,8 @@
 ﻿using System;
+
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
+
 using Xabbo.Ext.Avalonia.ViewModels;
 
 namespace Xabbo.Ext.Avalonia;

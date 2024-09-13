@@ -17,6 +17,9 @@ using Xabbo.Ext.Configuration;
 using Xabbo.Ext.Services;
 using Xabbo.Ext.Core.Services;
 
+using Splatr = Splat.SplatRegistrations;
+using Xabbo.Core.Game;
+
 namespace Xabbo.Ext.Avalonia;
 
 public static class ViewModelLocator
@@ -85,14 +88,11 @@ public static class ViewModelLocator
         // Xabbo components
         Splatr.RegisterLazySingleton<XabbotComponent>();
         Splatr.RegisterLazySingleton<NotificationComponent>();
-        // Splatr.RegisterLazySingleton<FlashWindowComponent>();
         Splatr.RegisterLazySingleton<AvatarOverlayComponent>();
-        // Splatr.RegisterLazySingleton<DisconnectionReasonComponent>();
 
         Splatr.RegisterLazySingleton<AntiHandItemComponent>();
         Splatr.RegisterLazySingleton<AntiHcGiftNotificationComponent>();
         Splatr.RegisterLazySingleton<AntiIdleComponent>();
-        // Splatr.RegisterLazySingleton<AntiKickComponent>();
         Splatr.RegisterLazySingleton<AntiTradeComponent>();
         Splatr.RegisterLazySingleton<AntiTurnComponent>();
         Splatr.RegisterLazySingleton<AntiTypingComponent>();
@@ -109,20 +109,19 @@ public static class ViewModelLocator
         Splatr.RegisterLazySingleton<RoomModeratorComponent>();
 
         // Xabbo commands
-        // container.Register<IOperationManager, OperationManager>();
         Splatr.RegisterLazySingleton<CommandManager>();
 
-        // Splatr.RegisterLazySingleton<AppCommands>();
+        #pragma warning disable SPLATDI006
         Splatr.RegisterLazySingleton<CommandModule, EffectCommands>();
-        Splatr.RegisterLazySingleton<FindFriendCommand>();
-        Splatr.RegisterLazySingleton<FurniCommands>();
-        Splatr.RegisterLazySingleton<InfoCommands>();
-        Splatr.RegisterLazySingleton<ModerationCommands>();
-        Splatr.RegisterLazySingleton<MoodCommands>();
-        // Splatr.RegisterLazySingleton<OperationCommands>();
-        Splatr.RegisterLazySingleton<RoomCommands>();
-        Splatr.RegisterLazySingleton<TurnCommand>();
-        Splatr.RegisterLazySingleton<UserProfileCommands>();
+        Splatr.RegisterLazySingleton<CommandModule, FindFriendCommand>();
+        Splatr.RegisterLazySingleton<CommandModule, FurniCommands>();
+        Splatr.RegisterLazySingleton<CommandModule, InfoCommands>();
+        Splatr.RegisterLazySingleton<CommandModule, ModerationCommands>();
+        Splatr.RegisterLazySingleton<CommandModule, MoodCommands>();
+        Splatr.RegisterLazySingleton<CommandModule, RoomCommands>();
+        Splatr.RegisterLazySingleton<CommandModule, TurnCommand>();
+        Splatr.RegisterLazySingleton<CommandModule, UserProfileCommands>();
+        #pragma warning restore SPLATDI006
 
         container.RegisterLazySingleton(() => Locator.Current.GetServices<CommandModule>());
 

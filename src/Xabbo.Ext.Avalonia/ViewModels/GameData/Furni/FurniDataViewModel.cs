@@ -7,9 +7,7 @@ using DynamicData;
 using Xabbo.Extension;
 using Xabbo.Core;
 using Xabbo.Core.GameData;
-
 using Xabbo.Ext.Services;
-using Xabbo;
 
 namespace Xabbo.Ext.Avalonia.ViewModels;
 

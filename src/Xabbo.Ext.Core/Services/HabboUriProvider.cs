@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
+﻿using System.Net;
 using System.Reflection;
 
 using Microsoft.Extensions.Configuration;
@@ -9,7 +7,7 @@ namespace Xabbo.Ext.Services;
 
 public class HabboUriProvider : IUriProvider<HabboEndpoints>
 {
-    private readonly Dictionary<HabboEndpoints, string> _endpoints = new();
+    private readonly Dictionary<HabboEndpoints, string> _endpoints = [];
 
     public string Host { get; set; } = "";
 
@@ -18,12 +16,12 @@ public class HabboUriProvider : IUriProvider<HabboEndpoints>
     public HabboUriProvider(IConfiguration config)
     {
         IConfigurationSection endpointSection = config.GetSection("Web:Endpoints");
-        string host = endpointSection.GetValue<string>("Host");
+        string? host = endpointSection.GetValue<string>("Host");
 
         foreach (IConfigurationSection pathSection in endpointSection.GetSection("Paths").GetChildren())
         {
             string endpointName = pathSection.Key;
-                
+
             if (!Enum.TryParse(endpointName, out HabboEndpoints endpoint))
             {
                 throw new Exception($"Unknown Habbo endpoint name: '{endpointName}'.");

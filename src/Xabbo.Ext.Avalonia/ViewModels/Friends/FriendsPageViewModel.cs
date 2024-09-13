@@ -1,7 +1,7 @@
-﻿using IconSource = FluentAvalonia.UI.Controls.IconSource;
-
-using FluentIcons.Common;
+﻿using FluentIcons.Common;
 using FluentIcons.Avalonia.Fluent;
+
+using IconSource = FluentAvalonia.UI.Controls.IconSource;
 
 namespace Xabbo.Ext.Avalonia.ViewModels;
 

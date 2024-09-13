@@ -27,7 +27,7 @@
     <Grid Name="TitleBarHost" ColumnDefinitions="48,*,Auto,0" ZIndex="1000">
       <Image
         Margin="0,8,0,-8"
-        Source="avares://Xabbo.Ext.Avalonia/Assets/xabbo-skull-64.png"
+        Source="avares://xabbo/Assets/xabbo-skull-64.png"
         Width="30" Height="30"
         HorizontalAlignment="Center"
         VerticalAlignment="Center"
@@ -42,7 +42,7 @@
         Theme="{StaticResource TransparentButton}"
         IsChecked="{Binding Mode=TwoWay, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Path=Topmost}"
       >
-        <ic:SymbolIcon Symbol="Pin" FontSize="14" IsFilled="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}, Path=Topmost}" />
+        <ic:SymbolIcon Symbol="Pin" FontSize="14" Classes.filled="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}, Path=Topmost}" />
       </ToggleButton>
     </Grid>
     <v:MainView Grid.Row="1" />
@@ -50,7 +50,7 @@
       <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
         <Grid>
         <Image
-          Source="avares://Xabbo.Ext.Avalonia/Assets/xabbo-skull-64.png"
+          Source="avares://xabbo/Assets/xabbo-skull-64.png"
           Width="64" Height="64"
           HorizontalAlignment="Center"
           VerticalAlignment="Center"

@@ -22,9 +22,6 @@
       <DataTemplate DataType="{x:Type vm:ChatPageViewModel}">
         <v:ChatPage />
       </DataTemplate>
-      <DataTemplate DataType="{x:Type vm:ProfilePageViewModel}">
-        <v:ProfilePage />
-      </DataTemplate>
       <DataTemplate DataType="{x:Type vm:RoomPageViewModel}">
         <v:RoomPage />
       </DataTemplate>

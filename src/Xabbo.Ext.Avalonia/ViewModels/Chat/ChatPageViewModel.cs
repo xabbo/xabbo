@@ -11,12 +11,9 @@ using ReactiveUI;
 
 using Splat;
 
-using Xabbo.Extension;
 using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.Events;
-
-using Xabbo.Ext.Components;
 
 using IconSource = FluentAvalonia.UI.Controls.IconSource;
 

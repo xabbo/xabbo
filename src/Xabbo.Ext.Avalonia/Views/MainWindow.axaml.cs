@@ -30,4 +30,15 @@ public partial class MainWindow : AppWindow
 
         TitleBarHost.ColumnDefinitions[3].Width = new GridLength(TitleBar.RightInset, GridUnitType.Pixel);
     }
+
+    protected override void OnClosing(WindowClosingEventArgs e)
+    {
+        base.OnClosing(e);
+
+        if (e.CloseReason is WindowCloseReason.WindowClosing)
+        {
+            e.Cancel = true;
+            Hide();
+        }
+    }
 }

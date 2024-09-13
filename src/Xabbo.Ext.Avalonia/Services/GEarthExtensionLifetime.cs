@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Threading.Tasks;
 
 using Avalonia.Controls.ApplicationLifetimes;
-using Xabbo.Ext.Core.Services;
+
 using Xabbo.GEarth;
+using Xabbo.Ext.Core.Services;
 
 namespace Xabbo.Ext.Avalonia.Services;
 
@@ -45,20 +45,8 @@ public class GEarthExtensionLifetime
         }
         finally
         {
-            OnInterceptorDisconnected();
-        }
-    }
-
-    private void OnInterceptorDisconnected()
-    {
-        try
-        {
             if (_lifetime is IControlledApplicationLifetime lifetime)
                 lifetime.Shutdown();
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine(ex.Message);
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
 
-using Xabbo;
 using Xabbo.Messages;
 using Xabbo.Interceptor;
 using Xabbo.Extension;
@@ -44,6 +43,7 @@ public partial class CommandManager
 
         Extension = extension;
         _modules = modules.ToArray();
+        Console.WriteLine($"loaded {_modules.Length} command modules");
         _profileManager = profileManager;
         _roomManager = roomManager;
         _xabbot = xabbot;
