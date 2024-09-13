@@ -1,15 +1,13 @@
 ﻿using System.Text.RegularExpressions;
-using Xabbo.Ext.Core.Commands;
-using Xabbo;
-using Xabbo.Core.GameData;
+
 using Xabbo.Messages.Flash;
+using Xabbo.Core.GameData;
 
 namespace Xabbo.Ext.Commands;
 
 [CommandModule(SupportedClients = ~ClientType.Shockwave)]
-public partial class EffectCommands : CommandModule
+public sealed partial class EffectCommands : CommandModule
 {
-
     [GeneratedRegex(@"^fx_(\d+)$")]
     private static partial Regex RegexEffect();
 
@@ -100,21 +98,21 @@ public partial class EffectCommands : CommandModule
     }
 
     [Command("fxa")]
-    protected Task OnActivateEffect(CommandArgs args)
+    public Task OnActivateEffect(CommandArgs args)
     {
         EnableMatchingEffect(args, true);
         return Task.CompletedTask;
     }
 
     [Command("fx")]
-    protected Task OnEnableEffect(CommandArgs args)
+    public Task OnEnableEffect(CommandArgs args)
     {
         EnableMatchingEffect(args, false);
         return Task.CompletedTask;
     }
 
     [Command("dropfx")]
-    protected Task OnDropEffect(CommandArgs args)
+    public Task OnDropEffect(CommandArgs args)
     {
         Ext.Send(Out.Chat, ":yyxxabxa", 0, -1);
         Ext.Send(Out.Shout, ":yyxxabxa", 0);

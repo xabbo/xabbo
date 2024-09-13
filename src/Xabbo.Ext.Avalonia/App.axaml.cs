@@ -16,6 +16,7 @@ using Xabbo.Ext.Avalonia.Views;
 using System.Linq;
 using Xabbo.Ext.Components;
 using ReactiveUI;
+using Xabbo.Ext.Commands;
 
 namespace Xabbo.Ext.Avalonia;
 
@@ -39,8 +40,9 @@ public partial class App : Application, ILiveView
 
         var mainViewModel = ViewModelLocator.Main;
 
-        // Initialize background session manager
+        // Initialize managers
         Locator.Current.GetService<AppSessionManager>();
+        Locator.Current.GetService<CommandManager>();
 
         // Initialize and run G-Earth extension lifetime
         if (Locator.Current.GetService<GEarthExtensionLifetime>() is not { } lifetime)

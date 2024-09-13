@@ -2,27 +2,18 @@
 
 using ReactiveUI;
 
-using Xabbo;
 using Xabbo.Extension;
 using Xabbo.Messages.Flash;
-
-using Xabbo.Ext.Commands;
 
 namespace Xabbo.Ext.Components;
 
 [Intercept(~ClientType.Shockwave)]
 public partial class ClickThroughComponent : Component
 {
-    protected readonly CommandManager _commandManager;
-
     public ClickThroughComponent(IExtension extension,
-        IConfiguration config,
-        CommandManager commandManager)
+        IConfiguration config)
         : base(extension)
     {
-        _commandManager = commandManager;
-        _commandManager.Register(OnToggle, "ct", null);
-
         IsActive = config.GetValue("ClickThrough:Active", false);
 
         this.ObservableForProperty(x => x.IsActive)
@@ -34,14 +25,6 @@ public partial class ClickThroughComponent : Component
         base.OnConnected(e);
 
         IsAvailable = Client is not ClientType.Shockwave;
-    }
-
-    private Task OnToggle(CommandArgs args)
-    {
-        IsActive = !IsActive;
-        _commandManager.ShowMessage($"Click-through {(IsActive ? "enabled" : "disabled")}");
-
-        return Task.CompletedTask;
     }
 
     // [RequiredIn(nameof(In.GameYouArePlayer))]

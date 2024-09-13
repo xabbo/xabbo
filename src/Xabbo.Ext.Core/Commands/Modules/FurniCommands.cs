@@ -9,7 +9,8 @@ using Xabbo.Ext.Util;
 
 namespace Xabbo.Ext.Commands;
 
-public class FurniCommands(
+[CommandModule]
+public sealed class FurniCommands(
     IOperationManager operationManager,
     IGameDataManager gameData,
     ProfileManager profileManager,

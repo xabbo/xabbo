@@ -1,17 +1,17 @@
-﻿using Xabbo;
-using Xabbo.Core;
+﻿using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.Messages.Outgoing;
 
 namespace Xabbo.Ext.Commands;
 
-public class TurnCommand(ProfileManager profileManager, RoomManager roomManager) : CommandModule
+[CommandModule]
+public sealed class TurnCommand(ProfileManager profileManager, RoomManager roomManager) : CommandModule
 {
     private readonly ProfileManager _profileManager = profileManager;
     private readonly RoomManager _roomManager = roomManager;
 
     [Command("turn", "t")]
-    protected async Task HandleLookCommand(CommandArgs args)
+    private async Task HandleLookCommand(CommandArgs args)
     {
         if (args.Count == 0) return;
 

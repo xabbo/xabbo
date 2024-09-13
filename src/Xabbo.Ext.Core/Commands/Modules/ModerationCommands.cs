@@ -1,13 +1,13 @@
-﻿using Xabbo;
+﻿using Xabbo.Messages.Flash;
 using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.Events;
-using Xabbo.Messages.Flash;
 using Xabbo.Core.Messages.Outgoing;
 
 namespace Xabbo.Ext.Commands;
 
-public class ModerationCommands(RoomManager roomManager) : CommandModule
+[CommandModule]
+public sealed class ModerationCommands(RoomManager roomManager) : CommandModule
 {
     private readonly RoomManager _roomManager = roomManager;
 
@@ -58,7 +58,7 @@ public class ModerationCommands(RoomManager roomManager) : CommandModule
     }
 
     [Command("mute")]
-    protected Task HandleMuteCommand(CommandArgs args)
+    public Task HandleMuteCommand(CommandArgs args)
     {
         if (args.Count < 2)
         {
@@ -119,7 +119,7 @@ public class ModerationCommands(RoomManager roomManager) : CommandModule
     }
 
     [Command("unmute")]
-    protected Task HandleUnmuteCommand(CommandArgs args)
+    public Task HandleUnmuteCommand(CommandArgs args)
     {
         if (args.Count < 1) return Task.CompletedTask;
 
@@ -151,7 +151,7 @@ public class ModerationCommands(RoomManager roomManager) : CommandModule
     }
 
     [Command("kick")]
-    protected Task HandleKickCommand(CommandArgs args)
+    public Task HandleKickCommand(CommandArgs args)
     {
         if (args.Count < 1) return Task.CompletedTask;
 
@@ -183,7 +183,7 @@ public class ModerationCommands(RoomManager roomManager) : CommandModule
     }
 
     [Command("ban")]
-    protected Task HandleBanCommand(CommandArgs args)
+    public Task HandleBanCommand(CommandArgs args)
     {
         if (args.Count < 1) return Task.CompletedTask;
 
@@ -229,7 +229,7 @@ public class ModerationCommands(RoomManager roomManager) : CommandModule
     }
 
     // [Command("unban"), RequiredOut(nameof(Out.UnbanUser))]
-    // protected async Task HandleUnbanCommand(CommandArgs args)
+    // public async Task HandleUnbanCommand(CommandArgs args)
     // {
     //     if (args.Count < 1) return;
 

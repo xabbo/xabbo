@@ -1,16 +1,14 @@
 ﻿using System.Globalization;
 
-using Xabbo;
 using Xabbo.Core;
 using Xabbo.Core.Game;
 
-using Xabbo.Ext.Core.Commands;
 using Xabbo.Messages.Flash;
 
 namespace Xabbo.Ext.Commands;
 
 [CommandModule(SupportedClients = ~ClientType.Shockwave)]
-public class MoodCommands : CommandModule
+public sealed class MoodCommands : CommandModule
 {
     private static (double H, double S, double L) RgbToHsl(int r, int g, int b)
     {
@@ -56,7 +54,7 @@ public class MoodCommands : CommandModule
     }
 
     [Command("mood")]
-    protected Task HandleMoodCommand(CommandArgs args)
+    public Task HandleMoodCommand(CommandArgs args)
     {
         if (args.Count > 0)
         {
@@ -75,7 +73,7 @@ public class MoodCommands : CommandModule
     }
 
     [Command("bg")]
-    protected Task HandleBgCommand(CommandArgs args)
+    public Task HandleBgCommand(CommandArgs args)
     {
         IRoom? room = _roomManager.Room;
         if (room is null)

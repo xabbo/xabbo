@@ -1,23 +1,21 @@
-﻿using Xabbo;
-using Xabbo.Messages;
+﻿using Xabbo.Messages;
 using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.Tasks;
 
-using Xabbo.Ext.Core.Commands;
 using Xabbo.Messages.Flash;
 
 namespace Xabbo.Ext.Commands;
 
 [CommandModule(SupportedClients = ~ClientType.Shockwave)]
-public class FindFriendCommand(FriendManager friendManager) : CommandModule
+public sealed class FindFriendCommand(FriendManager friendManager) : CommandModule
 {
     private readonly FriendManager _friendManager = friendManager;
 
     [Command("find", Usage = "<friendName>")]
     // [RequiredOut(nameof(Out.FollowFriend))]
     // [RequiredIn(nameof(In.RoomForward), nameof(In.FollowFriendFailed))]
-    protected async Task OnFind(CommandArgs args)
+    public async Task OnFind(CommandArgs args)
     {
         if (args.Count < 1)
             throw new InvalidArgsException();

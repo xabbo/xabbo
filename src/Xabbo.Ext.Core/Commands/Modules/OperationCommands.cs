@@ -2,7 +2,8 @@
 
 namespace Xabbo.Ext.Commands.Modules;
 
-public class OperationCommands(IOperationManager operationManager) : CommandModule
+[CommandModule]
+public sealed class OperationCommands(IOperationManager operationManager) : CommandModule
 {
     private readonly IOperationManager _operationManager = operationManager;
 

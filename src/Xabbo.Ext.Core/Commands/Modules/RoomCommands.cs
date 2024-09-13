@@ -1,12 +1,12 @@
-﻿using Xabbo;
-using Xabbo.Messages.Flash;
+﻿using Xabbo.Messages.Flash;
 using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.Tasks;
 
 namespace Xabbo.Ext.Commands;
 
-public class RoomCommands(RoomManager roomManager) : CommandModule
+[CommandModule]
+public sealed class RoomCommands(RoomManager roomManager) : CommandModule
 {
     private readonly RoomManager _roomMgr = roomManager;
 
@@ -16,7 +16,7 @@ public class RoomCommands(RoomManager roomManager) : CommandModule
     //     nameof(Out.FlatOpc),
     //     nameof(Out.Navigator2Search)
     // )]
-    private async Task GoCommandHandler(CommandArgs args)
+    public async Task GoCommandHandler(CommandArgs args)
     {
         string searchText = string.Join(" ", args);
         if (string.IsNullOrWhiteSpace(searchText)) return;
@@ -44,7 +44,7 @@ public class RoomCommands(RoomManager roomManager) : CommandModule
 
     [Command("goto", SupportedClients = ClientType.Flash)]
     // [RequiredOut(nameof(Out.FlatOpc))]
-    protected Task GotoCommandHandler(CommandArgs args)
+    public Task GotoCommandHandler(CommandArgs args)
     {
         if (args.Count >= 1 && !long.TryParse(args[0], out long roomId))
         {
@@ -64,7 +64,7 @@ public class RoomCommands(RoomManager roomManager) : CommandModule
 
     [Command("exit")]
     //[RequiredOut(nameof(Out.FlatOpc))]
-    protected Task ExitCommandHandler(CommandArgs args)
+    public Task ExitCommandHandler(CommandArgs args)
     {
         Ext.Send(Out.OpenFlatConnection, (Id)0, "", (Id)(-1));
         return Task.CompletedTask;
@@ -72,7 +72,7 @@ public class RoomCommands(RoomManager roomManager) : CommandModule
 
     [Command("reload", SupportedClients = ClientType.Flash)]
     // [RequiredIn(nameof(In.RoomForward))]
-    protected Task ReloadCommandHandler(CommandArgs args)
+    public Task ReloadCommandHandler(CommandArgs args)
     {
         if (_roomMgr.IsInRoom)
             Ext.Send(In.RoomForward, _roomMgr.CurrentRoomId);
@@ -81,13 +81,13 @@ public class RoomCommands(RoomManager roomManager) : CommandModule
 
     [Command("entry", SupportedClients = ClientType.Flash)]
     // RequiredOut(nameof(Out.GetRoomEntryData))]
-    protected Task TriggerEntryWiredCommandHandler(CommandArgs args)
+    public Task TriggerEntryWiredCommandHandler(CommandArgs args)
     {
         // TODO: Send(Out.GetRoomEntryData);
         return Task.CompletedTask;
     }
 
-    protected async Task UpdateRoomSettingsAsync(Action<RoomSettings> update)
+    public async Task UpdateRoomSettingsAsync(Action<RoomSettings> update)
     {
         if (!_roomMgr.IsInRoom)
         {
@@ -120,7 +120,7 @@ public class RoomCommands(RoomManager roomManager) : CommandModule
     [Command("lock", SupportedClients = ClientType.Flash)]
     // [RequiredIn(nameof(In.RoomSettingsData))]
     // [RequiredOut(nameof(Out.GetRoomSettings), nameof(Out.SaveRoomSettings))]
-    protected async Task LockRoomAsync(CommandArgs args)
+    public async Task LockRoomAsync(CommandArgs args)
     {
         string? password = null;
         if (args.Count > 0)
@@ -146,7 +146,7 @@ public class RoomCommands(RoomManager roomManager) : CommandModule
     [Command("open", SupportedClients = ClientType.Flash)]
     // [RequiredIn(nameof(In.RoomSettingsData))]
     // [RequiredOut(nameof(Out.GetRoomSettings), nameof(Out.SaveRoomSettings))]
-    protected async Task OpenRoomAsync(CommandArgs args)
+    public async Task OpenRoomAsync(CommandArgs args)
     {
         await UpdateRoomSettingsAsync(s => s.Access = RoomAccess.Open);
         ShowMessage("Room has been opened.");
@@ -155,7 +155,7 @@ public class RoomCommands(RoomManager roomManager) : CommandModule
     [Command("access", "ra", Usage = "<open/hide/lock> [password]", SupportedClients = ClientType.Flash)]
     // [RequiredIn(nameof(In.RoomSettingsData))]
     // [RequiredOut(nameof(Out.GetRoomSettings), nameof(Out.SaveRoomSettings))]
-    protected async Task SetRoomAccessAsync(CommandArgs args)
+    public async Task SetRoomAccessAsync(CommandArgs args)
     {
         if (args.Count < 1)
             throw new InvalidArgsException();

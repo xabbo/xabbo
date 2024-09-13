@@ -1,6 +1,4 @@
-using Xabbo;
-
-namespace Xabbo.Ext.Core.Commands;
+namespace Xabbo.Ext.Commands;
 
 [AttributeUsage(AttributeTargets.Class)]
 public sealed class CommandModuleAttribute : Attribute

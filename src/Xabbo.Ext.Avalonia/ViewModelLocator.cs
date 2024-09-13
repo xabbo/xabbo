@@ -112,6 +112,7 @@ public static class ViewModelLocator
         Splatr.RegisterLazySingleton<CommandManager>();
 
         #pragma warning disable SPLATDI006
+        Splatr.RegisterLazySingleton<CommandModule, AppCommands>();
         Splatr.RegisterLazySingleton<CommandModule, EffectCommands>();
         Splatr.RegisterLazySingleton<CommandModule, FindFriendCommand>();
         Splatr.RegisterLazySingleton<CommandModule, FurniCommands>();
@@ -121,6 +122,7 @@ public static class ViewModelLocator
         Splatr.RegisterLazySingleton<CommandModule, RoomCommands>();
         Splatr.RegisterLazySingleton<CommandModule, TurnCommand>();
         Splatr.RegisterLazySingleton<CommandModule, UserProfileCommands>();
+        Splatr.RegisterLazySingleton<CommandModule, ClickThroughCommand>();
         #pragma warning restore SPLATDI006
 
         container.RegisterLazySingleton(() => Locator.Current.GetServices<CommandModule>());

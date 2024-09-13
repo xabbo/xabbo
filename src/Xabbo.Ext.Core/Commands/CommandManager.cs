@@ -51,23 +51,19 @@ public partial class CommandManager
         Extension.Connected += OnConnected;
     }
 
-    public IDisposable Attach(IInterceptor interceptor)
-    {
-        return null!;
-    }
-
     private void OnConnected(GameConnectedArgs e)
     {
         Initialize();
 
-        Attach(Extension);
+        if (this is IMessageHandler handler)
+            handler.Attach(Extension);
 
         foreach (CommandModule module in _modules)
         {
             try
             {
-                if (module is IMessageHandler handler)
-                    handler.Attach(Extension);
+                if (module is IMessageHandler moduleHandler)
+                    moduleHandler.Attach(Extension);
                 module.IsAvailable = true;
             }
             catch
@@ -96,18 +92,32 @@ public partial class CommandManager
         {
             Type type = module.GetType();
 
+            var moduleAttribute = type.GetCustomAttribute<CommandModuleAttribute>()
+                ?? throw new Exception($"Command module '{type.Name}' must be decorated with CommandModuleAttribute.");
+
             foreach (var method in type.GetMethods(bindingFlags))
             {
                 var commandAttribute = method.GetCustomAttribute<CommandAttribute>();
                 if (commandAttribute == null) continue;
 
                 // TODO Validate method signature
-                var handler = (CommandHandler)method.CreateDelegate(typeof(CommandHandler), module);
+                CommandHandler handler;
+                try
+                {
+                    handler = (CommandHandler)method.CreateDelegate(typeof(CommandHandler), module);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Failed to bind command '{commandAttribute.CommandName}': {ex.Message}");
+                    continue;
+                }
+
                 var binding = new CommandBinding(
                     module,
                     commandAttribute.CommandName,
                     commandAttribute.Aliases,
                     commandAttribute.Usage,
+                    moduleAttribute.SupportedClients & commandAttribute.SupportedClients & ClientType.All,
                     handler
                 );
 
@@ -129,7 +139,7 @@ public partial class CommandManager
         {
             Process.Start(new ProcessStartInfo
             {
-                FileName = "https://github.com/b7c/Xabbo.Ext#commands",
+                FileName = "https://github.com/xabbo/xabbo#commands",
                 UseShellExecute = true
             });
         }
@@ -138,12 +148,13 @@ public partial class CommandManager
         return Task.CompletedTask;
     }
 
-    public void Register(CommandHandler handler, string commandName, string? usage = null, params string[] aliases)
+    private void Register(CommandHandler handler, string commandName, string? usage = null,
+        ClientType supportedClients = ClientType.All, params string[] aliases)
     {
-        var binding = new CommandBinding(null, commandName, aliases, usage, handler);
-        var commandNames = aliases.Concat(new[] { commandName });
+        var binding = new CommandBinding(null, commandName, aliases, usage, supportedClients, handler);
+        var commandNames = aliases.Concat([commandName]);
         var boundCommands = commandNames.Where(x => _bindings.ContainsKey(x)).ToList();
-        if (boundCommands.Any())
+        if (boundCommands.Count != 0)
             throw new InvalidOperationException($"Command(s) are already registered: {string.Join(", ", boundCommands)}");
 
         foreach (string name in commandNames)
@@ -168,14 +179,22 @@ public partial class CommandManager
         string[] split = message.Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         if (split.Length == 0) return;
 
-        string command = split[0].ToLower();
-        string[] args = split[1..];
-
+        var (command, args) = (split[0].ToLower(), split[1..]);
         if (!_bindings.TryGetValue(command, out CommandBinding? binding)) return;
 
-        if (binding.Module != null && !binding.Module.IsAvailable)
+        if (binding.Module is { IsAvailable: false })
         {
             ShowMessage($"Command module '{binding.Module.GetType().Name}' is unavailable");
+            return;
+        }
+
+        ClientType supportedClients = binding.SupportedClients;
+        if (binding.Module is not null)
+            supportedClients &= binding.Module.Client;
+
+        if ((supportedClients & Extension.Session.Client.Type) is ClientType.None)
+        {
+            ShowMessage($"The `{command}` command is not supported on {Extension.Session.Client.Type}.");
             return;
         }
 

@@ -1,9 +1,9 @@
-﻿using Xabbo;
-using Xabbo.Messages.Flash;
+﻿using Xabbo.Messages.Flash;
 
 namespace Xabbo.Ext.Commands;
 
-public class InfoCommands : CommandModule
+[CommandModule]
+public sealed class InfoCommands : CommandModule
 {
     public InfoCommands() { }
 
