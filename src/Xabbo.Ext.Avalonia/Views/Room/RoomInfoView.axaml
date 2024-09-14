@@ -117,12 +117,12 @@
             <SelectableTextBlock Grid.Column="1" Grid.Row="1" Text="{Binding Id, Mode=OneWay}" TextWrapping="Wrap" />
 
             <!-- Owner ID -->
-            <TextBlock Grid.Row="3" Text="Owner ID" />
-            <SelectableTextBlock Grid.Column="1" Grid.Row="3" Text="{Binding OwnerId, Mode=OneWay}" TextWrapping="Wrap" />
+            <TextBlock IsVisible="{DynamicResource IsModern}" Grid.Row="3" Text="Owner ID" />
+            <SelectableTextBlock IsVisible="{DynamicResource IsModern}" Grid.Column="1" Grid.Row="3" Text="{Binding OwnerId, Mode=OneWay}" TextWrapping="Wrap" />
 
             <!-- Category -->
-            <TextBlock Grid.Row="4" Text="Category" />
-            <SelectableTextBlock Grid.Column="1" Grid.Row="4" Text="{Binding Category, Mode=OneWay, Converter={StaticResource HumanizerConverter}}" TextWrapping="Wrap" />
+            <TextBlock IsVisible="{DynamicResource IsModern}" Grid.Row="4" Text="Category" />
+            <SelectableTextBlock IsVisible="{DynamicResource IsModern}" Grid.Column="1" Grid.Row="4" Text="{Binding Category, Mode=OneWay, Converter={StaticResource HumanizerConverter}}" TextWrapping="Wrap" />
 
             <!-- Room access -->
             <TextBlock Grid.Row="6" Text="Access" />
@@ -148,13 +148,28 @@
             />
 
             <TextBlock IsVisible="{DynamicResource IsModern}" Grid.Row="10" Text="Who can mute" />
-            <SelectableTextBlock IsVisible="{DynamicResource IsModern}" TextWrapping="Wrap" />
+            <SelectableTextBlock
+              IsVisible="{DynamicResource IsModern}"
+              Grid.Row="10" Grid.Column="1"
+              TextWrapping="Wrap"
+              Text="{Binding Moderation.WhoCanMute, Mode=OneWay, Converter={StaticResource HumanizerConverter}}"
+            />
 
             <TextBlock IsVisible="{DynamicResource IsModern}" Grid.Row="11" Text="Who can kick" />
-            <SelectableTextBlock IsVisible="{DynamicResource IsModern}" TextWrapping="Wrap" />
+            <SelectableTextBlock
+              IsVisible="{DynamicResource IsModern}"
+              Grid.Row="11" Grid.Column="1"
+              TextWrapping="Wrap"
+              Text="{Binding Moderation.WhoCanKick, Mode=OneWay, Converter={StaticResource HumanizerConverter}}"
+            />
 
             <TextBlock IsVisible="{DynamicResource IsModern}" Grid.Row="12" Text="Who can ban" />
-            <SelectableTextBlock IsVisible="{DynamicResource IsModern}" TextWrapping="Wrap" />
+            <SelectableTextBlock
+              IsVisible="{DynamicResource IsModern}"
+              Grid.Row="12" Grid.Column="1"
+              TextWrapping="Wrap"
+              Text="{Binding Moderation.WhoCanBan, Mode=OneWay, Converter={StaticResource HumanizerConverter}}"
+            />
 
             <!-- Chat settings -->
             <TextBlock
@@ -168,19 +183,44 @@
             />
 
             <TextBlock IsVisible="{DynamicResource IsModern}" Grid.Row="14" Text="Flow" />
-            <SelectableTextBlock IsVisible="{DynamicResource IsModern}" TextWrapping="Wrap" />
+            <SelectableTextBlock
+              IsVisible="{DynamicResource IsModern}"
+              Grid.Row="14" Grid.Column="1"
+              TextWrapping="Wrap"
+              Text="{Binding ChatSettings.Flow, Mode=OneWay, Converter={StaticResource HumanizerConverter}}"
+            />
 
             <TextBlock IsVisible="{DynamicResource IsModern}" Grid.Row="15" Text="Bubble width"  />
-            <SelectableTextBlock IsVisible="{DynamicResource IsModern}" TextWrapping="Wrap" />
+            <SelectableTextBlock
+              IsVisible="{DynamicResource IsModern}"
+              Grid.Row="15" Grid.Column="1"
+              TextWrapping="Wrap"
+              Text="{Binding ChatSettings.BubbleWidth, Mode=OneWay, Converter={StaticResource HumanizerConverter}}"
+            />
 
             <TextBlock IsVisible="{DynamicResource IsModern}" Grid.Row="16" Text="Scroll speed" />
-            <SelectableTextBlock IsVisible="{DynamicResource IsModern}" TextWrapping="Wrap" />
+            <SelectableTextBlock
+              IsVisible="{DynamicResource IsModern}"
+              Grid.Row="16" Grid.Column="1"
+              TextWrapping="Wrap"
+              Text="{Binding ChatSettings.ScrollSpeed, Mode=OneWay, Converter={StaticResource HumanizerConverter}}"
+            />
 
             <TextBlock IsVisible="{DynamicResource IsModern}" Grid.Row="17" Text="Talk hearing distance" />
-            <SelectableTextBlock IsVisible="{DynamicResource IsModern}" TextWrapping="Wrap" />
+            <SelectableTextBlock
+              IsVisible="{DynamicResource IsModern}"
+              Grid.Row="17" Grid.Column="1"
+              TextWrapping="Wrap"
+              Text="{Binding ChatSettings.TalkHearingDistance, Mode=OneWay, Converter={StaticResource HumanizerConverter}}"
+            />
 
             <TextBlock IsVisible="{DynamicResource IsModern}" Grid.Row="18" Text="Flood protection" />
-            <SelectableTextBlock IsVisible="{DynamicResource IsModern}" TextWrapping="Wrap" />
+            <SelectableTextBlock
+              IsVisible="{DynamicResource IsModern}"
+              Grid.Row="18" Grid.Column="1"
+              TextWrapping="Wrap"
+              Text="{Binding ChatSettings.FloodProtection, Mode=OneWay, Converter={StaticResource HumanizerConverter}}"
+            />
         </Grid>
       </StackPanel>
     </ScrollViewer>

@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 
 using Avalonia.Media.Imaging;
+
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
@@ -11,7 +12,6 @@ using Xabbo.Core.Game;
 using Xabbo.Core.Events;
 
 using Xabbo.Ext.Avalonia.Helpers;
-using Xabbo.Ext.Components;
 
 namespace Xabbo.Ext.Avalonia.ViewModels;
 
@@ -56,7 +56,7 @@ public class RoomInfoViewModel : ViewModelBase
 
     private void OnEnteredRoom(RoomEventArgs e)
     {
-        Data = _roomManager.Data;
+        Data = e.Room.Data;
 
         if (Data is not null)
         {
