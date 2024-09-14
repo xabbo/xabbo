@@ -24,10 +24,37 @@
   </Design.DataContext>
 
   <Grid RowDefinitions="32,*">
+    <Grid.Styles>
+      <Style Selector=":is(Control).overlay">
+          <Setter Property="IsHitTestVisible" Value="true"/>
+          <Setter Property="Opacity" Value="1"/>
+          <Setter Property="Transitions">
+              <Transitions>
+                  <DoubleTransition Property="Opacity" Duration="0:0:0.8"/>
+              </Transitions>
+          </Setter>
+      </Style>
+      <Style Selector=":is(Control).imgoverlay">
+          <Setter Property="RenderTransform" Value="scale(1)"/>
+          <Setter Property="Transitions">
+              <Transitions>
+                <DoubleTransition Property="Opacity" Duration="0:0:0.6"/>
+                <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.6"/>
+              </Transitions>
+          </Setter>
+      </Style>
+      <Style Selector=":is(Control).online">
+        <Setter Property="IsHitTestVisible" Value="false"/>
+        <Setter Property="Opacity" Value="0" />
+      </Style>
+      <Style Selector=":is(Control).imgoverlay.online">
+        <Setter Property="RenderTransform" Value="scale(4)"/>
+      </Style>
+    </Grid.Styles>
     <Grid Name="TitleBarHost" ColumnDefinitions="48,*,Auto,0" ZIndex="1000">
       <Image
         Margin="0,8,0,-8"
-        Source="avares://xabbo/Assets/xabbo-skull-64.png"
+        Source="avares://xabbo/Assets/xabbo-skull-128.png"
         Width="30" Height="30"
         HorizontalAlignment="Center"
         VerticalAlignment="Center"
@@ -46,16 +73,34 @@
       </ToggleButton>
     </Grid>
     <v:MainView Grid.Row="1" />
-    <Grid Grid.Row="1" Background="{DynamicResource SolidBackgroundFillColorBase}" IsVisible="{DynamicResource IsConnecting}">
-      <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+    <Grid Grid.Row="1"
+      Background="{DynamicResource SolidBackgroundFillColorBase}"
+      Classes="overlay"
+      Classes.online="{DynamicResource IsConnected}"
+    >
+      <StackPanel
+        HorizontalAlignment="Center"
+        VerticalAlignment="Center"
+      >
         <Grid>
-        <Image
-          Source="avares://xabbo/Assets/xabbo-skull-64.png"
-          Width="64" Height="64"
-          HorizontalAlignment="Center"
-          VerticalAlignment="Center"
-        />
-        <ui:ProgressRing Width="128" Height="128" />
+          <Image
+            Classes="imgoverlay"
+            Classes.online="{DynamicResource IsConnected}"
+            Source="avares://xabbo/Assets/xabbo-skull-64.png"
+            Width="64" Height="64"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+          />
+          <ui:ProgressRing Width="128" Height="128">
+            <ui:ProgressRing.Styles>
+              <Style Selector="ui|ProgressRing">
+                <Setter Property="Opacity" Value="1" />
+              </Style>
+              <Style Selector=".online ui|ProgressRing">
+                <Setter Property="Opacity" Value="0" />
+              </Style>
+            </ui:ProgressRing.Styles>
+          </ui:ProgressRing>
         </Grid>
         <TextBlock
           FontSize="16"
