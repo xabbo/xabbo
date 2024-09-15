@@ -1,24 +1,35 @@
 ﻿using System;
+using System.Linq;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
+using System.Reactive;
+
 using DynamicData;
 using DynamicData.Kernel;
 
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-using FluentIcons.Common;
-using FluentIcons.Avalonia.Fluent;
+using Avalonia.Controls.Selection;
 
+using FluentAvalonia.UI.Controls;
+
+using Humanizer;
+
+using HanumanInstitute.MvvmDialogs;
+using HanumanInstitute.MvvmDialogs.Avalonia.Fluent;
+
+using Xabbo.Interceptor;
+using Xabbo.Messages.Flash;
 using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.Events;
-using Xabbo.Interceptor;
-
+using Xabbo.Core.Messages.Outgoing;
 using Xabbo.Ext.Services;
 
-using IconSource = FluentAvalonia.UI.Controls.IconSource;
-using System.Reactive;
-using Xabbo.Messages.Flash;
+using Symbol = FluentIcons.Common.Symbol;
+using SymbolIconSource = FluentIcons.Avalonia.Fluent.SymbolIconSource;
 
 namespace Xabbo.Ext.Avalonia.ViewModels;
 
@@ -28,6 +39,7 @@ public sealed class FriendsPageViewModel : PageViewModel
     public override IconSource? Icon { get; } = new SymbolIconSource { Symbol = Symbol.People };
 
     private readonly IUiContext _uiContext;
+    private readonly IDialogService _dialogService;
     private readonly IInterceptor _interceptor;
     private readonly FriendManager _friendManager;
     private readonly SourceCache<FriendViewModel, Id> _cache = new(key => key.Id);
@@ -39,9 +51,20 @@ public sealed class FriendsPageViewModel : PageViewModel
     [Reactive] public bool ShowOnlineOnly { get; set; }
 
     public ReactiveCommand<FriendViewModel, Unit> FollowFriendCmd { get; }
+    public ReactiveCommand<Unit, Unit> RemoveFriendsCmd { get; }
 
-    public FriendsPageViewModel(IUiContext uiContext, IInterceptor interceptor, FriendManager friendManager)
+    public SelectionModel<FriendViewModel> Selection { get; }
+        = new SelectionModel<FriendViewModel>() { SingleSelect = false };
+
+    public FriendsPageViewModel(
+        IUiContext uiContext, IDialogService dialogService,
+        IInterceptor interceptor, FriendManager friendManager)
     {
+        _uiContext = uiContext;
+        _dialogService = dialogService;
+        _interceptor = interceptor;
+        _friendManager = friendManager;
+
         _cache
             .Connect()
             .Filter(friend => {
@@ -59,13 +82,9 @@ public sealed class FriendsPageViewModel : PageViewModel
             .WhenAnyValue(x => x.FilterText, x => x.ShowOnlineOnly)
             .Subscribe(_ => _cache.Refresh());
 
-        FollowFriendCmd = ReactiveCommand.Create<FriendViewModel>(
-            (FriendViewModel friend) =>
-            _interceptor.Send(Out.FollowFriend, friend.Id));
+        FollowFriendCmd = ReactiveCommand.Create<FriendViewModel>(FollowFriend);
+        RemoveFriendsCmd = ReactiveCommand.CreateFromTask(RemoveSelectedFriendsAsync);
 
-        _uiContext = uiContext;
-        _interceptor = interceptor;
-        _friendManager = friendManager;
         _friendManager.Loaded += OnFriendsLoaded;
         _friendManager.FriendAdded += OnFriendAdded;
         _friendManager.FriendUpdated += OnFriendUpdated;
@@ -112,4 +131,41 @@ public sealed class FriendsPageViewModel : PageViewModel
     private void OnFriendAdded(FriendEventArgs args) => AddFriend(args.Friend);
     private void OnFriendUpdated(FriendEventArgs args) => UpdateFriend(args.Friend);
     private void OnFriendRemoved(FriendEventArgs args) => RemoveFriend(args.Friend.Id);
+
+    private void FollowFriend(FriendViewModel friend)
+    {
+        _interceptor.Send(Out.FollowFriend, friend.Id);
+    }
+
+    private async Task RemoveSelectedFriendsAsync()
+    {
+        List<FriendViewModel> friendsToRemove = Selection.SelectedItems
+            .Where(x => x is not null)
+            .Select(x => x!)
+            .ToList();
+
+        if (friendsToRemove.Count == 0)
+            return;
+
+        var result = await _dialogService.ShowContentDialogAsync(ViewModelLocator.Main, new ContentDialogSettings
+        {
+            Title = $"Delete {"friend".ToQuantity(friendsToRemove.Count)}",
+            Content = $"Are you sure you wish to delete {
+                friendsToRemove.Select(x => x.Name).Humanize(5, "more friends")
+            }?",
+            PrimaryButtonText = "Yes",
+            SecondaryButtonText = "No",
+        });
+
+        if (result is ContentDialogResult.Primary)
+        {
+            _interceptor.Send(new RemoveFriendsMsg(friendsToRemove.Select(x => x.Id)));
+
+            // TODO fix: Xabbo.Common.Generator reports
+            // this IEnumerable<Id> as an invalid packet type
+            //
+            // _interceptor.Send(Out.RemoveFriend,
+            //     Selection.SelectedItems.Select(x => x.Id));
+        }
+    }
 }

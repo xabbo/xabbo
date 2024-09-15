@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,6 +22,9 @@ using Xabbo.Ext.Core.Services;
 
 using Splatr = Splat.SplatRegistrations;
 
+using HanumanInstitute.MvvmDialogs;
+using HanumanInstitute.MvvmDialogs.Avalonia;
+
 namespace Xabbo.Ext.Avalonia;
 
 public static class ViewModelLocator
@@ -42,7 +45,7 @@ public static class ViewModelLocator
                 config.SingleLine = true;
                 config.IncludeScopes = true;
             });
-            builder.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
+            builder.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Debug);
         });
         container.RegisterConstant(loggerFactory);
         container.UseMicrosoftExtensionsLoggingWithWrappingFullLogger(loggerFactory);
@@ -50,6 +53,11 @@ public static class ViewModelLocator
         // Services
         Splatr.RegisterLazySingleton<IApplicationManager, AvaloniaAppManager>();
         Splatr.RegisterLazySingleton<IUiContext, AvaloniaUiContext>();
+        container.RegisterLazySingleton(() => (IDialogService)new DialogService(
+            new DialogManager(
+                viewLocator: new ViewLocator(),
+                dialogFactory: new DialogFactory().AddFluent(FluentMessageBoxType.ContentDialog)),
+            viewModelFactory: x => Locator.Current.GetService(x)));
 
         Splatr.RegisterLazySingleton<AppSessionManager>();
 
