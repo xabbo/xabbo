@@ -16,16 +16,22 @@ public class GameStateService
     public RoomManager Room { get; }
     public TradeManager Trade { get; }
 
-    public GameStateService(IExtension ext, IGameDataManager gameData)
+    public GameStateService(IExtension ext,
+        IGameDataManager gameData,
+        ProfileManager profileManager,
+        FriendManager friendManager,
+        InventoryManager inventoryManager,
+        RoomManager roomManager,
+        TradeManager tradeManager)
     {
         _ext = ext;
         GameData = gameData;
 
-        Profile = new ProfileManager(ext);
-        Friends = new FriendManager(ext);
-        Inventory = new InventoryManager(ext);
-        Room = new RoomManager(ext);
-        Trade = new TradeManager(ext, Profile, Room);
+        Profile = profileManager;
+        Friends = friendManager;
+        Inventory = inventoryManager;
+        Room = roomManager;
+        Trade = tradeManager;
 
         ext.Connected += OnConnected;
     }

@@ -1,12 +1,14 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using Splat;
 
+using Xabbo.Interceptor;
 using Xabbo.Extension;
 using Xabbo.GEarth;
+using Xabbo.Core.Game;
 using Xabbo.Core.GameData;
 
 using Xabbo.Ext.Avalonia.Services;
@@ -58,30 +60,24 @@ public static class ViewModelLocator
         Splatr.RegisterLazySingleton<FurniDataViewModel>();
 
         // Logic
-        var ext = new GEarthExtension(
-            GEarthOptions.Default.WithAssemblyVersion() with
-            {
-                Name = "xabbo",
-                Description = "enhanced habbo",
-                Author = "b7"
-            }
-        );
-        Splatr.RegisterConstant(ext);
-        Splatr.RegisterConstant<IExtension>(ext);
+        Splatr.RegisterConstant(GEarthOptions.Default.WithAssemblyVersion() with
+        {
+            Name = "xabbo",
+            Description = "enhanced habbo",
+            Author = "b7"
+        });
+        Splatr.RegisterLazySingleton<GEarthExtension>();
+        container.Register<IExtension>(() => Locator.Current.GetService<GEarthExtension>());
+        container.Register<IInterceptor>(() => Locator.Current.GetService<GEarthExtension>());
         Splatr.RegisterLazySingleton<GEarthExtensionLifetime>();
-
-        // Configuration
-        container.RegisterLazySingleton(() => Options.Create(new GameOptions()));
-
-        container.RegisterConstant<ILoggerFactory>(new LoggerFactory());
 
         // Xabbo core components
         Splatr.RegisterLazySingleton<GameStateService>();
-        container.Register(() => Locator.Current.GetService<GameStateService>()!.Profile);
-        container.Register(() => Locator.Current.GetService<GameStateService>()!.Trade);
-        container.Register(() => Locator.Current.GetService<GameStateService>()!.Friends);
-        container.Register(() => Locator.Current.GetService<GameStateService>()!.Inventory);
-        container.Register(() => Locator.Current.GetService<GameStateService>()!.Room);
+        Splatr.RegisterLazySingleton<ProfileManager>();
+        Splatr.RegisterLazySingleton<InventoryManager>();
+        Splatr.RegisterLazySingleton<RoomManager>();
+        Splatr.RegisterLazySingleton<TradeManager>();
+        Splatr.RegisterLazySingleton<FriendManager>();
 
         container.RegisterLazySingleton<IGameDataManager>(() => new GameDataManager());
 
