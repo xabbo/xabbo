@@ -22,6 +22,9 @@
       <DataTemplate DataType="{x:Type vm:ChatPageViewModel}">
         <v:ChatPage />
       </DataTemplate>
+      <DataTemplate DataType="{x:Type vm:FriendsPageViewModel}">
+        <v:FriendsPage />
+      </DataTemplate>
       <DataTemplate DataType="{x:Type vm:RoomPageViewModel}">
         <v:RoomPage />
       </DataTemplate>
