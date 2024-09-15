@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -93,7 +93,7 @@ public static class ViewModelLocator
         Splatr.RegisterLazySingleton<TradeManager>();
         Splatr.RegisterLazySingleton<FriendManager>();
 
-        container.RegisterLazySingleton<IGameDataManager>(() => new GameDataManager());
+        Splatr.RegisterLazySingleton<IGameDataManager, GameDataManager>();
 
         // Xabbo components
         Splatr.RegisterLazySingleton<XabbotComponent>();
