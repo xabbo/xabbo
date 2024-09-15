@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <AssemblyName>xabbo</AssemblyName>
     <OutputType>WinExe</OutputType>
@@ -37,6 +37,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Splat.Microsoft.Extensions.Logging" Version="15.1.1" />
     <PackageReference Include="Splat.Microsoft.Extensions.DependencyInjection" Version="15.1.1" />
   </ItemGroup>
 

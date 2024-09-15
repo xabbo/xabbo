@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using Splat;
+using Splat.Microsoft.Extensions.Logging;
 
 using Xabbo.Interceptor;
 using Xabbo.Extension;
@@ -20,7 +21,6 @@ using Xabbo.Ext.Services;
 using Xabbo.Ext.Core.Services;
 
 using Splatr = Splat.SplatRegistrations;
-using Xabbo.Core.Game;
 
 namespace Xabbo.Ext.Avalonia;
 
@@ -32,6 +32,20 @@ public static class ViewModelLocator
 
         var configRoot = new ConfigurationBuilder().Build();
         Splatr.RegisterConstant<IConfiguration>(configRoot);
+
+        // Configuration
+        container.RegisterLazySingleton(() => Options.Create(new GameOptions()));
+
+        ILoggerFactory loggerFactory = LoggerFactory.Create(builder => {
+            builder.AddSimpleConsole(config =>
+            {
+                config.SingleLine = true;
+                config.IncludeScopes = true;
+            });
+            builder.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
+        });
+        container.RegisterConstant(loggerFactory);
+        container.UseMicrosoftExtensionsLoggingWithWrappingFullLogger(loggerFactory);
 
         // Services
         Splatr.RegisterLazySingleton<IApplicationManager, AvaloniaAppManager>();
