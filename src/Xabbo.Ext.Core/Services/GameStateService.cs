@@ -1,15 +1,25 @@
 ﻿using Xabbo.Extension;
 using Xabbo.Core.Game;
 using Xabbo.Core.GameData;
+using Xabbo.Ext.Core.Services;
+
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Xabbo.Ext.Services;
 
-public class GameStateService
+public class GameStateService : IGameStateService
 {
+    private readonly ILogger Log;
     private readonly IExtension _ext;
 
+    public event Action<GameConnectedArgs>? Connected;
+    public event Action? Disconnected;
+
+    public Session Session { get; private set; } = Session.None;
+
     public IGameDataManager GameData { get; }
-    public FurniData? Furni => GameData.Furni;
+
     public ProfileManager Profile { get; }
     public FriendManager Friends { get; }
     public InventoryManager Inventory { get; }
@@ -22,8 +32,11 @@ public class GameStateService
         FriendManager friendManager,
         InventoryManager inventoryManager,
         RoomManager roomManager,
-        TradeManager tradeManager)
+        TradeManager tradeManager,
+        ILoggerFactory? loggerFactory = null)
     {
+        Log = (ILogger?)loggerFactory?.CreateLogger<GameStateService>() ?? NullLogger.Instance;
+
         _ext = ext;
         GameData = gameData;
 
@@ -34,15 +47,28 @@ public class GameStateService
         Trade = tradeManager;
 
         ext.Connected += OnConnected;
+        ext.Disconnected += OnDisconnected;
     }
 
     private async void OnConnected(GameConnectedArgs e)
     {
+        Session = e.Session;
+        Connected?.Invoke(e);
+
         try
         {
             var hotel = Hotel.FromGameHost(e.Host);
             await GameData.LoadAsync(hotel);
         }
-        catch { }
+        catch (Exception ex)
+        {
+            Log.LogError(ex, "Failed to load game data: {Error}.", ex.Message);
+        }
+    }
+
+    private void OnDisconnected()
+    {
+        Session = Session.None;
+        Disconnected?.Invoke();
     }
 }

@@ -27,6 +27,7 @@ using Xabbo.Core.Game;
 using Xabbo.Core.Events;
 using Xabbo.Core.Messages.Outgoing;
 using Xabbo.Ext.Services;
+using Xabbo.Ext.Core.Services;
 
 using Symbol = FluentIcons.Common.Symbol;
 using SymbolIconSource = FluentIcons.Avalonia.Fluent.SymbolIconSource;
@@ -41,6 +42,7 @@ public sealed class FriendsPageViewModel : PageViewModel
     private readonly IUiContext _uiContext;
     private readonly IDialogService _dialogService;
     private readonly IInterceptor _interceptor;
+    private readonly IFigureConverterService _figureConverter;
     private readonly FriendManager _friendManager;
     private readonly SourceCache<FriendViewModel, Id> _cache = new(key => key.Id);
 
@@ -53,17 +55,20 @@ public sealed class FriendsPageViewModel : PageViewModel
     public ReactiveCommand<FriendViewModel, Unit> FollowFriendCmd { get; }
     public ReactiveCommand<Unit, Unit> RemoveFriendsCmd { get; }
 
-    public SelectionModel<FriendViewModel> Selection { get; }
-        = new SelectionModel<FriendViewModel>() { SingleSelect = false };
+    public SelectionModel<FriendViewModel> Selection { get; } = new() { SingleSelect = false };
 
     public FriendsPageViewModel(
         IUiContext uiContext, IDialogService dialogService,
-        IInterceptor interceptor, FriendManager friendManager)
+        IInterceptor interceptor, IFigureConverterService figureConverter,
+        FriendManager friendManager)
     {
         _uiContext = uiContext;
         _dialogService = dialogService;
         _interceptor = interceptor;
+        _figureConverter = figureConverter;
         _friendManager = friendManager;
+
+        _figureConverter.Available += OnFigureConverterAvailable;
 
         _cache
             .Connect()
@@ -91,17 +96,45 @@ public sealed class FriendsPageViewModel : PageViewModel
         _friendManager.FriendRemoved += OnFriendRemoved;
     }
 
-    private void AddFriend(IFriend friend)
+    private void OnFigureConverterAvailable()
     {
-        _cache.AddOrUpdate(new FriendViewModel
+        foreach (var (_, vm) in _cache.KeyValues)
+            UpdateOriginsFigure(vm);
+    }
+
+    private void UpdateOriginsFigure(FriendViewModel vm)
+    {
+        if (!vm.IsModernFigure &&
+            _figureConverter.TryConvertToModern(vm.Figure, out Figure? figure))
         {
-            Hotel = _interceptor.Session.Hotel,
+            using (vm.DelayChangeNotifications())
+            {
+                vm.Figure = figure.ToString();
+                vm.IsModernFigure = true;
+            }
+        }
+    }
+
+    private FriendViewModel CreateViewModel(IFriend friend)
+    {
+        FriendViewModel vm = new()
+        {
             Id = friend.Id,
             IsOnline = friend.IsOnline,
             Name = friend.Name,
             Motto = friend.Motto,
             Figure = friend.Figure,
-        });
+            IsModernFigure = !_interceptor.Session.Hotel.IsOrigins
+        };
+
+        UpdateOriginsFigure(vm);
+
+        return vm;
+    }
+
+    private void AddFriend(IFriend friend)
+    {
+        _cache.AddOrUpdate(CreateViewModel(friend));
         this.RaisePropertyChanged(nameof(Header));
     }
 
@@ -112,7 +145,15 @@ public sealed class FriendsPageViewModel : PageViewModel
             {
                 vm.IsOnline = friend.IsOnline;
                 vm.Motto = friend.Motto;
-                vm.Figure = friend.Figure;
+                if (vm.Figure != friend.Figure)
+                {
+                    using (vm.DelayChangeNotifications())
+                    {
+                        vm.IsModernFigure = !_interceptor.Session.Hotel.IsOrigins;
+                        vm.Figure = friend.Figure;
+                        UpdateOriginsFigure(vm);
+                    }
+                }
             }
         });
     }

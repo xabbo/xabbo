@@ -13,7 +13,7 @@ using Live.Avalonia;
 using Xabbo.Ext.Avalonia.Services;
 using Xabbo.Ext.Avalonia.Views;
 using Xabbo.Ext.Commands;
-using Xabbo.Ext.Services;
+using Xabbo.Ext.Core.Services;
 
 namespace Xabbo.Ext.Avalonia;
 
@@ -37,9 +37,10 @@ public partial class App : Application, ILiveView
 
         var mainViewModel = ViewModelLocator.Main;
 
-        // Initialize managers
+        // Initialize persistent services
         Locator.Current.GetService<AppSessionManager>();
-        Locator.Current.GetService<GameStateService>();
+        Locator.Current.GetService<IGameStateService>();
+        Locator.Current.GetService<IFigureConverterService>();
         Locator.Current.GetService<CommandManager>();
 
         // Initialize and run G-Earth extension lifetime

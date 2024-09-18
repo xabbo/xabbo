@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -50,7 +50,7 @@ public static class ViewModelLocator
         container.RegisterConstant(loggerFactory);
         container.UseMicrosoftExtensionsLoggingWithWrappingFullLogger(loggerFactory);
 
-        // Services
+        // Application services
         Splatr.RegisterLazySingleton<IApplicationManager, AvaloniaAppManager>();
         Splatr.RegisterLazySingleton<IUiContext, AvaloniaUiContext>();
         container.RegisterLazySingleton(() => (IDialogService)new DialogService(
@@ -93,8 +93,11 @@ public static class ViewModelLocator
         container.Register<IInterceptor>(() => Locator.Current.GetService<GEarthExtension>());
         Splatr.RegisterLazySingleton<GEarthExtensionLifetime>();
 
+        // Xabbo services
+        Splatr.RegisterLazySingleton<IGameStateService, GameStateService>();
+        Splatr.RegisterLazySingleton<IFigureConverterService, FigureConverterService>();
+
         // Xabbo core components
-        Splatr.RegisterLazySingleton<GameStateService>();
         Splatr.RegisterLazySingleton<ProfileManager>();
         Splatr.RegisterLazySingleton<InventoryManager>();
         Splatr.RegisterLazySingleton<RoomManager>();

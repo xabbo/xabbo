@@ -14,13 +14,12 @@ namespace Xabbo.Ext.Avalonia.ViewModels;
 
 public sealed partial class FriendViewModel : ViewModelBase
 {
-    [Reactive] public Hotel Hotel { get; set; } = Hotel.None;
-
     public Id Id { get; set; }
     [Reactive] public bool IsOnline { get; set; }
     [Reactive] public string Name { get; set; } = "";
     [Reactive] public string Motto { get; set; } = "";
     [Reactive] public string Figure { get; set; } = "";
+    [Reactive] public bool IsModernFigure { get; set; }
     [Reactive] public string? AvatarImageUrl { get; set; }
     [Reactive] public Task<Bitmap?>? AvatarImage { get; private set; }
 
@@ -28,13 +27,13 @@ public sealed partial class FriendViewModel : ViewModelBase
     {
         this
             .WhenAnyValue(
-                x => x.Hotel,
                 x => x.Name,
-                x => x.Figure
+                x => x.Figure,
+                x => x.IsModernFigure
             )
             .Subscribe(values => {
-                var (hotel, name, figure) = values;
-                AvatarImageUrl = CreateAvatarImageUrl(hotel, name, figure);
+                var (name, figure, isModern) = values;
+                AvatarImageUrl = isModern ? CreateAvatarImageUrl(name, figure) : null;
             });
 
         this
@@ -43,15 +42,14 @@ public sealed partial class FriendViewModel : ViewModelBase
                 if (string.IsNullOrWhiteSpace(url))
                     AvatarImage = null;
                 else
+                {
                     AvatarImage = ImageHelper.LoadFromWeb(new Uri(url));
+                }
             });
     }
 
-    private static string? CreateAvatarImageUrl(Hotel hotel, string name, string figure)
+    private static string? CreateAvatarImageUrl(string name, string figure)
     {
-        if (hotel == Hotel.None)
-            return null;
-
         var query = HttpUtility.ParseQueryString("");
         query.Add("headonly", "1");
         query.Add("direction", "2");
@@ -60,6 +58,6 @@ public sealed partial class FriendViewModel : ViewModelBase
         else
             query.Add("figure", figure);
 
-        return $"https://{hotel.WebHost}/habbo-imaging/avatarimage?{query}";
+        return $"https://habbo.com/habbo-imaging/avatarimage?{query}";
     }
 }
