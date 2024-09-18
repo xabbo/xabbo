@@ -61,9 +61,14 @@
           </StackPanel>
           <Expander
             Margin="0,5"
-            Header="Movement"
             IsExpanded="{Binding IsMovementExpanded}"
           >
+            <Expander.Header>
+              <StackPanel Orientation="Horizontal" Spacing="5">
+                <ic:SymbolIcon Symbol="Accessibility" />
+                <TextBlock Text="Movement" />
+              </StackPanel>
+            </Expander.Header>
             <StackPanel>
               <StackPanel Orientation="Horizontal">
                 <CheckBox
@@ -100,10 +105,12 @@
             IsExpanded="{Binding IsClickToExpanded}"
           >
             <Expander.Header>
-              <CheckBox
-                Content="Click to"
-                IsChecked="{Binding ClickTo.IsActive}"
-              />
+              <CheckBox IsChecked="{Binding ClickTo.IsActive}">
+                <StackPanel Orientation="Horizontal" Spacing="5">
+                  <ic:SymbolIcon Symbol="CursorClick" />
+                  <TextBlock Text="Click to" />
+                </StackPanel>
+              </CheckBox>
             </Expander.Header>
             <StackPanel>
               <StackPanel Orientation="Horizontal" IsVisible="{DynamicResource IsModern}">
@@ -185,9 +192,14 @@
           </Expander>
           <Expander
             Margin="0,5"
-            Header="Entry"
             IsExpanded="{Binding IsEntryExpanded}"
           >
+            <Expander.Header>
+              <StackPanel Orientation="Horizontal" Spacing="5">
+                <ic:SymbolIcon Symbol="DoorArrowLeft" />
+                <TextBlock Text="Entry" />
+              </StackPanel>
+            </Expander.Header>
             <StackPanel>
               <CheckBox
                 Content="Remember room passwords"
@@ -229,9 +241,14 @@
           />
           <Expander
             Margin="0,5,0,5"
-            Header="Mute"
             IsExpanded="{Binding IsMuteExpanded}"
           >
+            <Expander.Header>
+              <StackPanel Orientation="Horizontal" Spacing="5">
+                <ic:SymbolIcon Symbol="ChatOff" />
+                <TextBlock Text="Mute" />
+              </StackPanel>
+            </Expander.Header>
             <WrapPanel>
               <CheckBox Content="Bots" IsChecked="{Binding Chat.MuteBots}" />
               <CheckBox Content="Pets" IsChecked="{Binding Chat.MutePets}" />
