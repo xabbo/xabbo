@@ -23,7 +23,7 @@
       CanUserResizeColumns="True"
     >
       <DataGrid.Columns>
-        <DataGridTextColumn Header="id" Binding="{Binding Id}" Classes="modern" />
+        <DataGridTextColumn Header="id" Binding="{Binding Id}" IsVisible="{DynamicResource IsModern}" />
         <DataGridTextColumn Header="name" Binding="{Binding Name}" />
         <DataGridTextColumn Header="last entered" Binding="{Binding Entered}" />
         <DataGridTextColumn Header="left" Binding="{Binding Left}" />
