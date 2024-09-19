@@ -41,7 +41,7 @@ public class OperationManager : IOperationManager
         }
     }
 
-    public async Task RunAsync(Func<CancellationToken, Task> task)
+    public async Task RunAsync(Func<CancellationToken, Task> task, bool command = false)
     {
         lock (_sync)
         {
@@ -59,7 +59,7 @@ public class OperationManager : IOperationManager
         }
         catch (OperationCanceledException)
         {
-            if (!_lifetime.ApplicationStopping.IsCancellationRequested)
+            if (command && !_lifetime.ApplicationStopping.IsCancellationRequested)
             {
                 _xabbotComponent.ShowMessage("Operation canceled.");
             }

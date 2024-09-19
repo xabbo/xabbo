@@ -8,6 +8,6 @@ public interface IOperationManager
 {
     bool IsRunning { get; }
     bool IsCancelling { get; }
-    Task RunAsync(Func<CancellationToken, Task> task);
+    Task RunAsync(Func<CancellationToken, Task> task, bool command = false);
     bool Cancel();
 }
