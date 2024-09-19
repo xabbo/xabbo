@@ -1,0 +1,87 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32014.148
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "vs", "vs", "{2A1782FE-86A9-4A41-8CE2-27A9187B0DAC}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xabbo.Avalonia", "src\Xabbo.Avalonia\Xabbo.Avalonia.csproj", "{215A276F-73CB-4695-982A-BAF567DD70E4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "lib", "lib", "{9F431937-CF1D-4798-B4C5-DC9F6C621E64}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xabbo.Common", "lib\common\src\Xabbo.Common\Xabbo.Common.csproj", "{E5A6FEE4-C128-440A-892D-9D58F42F0072}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xabbo.Core", "lib\core\src\Xabbo.Core\Xabbo.Core.csproj", "{17A799EC-CBDB-478C-9640-4CD32104106F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xabbo.GEarth", "lib\gearth\src\Xabbo.GEarth\Xabbo.GEarth.csproj", "{06E636F3-5DB8-4083-A2CD-62085CE50E86}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xabbo", "src\Xabbo\Xabbo.csproj", "{81FC3DDC-AB21-4951-B6B1-F5A199054A9D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "messages", "messages", "{27D34F9C-DFAF-4CB3-9A0B-EB6B6FB858F8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{775A4D5E-50EE-42C9-A667-39FA3CE51485}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xabbo.Messages", "lib\messages\src\Xabbo.Messages\Xabbo.Messages.csproj", "{626A70F7-2BE8-49A5-8CCA-D2E04B7A6FE7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{EC35F8AC-B42D-4866-9BE0-80D409019CCA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{DA4317F3-837F-4104-9C1C-07D486F85259}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xabbo.Common.Generator", "lib\common\src\Xabbo.Common.Generator\Xabbo.Common.Generator.csproj", "{C21936B3-D6BC-40A4-8714-1B42D1C513D7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{215A276F-73CB-4695-982A-BAF567DD70E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{215A276F-73CB-4695-982A-BAF567DD70E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{215A276F-73CB-4695-982A-BAF567DD70E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{215A276F-73CB-4695-982A-BAF567DD70E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E5A6FEE4-C128-440A-892D-9D58F42F0072}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E5A6FEE4-C128-440A-892D-9D58F42F0072}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E5A6FEE4-C128-440A-892D-9D58F42F0072}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E5A6FEE4-C128-440A-892D-9D58F42F0072}.Release|Any CPU.Build.0 = Release|Any CPU
+		{17A799EC-CBDB-478C-9640-4CD32104106F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17A799EC-CBDB-478C-9640-4CD32104106F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17A799EC-CBDB-478C-9640-4CD32104106F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17A799EC-CBDB-478C-9640-4CD32104106F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{06E636F3-5DB8-4083-A2CD-62085CE50E86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06E636F3-5DB8-4083-A2CD-62085CE50E86}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06E636F3-5DB8-4083-A2CD-62085CE50E86}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06E636F3-5DB8-4083-A2CD-62085CE50E86}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81FC3DDC-AB21-4951-B6B1-F5A199054A9D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81FC3DDC-AB21-4951-B6B1-F5A199054A9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81FC3DDC-AB21-4951-B6B1-F5A199054A9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81FC3DDC-AB21-4951-B6B1-F5A199054A9D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{626A70F7-2BE8-49A5-8CCA-D2E04B7A6FE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{626A70F7-2BE8-49A5-8CCA-D2E04B7A6FE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{626A70F7-2BE8-49A5-8CCA-D2E04B7A6FE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{626A70F7-2BE8-49A5-8CCA-D2E04B7A6FE7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C21936B3-D6BC-40A4-8714-1B42D1C513D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C21936B3-D6BC-40A4-8714-1B42D1C513D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C21936B3-D6BC-40A4-8714-1B42D1C513D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C21936B3-D6BC-40A4-8714-1B42D1C513D7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{E5A6FEE4-C128-440A-892D-9D58F42F0072} = {9F431937-CF1D-4798-B4C5-DC9F6C621E64}
+		{17A799EC-CBDB-478C-9640-4CD32104106F} = {9F431937-CF1D-4798-B4C5-DC9F6C621E64}
+		{06E636F3-5DB8-4083-A2CD-62085CE50E86} = {9F431937-CF1D-4798-B4C5-DC9F6C621E64}
+		{27D34F9C-DFAF-4CB3-9A0B-EB6B6FB858F8} = {9F431937-CF1D-4798-B4C5-DC9F6C621E64}
+		{775A4D5E-50EE-42C9-A667-39FA3CE51485} = {27D34F9C-DFAF-4CB3-9A0B-EB6B6FB858F8}
+		{626A70F7-2BE8-49A5-8CCA-D2E04B7A6FE7} = {775A4D5E-50EE-42C9-A667-39FA3CE51485}
+		{EC35F8AC-B42D-4866-9BE0-80D409019CCA} = {9F431937-CF1D-4798-B4C5-DC9F6C621E64}
+		{DA4317F3-837F-4104-9C1C-07D486F85259} = {EC35F8AC-B42D-4866-9BE0-80D409019CCA}
+		{C21936B3-D6BC-40A4-8714-1B42D1C513D7} = {DA4317F3-837F-4104-9C1C-07D486F85259}
+	EndGlobalSection
+	GlobalSection(nsibilityGlobals) = postSolution
+		SolutionGuid = {75AC1C17-09AE-4B3C-B1B2-45DA0AA72A2C}
+	EndGlobalSection
+EndGlobal

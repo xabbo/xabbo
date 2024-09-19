@@ -1,0 +1,68 @@
+<UserControl
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:ui="using:FluentAvalonia.UI.Controls"
+  xmlns:v="using:Xabbo.Views"
+  xmlns:vm="using:Xabbo.ViewModels"
+  mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+  x:Class="Xabbo.Views.MainView"
+  x:DataType="vm:MainViewModel"
+>
+  <ui:NavigationView
+    Grid.Row="1"
+    Name="NavView"
+    PaneDisplayMode="Left"
+    IsPaneOpen="False"
+    IsSettingsVisible="False"
+    MenuItemsSource="{Binding Pages}"
+    FooterMenuItemsSource="{Binding FooterPages}"
+    SelectedItem="{Binding SelectedPage}"
+    Content="{Binding SelectedPage, Mode=OneWay}"
+  >
+    <ui:NavigationView.DataTemplates>
+      <DataTemplate DataType="{x:Type vm:GeneralPageViewModel}">
+        <v:GeneralPage />
+      </DataTemplate>
+      <DataTemplate DataType="{x:Type vm:FriendsPageViewModel}">
+        <v:FriendsPage />
+      </DataTemplate>
+      <DataTemplate DataType="{x:Type vm:WardrobePageViewModel}">
+        <v:WardrobePageView />
+      </DataTemplate>
+      <DataTemplate DataType="{x:Type vm:ChatPageViewModel}">
+        <v:ChatPage />
+      </DataTemplate>
+      <DataTemplate DataType="{x:Type vm:RoomPageViewModel}">
+        <v:RoomPage />
+      </DataTemplate>
+      <DataTemplate DataType="{x:Type vm:GameDataPageViewModel}">
+        <v:GameDataPage />
+      </DataTemplate>
+      <DataTemplate DataType="{x:Type vm:SettingsPageViewModel}">
+        <v:SettingsPageView />
+      </DataTemplate>
+    </ui:NavigationView.DataTemplates>
+    <ui:NavigationView.MenuItemTemplate>
+      <DataTemplate DataType="{x:Type vm:PageViewModel}">
+        <ui:NavigationViewItem
+          IconSource="{Binding Icon}"
+          Content="{Binding Header}"
+        />
+      </DataTemplate>
+    </ui:NavigationView.MenuItemTemplate>
+    <ui:NavigationView.ContentTemplate>
+      <DataTemplate DataType="{x:Type vm:PageViewModel}">
+        <Grid RowDefinitions="Auto,*">
+          <TextBlock
+            Grid.Row="0" Margin="15,10,0,0"
+            FontSize="16" FontWeight="Bold"
+            Text="{Binding Header}"
+          />
+          <ContentControl Grid.Row="1" Content="{Binding}" />
+        </Grid>
+      </DataTemplate>
+    </ui:NavigationView.ContentTemplate>
+  </ui:NavigationView>
+</UserControl>
