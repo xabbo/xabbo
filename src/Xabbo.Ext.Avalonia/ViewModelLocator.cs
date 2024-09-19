@@ -1,3 +1,5 @@
+﻿using System;
+
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
@@ -5,6 +7,8 @@ using Microsoft.Extensions.DependencyInjection;
 
 using Splat;
 using Splat.Microsoft.Extensions.Logging;
+
+using Avalonia.Controls.ApplicationLifetimes;
 
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
@@ -25,6 +29,8 @@ using Xabbo.Ext.Core.Services;
 
 using Splatr = Splat.SplatRegistrations;
 
+using IHostApplicationLifetime = Microsoft.Extensions.Hosting.IHostApplicationLifetime;
+
 namespace Xabbo.Ext.Avalonia;
 
 public static class ViewModelLocator
@@ -42,7 +48,6 @@ public static class ViewModelLocator
         ILoggerFactory loggerFactory = LoggerFactory.Create(builder => {
             builder.AddSimpleConsole(config =>
             {
-                config.SingleLine = true;
                 config.IncludeScopes = true;
             });
             builder.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Debug);
@@ -51,6 +56,19 @@ public static class ViewModelLocator
         container.UseMicrosoftExtensionsLoggingWithWrappingFullLogger(loggerFactory);
 
         // Application services
+        {
+            Lazy<IHostApplicationLifetime> lazy = new Lazy<IHostApplicationLifetime>(
+                () => new AvaloniaHostApplicationLifetime(
+                    Locator.Current.GetService<ILoggerFactory>()!,
+                    Locator.Current.GetService<IApplicationLifetime>()!
+                )
+            );
+            container.Register<Lazy<IHostApplicationLifetime>>(() => lazy);
+            container.Register<IHostApplicationLifetime>(() => {
+                return lazy.Value;
+            });
+        }
+
         Splatr.RegisterLazySingleton<IApplicationManager, AvaloniaAppManager>();
         Splatr.RegisterLazySingleton<IUiContext, AvaloniaUiContext>();
         container.RegisterLazySingleton(() => (IDialogService)new DialogService(
@@ -60,6 +78,7 @@ public static class ViewModelLocator
             viewModelFactory: x => Locator.Current.GetService(x)));
 
         Splatr.RegisterLazySingleton<AppSessionManager>();
+        Splatr.RegisterLazySingleton<GlobalExceptionHandler>();
 
         // ViewModels
         Splatr.RegisterLazySingleton<MainViewModel>();

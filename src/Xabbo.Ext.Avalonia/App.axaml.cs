@@ -1,23 +1,21 @@
-﻿using System;
-using System.Threading.Tasks;
-
-using Splat;
-
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 
-using Live.Avalonia;
+using ReactiveUI;
+
+using Splat;
 
 using Xabbo.Ext.Avalonia.Services;
-using Xabbo.Ext.Avalonia.Views;
 using Xabbo.Ext.Commands;
 using Xabbo.Ext.Core.Services;
 
+using IHostApplicationLifetime = Microsoft.Extensions.Hosting.IHostApplicationLifetime;
+
 namespace Xabbo.Ext.Avalonia;
 
-public partial class App : Application, ILiveView
+public partial class App : Application
 {
     public override void Initialize() => AvaloniaXamlLoader.Load(this);
 
@@ -35,31 +33,23 @@ public partial class App : Application, ILiveView
         container.RegisterConstant<Application>(this);
         container.RegisterConstant(ApplicationLifetime);
 
-        var mainViewModel = ViewModelLocator.Main;
+        DataContext = ViewModelLocator.Main;
 
         // Initialize persistent services
-        Locator.Current.GetService<AppSessionManager>();
-        Locator.Current.GetService<IGameStateService>();
-        Locator.Current.GetService<IFigureConverterService>();
-        Locator.Current.GetService<CommandManager>();
-
-        // Initialize and run G-Earth extension lifetime
-        if (Locator.Current.GetService<GEarthExtensionLifetime>() is not { } lifetime)
-            throw new Exception($"Failed to obtain {nameof(GEarthExtensionLifetime)}.");
-        Task.Run(lifetime.RunAsync);
+        Locator.Current.GetRequiredService<IHostApplicationLifetime>();
+        Locator.Current.GetRequiredService<AppSessionManager>();
+        Locator.Current.GetRequiredService<GEarthExtensionLifetime>();
+        Locator.Current.GetRequiredService<IGameStateService>();
+        Locator.Current.GetRequiredService<IFigureConverterService>();
+        Locator.Current.GetRequiredService<CommandManager>();
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.MainWindow = new MainWindow { DataContext = mainViewModel };
-
-            desktop.ShutdownRequested += (s, e) =>
-            {
-                desktop.MainWindow?.Close();
-            };
+            desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
         }
+
+        RxApp.DefaultExceptionHandler = Locator.Current.GetRequiredService<GlobalExceptionHandler>();
 
         base.OnFrameworkInitializationCompleted();
     }
-
-    public object CreateView(Window window) { throw new NotImplementedException(); }
 }

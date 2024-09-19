@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-using Avalonia.Controls.ApplicationLifetimes;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 using Xabbo.GEarth;
 using Xabbo.Ext.Core.Services;
@@ -10,25 +11,33 @@ namespace Xabbo.Ext.Avalonia.Services;
 
 public class GEarthExtensionLifetime
 {
-    private readonly IApplicationLifetime _lifetime;
+    private readonly ILogger Log;
+    private readonly IHostApplicationLifetime _lifetime;
     private readonly IApplicationManager _app;
     private readonly GEarthExtension _ext;
 
     public GEarthExtensionLifetime(
-        IApplicationLifetime appLifetime,
+        ILoggerFactory loggerFactory,
+        IHostApplicationLifetime hostLifetime,
         IApplicationManager appManager,
         GEarthExtension extension)
     {
-        ArgumentNullException.ThrowIfNull(appLifetime);
+        ArgumentNullException.ThrowIfNull(loggerFactory);
+        ArgumentNullException.ThrowIfNull(hostLifetime);
         ArgumentNullException.ThrowIfNull(appManager);
         ArgumentNullException.ThrowIfNull(extension);
 
-        _lifetime = appLifetime;
+        Log = loggerFactory.CreateLogger<GEarthExtensionLifetime>();
+        _lifetime = hostLifetime;
         _app = appManager;
         _ext = extension;
 
+        _lifetime.ApplicationStarted.Register(OnApplicationStarted);
+
         _ext.Activated += OnActivated;
     }
+
+    private void OnApplicationStarted() => Task.Run(RunAsync);
 
     private void OnActivated() => _app.BringToFront();
 
@@ -36,17 +45,16 @@ public class GEarthExtensionLifetime
     {
         try
         {
+            Log.LogInformation("Running G-Earth extension.");
             await _ext.RunAsync();
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.Message);
-            Console.WriteLine(ex.StackTrace);
+            Log.LogError(ex, "Exception occurred in G-Earth extension handler.");
         }
         finally
         {
-            if (_lifetime is IControlledApplicationLifetime lifetime)
-                lifetime.Shutdown();
+            _lifetime.StopApplication();
         }
     }
 }
