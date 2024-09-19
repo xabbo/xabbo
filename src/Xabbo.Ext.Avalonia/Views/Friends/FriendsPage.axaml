@@ -54,7 +54,13 @@
               Grid.Column="1" VerticalAlignment="Center" Orientation="Vertical"
             >
               <TextBlock Text="{Binding Name}" FontWeight="Bold" />
-              <TextBlock Text="{Binding Motto}" />
+              <TextBlock
+                Text="{Binding Motto}"
+                IsVisible="{
+                  Binding Motto,
+                  Converter={x:Static StringConverters.IsNotNullOrEmpty}
+                }"
+              />
             </StackPanel>
             <Button
               Classes="follow"
