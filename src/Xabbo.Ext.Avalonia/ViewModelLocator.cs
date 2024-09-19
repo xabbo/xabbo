@@ -1,10 +1,13 @@
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using Splat;
 using Splat.Microsoft.Extensions.Logging;
+
+using HanumanInstitute.MvvmDialogs;
+using HanumanInstitute.MvvmDialogs.Avalonia;
 
 using Xabbo.Interceptor;
 using Xabbo.Extension;
@@ -21,9 +24,6 @@ using Xabbo.Ext.Services;
 using Xabbo.Ext.Core.Services;
 
 using Splatr = Splat.SplatRegistrations;
-
-using HanumanInstitute.MvvmDialogs;
-using HanumanInstitute.MvvmDialogs.Avalonia;
 
 namespace Xabbo.Ext.Avalonia;
 
@@ -68,6 +68,7 @@ public static class ViewModelLocator
         Splatr.RegisterLazySingleton<GeneralPageViewModel>();
         Splatr.RegisterLazySingleton<ChatPageViewModel>();
         Splatr.RegisterLazySingleton<ProfilePageViewModel>();
+        Splatr.RegisterLazySingleton<WardrobePageViewModel>();
         Splatr.RegisterLazySingleton<FriendsPageViewModel>();
         Splatr.RegisterLazySingleton<RoomPageViewModel>();
         Splatr.RegisterLazySingleton<NavigatorPageViewModel>();
@@ -96,6 +97,7 @@ public static class ViewModelLocator
         // Xabbo services
         Splatr.RegisterLazySingleton<IGameStateService, GameStateService>();
         Splatr.RegisterLazySingleton<IFigureConverterService, FigureConverterService>();
+        Splatr.RegisterLazySingleton<IWardrobeRepository, JsonWardrobeRepository>();
 
         // Xabbo core components
         Splatr.RegisterLazySingleton<ProfileManager>();

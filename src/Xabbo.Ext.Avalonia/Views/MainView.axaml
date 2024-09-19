@@ -19,11 +19,14 @@
       <DataTemplate DataType="{x:Type vm:GeneralPageViewModel}">
         <v:GeneralPage />
       </DataTemplate>
-      <DataTemplate DataType="{x:Type vm:ChatPageViewModel}">
-        <v:ChatPage />
-      </DataTemplate>
       <DataTemplate DataType="{x:Type vm:FriendsPageViewModel}">
         <v:FriendsPage />
+      </DataTemplate>
+      <DataTemplate DataType="{x:Type vm:WardrobePageViewModel}">
+        <v:WardrobePageView />
+      </DataTemplate>
+      <DataTemplate DataType="{x:Type vm:ChatPageViewModel}">
+        <v:ChatPage />
       </DataTemplate>
       <DataTemplate DataType="{x:Type vm:RoomPageViewModel}">
         <v:RoomPage />

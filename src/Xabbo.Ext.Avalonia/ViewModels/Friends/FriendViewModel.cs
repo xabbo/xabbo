@@ -1,7 +1,6 @@
 using System;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using System.Web;
 
 using Avalonia.Media.Imaging;
 
@@ -9,6 +8,7 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 using Xabbo.Ext.Avalonia.Helpers;
+using Xabbo.Ext.Avalonia.Util;
 
 namespace Xabbo.Ext.Avalonia.ViewModels;
 
@@ -33,7 +33,7 @@ public sealed partial class FriendViewModel : ViewModelBase
             )
             .Subscribe(values => {
                 var (name, figure, isModern) = values;
-                AvatarImageUrl = isModern ? CreateAvatarImageUrl(name, figure) : null;
+                AvatarImageUrl = isModern ? UrlHelper.AvatarImageUrl(name, figure, headOnly: true) : null;
             });
 
         this
@@ -46,18 +46,5 @@ public sealed partial class FriendViewModel : ViewModelBase
                     AvatarImage = ImageHelper.LoadFromWeb(new Uri(url));
                 }
             });
-    }
-
-    private static string? CreateAvatarImageUrl(string name, string figure)
-    {
-        var query = HttpUtility.ParseQueryString("");
-        query.Add("headonly", "1");
-        query.Add("direction", "2");
-        if (string.IsNullOrWhiteSpace(figure))
-            query.Add("user", name);
-        else
-            query.Add("figure", figure);
-
-        return $"https://habbo.com/habbo-imaging/avatarimage?{query}";
     }
 }

@@ -33,6 +33,7 @@ public class MainViewModel : ViewModelBase
     public MainViewModel(IControlledApplicationLifetime lt,
         GEarthExtension extension,
         GeneralPageViewModel general,
+        WardrobePageViewModel wardrobe,
         FriendsPageViewModel friends,
         ChatPageViewModel chat,
         RoomPageViewModel room,
@@ -41,7 +42,7 @@ public class MainViewModel : ViewModelBase
         _extension = extension;
         _extension.Connected += OnGameConnected;
 
-        Pages = [general, friends, chat, room, gameData];
+        Pages = [general, wardrobe, friends, chat, room, gameData];
         CurrentPage = general;
     }
 
