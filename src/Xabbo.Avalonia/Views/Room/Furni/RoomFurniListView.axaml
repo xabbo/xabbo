@@ -48,8 +48,8 @@
           </Grid>
         </DataTemplate>
       </DataGridTemplateColumn>
-      <DataGridTextColumn Width="100" Header="owner id" Binding="{Binding OwnerId}" IsVisible="{DynamicResource IsModern}" />
-      <DataGridTextColumn Width="150" Header="owner name" Binding="{Binding OwnerName}" IsVisible="{DynamicResource IsModern}" />
+      <DataGridTextColumn Classes="modern" Width="100" Header="owner id" Binding="{Binding OwnerId}" />
+      <DataGridTextColumn Classes="modern" Width="150" Header="owner name" Binding="{Binding OwnerName}" />
     </DataGrid.Columns>
   </DataGrid>
 </UserControl>

@@ -17,6 +17,10 @@
       <sty:FluentAvaloniaTheme  />
       <StyleInclude Source="avares://FluentAvalonia.ProgressRing/Styling/Controls/ProgressRing.axaml" />
 
+      <Style Selector=":is(Control).origins :is(Control).modern">
+        <Setter Property="IsVisible" Value="False" />
+      </Style>
+
       <Style Selector="SelectableTextBlock">
         <Setter Property="SelectionBrush" Value="Purple" />
       </Style>

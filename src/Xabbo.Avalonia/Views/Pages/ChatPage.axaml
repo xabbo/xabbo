@@ -31,8 +31,8 @@
         IsChecked="{Binding IncludeWhispers}"
         Content="Whispers" />
       <CheckBox
+        Classes="modern"
         IsChecked="{Binding IncludeWiredMessages}"
-        IsVisible="{DynamicResource IsModern}"
         Content="Wired" />
       <CheckBox
         IsChecked="{Binding IncludeBotMessages}"
