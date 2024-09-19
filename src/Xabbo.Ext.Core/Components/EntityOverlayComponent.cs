@@ -112,8 +112,8 @@ public class AvatarOverlayComponent : Component
 
         if (self.CurrentUpdate is not null)
         {
-            Ext.Send(new AvatarUpdatesMsg {
-                new AvatarStatusUpdate(self.CurrentUpdate)
+            Ext.Send(new AvatarStatusMsg {
+                new AvatarStatus(self.CurrentUpdate)
                 {
                     Index = ghostUser.Index,
                     Location = self.CurrentUpdate.Location + (64, 64, 64)
@@ -128,8 +128,8 @@ public class AvatarOverlayComponent : Component
     {
         if (!_isInjected) return;
 
-        Ext.Send(new AvatarUpdatesMsg {
-            new AvatarStatusUpdate
+        Ext.Send(new AvatarStatusMsg {
+            new AvatarStatus
             {
                 Index = GHOST_INDEX,
                 Location = (0, 0, -1000)
@@ -151,17 +151,17 @@ public class AvatarOverlayComponent : Component
     }
 
     [Intercept]
-    protected void HandleStatus(Intercept e, AvatarUpdatesMsg updates)
+    protected void HandleStatus(Intercept e, AvatarStatusMsg updates)
     {
         if (!IsActive || !_isInjected) return;
 
         if (!TryGetSelf(out IUser? self)) return;
 
-        AvatarStatusUpdate? selfUpdate = updates.FirstOrDefault(x => x.Index == self.Index);
+        AvatarStatus? selfUpdate = updates.FirstOrDefault(x => x.Index == self.Index);
 
         if (selfUpdate is null) return;
 
-        AvatarStatusUpdate overlayUpdate = new AvatarStatusUpdate(selfUpdate)
+        AvatarStatus overlayUpdate = new AvatarStatus(selfUpdate)
         {
             Index = GHOST_INDEX,
             Location = selfUpdate.Location + (32, 32, 32),

@@ -80,8 +80,8 @@ public partial class XabbotComponent : Component
     public void ShowMessage(string message, Point location)
     {
         _currentLocation = location;
-        Ext.Send(new AvatarUpdatesMsg {
-            new AvatarStatusUpdate {
+        Ext.Send(new AvatarStatusMsg {
+            new AvatarStatus {
                 Index = UserIndex,
                 Location = new Tile(location.X, location.Y, -100),
                 Direction = 4,

@@ -149,7 +149,7 @@ public partial class FlattenRoomComponent(IExtension extension, RoomManager room
     {
         if (!_isActivated) return;
 
-        var updates = e.Packet.Read<AvatarStatusUpdate[]>();
+        var updates = e.Packet.Read<AvatarStatus[]>();
         foreach (var update in updates)
         {
             update.Location = AdjustTile(update.Location);
