@@ -110,6 +110,8 @@ public static class ViewModelLocator
         Splatr.RegisterLazySingleton<IGameDataManager, GameDataManager>();
 
         // Xabbo components
+        Splatr.RegisterLazySingleton<IOperationManager, OperationManager>();
+
         Splatr.RegisterLazySingleton<XabbotComponent>();
         Splatr.RegisterLazySingleton<NotificationComponent>();
         Splatr.RegisterLazySingleton<AvatarOverlayComponent>();
@@ -137,6 +139,7 @@ public static class ViewModelLocator
 
         #pragma warning disable SPLATDI006
         Splatr.RegisterLazySingleton<CommandModule, AppCommands>();
+        Splatr.RegisterLazySingleton<CommandModule, OperationCommands>();
         Splatr.RegisterLazySingleton<CommandModule, EffectCommands>();
         Splatr.RegisterLazySingleton<CommandModule, FindFriendCommand>();
         Splatr.RegisterLazySingleton<CommandModule, FurniCommands>();

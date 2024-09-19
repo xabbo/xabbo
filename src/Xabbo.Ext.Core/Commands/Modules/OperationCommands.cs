@@ -1,6 +1,6 @@
 ﻿using Xabbo.Ext.Services;
 
-namespace Xabbo.Ext.Commands.Modules;
+namespace Xabbo.Ext.Commands;
 
 [CommandModule]
 public sealed class OperationCommands(IOperationManager operationManager) : CommandModule
@@ -10,7 +10,14 @@ public sealed class OperationCommands(IOperationManager operationManager) : Comm
     [Command("cancel", "c")]
     public Task CancelOperationAsync(CommandArgs args)
     {
-        _operationManager.Cancel();
+        if (_operationManager.TryCancelOperation(out string? operationName))
+        {
+            ShowMessage($"Operation canceled. ({operationName})");
+        }
+        else
+        {
+            ShowMessage("There is no operation to cancel.");
+        }
 
         return Task.CompletedTask;
     }

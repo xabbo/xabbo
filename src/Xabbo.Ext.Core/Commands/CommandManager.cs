@@ -1,14 +1,16 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
 
+using Microsoft.Extensions.Logging;
+
 using Xabbo.Messages;
-using Xabbo.Interceptor;
 using Xabbo.Extension;
 using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.Messages.Outgoing;
 
 using Xabbo.Ext.Components;
+using Xabbo.Ext.Core.Exceptions;
 
 namespace Xabbo.Ext.Commands;
 
@@ -17,6 +19,7 @@ public partial class CommandManager
 {
     public const string CommandPrefix = "/";
 
+    private readonly ILogger Log;
     private bool _isInitialized = false;
 
     private readonly Dictionary<string, CommandBinding> _bindings;
@@ -33,12 +36,16 @@ public partial class CommandManager
     private IMessageDispatcher Dispatcher => Extension.Dispatcher;
     private IMessageManager Messages => Extension.Messages;
 
-    public CommandManager(IExtension extension,
+    public CommandManager(
+        ILoggerFactory loggerFactory,
+        IExtension extension,
         IEnumerable<CommandModule> modules,
         ProfileManager profileManager,
         RoomManager roomManager,
         XabbotComponent xabbot)
     {
+        Log = loggerFactory.CreateLogger<CommandManager>();
+
         _bindings = new Dictionary<string, CommandBinding>(StringComparer.OrdinalIgnoreCase);
 
         Extension = extension;
@@ -207,14 +214,14 @@ public partial class CommandManager
         {
             await binding.Handler.Invoke(new CommandArgs(command, args, chatType, bubbleStyle, whisperTarget));
         }
+        catch (OperationInProgressException ex)
+        {
+            ShowMessage($"Operation '{ex.OperationName}' is already in progress.");
+        }
         catch (Exception? ex)
         {
-            bool unexpected = false;
             if (ex is TargetInvocationException t)
-            {
                 ex = t.InnerException;
-                unexpected = true;
-            }
 
             if (ex is InvalidArgsException && !string.IsNullOrWhiteSpace(binding.Usage))
             {
@@ -225,9 +232,13 @@ public partial class CommandManager
             ShowMessage("An error occurred while executing that command");
 
             if (ex is null) return;
-            Debug.WriteLine($"[CommandManager] An {(unexpected ? "unexpected " : "")}error occurred while executing command handler! " +
-                $"({binding.Handler.Target?.GetType().FullName ?? "?"}.{binding.Handler.Method.Name})\r\n" +
-                $"{ex.Message}\r\n{ex.StackTrace}");
+
+            Log.LogError(ex,
+                "An error occurred while executing a command handler ({Handler}:{Method}). {Message}",
+                binding.Handler.Target?.GetType().FullName ?? "?",
+                binding.Handler.Method.Name,
+                ex.Message
+            );
         }
 
     }

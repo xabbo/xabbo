@@ -16,6 +16,7 @@ public abstract class CommandModule
 
     public CancellationToken DisconnectToken => Ext.DisconnectToken;
     public ClientType Client => Ext.Session.Client.Type;
+    public Session Session => Ext.Session;
     public Hotel Hotel => Ext.Session.Hotel;
     public bool IsConnected => Ext.IsConnected;
 

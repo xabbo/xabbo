@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Diagnostics.CodeAnalysis;
 
 namespace Xabbo.Ext.Services;
 
@@ -8,6 +6,6 @@ public interface IOperationManager
 {
     bool IsRunning { get; }
     bool IsCancelling { get; }
-    Task RunAsync(Func<CancellationToken, Task> task, bool command = false);
-    bool Cancel();
+    Task RunAsync(string operationName, Func<CancellationToken, Task> task);
+    bool TryCancelOperation([NotNullWhen(true)] out string? operationName);
 }

@@ -1,69 +1,57 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Diagnostics.CodeAnalysis;
 
 using Microsoft.Extensions.Hosting;
 
 using Xabbo.Ext.Components;
+using Xabbo.Ext.Core.Exceptions;
 
 namespace Xabbo.Ext.Services;
 
-public class OperationManager : IOperationManager
+public class OperationManager(IHostApplicationLifetime lifetime, XabbotComponent xabbotComponent)
+    : IOperationManager
 {
-    private readonly IHostApplicationLifetime _lifetime;
-    private readonly XabbotComponent _xabbotComponent;
+    private readonly IHostApplicationLifetime _lifetime = lifetime;
+    private readonly XabbotComponent _xabbotComponent = xabbotComponent;
 
     private readonly object _sync = new();
     private CancellationTokenSource? _cts;
+    private string _currentOperationName = "";
 
     public bool IsRunning => _cts is not null;
     public bool IsCancelling { get; private set; }
 
-    public OperationManager(
-        IHostApplicationLifetime lifetime,
-        XabbotComponent xabbotComponent)
-    {
-        _lifetime = lifetime;
-        _xabbotComponent = xabbotComponent;
-    }
-
-    public bool Cancel()
+    public bool TryCancelOperation([NotNullWhen(true)] out string? operationName)
     {
         lock (_sync)
         {
             if (!IsCancelling && _cts is not null)
             {
                 _cts.Cancel();
+                operationName = _currentOperationName;
                 return true;
             }
 
+            operationName = null;
             return false;
         }
     }
 
-    public async Task RunAsync(Func<CancellationToken, Task> task, bool command = false)
+    public async Task RunAsync(string operationName, Func<CancellationToken, Task> task)
     {
         lock (_sync)
         {
             if (_cts is not null)
-            {
-                throw new InvalidOperationException("A task is already running.");
-            }
+                throw new OperationInProgressException(_currentOperationName);
 
             _cts = CancellationTokenSource.CreateLinkedTokenSource(_lifetime.ApplicationStopping);
+            _currentOperationName = operationName;
         }
 
         try
         {
             await task(_cts.Token);
         }
-        catch (OperationCanceledException)
-        {
-            if (command && !_lifetime.ApplicationStopping.IsCancellationRequested)
-            {
-                _xabbotComponent.ShowMessage("Operation canceled.");
-            }
-        }
+        catch (OperationCanceledException) { }
         finally
         {
             lock (_sync)
