@@ -19,7 +19,8 @@ public class MainViewModel : ViewModelBase
     private readonly GEarthExtension _extension;
 
     public List<PageViewModel> Pages { get; set; }
-    [Reactive] public PageViewModel? CurrentPage { get; set; }
+    public List<PageViewModel> FooterPages { get; set; }
+    [Reactive] public PageViewModel? SelectedPage { get; set; }
 
     [Reactive] public bool IsConnected { get; set; }
 
@@ -27,6 +28,7 @@ public class MainViewModel : ViewModelBase
     {
         _extension = null!;
         Pages = [];
+        FooterPages = [];
     }
 
     [DependencyInjectionConstructor]
@@ -37,13 +39,15 @@ public class MainViewModel : ViewModelBase
         FriendsPageViewModel friends,
         ChatPageViewModel chat,
         RoomPageViewModel room,
+        SettingsPageViewModel settings,
         GameDataPageViewModel gameData)
     {
         _extension = extension;
         _extension.Connected += OnGameConnected;
 
         Pages = [general, wardrobe, friends, chat, room, gameData];
-        CurrentPage = general;
+        FooterPages = [settings];
+        SelectedPage = general;
     }
 
     private void OnGameConnected(GameConnectedArgs args)

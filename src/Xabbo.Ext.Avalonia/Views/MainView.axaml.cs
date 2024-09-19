@@ -1,4 +1,5 @@
-﻿using Avalonia.Controls;
+﻿using System;
+using Avalonia.Controls;
 using Avalonia.Interactivity;
 
 using Xabbo.Ext.Avalonia.ViewModels;
@@ -23,12 +24,9 @@ public partial class MainView : UserControl
 
     private void NavView_ItemInvoked(object? sender, FluentAvalonia.UI.Controls.NavigationViewItemInvokedEventArgs e)
     {
+        if (ViewModel is null) return;
+
         if (e.InvokedItemContainer.DataContext is PageViewModel pageVm)
-        {
-            if (ViewModel is not null)
-            {
-                ViewModel.CurrentPage = pageVm;
-            }
-        }
+            ViewModel.SelectedPage = pageVm;
     }
 }
