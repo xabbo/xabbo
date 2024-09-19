@@ -66,7 +66,8 @@ public sealed class RoomCommands(RoomManager roomManager) : CommandModule
     //[RequiredOut(nameof(Out.FlatOpc))]
     public Task ExitCommandHandler(CommandArgs args)
     {
-        Ext.Send(Out.OpenFlatConnection, (Id)0, "", (Id)(-1));
+        Ext.Send(Out.Quit);
+        // Ext.Send(Out.OpenFlatConnection, (Id)0, "", (Id)(-1));
         return Task.CompletedTask;
     }
 
