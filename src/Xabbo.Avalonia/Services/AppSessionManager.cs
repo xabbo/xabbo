@@ -3,7 +3,7 @@ using Avalonia;
 using Xabbo.Extension;
 using Xabbo.Services.Abstractions;
 
-namespace Xabbo.Services;
+namespace Xabbo.Avalonia.Services;
 
 public class AppSessionManager
 {

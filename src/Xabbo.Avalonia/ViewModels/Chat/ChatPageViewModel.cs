@@ -10,6 +10,8 @@ using FluentIcons.Avalonia.Fluent;
 using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.Events;
+using Xabbo.Configuration;
+using Xabbo.Services.Abstractions;
 
 using IconSource = FluentAvalonia.UI.Controls.IconSource;
 
@@ -19,6 +21,9 @@ public class ChatPageViewModel : PageViewModel
 {
     public override string Header => "Chat";
     public override IconSource? Icon { get; } = new SymbolIconSource { Symbol = Symbol.Chat };
+
+    private readonly IConfigProvider<AppConfig> _settingsProvider;
+    private AppConfig Settings => _settingsProvider.Value;
 
     const string LogDirectory = "logs/chat";
     private string? _currentFilePath;
@@ -41,58 +46,20 @@ public class ChatPageViewModel : PageViewModel
         }
     }
 
-    private bool _includeNormalChat;
-    public bool IncludeNormalChat
-    {
-        get => _includeNormalChat;
-        set => this.RaiseAndSetIfChanged(ref _includeNormalChat, value);
-    }
-
-    private bool _includeWhispers;
-    public bool IncludeWhispers
-    {
-        get => _includeWhispers;
-        set => this.RaiseAndSetIfChanged(ref _includeWhispers, value);
-    }
-
-    private bool _includeWiredMessages;
-    public bool IncludeWiredMessages
-    {
-        get => _includeWiredMessages;
-        set => this.RaiseAndSetIfChanged(ref _includeWiredMessages, value);
-    }
-
-    private bool _includeBotMessages;
-    public bool IncludeBotMessages
-    {
-        get => _includeBotMessages;
-        set => this.RaiseAndSetIfChanged(ref _includeBotMessages, value);
-    }
-
-    private bool _logToFile;
-    public bool LogToFile
-    {
-        get => _logToFile;
-        set => this.RaiseAndSetIfChanged(ref _logToFile, value);
-    }
+    public Configuration.ChatLogSettings Config => Settings.Chat.Log;
 
     [DependencyInjectionConstructor]
     public ChatPageViewModel(
-        IConfiguration config,
+        IConfigProvider<AppConfig> settingsProvider,
         RoomManager roomManager)
     {
-        Directory.CreateDirectory(LogDirectory);
-
+        _settingsProvider = settingsProvider;
         _roomManager = roomManager;
         _roomManager.AvatarChat += RoomManager_AvatarChat;
 
         _stringBuffer = new StringBuilder();
 
-        _includeNormalChat = config.GetValue("ChatLog:Normal", true);
-        _includeWhispers = config.GetValue("ChatLog:Whispers", true);
-        _includeWiredMessages = config.GetValue("ChatLog:Wired", false);
-        _includeBotMessages = config.GetValue("ChatLog:Bots", false);
-        _logToFile = config.GetValue("ChatLog:LogToFile", false);
+        Directory.CreateDirectory(LogDirectory);
     }
 
     private void Log(string text)
@@ -103,11 +70,11 @@ public class ChatPageViewModel : PageViewModel
 
     private void RoomManager_AvatarChat(AvatarChatEventArgs e)
     {
-        if (!IncludeNormalChat && e.Avatar.Type == AvatarType.User && e.ChatType != ChatType.Whisper) return;
-        if (!IncludeWhispers && e.ChatType == ChatType.Whisper && e.BubbleStyle != 34) return;
-        if (!IncludeBotMessages && (e.Avatar.Type == AvatarType.PublicBot || e.Avatar.Type == AvatarType.PrivateBot)) return;
-        if (!IncludeWiredMessages && e.ChatType == ChatType.Whisper && e.BubbleStyle == 34) return;
-        if (e.Avatar.Type == AvatarType.Pet) return;
+        if (!Settings.Chat.Log.Normal && e.Avatar.Type == AvatarType.User && e.ChatType != ChatType.Whisper) return;
+        if (!Settings.Chat.Log.Whispers && e.ChatType == ChatType.Whisper && e.BubbleStyle != 34) return;
+        if (!Settings.Chat.Log.Bots && (e.Avatar.Type == AvatarType.PublicBot || e.Avatar.Type == AvatarType.PrivateBot)) return;
+        if (!Settings.Chat.Log.Pets && (e.Avatar.Type == AvatarType.Pet)) return;
+        if (!Settings.Chat.Log.Wired && e.ChatType == ChatType.Whisper && e.BubbleStyle == 34) return;
 
         IRoom? room = _roomManager.Room;
         if (room is null) return;
@@ -149,12 +116,12 @@ public class ChatPageViewModel : PageViewModel
 
         Log(text);
 
-        if (LogToFile && !string.IsNullOrWhiteSpace(_currentFilePath))
+        if (Settings.Chat.Log.LogToFile && !string.IsNullOrWhiteSpace(_currentFilePath))
         {
             try { File.AppendAllText(_currentFilePath, text); }
             catch (Exception ex)
             {
-                LogToFile = false;
+                Settings.Chat.Log.LogToFile = false;
                 Log($"[ERROR] Failed to log to file! {ex}");
             }
         }

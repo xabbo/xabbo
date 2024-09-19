@@ -1,5 +1,4 @@
 ﻿using System;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,8 +14,9 @@ using Xabbo.GEarth;
 using Xabbo.Core.Game;
 using Xabbo.Core.GameData;
 using Xabbo.Configuration;
-using Xabbo.Services;
 using Xabbo.Services.Abstractions;
+using Xabbo.Services;
+using Xabbo.Avalonia.Services;
 using Xabbo.Components;
 using Xabbo.Command;
 using Xabbo.Command.Modules;
@@ -33,18 +33,24 @@ public static class ViewModelLocator
     {
         var container = Locator.CurrentMutable;
 
-        var configRoot = new ConfigurationBuilder().Build();
+        // Settings
+        Splatr.RegisterLazySingleton<IAppPathProvider, AppPathService>();
+        Splatr.RegisterLazySingleton<IConfigProvider<AppConfig>, AppConfigProvider>();
+
+        // Static configuration
+        var configRoot = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json")
+            .Build();
         Splatr.RegisterConstant<IConfiguration>(configRoot);
 
-        // Configuration
-        container.RegisterLazySingleton(() => Options.Create(new GameOptions()));
-
+        // Logging
         ILoggerFactory loggerFactory = LoggerFactory.Create(builder => {
-            builder.AddSimpleConsole(config =>
-            {
-                config.IncludeScopes = true;
-            });
-            builder.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Debug);
+            builder
+                .AddConfiguration(configRoot.GetSection("Logging"))
+                .AddSimpleConsole(console =>
+                {
+                    console.IncludeScopes = true;
+                });
         });
         container.RegisterConstant(loggerFactory);
         container.UseMicrosoftExtensionsLoggingWithWrappingFullLogger(loggerFactory);

@@ -18,6 +18,8 @@ using Xabbo.Extension;
 using Xabbo.Messages.Flash;
 
 using Xabbo.Components;
+using Xabbo.Services.Abstractions;
+using Xabbo.Configuration;
 
 namespace Xabbo.ViewModels;
 
@@ -26,11 +28,19 @@ public class GeneralPageViewModel : PageViewModel
     public override string Header => "General";
     public override IconSource? Icon { get; } = new SymbolIconSource { Symbol = Symbol.AppGeneric };
 
+    private readonly IConfigProvider<AppConfig> _settingsProvider;
     private readonly IExtension _ext;
 
-    public GeneralPageViewModel(IExtension ext)
+    public AppConfig Config => _settingsProvider.Value;
+
+    public GeneralPageViewModel(IConfigProvider<AppConfig> settingsProvider, IExtension ext)
     {
+        _settingsProvider = settingsProvider;
         _ext = ext;
+
+        _settingsProvider
+            .WhenAnyValue(x => x.Value)
+            .Subscribe(_ => this.RaisePropertyChanged(nameof(AppConfig)));
 
         this.ObservableForProperty(x => x.TonerColor)
             .Sample(TimeSpan.FromMilliseconds(300))
@@ -57,7 +67,7 @@ public class GeneralPageViewModel : PageViewModel
     [Reactive] public bool IsFlashWindowExpanded { get; set; } = true;
     [Reactive] public bool IsMiscExpanded { get; set; } = true;
 
-    [DependencyInjectionProperty] public ChatComponent? Chat { get; internal set; }
+    [DependencyInjectionProperty] public ChatComponent? ChatComponent { get; internal set; }
     [DependencyInjectionProperty] public FurniActionsComponent? Furni { get; internal set; }
     [DependencyInjectionProperty] public AntiHandItemComponent? HandItem { get; internal set; }
     [DependencyInjectionProperty] public AntiIdleComponent? AntiIdle { get; internal set; }

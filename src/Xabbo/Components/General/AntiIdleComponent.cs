@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using ReactiveUI;
+﻿using ReactiveUI;
 
 using Xabbo.Messages;
 using Xabbo.Messages.Flash;
@@ -7,41 +6,35 @@ using Xabbo.Extension;
 using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.Messages.Outgoing;
+using Xabbo.Services.Abstractions;
+using Xabbo.Configuration;
 
 namespace Xabbo.Components;
 
 [Intercept]
 public partial class AntiIdleComponent : Component
 {
-    private readonly IConfiguration _config;
+    private readonly IConfigProvider<AppConfig> _settingsProvider;
+    private AppConfig Settings => _settingsProvider.Value;
 
     private readonly ProfileManager _profileManager;
     private readonly RoomManager _roomManager;
 
     private int _pingCount = -1;
 
-    private bool _isAntiIdleOutActive;
-    public bool IsAntiIdleOutActive
-    {
-        get => _isAntiIdleOutActive;
-        set => Set(ref _isAntiIdleOutActive, value);
-    }
-
     public AntiIdleComponent(IExtension extension,
-        IConfiguration config,
+        IConfigProvider<AppConfig> settingsProvider,
         ProfileManager profileManager,
         RoomManager roomManager)
         : base(extension)
     {
-        _config = config;
-
         _profileManager = profileManager;
         _roomManager = roomManager;
 
-        IsActive = config.GetValue("AntiIdle:Active", true);
-        IsAntiIdleOutActive = config.GetValue("AntiIdle:AntiIdleOut", true);
-
-        this.WhenAnyValue(x => x.IsActive, x => x.IsAntiIdleOutActive)
+        _settingsProvider = settingsProvider;
+        _settingsProvider.WhenAnyValue(
+            x => x.Value.General.AntiIdle,
+            x => x.Value.General.AntiIdleOut)
             .Subscribe(_ => OnActiveChanged());
     }
 
@@ -59,14 +52,6 @@ public partial class AntiIdleComponent : Component
 
     protected void OnActiveChanged() => SendAntiIdlePacket();
 
-    protected override void OnInitialized(InitializedArgs e)
-    {
-        base.OnInitialized(e);
-
-        IsActive = _config.GetValue("AntiIdle:Active", true);
-        IsAntiIdleOutActive = _config.GetValue("AntiIdle:IdleOutActive", true);
-    }
-
     [InterceptIn(nameof(In.Ping))]
     protected void HandlePing(Intercept e)
     {
@@ -82,7 +67,7 @@ public partial class AntiIdleComponent : Component
 
         if (Ext.Session.Client.Type is ClientType.Shockwave)
         {
-            if (IsActive)
+            if (Settings.General.AntiIdle)
                 antiIdleMsg = new WalkMsg(0, 0);
         }
         else
@@ -91,11 +76,11 @@ public partial class AntiIdleComponent : Component
                 _roomManager.Room is not null &&
                 _roomManager.Room.TryGetUserById(_profileManager.UserData.Id, out IUser? self))
             {
-                if (self.IsIdle && IsAntiIdleOutActive)
+                if (self.IsIdle && Settings.General.AntiIdleOut)
                     antiIdleMsg = new ActionMsg(Actions.Idle);
-                else if (self.Dance != 0 && IsActive)
+                else if (self.Dance != 0 && Settings.General.AntiIdle)
                     antiIdleMsg = new WalkMsg(0, 0);
-                else if (IsActive)
+                else if (Settings.General.AntiIdle)
                     antiIdleMsg = new ActionMsg(Actions.None);
             }
             else

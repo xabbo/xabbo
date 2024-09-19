@@ -5,8 +5,9 @@ using Microsoft.Extensions.Logging;
 
 using Xabbo.GEarth;
 using Xabbo.Services.Abstractions;
+using Xabbo.Configuration;
 
-namespace Xabbo.Services;
+namespace Xabbo.Avalonia.Services;
 
 public class GEarthExtensionLifetime
 {

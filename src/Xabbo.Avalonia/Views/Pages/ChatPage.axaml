@@ -25,20 +25,20 @@
       HorizontalAlignment="Right"
     >
       <CheckBox
-        IsChecked="{Binding IncludeNormalChat}"
+        IsChecked="{Binding Config.Normal}"
         Content="Normal" />
       <CheckBox
-        IsChecked="{Binding IncludeWhispers}"
+        IsChecked="{Binding Config.Whispers}"
         Content="Whispers" />
       <CheckBox
         Classes="modern"
-        IsChecked="{Binding IncludeWiredMessages}"
+        IsChecked="{Binding Config.Wired}"
         Content="Wired" />
       <CheckBox
-        IsChecked="{Binding IncludeBotMessages}"
+        IsChecked="{Binding Config.Bots}"
         Content="Bots" />
       <CheckBox
-        IsChecked="{Binding LogToFile}"
+        IsChecked="{Binding Config.LogToFile}"
         Content="Log to file" />
       <CheckBox
         IsEnabled="False"

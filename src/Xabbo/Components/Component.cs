@@ -27,8 +27,6 @@ public abstract class Component : ReactiveObject
     /// </summary>
     public Identifiers UnresolvedIdentifiers { get; set; } = [];
 
-    [Reactive] public bool IsActive { get; set; }
-
     public Component(IExtension ext)
     {
         Ext = ext;

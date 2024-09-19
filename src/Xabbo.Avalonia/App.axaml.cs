@@ -1,14 +1,12 @@
-﻿using Avalonia;
+﻿using ReactiveUI;
+using Splat;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 
-using ReactiveUI;
-
-using Splat;
-
+using Xabbo.Avalonia.Services;
 using Xabbo.Command;
-using Xabbo.Services;
 using Xabbo.Services.Abstractions;
 
 using IHostApplicationLifetime = Microsoft.Extensions.Hosting.IHostApplicationLifetime;

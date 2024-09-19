@@ -1,28 +1,26 @@
 ﻿using System.Text.Json;
-using Microsoft.Extensions.Configuration;
 
 using Xabbo.Messages.Flash;
 using Xabbo.Extension;
 using Xabbo.Core;
+using Xabbo.Serialization;
+using Xabbo.Services.Abstractions;
+using Xabbo.Configuration;
+using Xabbo.Models.Enums;
 
 namespace Xabbo.Components;
 
 [Intercept]
 public partial class RoomEntryComponent : Component
 {
-    private Dictionary<long, string> _passwords = new();
-
-    private const string FILE_PATH = @"passwords.json";
     private const int ERROR_INVALID_PW = -100002;
 
-    private int _lastRequestedRoom = -1;
+    private readonly IConfigProvider<AppConfig> _settings;
+    private AppConfig Settings => _settings.Value;
+    private readonly IAppPathProvider _appPathProvider;
 
-    private bool _rememberPasswords;
-    public bool RememberPasswords
-    {
-        get => _rememberPasswords;
-        set => Set(ref _rememberPasswords, value);
-    }
+    private readonly Dictionary<long, string> _passwords = [];
+    private int _lastRequestedRoom = -1;
 
     private bool _dontAskToRingDoorbell;
     public bool DontAskToRingDoorbell
@@ -31,19 +29,24 @@ public partial class RoomEntryComponent : Component
         set => Set(ref _dontAskToRingDoorbell, value);
     }
 
-    public RoomEntryComponent(IExtension extension,
-        IConfiguration config)
+    public RoomEntryComponent(
+        IExtension extension,
+        IConfigProvider<AppConfig> settings,
+        IAppPathProvider appPathProvider)
         : base(extension)
     {
-        RememberPasswords = config.GetValue("RoomEntry:RememberPasswords", true);
+        _settings = settings;
+        _appPathProvider = appPathProvider;
 
-        if (File.Exists(FILE_PATH))
+        string passwordsFilePath = _appPathProvider.GetPath(AppPathKind.RoomPasswords);
+        if (File.Exists(passwordsFilePath))
         {
             try
             {
-                _passwords = JsonSerializer.Deserialize<Dictionary<long, string>>(
-                    File.ReadAllText(FILE_PATH)
-                ) ?? new();
+                _passwords = JsonSerializer.Deserialize(
+                    File.ReadAllText(passwordsFilePath),
+                    JsonSourceGenerationContext.Default.DictionaryInt64String
+                ) ?? [];
             }
             catch { }
         }
@@ -53,7 +56,10 @@ public partial class RoomEntryComponent : Component
     {
         try
         {
-            File.WriteAllText(FILE_PATH, JsonSerializer.Serialize(_passwords));
+            File.WriteAllText(
+                _appPathProvider.GetPath(AppPathKind.RoomPasswords),
+                JsonSerializer.Serialize(_passwords, JsonSourceGenerationContext.Default.DictionaryInt64String)
+            );
         }
         catch { }
     }
@@ -63,7 +69,7 @@ public partial class RoomEntryComponent : Component
     {
         var roomData = e.Packet.Read<RoomData>();
 
-        if ((RememberPasswords && roomData.Access == RoomAccess.Password && _passwords.ContainsKey(roomData.Id)) ||
+        if ((Settings.Room.RememberPasswords && roomData.Access == RoomAccess.Password && _passwords.ContainsKey(roomData.Id)) ||
             (DontAskToRingDoorbell && roomData.Access == RoomAccess.Doorbell))
         {
             roomData.IsGroupMember = true;
@@ -78,7 +84,7 @@ public partial class RoomEntryComponent : Component
         _lastRequestedRoom = e.Packet.Read<int>();
         string password = e.Packet.Read<string>();
 
-        if (!RememberPasswords) return;
+        if (!Settings.Room.RememberPasswords) return;
 
         if (!string.IsNullOrEmpty(password))
         {
@@ -98,7 +104,7 @@ public partial class RoomEntryComponent : Component
     [InterceptIn(nameof(In.ErrorReport))]
     private void HandleError(Intercept e)
     {
-        if (!RememberPasswords) return;
+        if (!Settings.Room.RememberPasswords) return;
 
         if (e.Packet.Read<int>() == ERROR_INVALID_PW &&
             _lastRequestedRoom != -1 &&

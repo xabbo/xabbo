@@ -1,13 +1,13 @@
-﻿using Microsoft.Extensions.Configuration;
-
-using Xabbo.Extension;
+﻿using Xabbo.Extension;
 using Xabbo.Core.Messages.Outgoing;
 
 namespace Xabbo.Components;
 
 [Intercept]
-public partial class AntiWalkComponent : Component
+public partial class AntiWalkComponent(IExtension extension) : Component(extension)
 {
+    [Reactive] bool Enabled { get; set; }
+
     private bool _faceDirection;
     public bool FaceDirection
     {
@@ -15,19 +15,10 @@ public partial class AntiWalkComponent : Component
         set => Set(ref _faceDirection, value);
     }
 
-    public AntiWalkComponent(IExtension extension,
-        IConfiguration config)
-        : base(extension)
-    {
-        IsActive = config.GetValue("AntiWalk:Active", false);
-        FaceDirection = config.GetValue("AntiWalk:FaceDirection", false);
-    }
-
     [Intercept]
-    // [RequiredOut(nameof(Out.LookTo))]
     private void OnMove(Intercept e, WalkMsg walk)
     {
-        if (IsActive) e.Block();
+        if (Enabled) e.Block();
 
         if (FaceDirection)
             Ext.Send(new LookToMsg(walk.Point));

@@ -15,6 +15,8 @@ public partial class FlattenRoomComponent(IExtension extension, RoomManager room
     private Heightmap? _heightmap;
     private FloorPlan? _originalFloorPlan;
 
+    [Reactive] public bool Enabled { get; set; }
+
     protected override void OnInitialized(InitializedArgs e)
     {
         _roomManager.Entering += RoomManager_Entering;
@@ -22,7 +24,7 @@ public partial class FlattenRoomComponent(IExtension extension, RoomManager room
 
     private void RoomManager_Entering()
     {
-        _isActivated = IsActive;
+        _isActivated = Enabled;
     }
 
     private float GetOffset(Point location)

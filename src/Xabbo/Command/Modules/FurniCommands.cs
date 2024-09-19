@@ -4,17 +4,20 @@ using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.GameData;
 using Xabbo.Services.Abstractions;
+using Xabbo.Configuration;
 using Xabbo.Utility;
 
 namespace Xabbo.Command.Modules;
 
 [CommandModule]
 public sealed class FurniCommands(
+    IConfigProvider<AppConfig> settingsProvider,
     IOperationManager operationManager,
     IGameDataManager gameData,
     ProfileManager profileManager,
     RoomManager roomManager) : CommandModule
 {
+    private readonly IConfigProvider<AppConfig> _settingsProvider = settingsProvider;
     private readonly IOperationManager _operationManager = operationManager;
     private readonly IGameDataManager _gameData = gameData;
     private readonly ProfileManager _profileManager = profileManager;
@@ -140,7 +143,10 @@ public sealed class FurniCommands(
                 return;
             }
 
-            int pickupInterval = Session.IsOrigins ? 750 : 100;
+            int pickupInterval = Session.IsOrigins
+                ? _settingsProvider.Value.Furni.PickupIntervalOrigins
+                : _settingsProvider.Value.Furni.PickupInterval;
+
             int totalDelay = pickupInterval * matched.Length;
             string message = $"Picking up {matched.Length} furni...";
             if (totalDelay >= 2500)

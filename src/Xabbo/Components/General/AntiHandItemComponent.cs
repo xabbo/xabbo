@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-
-using Xabbo.Messages.Flash;
+﻿using Xabbo.Messages.Flash;
 using Xabbo.Extension;
 using Xabbo.Core;
 using Xabbo.Core.Game;
@@ -10,7 +8,6 @@ namespace Xabbo.Components;
 [Intercept]
 public partial class AntiHandItemComponent(
     IExtension extension,
-    IConfiguration config,
     ProfileManager profileManager,
     RoomManager roomManager
 )
@@ -22,9 +19,9 @@ public partial class AntiHandItemComponent(
     private readonly SemaphoreSlim semaphore = new(1, 1);
     private DateTime lastUpdate = DateTime.MinValue;
 
-    [Reactive] public bool DropHandItem { get; set; } = config.GetValue("AntiHandItem:DropHandItem", false);
-    [Reactive] public bool ReturnHandItem { get; set; } = config.GetValue("AntiHandItem:ReturnHandItem", false);
-    [Reactive] public bool ShouldMaintainDirection { get; set; } = config.GetValue("AntiHandItem:MaintainDirection", false);
+    [Reactive] public bool DropHandItem { get; set; }
+    [Reactive] public bool ReturnHandItem { get; set; }
+    [Reactive] public bool ShouldMaintainDirection { get; set; }
 
     [InterceptIn(nameof(In.HandItemReceived))]
     private void HandleHandItemReceived(Intercept e)

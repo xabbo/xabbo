@@ -1,47 +1,38 @@
-﻿using Microsoft.Extensions.Configuration;
-
-using Xabbo.Messages.Flash;
+﻿using Xabbo.Messages.Flash;
 using Xabbo.Extension;
 using Xabbo.Core.Messages.Outgoing;
+using Xabbo.Services.Abstractions;
+using Xabbo.Configuration;
 
 namespace Xabbo.Components;
 
 [Intercept]
-public partial class AntiTurnComponent : Component
+public partial class AntiTurnComponent(
+    IExtension extension,
+    IConfigProvider<AppConfig> config
+    ) : Component(extension)
 {
-    private readonly double _reselectThreshold;
-
     private long _lastSelectedUser = -1;
     private int _lastLookAtX, _lastLookAtY;
     private DateTime _lastSelection = DateTime.MinValue;
 
-    private bool _turnOnReselect = true;
-    public bool TurnOnReselect
-    {
-        get => _turnOnReselect;
-        set => Set(ref _turnOnReselect, value);
-    }
+    private readonly IConfigProvider<AppConfig> _config = config;
+    private AppConfig Config => _config.Value;
 
-    public AntiTurnComponent(IExtension extension,
-        IConfiguration config)
-        : base(extension)
-    {
-        _reselectThreshold = config.GetValue("AntiTurn:ReselectThreshold", 1.0);
-
-        IsActive = config.GetValue("AntiTurn:Active", true);
-        TurnOnReselect = config.GetValue("AntiTurn:TurnOnReselect", true);
-    }
+    private bool Enabled => Config.Movement.NoTurn;
+    private bool TurnOnReselect => Config.Movement.TurnOnReselectUser;
+    private double ReselectThreshold => Config.Movement.ReselectThreshold;
 
     [Intercept]
     private void OnLookTo(Intercept e, LookToMsg look)
     {
-        if (!IsActive) return;
+        if (!Enabled) return;
 
         bool block = true;
 
         if (Client is ClientType.Shockwave)
         {
-            if (IsActive && TurnOnReselect && (DateTime.Now - _lastSelection).TotalSeconds < _reselectThreshold)
+            if (Enabled && TurnOnReselect && (DateTime.Now - _lastSelection).TotalSeconds < ReselectThreshold)
             {
                 if (_lastLookAtX == look.X && _lastLookAtY == look.Y)
                     block = false;
@@ -62,7 +53,7 @@ public partial class AntiTurnComponent : Component
     {
         Id userId = e.Packet.Read<Id>();
 
-        if (IsActive && TurnOnReselect && (DateTime.Now - _lastSelection).TotalSeconds < _reselectThreshold)
+        if (Enabled && TurnOnReselect && (DateTime.Now - _lastSelection).TotalSeconds < ReselectThreshold)
         {
             if (userId == _lastSelectedUser)
                 Ext.Send(new LookToMsg(_lastLookAtX, _lastLookAtY));

@@ -6,20 +6,29 @@ using Xabbo.Extension;
 using Xabbo.Core;
 using Xabbo.Core.Events;
 using Xabbo.Core.Game;
+using Xabbo.Services.Abstractions;
+using Xabbo.Configuration;
 
 namespace Xabbo.Components;
 
 [Intercept(~ClientType.Shockwave)]
 public partial class AntiTradeComponent : Component
 {
-    private readonly IConfiguration _config;
+    private readonly IConfigProvider<AppConfig> _config;
+    private AppConfig Config => _config.Value;
     private readonly RoomManager _roomManager;
     private readonly ProfileManager _profileManager;
     private readonly TradeManager _tradeManager;
 
+    private bool Enabled
+    {
+        get => Config.General.AntiTrade;
+        set => Config.General.AntiTrade = true;
+    }
+
     public AntiTradeComponent(
         IExtension extension,
-        IConfiguration config,
+        IConfigProvider<AppConfig> config,
         ProfileManager profileManager,
         RoomManager roomManager,
         TradeManager tradeManager)
@@ -33,10 +42,9 @@ public partial class AntiTradeComponent : Component
         _roomManager.Entered += OnRoomEntered;
         _roomManager.RoomDataUpdated += OnRoomDataUpdated;
 
-        IsActive = _config.GetValue("AntiTrade:Active", false);
-
-        this.ObservableForProperty(x => x.IsActive)
-            .Subscribe(x => OnIsActiveChanged(x.Value));
+        config
+            .ObservableForProperty(config => config.Value.General.AntiTrade)
+            .Subscribe(change => OnIsActiveChanged(change.Value));
 
         Task initialization = Task.Run(InitializeAsync);
     }
@@ -82,7 +90,7 @@ public partial class AntiTradeComponent : Component
         {
             if (_tradeManager.IsTrading)
             {
-                IsActive = false;
+                Enabled = false;
             }
             else
             {
@@ -102,14 +110,14 @@ public partial class AntiTradeComponent : Component
 
     private void OnRoomEntered(RoomEventArgs e)
     {
-        if (!IsActive) return;
+        if (!Enabled) return;
 
         TradeSelf(e.Room);
     }
 
     private void OnRoomDataUpdated(RoomDataEventArgs e)
     {
-        if (IsActive && !_tradeManager.IsTrading)
+        if (Enabled && !_tradeManager.IsTrading)
         {
             TradeSelf(_roomManager.Room);
         }
@@ -118,7 +126,7 @@ public partial class AntiTradeComponent : Component
     [InterceptIn(nameof(In.TradingOpen))]
     protected void HandleTradeOpen(Intercept e)
     {
-        if (IsActive)
+        if (Enabled)
         {
             e.Block();
         }
@@ -129,7 +137,7 @@ public partial class AntiTradeComponent : Component
     {
         if (e.Packet.Read<string>() == "trade.trading_perk")
         {
-            IsActive = false;
+            Enabled = false;
         }
     }
 }

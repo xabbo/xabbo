@@ -31,13 +31,9 @@ public partial class RespectedComponent : Component
     }
 
     public RespectedComponent(IExtension extension,
-        IConfiguration config,
         RoomManager roomManager)
         : base(extension)
     {
-        ShowWhoRespected = config.GetValue("Respect:ShowWhoRespected", true);
-        ShowTotalRespects = config.GetValue("Respect:ShowTotalRespects", true);
-
         _roomManager = roomManager;
         roomManager.Left += Room_Left;
     }

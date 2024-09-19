@@ -9,13 +9,12 @@ namespace Xabbo.Components;
 [Intercept(~ClientType.Shockwave)]
 public partial class ClickThroughComponent : Component
 {
-    public ClickThroughComponent(IExtension extension,
-        IConfiguration config)
+    [Reactive] public bool Enabled { get; set; }
+
+    public ClickThroughComponent(IExtension extension)
         : base(extension)
     {
-        IsActive = config.GetValue("ClickThrough:Active", false);
-
-        this.ObservableForProperty(x => x.IsActive)
+        this.ObservableForProperty(x => x.Enabled)
             .Subscribe(x => OnIsActiveChanged(x.Value));
     }
 
@@ -36,7 +35,7 @@ public partial class ClickThroughComponent : Component
     // [RequiredIn(nameof(In.GameYouArePlayer))]
     private void OnEnterRoom(Intercept e)
     {
-        if (IsActive)
+        if (Enabled)
             Ext.Send(In.YouArePlayingGame, true);
     }
 }

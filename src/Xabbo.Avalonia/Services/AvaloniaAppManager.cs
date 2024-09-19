@@ -6,7 +6,7 @@ using Xabbo.Views;
 using Xabbo.ViewModels;
 using Xabbo.Services.Abstractions;
 
-namespace Xabbo.Services;
+namespace Xabbo.Avalonia.Services;
 
 public sealed class AvaloniaAppManager(IApplicationLifetime lifetime, MainViewModel mainViewModel) : IApplicationManager
 {

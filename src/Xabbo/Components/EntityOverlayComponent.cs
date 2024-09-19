@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using Microsoft.Extensions.Configuration;
 using ReactiveUI;
 
 using Xabbo.Messages.Flash;
@@ -20,8 +19,9 @@ public class AvatarOverlayComponent : Component
 
     private bool _isInjected;
 
+    [Reactive] public bool Enabled { get; set; }
+
     public AvatarOverlayComponent(IExtension extension,
-        IConfiguration config,
         ProfileManager profileManager,
         RoomManager roomManager)
         : base(extension)
@@ -33,11 +33,9 @@ public class AvatarOverlayComponent : Component
         _roomManager.AvatarDataUpdated += OnAvatarDataUpdated;
         _roomManager.Left += OnLeftRoom;
 
-        IsActive = config.GetValue("AvatarOverlay:Active", false);
-
         Task initialization = Task.Run(InitializeAsync);
 
-        this.ObservableForProperty(x => x.IsActive)
+        this.ObservableForProperty(x => x.Enabled)
             .Subscribe(x => OnIsActiveChanged(x.Value));
     }
 
@@ -136,7 +134,7 @@ public class AvatarOverlayComponent : Component
 
     private void OnEnteredRoom(RoomEventArgs e)
     {
-        if (IsAvailable && IsActive)
+        if (IsAvailable && Enabled)
         {
             InjectGhostUser();
         }
@@ -150,7 +148,7 @@ public class AvatarOverlayComponent : Component
     [Intercept]
     protected void HandleStatus(Intercept e, AvatarStatusMsg updates)
     {
-        if (!IsActive || !_isInjected) return;
+        if (!Enabled || !_isInjected) return;
 
         if (!TryGetSelf(out IUser? self)) return;
 

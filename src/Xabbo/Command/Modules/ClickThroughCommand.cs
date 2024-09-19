@@ -10,8 +10,8 @@ public sealed class ClickThroughCommand(ClickThroughComponent clickThrough) : Co
     [Command("ct")]
     public Task OnToggleClickThrough(CommandArgs args)
     {
-        _clickThrough.IsActive = !_clickThrough.IsActive;
-        ShowMessage($"Click-through {(_clickThrough.IsActive ? "en" : "dis")}abled.");
+        _clickThrough.Enabled = !_clickThrough.Enabled;
+        ShowMessage($"Click-through {(_clickThrough.Enabled ? "en" : "dis")}abled.");
 
         return Task.CompletedTask;
     }

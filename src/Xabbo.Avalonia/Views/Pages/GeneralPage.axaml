@@ -44,19 +44,19 @@
             <CheckBox
               Content="Idle"
               ToolTip.Tip="Prevents you from idling"
-              IsChecked="{Binding AntiIdle.IsActive}"
+              IsChecked="{Binding Config.General.AntiIdle}"
             />
             <CheckBox
               Content="Idle-out"
               Classes="modern"
               ToolTip.Tip="Allows you to idle, but prevents you from leaving the room"
-              IsChecked="{Binding AntiIdle.IsAntiIdleOutActive}"
+              IsChecked="{Binding Config.General.AntiIdleOut}"
             />
             <CheckBox
               Content="Trade"
               ToolTip.Tip="Prevents others from trading you"
+              IsChecked="{Binding Config.General.AntiTrade}"
               IsEnabled="{Binding AntiTrade.IsAvailable}"
-              IsChecked="{Binding AntiTrade.IsActive}"
             />
           </StackPanel>
           <Expander
@@ -74,21 +74,21 @@
                 <CheckBox
                   Content="No turn"
                   ToolTip.Tip="Don't turn when clicking another user"
-                  IsChecked="{Binding AntiTurn.IsActive}"
+                  IsChecked="{Binding Config.Movement.NoTurn}"
                 />
                 <CheckBox
                   Content="except when re-selecting user"
-                  IsChecked="{Binding AntiTurn.TurnOnReselect}"
+                  IsChecked="{Binding Config.Movement.TurnOnReselectUser}"
                 />
               </StackPanel>
               <StackPanel Orientation="Horizontal">
                 <CheckBox
                   Content="No walk"
-                  IsChecked="{Binding AntiWalk.IsActive}"
+                  IsChecked="{Binding Config.Movement.NoWalk}"
                 />
                 <CheckBox
                   Content="turn towards tile clicked"
-                  IsChecked="{Binding AntiWalk.FaceDirection}"
+                  IsChecked="{Binding Config.Movement.TurnTowardsClickedTile}"
                 />
               </StackPanel>
               <CheckBox
@@ -96,7 +96,7 @@
                 Classes="modern"
                 ToolTip.ShowDelay="100"
                 ToolTip.Tip="Allows you to click on tiles behind users to walk"
-                IsChecked="{Binding ClickThrough.IsActive}"
+                IsChecked="{Binding ClickThrough.Enabled}"
               />
             </StackPanel>
           </Expander>
@@ -105,7 +105,7 @@
             IsExpanded="{Binding IsClickToExpanded}"
           >
             <Expander.Header>
-              <CheckBox IsChecked="{Binding ClickTo.IsActive}">
+              <CheckBox IsChecked="{Binding ClickTo.Enabled}">
                 <StackPanel Orientation="Horizontal" Spacing="5">
                   <ic:SymbolIcon Symbol="CursorClick" />
                   <TextBlock Text="Click to" />
@@ -203,23 +203,23 @@
             <StackPanel>
               <CheckBox
                 Content="Remember room passwords"
-                IsChecked="{Binding RoomEntry.RememberPasswords}"
+                IsChecked="{Binding Config.Room.RememberPasswords}"
               />
               <CheckBox
                 Content="Auto accept friends at door"
-                IsChecked="{Binding Doorbell.AcceptFriends}"
+                IsChecked="{Binding Config.Room.AcceptFriendsAtDoor}"
               />
             </StackPanel>
           </Expander>
           <CheckBox
             Content="Flatten floor plan"
             Classes="modern"
-            IsChecked="{Binding Flatten.IsActive}"
+            IsChecked="{Binding Flatten.Enabled}"
           />
           <CheckBox
             Content="Show self through furni"
             Classes="modern"
-            IsChecked="{Binding Overlay.IsActive}"
+            IsChecked="{Binding Overlay.Enabled}"
           />
         </StackPanel>
       </Expander>
@@ -237,7 +237,7 @@
           <CheckBox
             Content="No typing indicator"
             Classes="modern"
-            IsChecked="{Binding AntiTyping.IsActive}"
+            IsChecked="{Binding Config.General.AntiTyping}"
           />
           <Expander
             Margin="0,5,0,5"
@@ -250,12 +250,12 @@
               </StackPanel>
             </Expander.Header>
             <WrapPanel>
-              <CheckBox Content="Bots" IsChecked="{Binding Chat.MuteBots}" />
-              <CheckBox Content="Pets" IsChecked="{Binding Chat.MutePets}" />
-              <CheckBox Content="Pet commands" Classes="modern" IsChecked="{Binding Chat.MutePetCommands}" />
-              <CheckBox Content="Wired messages" Classes="modern" IsChecked="{Binding Chat.MuteWired}" />
-              <CheckBox Content="Respects" Classes="modern" IsChecked="{Binding Chat.MuteRespects}" />
-              <CheckBox Content="Scratches" Classes="modern" IsChecked="{Binding Chat.MuteScratches}" />
+              <CheckBox Content="Bots" IsChecked="{Binding Config.Chat.MuteBots}" />
+              <CheckBox Content="Pets" IsChecked="{Binding Config.Chat.MutePets}" />
+              <CheckBox Content="Pet commands" Classes="modern" IsChecked="{Binding Config.Chat.MutePetCommands}" />
+              <CheckBox Content="Wired messages" Classes="modern" IsChecked="{Binding Config.Chat.MuteWired}" />
+              <CheckBox Content="Respects" Classes="modern" IsChecked="{Binding Config.Chat.MuteRespects}" />
+              <CheckBox Content="Scratches" Classes="modern" IsChecked="{Binding Config.Chat.MuteScratches}" />
             </WrapPanel>
           </Expander>
           <CheckBox Content="Show who respected" Classes="modern" IsChecked="{Binding Respected.ShowWhoRespected}" />
@@ -330,7 +330,7 @@
         </Expander.Header>
         <!-- Content -->
         <StackPanel Spacing="10">
-          <CheckBox Content="Block HC gift notification" IsChecked="{Binding AntiHcNotification.IsActive}" />
+          <CheckBox Content="Block HC gift notification" IsChecked="{Binding AntiHcNotification.Enabled}" />
           <StackPanel Orientation="Horizontal" Spacing="10">
             <ColorPicker Color="{Binding TonerColor}" />
             <TextBlock VerticalAlignment="Center" Text="Background toner" />

@@ -3,7 +3,7 @@ using System.Threading;
 using Microsoft.Extensions.Logging;
 using Avalonia.Controls.ApplicationLifetimes;
 
-namespace Xabbo.Services;
+namespace Xabbo.Avalonia.Services;
 
 using IHostApplicationLifetime = Microsoft.Extensions.Hosting.IHostApplicationLifetime;
 

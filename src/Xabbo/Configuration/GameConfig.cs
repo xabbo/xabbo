@@ -1,9 +1,7 @@
 ﻿namespace Xabbo.Configuration;
 
-public class GameOptions
+public class GameConfig
 {
-    public const string Path = "Game";
-
     private HashSet<string> _staffList = new(StringComparer.OrdinalIgnoreCase);
     public HashSet<string> StaffList
     {

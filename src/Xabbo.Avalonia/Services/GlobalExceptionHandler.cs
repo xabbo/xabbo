@@ -1,7 +1,7 @@
 using System;
 using Microsoft.Extensions.Logging;
 
-namespace Xabbo.Services;
+namespace Xabbo.Avalonia.Services;
 
 public sealed class GlobalExceptionHandler(ILoggerFactory loggerFactory) : IObserver<Exception>
 {

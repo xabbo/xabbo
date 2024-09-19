@@ -37,7 +37,6 @@ public class FlashWindowComponent : Component
         set => Set(ref _flashOnUserChat, value);
     }
 
-
     private bool _flashOnFriendChat;
     public bool FlashOnFriendChat
     {
