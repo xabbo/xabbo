@@ -181,7 +181,7 @@ public sealed class FriendsPageViewModel : PageViewModel
         if (friendsToRemove.Count == 0)
             return;
 
-        var result = await _dialogService.ShowContentDialogAsync(ViewModelLocator.Main, new ContentDialogSettings
+        var result = await _dialogService.ShowContentDialogAsync(_dialogService.CreateViewModel<MainViewModel>(), new ContentDialogSettings
         {
             Title = $"Delete {"friend".ToQuantity(friendsToRemove.Count)}",
             Content = $"Are you sure you wish to delete {

@@ -1,18 +1,12 @@
-﻿using System;
-using System.Reactive.Linq;
+﻿using System.Reactive.Linq;
 using System.Diagnostics;
-
-using Avalonia.Media;
-
+using Splat;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
-
+using HanumanInstitute.MvvmDialogs;
+using Avalonia.Media;
 using FluentIcons.Common;
 using FluentIcons.Avalonia.Fluent;
-
 using IconSource = FluentAvalonia.UI.Controls.IconSource;
-
-using Splat;
 
 using Xabbo.Extension;
 using Xabbo.Messages.Flash;
@@ -33,7 +27,10 @@ public class GeneralPageViewModel : PageViewModel
 
     public AppConfig Config => _settingsProvider.Value;
 
-    public GeneralPageViewModel(IConfigProvider<AppConfig> settingsProvider, IExtension ext)
+    public GeneralPageViewModel(IConfigProvider<AppConfig> settingsProvider,
+        IAppPathProvider appPathProvider,
+        IDialogService dialogService,
+        IExtension ext)
     {
         _settingsProvider = settingsProvider;
         _ext = ext;
@@ -67,20 +64,20 @@ public class GeneralPageViewModel : PageViewModel
     [Reactive] public bool IsFlashWindowExpanded { get; set; } = true;
     [Reactive] public bool IsMiscExpanded { get; set; } = true;
 
-    [DependencyInjectionProperty] public ChatComponent? ChatComponent { get; internal set; }
-    [DependencyInjectionProperty] public FurniActionsComponent? Furni { get; internal set; }
-    [DependencyInjectionProperty] public AntiHandItemComponent? HandItem { get; internal set; }
-    [DependencyInjectionProperty] public AntiIdleComponent? AntiIdle { get; internal set; }
-    [DependencyInjectionProperty] public AntiTradeComponent? AntiTrade { get; internal set; }
-    [DependencyInjectionProperty] public AntiTurnComponent? AntiTurn { get; internal set; }
-    [DependencyInjectionProperty] public AntiTypingComponent? AntiTyping { get; internal set; }
-    [DependencyInjectionProperty] public AntiWalkComponent? AntiWalk { get; internal set; }
-    [DependencyInjectionProperty] public ClickThroughComponent? ClickThrough { get; internal set; }
-    [DependencyInjectionProperty] public ClickToComponent? ClickTo { get; internal set; }
-    [DependencyInjectionProperty] public RespectedComponent? Respected { get; internal set; }
-    [DependencyInjectionProperty] public RoomEntryComponent? RoomEntry { get; internal set; }
-    [DependencyInjectionProperty] public DoorbellComponent? Doorbell { get; internal set; }
-    [DependencyInjectionProperty] public FlattenRoomComponent? Flatten { get; internal set; }
-    [DependencyInjectionProperty] public AvatarOverlayComponent? Overlay { get; internal set; }
-    [DependencyInjectionProperty] public AntiHcGiftNotificationComponent? AntiHcNotification { get; internal set; }
+    [DependencyInjectionProperty] public ChatComponent? ChatComponent { get; set; }
+    [DependencyInjectionProperty] public FurniActionsComponent? Furni { get; set; }
+    [DependencyInjectionProperty] public AntiHandItemComponent? HandItem { get; set; }
+    [DependencyInjectionProperty] public AntiIdleComponent? AntiIdle { get; set; }
+    [DependencyInjectionProperty] public AntiTradeComponent? AntiTrade { get; set; }
+    [DependencyInjectionProperty] public AntiTurnComponent? AntiTurn { get; set; }
+    [DependencyInjectionProperty] public AntiTypingComponent? AntiTyping { get; set; }
+    [DependencyInjectionProperty] public AntiWalkComponent? AntiWalk { get; set; }
+    [DependencyInjectionProperty] public ClickThroughComponent? ClickThrough { get; set; }
+    [DependencyInjectionProperty] public ClickToComponent? ClickTo { get; set; }
+    [DependencyInjectionProperty] public RespectedComponent? Respected { get; set; }
+    [DependencyInjectionProperty] public RoomEntryComponent? RoomEntry { get; set; }
+    [DependencyInjectionProperty] public DoorbellComponent? Doorbell { get; set; }
+    [DependencyInjectionProperty] public FlattenRoomComponent? Flatten { get; set; }
+    [DependencyInjectionProperty] public AvatarOverlayComponent? Overlay { get; set; }
+    [DependencyInjectionProperty] public AntiHcGiftNotificationComponent? AntiHcNotification { get; set; }
 }

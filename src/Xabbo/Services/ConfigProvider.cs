@@ -44,11 +44,14 @@ public abstract class ConfigProvider<T> : ReactiveObject, IConfigProvider<T> whe
             FileInfo fi = new(FilePath);
             if (fi.Exists)
             {
-                Log.LogDebug("Loading settings from '{FilePath}'.", FilePath);
-                Value = JsonSerializer.Deserialize<T>(File.ReadAllText(FilePath), _jsonTypeInfo)
-                    ?? throw new Exception("Failed to deserialize settings.");
-                Log.LogInformation("Loaded settings.");
-                Loaded?.Invoke();
+                using (DelayChangeNotifications())
+                {
+                    Log.LogDebug("Loading settings from '{FilePath}'.", FilePath);
+                    Value = JsonSerializer.Deserialize<T>(File.ReadAllText(FilePath), _jsonTypeInfo)
+                        ?? throw new Exception("Failed to deserialize settings.");
+                    Log.LogInformation("Loaded settings.");
+                    Loaded?.Invoke();
+                }
             }
         }
         catch (Exception ex)
