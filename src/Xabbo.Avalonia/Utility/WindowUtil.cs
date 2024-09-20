@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using Avalonia.Controls;
 
-namespace Xabbo.Utility;
+namespace Xabbo.Avalonia.Utility;
 
 static class WindowUtility
 {

@@ -1,13 +1,10 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 using Xabbo.GEarth;
 using Xabbo.Services.Abstractions;
-using Xabbo.Configuration;
 
-namespace Xabbo.Avalonia.Services;
+namespace Xabbo.Services;
 
 public class GEarthExtensionLifetime
 {

@@ -1,13 +1,14 @@
-﻿using ReactiveUI;
-using Splat;
+﻿using Splat;
+using ReactiveUI;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 
-using Xabbo.Avalonia.Services;
 using Xabbo.Command;
+using Xabbo.Services;
 using Xabbo.Services.Abstractions;
+using Xabbo.Avalonia.Services;
 
 using IHostApplicationLifetime = Microsoft.Extensions.Hosting.IHostApplicationLifetime;
 
@@ -34,6 +35,7 @@ public partial class App : Application
         DataContext = ViewModelLocator.Main;
 
         // Initialize persistent services
+        // TODO make a better way to initialize these
         Locator.Current.GetRequiredService<IHostApplicationLifetime>();
         Locator.Current.GetRequiredService<AppSessionManager>();
         Locator.Current.GetRequiredService<GEarthExtensionLifetime>();
