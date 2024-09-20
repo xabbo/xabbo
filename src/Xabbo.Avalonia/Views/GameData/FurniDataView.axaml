@@ -7,7 +7,7 @@
   mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
   x:Class="Xabbo.Views.FurniDataView"
   x:DataType="vm:FurniDataViewModel"
-> 
+>
   <Grid RowDefinitions="Auto,*">
     <TextBox
       Margin="10,4,10,10"
@@ -47,6 +47,7 @@
         <DataGridTemplateColumn
           x:DataType="vm:FurniInfoViewModel"
           Width="100"
+          IsVisible="{DynamicResource IsModern}"
           Header="type/kind"
           ClipboardContentBinding="{Binding TypeKind}"
         >
@@ -61,13 +62,33 @@
             />
           </DataTemplate>
         </DataGridTemplateColumn>
+        <DataGridTemplateColumn
+          x:DataType="vm:FurniInfoViewModel"
+          Width="100"
+          IsVisible="{DynamicResource IsOrigins}"
+          Header="type"
+          ClipboardContentBinding="{Binding Type}"
+        >
+          <DataTemplate DataType="vm:FurniInfoViewModel">
+            <TextBlock
+              Margin="12,8,12,0"
+              VerticalAlignment="Center"
+              FontFamily="Consolas"
+              FontSize="12"
+              Text="{Binding Type}"
+              TextTrimming="CharacterEllipsis"
+            />
+          </DataTemplate>
+        </DataGridTemplateColumn>
         <DataGridTextColumn
           Width="100"
+          IsVisible="{DynamicResource IsModern}"
           Header="line"
           Binding="{Binding Line}"
         />
         <DataGridTextColumn
           Width="100"
+          IsVisible="{DynamicResource IsModern}"
           Header="category"
           Binding="{Binding Category}"
         />

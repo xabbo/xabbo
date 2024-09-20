@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using DynamicData;
-using ReactiveUI.Fody.Helpers;
+using ReactiveUI;
 
 using Xabbo.Extension;
 using Xabbo.Core;
@@ -16,7 +15,7 @@ public class FurniDataViewModel : ViewModelBase
     private readonly IUiContext _uiContext;
     private readonly IGameDataManager _gameDataManager;
 
-    private readonly SourceCache<FurniInfoViewModel, (ItemType, int)> _furniCache = new(x => (x.Type, x.Kind));
+    private readonly SourceCache<FurniInfoViewModel, (ItemType, int, string?)> _furniCache = new(x => (x.Type, x.Kind, x.Identifier));
     private readonly ReadOnlyObservableCollection<FurniInfoViewModel> _furni;
 
     public ReadOnlyObservableCollection<FurniInfoViewModel> Furni => _furni;
@@ -38,6 +37,8 @@ public class FurniDataViewModel : ViewModelBase
         _gameDataManager.Loaded += OnGameDataLoaded;
 
         _furniCache.Connect().Filter(Filter).Bind(out _furni).Subscribe();
+
+        this.WhenAnyValue(x => x.FilterText).Subscribe(_ => _furniCache.Refresh());
 
         _extension.Connected += OnGameConnected;
         _extension.Disconnected += OnGameDisconnected;
