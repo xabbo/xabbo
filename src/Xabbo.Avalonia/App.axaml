@@ -63,6 +63,7 @@
     <x:Boolean x:Key="IsConnected">False</x:Boolean>
     <x:Boolean x:Key="IsOrigins">False</x:Boolean>
     <x:Boolean x:Key="IsModern">False</x:Boolean>
+    <x:String x:Key="AppStatus">Waiting for connection...</x:String>
 
     <Color x:Key="RadioButtonCheckGlyphFill">#5000AA</Color>
     <Color x:Key="RadioButtonCheckGlyphFillPointerOver">#5000AA</Color>

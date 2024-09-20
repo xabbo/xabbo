@@ -11,7 +11,6 @@ public sealed class AvaloniaHostApplicationLifetime : IHostApplicationLifetime
 {
     private readonly ILogger Log;
     private readonly IApplicationLifetime _lifetime;
-
     private readonly CancellationTokenSource
         _started = new(),
         _stopping = new(),
@@ -56,21 +55,16 @@ public sealed class AvaloniaHostApplicationLifetime : IHostApplicationLifetime
     {
         try
         {
-            if (_lifetime is IControlledApplicationLifetime controlledLifetime)
-            {
-                Log.LogInformation("Shutting down...");
-                _stopping.Cancel();
-                controlledLifetime.Shutdown();
-                // TODO: application exits before we get here.
-                // Exit event is also not invoked for some reason.
-                _stopped.Cancel();
-                Log.LogInformation("Shutdown complete.");
-            }
-            else
-            {
-                Log.LogWarning("Cannot stop application: lifetime is not controlled.");
-            }
+            if (_lifetime is not IControlledApplicationLifetime controlledLifetime)
+                throw new Exception("Lifetime is not controlled.");
 
+            Log.LogInformation("Shutting down...");
+            _stopping.Cancel();
+            controlledLifetime.Shutdown();
+            // TODO: application exits before we get here.
+            // Exit event is also not invoked for some reason.
+            _stopped.Cancel();
+            Log.LogInformation("Shutdown complete.");
         }
         catch (Exception ex)
         {

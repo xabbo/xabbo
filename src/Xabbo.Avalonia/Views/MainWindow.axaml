@@ -105,9 +105,9 @@
           FontSize="16"
           HorizontalAlignment="Center"
           VerticalAlignment="Center"
-        >
-          Waiting for connection...
-        </TextBlock>
+          TextAlignment="Center"
+          Text="{DynamicResource AppStatus}"
+        />
       </StackPanel>
     </Grid>
   </Grid>
