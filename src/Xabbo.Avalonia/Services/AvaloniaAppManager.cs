@@ -17,12 +17,14 @@ public sealed class AvaloniaAppManager(IApplicationLifetime lifetime, MainViewMo
     {
         if (_lifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            Dispatcher.UIThread.Invoke(() =>
-                (desktop.MainWindow ??= new MainWindow
+            Dispatcher.UIThread.Invoke(() => {
+                var window = (desktop.MainWindow ??= new MainWindow
                 {
                     DataContext = Application.Current?.DataContext
-                }).Show()
-            );
+                });
+                window.Show();
+                window.Activate();
+            });
         }
     }
 
