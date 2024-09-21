@@ -2,7 +2,7 @@
 using Xabbo.Messages.Flash;
 using Xabbo.Core;
 using Xabbo.Core.Game;
-using Xabbo.Core.Tasks;
+using Xabbo.Core.Messages.Outgoing;
 
 namespace Xabbo.Command.Modules;
 
@@ -43,8 +43,7 @@ public sealed class FindFriendCommand(FriendManager friendManager) : CommandModu
         if (Ext.Messages.Is(packet.Header, In.RoomForward))
         {
             int roomId = packet.Read<int>();
-            var roomData = await new GetRoomDataTask(Ext, roomId)
-                .ExecuteAsync(5000, CancellationToken.None);
+            var roomData = await Ext.RequestAsync(new GetRoomDataMsg(roomId));
             ShowMessage($"{friend.Name} is in room '{roomData.Name}' by {roomData.OwnerName} (id:{roomData.Id}){(roomData.IsInvisible ? "*" : "")}");
         }
         else

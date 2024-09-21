@@ -2,6 +2,7 @@
 using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.Tasks;
+using Xabbo.Core.Messages.Outgoing.Modern;
 
 namespace Xabbo.Command.Modules;
 
@@ -102,8 +103,7 @@ public sealed class RoomCommands(RoomManager roomManager) : CommandModule
             return;
         }
 
-        var settings = await new GetRoomSettingsTask(Ext, _roomMgr.CurrentRoomId)
-            .ExecuteAsync(2000, CancellationToken.None);
+        var settings = await Ext.RequestAsync(new GetRoomSettingsMsg(_roomMgr.CurrentRoomId));
         update(settings);
 
         var receiver = Ext.ReceiveAsync(
