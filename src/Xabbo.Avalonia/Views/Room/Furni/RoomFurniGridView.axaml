@@ -23,7 +23,7 @@
     </Style>
   </UserControl.Styles>
   <ScrollViewer Padding="6">
-    <ItemsRepeater ItemsSource="{Binding Stacks}">
+    <ItemsRepeater x:Name="FurniStacks" ItemsSource="{Binding Stacks}">
       <ItemsRepeater.Layout>
         <UniformGridLayout />
       </ItemsRepeater.Layout>
