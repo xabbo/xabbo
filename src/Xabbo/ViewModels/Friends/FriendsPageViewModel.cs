@@ -1,13 +1,8 @@
-﻿using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Threading.Tasks;
+﻿using System.Collections.ObjectModel;
 using System.Reactive;
 using DynamicData;
 using DynamicData.Kernel;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using Avalonia.Controls.Selection;
 using FluentAvalonia.UI.Controls;
 using Humanizer;
@@ -42,7 +37,7 @@ public sealed class FriendsPageViewModel : PageViewModel
     private readonly ReadOnlyObservableCollection<FriendViewModel> _friends;
     public ReadOnlyObservableCollection<FriendViewModel> Friends => _friends;
 
-    [Reactive] public bool IsLoading { get; set; }
+    [Reactive] public bool IsLoading { get; set; } = true;
     [Reactive] public string FilterText { get; set; } = "";
     [Reactive] public bool ShowOnlineOnly { get; set; }
 
