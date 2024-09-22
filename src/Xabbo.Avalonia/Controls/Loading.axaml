@@ -1,0 +1,69 @@
+<ResourceDictionary
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:controls="using:Xabbo.Avalonia.Controls"
+  xmlns:ui="using:FluentAvalonia.UI.Controls"
+>
+  <Design.PreviewWith>
+    <StackPanel Width="400" Spacing="10">
+        <StackPanel Background="{DynamicResource SystemRegionBrush}">
+          <controls:Overlay />
+        </StackPanel>
+    </StackPanel>
+  </Design.PreviewWith>
+
+  <ControlTheme x:Key="{x:Type controls:Loading}" TargetType="controls:Loading">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Grid>
+          <ContentPresenter
+            x:Name="PART_ContentPresenter"
+            Content="{TemplateBinding Content}"
+            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+          />
+          <Grid
+            x:Name="PART_OverlayGrid"
+            Background="{TemplateBinding Background}"
+            Classes.loading="{TemplateBinding IsLoading}"
+            IsHitTestVisible="{TemplateBinding IsLoading}"
+          >
+            <Grid.Styles>
+              <Style Selector="Grid#PART_OverlayGrid">
+                <Setter Property="Opacity" Value="1"/>
+                <Setter Property="Transitions">
+                  <Transitions>
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.2"/>
+                  </Transitions>
+                </Setter>
+                <Style Selector="^.loading StackPanel#PART_LoadingContent">
+                  <Setter Property="Transitions">
+                    <Transitions>
+                      <DoubleTransition Property="Opacity" Delay="0:0:0.4" Duration="0:0:0.3"/>
+                    </Transitions>
+                  </Setter>
+                  <Setter Property="Opacity" Value="1"/>
+                </Style>
+                <Style Selector="^:not(.loading)">
+                  <Setter Property="Opacity" Value="0"/>
+                  <Style Selector="^ StackPanel#PART_LoadingContent">
+                    <Setter Property="Transitions">
+                      <Transitions>
+                        <DoubleTransition Property="Opacity" Delay="0:0:0" Duration="0:0:0.1"/>
+                      </Transitions>
+                    </Setter>
+                    <Setter Property="Opacity" Value="0"/>
+                  </Style>
+                </Style>
+              </Style>
+            </Grid.Styles>
+            <StackPanel x:Name="PART_LoadingContent" Spacing="10" HorizontalAlignment="Center" VerticalAlignment="Center">
+              <ui:ProgressRing Width="32" Height="32" />
+              <ContentPresenter x:Name="PART_LoadingContentPresenter" Content="{TemplateBinding LoadingContent}" />
+            </StackPanel>
+          </Grid>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

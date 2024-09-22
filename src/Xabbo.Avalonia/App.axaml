@@ -58,26 +58,33 @@
     </Application.Styles>
 
   <Application.Resources>
-    <!-- Session -->
-    <x:Boolean x:Key="IsConnecting">True</x:Boolean>
-    <x:Boolean x:Key="IsConnected">False</x:Boolean>
-    <x:Boolean x:Key="IsOrigins">False</x:Boolean>
-    <x:Boolean x:Key="IsModern">False</x:Boolean>
-    <x:String x:Key="AppStatus">Waiting for connection...</x:String>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="Controls/Loading.axaml" />
+      </ResourceDictionary.MergedDictionaries>
 
-    <Color x:Key="RadioButtonCheckGlyphFill">#5000AA</Color>
-    <Color x:Key="RadioButtonCheckGlyphFillPointerOver">#5000AA</Color>
-    <Color x:Key="RadioButtonCheckGlyphFillPressed">#5000AA</Color>
-    <Color x:Key="RadioButtonCheckGlyphFillDisabled">#333333</Color>
+      <!-- Session -->
+      <x:Boolean x:Key="IsConnecting">True</x:Boolean>
+      <x:Boolean x:Key="IsConnected">False</x:Boolean>
+      <x:Boolean x:Key="IsOrigins">False</x:Boolean>
+      <x:Boolean x:Key="IsModern">False</x:Boolean>
+      <x:String x:Key="AppStatus">Waiting for connection...</x:String>
 
-    <!-- Fix: make checkbox padding consistent across different platforms -->
-    <Thickness x:Key="CheckBoxPadding">8,5,8,5</Thickness>
+      <Color x:Key="RadioButtonCheckGlyphFill">#5000AA</Color>
+      <Color x:Key="RadioButtonCheckGlyphFillPointerOver">#5000AA</Color>
+      <Color x:Key="RadioButtonCheckGlyphFillPressed">#5000AA</Color>
+      <Color x:Key="RadioButtonCheckGlyphFillDisabled">#333333</Color>
 
-    <c:HabboStringConverter x:Key="HabboStringConverter"/>
-    <c:MultiValueConverter x:Key="MultiValueConverter"/>
-    <c:BoolToOpacityConverter x:Key="BoolToOpacityConverter"/>
-    <c:HumanizerConverter x:Key="HumanizerConverter"/>
-    <c:WhitespaceNewlineConverter x:Key="WhitespaceNewlineConverter" />
-    <c:GtConverter x:Key="GtConverter" />
+      <!-- Fix: make checkbox padding consistent across different platforms -->
+      <Thickness x:Key="CheckBoxPadding">8,5,8,5</Thickness>
+
+      <c:HabboStringConverter x:Key="HabboStringConverter"/>
+      <c:MultiValueConverter x:Key="MultiValueConverter"/>
+      <c:BoolToOpacityConverter x:Key="BoolToOpacityConverter"/>
+      <c:HumanizerConverter x:Key="HumanizerConverter"/>
+      <c:WhitespaceNewlineConverter x:Key="WhitespaceNewlineConverter" />
+      <c:GtConverter x:Key="GtConverter" />
+
+    </ResourceDictionary>
   </Application.Resources>
 </Application>
