@@ -69,10 +69,10 @@
                     Symbol="Snooze"
                     IsVisible="{Binding IsIdle, Mode=OneWay}"
                   />
-                  <ic:SymbolIcon
+                  <Image
                     Margin="4,0,0,0"
+                    Source="avares://Xabbo.Avalonia/Assets/Images/trading.png"
                     VerticalAlignment="Center"
-                    Symbol="Handshake"
                     IsVisible="{Binding IsTrading, Mode=OneWay}"
                   />
                 </StackPanel>
