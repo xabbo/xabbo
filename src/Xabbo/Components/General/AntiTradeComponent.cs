@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 using ReactiveUI;
 
 using Xabbo.Messages.Flash;
@@ -23,7 +23,7 @@ public partial class AntiTradeComponent : Component
     private bool Enabled
     {
         get => Config.General.AntiTrade;
-        set => Config.General.AntiTrade = true;
+        set => Config.General.AntiTrade = value;
     }
 
     public AntiTradeComponent(
