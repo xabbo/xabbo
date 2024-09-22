@@ -1,13 +1,8 @@
-﻿using System;
-using System.Threading.Tasks;
-using System.Reactive.Linq;
+﻿using System.Reactive.Linq;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
-using Avalonia.Media.Imaging;
 
 using Xabbo.Core;
 using Xabbo.Core.GameData;
-using Xabbo.Utility;
 
 namespace Xabbo.ViewModels;
 
@@ -25,30 +20,26 @@ public abstract class ItemViewModelBase : ViewModelBase
 
     [Reactive] public bool IsHidden { get; set; }
 
-    private readonly Lazy<Task<Bitmap?>> _icon;
-    public Task<Bitmap?> Icon => _icon.Value;
+    [Reactive] public string? IconUrl { get; set; }
 
     public ItemViewModelBase(IItem item)
     {
         _item = item;
         if (Extensions.IsInitialized)
-            _item.TryGetInfo(out _info);
-        _icon = new Lazy<Task<Bitmap?>>(LoadIconAsync);
+        {
+            if (_item.TryGetInfo(out _info) && _info.Revision > 0)
+            {
+                string identifier = _info.Identifier.Replace('*', '_');
+                if (identifier == "poster" && _item is IWallItem wallItem)
+                    identifier += "_" + wallItem.Data;
+                IconUrl = $"http://images.habbo.com/dcr/hof_furni/{_info.Revision}/{identifier}_icon.png";
+            }
+        }
 
         HasDescription =
             _info is not null &&
             !string.IsNullOrWhiteSpace(_info.Description) &&
             !_info.Description.EndsWith(" desc");
-    }
-
-    protected virtual Task<Bitmap?> LoadIconAsync()
-    {
-        if (_info is null)
-            return Task.FromResult<Bitmap?>(null);
-        string identifier = _info.Identifier.Replace('*', '_');
-        if (identifier == "poster" && _item is IWallItem wallItem)
-            identifier += "_" + wallItem.Data;
-        return ImageHelper.LoadFromWeb(new Uri($"http://images.habbo.com/dcr/hof_furni/{_info.Revision}/{identifier}_icon.png"));
     }
 }
 
@@ -68,7 +59,7 @@ public class FurniStackViewModel : ItemViewModelBase
     public static StackDescriptor GetDescriptor(IFurni item)
     {
         if (!Extensions.IsInitialized)
-            return new StackDescriptor(item.Type, 0, item.Identifier, "", false, false);
+            return new StackDescriptor(item.Type, item.Kind, item.Identifier, "", false, false);
 
         item.TryGetIdentifier(out string? identifier);
         string variant = "";

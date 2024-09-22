@@ -5,6 +5,8 @@
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:v="using:Xabbo.Views"
   xmlns:vm="using:Xabbo.ViewModels"
+  xmlns:services="using:Xabbo.Avalonia.Services"
+  xmlns:img="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
   xmlns:Interactivity="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
   xmlns:Interactions="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
   mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
@@ -39,7 +41,20 @@
                   />
                 </Interactions:EventTriggerBehavior>
               </Interactivity:Interaction.Behaviors>
-              <Image Margin="0,0,0,24" Width="64" Height="110" Source="{Binding AvatarImage^}" />
+              <Image
+                x:Name="AvatarImagePlaceholder"
+                Margin="0,0,0,24"
+                Width="64" Height="110"
+                Source="avares://Xabbo.Avalonia/Assets/Images/avatar.png"
+                IsVisible="{Binding #AvatarImage.IsLoading, Mode=OneWay}"
+              />
+              <img:AdvancedImage
+                x:Name="AvatarImage"
+                Margin="0,0,0,24"
+                Width="64" Height="110"
+                Source="{Binding AvatarImageUrl}"
+                Loader="{x:Static services:XabboImageLoader.Instance}"
+              />
             </Grid>
           </DataTemplate>
         </ListBox.ItemTemplate>

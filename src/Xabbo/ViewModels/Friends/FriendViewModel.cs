@@ -1,11 +1,6 @@
-using System;
 using System.Reactive.Linq;
-using System.Threading.Tasks;
-
-using Avalonia.Media.Imaging;
 
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 
 using Xabbo.Utility;
 
@@ -20,7 +15,6 @@ public sealed partial class FriendViewModel : ViewModelBase
     [Reactive] public string Figure { get; set; } = "";
     [Reactive] public bool IsModernFigure { get; set; }
     [Reactive] public string? AvatarImageUrl { get; set; }
-    [Reactive] public Task<Bitmap?>? AvatarImage { get; private set; }
 
     public FriendViewModel()
     {
@@ -33,17 +27,6 @@ public sealed partial class FriendViewModel : ViewModelBase
             .Subscribe(values => {
                 var (name, figure, isModern) = values;
                 AvatarImageUrl = isModern ? UrlHelper.AvatarImageUrl(name, figure, headOnly: true) : null;
-            });
-
-        this
-            .WhenAnyValue(x => x.AvatarImageUrl)
-            .Subscribe(url => {
-                if (string.IsNullOrWhiteSpace(url))
-                    AvatarImage = null;
-                else
-                {
-                    AvatarImage = ImageHelper.LoadFromWeb(new Uri(url));
-                }
             });
     }
 }

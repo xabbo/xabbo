@@ -19,7 +19,6 @@ public sealed class OutfitViewModel : ViewModelBase
 
     [Reactive] public string? ModernFigure { get; set; }
     [Reactive] public string? AvatarImageUrl { get; set; }
-    [Reactive] public Task<Bitmap?>? AvatarImage { get; private set; }
 
     public OutfitViewModel(FigureModel model)
     {
@@ -29,12 +28,6 @@ public sealed class OutfitViewModel : ViewModelBase
             .WhenAnyValue(x => x.ModernFigure)
             .Subscribe(values => {
                 AvatarImageUrl = ModernFigure is null ? null : UrlHelper.AvatarImageUrl(figure: ModernFigure);
-            });
-
-        this
-            .WhenAnyValue(x => x.AvatarImageUrl)
-            .Subscribe(url => {
-                AvatarImage = url is not null ? ImageHelper.LoadFromWeb(new Uri(url)) : null;
             });
 
         if (!Model.IsOrigins)

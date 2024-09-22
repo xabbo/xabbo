@@ -6,6 +6,8 @@
   xmlns:sty="using:FluentAvalonia.Styling"
   xmlns:ui="using:FluentAvalonia.UI.Controls"
   xmlns:ic="using:FluentIcons.Avalonia.Fluent"
+  xmlns:img="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
+  xmlns:services="using:Xabbo.Avalonia.Services"
   xmlns:c="using:Xabbo.Converters"
   RequestedThemeVariant="Dark"
 >
@@ -16,6 +18,28 @@
     <Application.Styles>
       <sty:FluentAvaloniaTheme  />
       <StyleInclude Source="avares://FluentAvalonia.ProgressRing/Styling/Controls/ProgressRing.axaml" />
+      <StyleInclude Source="avares://AsyncImageLoader.Avalonia/AdvancedImage.axaml" />
+      <Style Selector="img|AdvancedImage">
+        <Setter Property="Template">
+          <ControlTemplate>
+            <Grid/>
+          </ControlTemplate>
+        </Setter>
+        <Style Selector="^.spinner">
+          <Setter Property="Template">
+            <ControlTemplate>
+              <Grid>
+                <ui:ProgressRing
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Width="24" Height="24"
+                  IsVisible="{TemplateBinding IsLoading}"
+                />
+              </Grid>
+            </ControlTemplate>
+          </Setter>
+        </Style>
+      </Style>
 
       <Style Selector=":is(Control).origins :is(Control).modern">
         <Setter Property="IsVisible" Value="False" />

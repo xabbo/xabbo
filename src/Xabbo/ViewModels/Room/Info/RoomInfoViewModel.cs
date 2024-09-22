@@ -1,15 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
-using Avalonia.Media.Imaging;
-
-using Xabbo.Extension;
+﻿using Xabbo.Extension;
 using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.Events;
-
-using Xabbo.Utility;
 
 namespace Xabbo.ViewModels;
 
@@ -21,15 +13,7 @@ public class RoomInfoViewModel : ViewModelBase
     [Reactive] public IRoomData? Data { get; set; }
 
     private long _currentThumbnailId = -1;
-    private Lazy<Task<Bitmap?>> _loadImage = new(() => LoadImage(-1));
-    public Task<Bitmap?> Thumbnail => _loadImage.Value;
-
-    private static Task<Bitmap?> LoadImage(long id)
-    {
-        if (id <= 0)
-            return Task.FromResult<Bitmap?>(null);
-        return ImageHelper.LoadFromWeb(new Uri($"https://habbo-stories-content.s3.amazonaws.com/navigator-thumbnail/hhus/{id}.png"));
-    }
+    [Reactive] public string? ThumbnailUrl { get; set; }
 
     public RoomInfoViewModel(IExtension extension, RoomManager roomManager)
     {
@@ -48,8 +32,7 @@ public class RoomInfoViewModel : ViewModelBase
             return;
 
         _currentThumbnailId = roomId;
-        _loadImage = new Lazy<Task<Bitmap?>>(() => LoadImage(roomId));
-        this.RaisePropertyChanged(nameof(Thumbnail));
+        ThumbnailUrl = roomId > 0 ? $"https://habbo-stories-content.s3.amazonaws.com/navigator-thumbnail/hhus/{roomId}.png" : null;
     }
 
     private void OnEnteredRoom(RoomEventArgs e)

@@ -3,8 +3,10 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:img="using:AsyncImageLoader"
   xmlns:v="using:Xabbo.Views"
   xmlns:vm="using:Xabbo.ViewModels"
+  xmlns:services="using:Xabbo.Avalonia.Services"
   mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
   x:Class="Xabbo.Views.FurniPopupView"
   x:DataType="vm:FurniViewModel"
@@ -19,7 +21,12 @@
       BorderThickness="1"
       BorderBrush="{StaticResource AccentControlElevationBorderBrush}"
     >
-      <Image Source="{Binding Icon^}" Width="32" Height="32" Stretch="None" />
+      <img:AdvancedImage
+        Classes="spinner"
+        Width="32" Height="32" Stretch="None"
+        Source="{Binding IconUrl}"
+        Loader="{x:Static services:XabboImageLoader.Instance}"
+      />
     </Border>
     <TextBlock HorizontalAlignment="Center" Text="{Binding Name}" FontWeight="Bold" />
     <TextBlock HorizontalAlignment="Center" Text="{Binding Description}"

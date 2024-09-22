@@ -3,6 +3,8 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:img="using:AsyncImageLoader"
+  xmlns:services="using:Xabbo.Avalonia.Services"
   xmlns:v="using:Xabbo.Views"
   xmlns:vm="using:Xabbo.ViewModels"
   xmlns:ic="using:FluentIcons.Avalonia.Fluent"
@@ -54,7 +56,25 @@
                   VerticalAlignment="Center"
                   Symbol="Home"
                 />
-                <Image Width="110" Height="110" Source="{Binding Thumbnail^}" />
+                <img:AdvancedImage
+                  Width="110" Height="110"
+                  Source="{Binding ThumbnailUrl}"
+                  Loader="{x:Static services:XabboImageLoader.Instance}"
+                >
+                  <img:AdvancedImage.Styles>
+                    <Style Selector="img|AdvancedImage">
+                      <Setter Property="Opacity" Value="0" />
+                      <Setter Property="Transitions">
+                        <Transitions>
+                          <DoubleTransition Property="Opacity" Duration="0:0:0.5" />
+                        </Transitions>
+                      </Setter>
+                      <Style Selector="^[IsLoading=false]">
+                        <Setter Property="Opacity" Value="1" />
+                      </Style>
+                    </Style>
+                  </img:AdvancedImage.Styles>
+                </img:AdvancedImage>
               </Panel>
             </Border>
             <StackPanel Grid.Column="1">
