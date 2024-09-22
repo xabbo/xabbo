@@ -15,48 +15,61 @@
   <ControlTheme x:Key="{x:Type controls:Loading}" TargetType="controls:Loading">
     <Setter Property="Template">
       <ControlTemplate>
-        <Grid>
+        <Grid x:Name="PART_Root" Classes.loading="{TemplateBinding IsLoading}">
+          <Grid.Styles>
+            <Style Selector="ContentPresenter#PART_Content">
+              <Setter Property="Opacity" Value="1"/>
+              <Setter Property="Transitions">
+                <Transitions>
+                  <DoubleTransition Property="Opacity" Duration="0:0:0.2"/>
+                </Transitions>
+              </Setter>
+              <Style Selector="^.loading">
+                <Setter Property="IsHitTestVisible" Value="False" />
+                <Setter Property="Opacity" Value="0"/>
+              </Style>
+            </Style>
+            <Style Selector="Grid#PART_Overlay">
+              <Setter Property="Opacity" Value="1"/>
+              <Setter Property="Transitions">
+                <Transitions>
+                  <DoubleTransition Property="Opacity" Duration="0:0:0.2"/>
+                </Transitions>
+              </Setter>
+              <Style Selector="^.loading StackPanel#PART_LoadingContent">
+                <Setter Property="Transitions">
+                  <Transitions>
+                    <DoubleTransition Property="Opacity" Delay="0:0:0.4" Duration="0:0:0.3"/>
+                  </Transitions>
+                </Setter>
+                <Setter Property="Opacity" Value="1"/>
+              </Style>
+              <Style Selector="^:not(.loading)">
+                <Setter Property="Opacity" Value="0"/>
+                <Style Selector="^ StackPanel#PART_LoadingContent">
+                  <Setter Property="Transitions">
+                    <Transitions>
+                      <DoubleTransition Property="Opacity" Delay="0:0:0" Duration="0:0:0.1"/>
+                    </Transitions>
+                  </Setter>
+                  <Setter Property="Opacity" Value="0"/>
+                </Style>
+              </Style>
+            </Style>
+          </Grid.Styles>
           <ContentPresenter
-            x:Name="PART_ContentPresenter"
+            x:Name="PART_Content"
+            Classes.loading="{TemplateBinding IsLoading}"
             Content="{TemplateBinding Content}"
             HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
             VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
           />
           <Grid
-            x:Name="PART_OverlayGrid"
+            x:Name="PART_Overlay"
             Background="{TemplateBinding Background}"
             Classes.loading="{TemplateBinding IsLoading}"
             IsHitTestVisible="{TemplateBinding IsLoading}"
           >
-            <Grid.Styles>
-              <Style Selector="Grid#PART_OverlayGrid">
-                <Setter Property="Opacity" Value="1"/>
-                <Setter Property="Transitions">
-                  <Transitions>
-                    <DoubleTransition Property="Opacity" Duration="0:0:0.2"/>
-                  </Transitions>
-                </Setter>
-                <Style Selector="^.loading StackPanel#PART_LoadingContent">
-                  <Setter Property="Transitions">
-                    <Transitions>
-                      <DoubleTransition Property="Opacity" Delay="0:0:0.4" Duration="0:0:0.3"/>
-                    </Transitions>
-                  </Setter>
-                  <Setter Property="Opacity" Value="1"/>
-                </Style>
-                <Style Selector="^:not(.loading)">
-                  <Setter Property="Opacity" Value="0"/>
-                  <Style Selector="^ StackPanel#PART_LoadingContent">
-                    <Setter Property="Transitions">
-                      <Transitions>
-                        <DoubleTransition Property="Opacity" Delay="0:0:0" Duration="0:0:0.1"/>
-                      </Transitions>
-                    </Setter>
-                    <Setter Property="Opacity" Value="0"/>
-                  </Style>
-                </Style>
-              </Style>
-            </Grid.Styles>
             <StackPanel x:Name="PART_LoadingContent" Spacing="10" HorizontalAlignment="Center" VerticalAlignment="Center">
               <ui:ProgressRing Width="32" Height="32" />
               <ContentPresenter x:Name="PART_LoadingContentPresenter" Content="{TemplateBinding LoadingContent}" />

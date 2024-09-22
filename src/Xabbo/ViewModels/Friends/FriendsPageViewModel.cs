@@ -42,6 +42,7 @@ public sealed class FriendsPageViewModel : PageViewModel
     private readonly ReadOnlyObservableCollection<FriendViewModel> _friends;
     public ReadOnlyObservableCollection<FriendViewModel> Friends => _friends;
 
+    [Reactive] public bool IsLoading { get; set; }
     [Reactive] public string FilterText { get; set; } = "";
     [Reactive] public bool ShowOnlineOnly { get; set; }
 
@@ -161,6 +162,7 @@ public sealed class FriendsPageViewModel : PageViewModel
     {
         foreach (var friend in _friendManager.Friends)
             AddFriend(friend);
+        IsLoading = false;
     }
     private void OnFriendAdded(FriendEventArgs args) => AddFriend(args.Friend);
     private void OnFriendUpdated(FriendEventArgs args) => UpdateFriend(args.Friend);
