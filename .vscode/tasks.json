@@ -1,0 +1,11 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "xstyler",
+      "type": "shell",
+      "command": "~/.dotnet/tools/xstyler --indent-size 2 --ending-bracket-newline -f ${file}",
+      "problemMatcher": []
+    }
+  ]
+}
