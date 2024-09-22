@@ -50,6 +50,7 @@ public static class ViewModelLocator
                 .AddConfiguration(configRoot.GetSection("Logging"))
                 .AddSimpleConsole(console =>
                 {
+                    console.SingleLine = true;
                     console.IncludeScopes = true;
                 });
         });
