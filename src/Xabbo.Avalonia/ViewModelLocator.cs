@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Splat;
 using Splat.Microsoft.Extensions.Logging;
+using Avalonia.Logging;
 using Avalonia.Controls.ApplicationLifetimes;
 using HanumanInstitute.MvvmDialogs;
 using HanumanInstitute.MvvmDialogs.Avalonia;
@@ -54,6 +55,8 @@ public static class ViewModelLocator
         });
         container.RegisterConstant(loggerFactory);
         container.UseMicrosoftExtensionsLoggingWithWrappingFullLogger(loggerFactory);
+
+        Logger.Sink = new AvaloniaLogSink(loggerFactory);
 
         // Application services
         {
