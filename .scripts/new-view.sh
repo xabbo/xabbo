@@ -6,5 +6,5 @@ if [[ -n $viewName ]]; then
   dir=$(dirname "$viewName")
   base=$(basename "$viewName")
   echo "Creating view ${viewName}..."
-  dotnet new avalonia.usercontrol -n "$base" -o "./src/Xabbo.Ext.Avalonia/Views/$dir" --namespace Xabbo.Ext.Avalonia.Views
+  dotnet new avalonia.usercontrol -n "$base" -o "./src/Xabbo.Avalonia/Views/$dir" --namespace Xabbo.Avalonia.Views
 fi
