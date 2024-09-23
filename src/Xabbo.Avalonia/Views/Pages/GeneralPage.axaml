@@ -332,8 +332,16 @@
         <StackPanel Spacing="10">
           <CheckBox Content="Block HC gift notification" IsChecked="{Binding AntiHcNotification.Enabled}" />
           <StackPanel Orientation="Horizontal" Spacing="10">
-            <ColorPicker Color="{Binding TonerColor}" />
-            <TextBlock VerticalAlignment="Center" Text="Background toner" />
+            <ColorPicker
+              IsEnabled="{Binding Lighting.IsTonerAvailable}"
+              Color="{Binding Lighting.TonerColor, Converter={StaticResource HslU8Converter}}"
+            />
+            <CheckBox
+              IsEnabled="{Binding Lighting.IsTonerAvailable}"
+              IsChecked="{Binding Lighting.IsTonerActive}"
+              VerticalAlignment="Center"
+              Content="Background toner"
+            />
           </StackPanel>
         </StackPanel>
       </Expander>

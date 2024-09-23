@@ -1,19 +1,14 @@
-using System.Reactive.Linq;
-using System.Diagnostics;
-using Splat;
+﻿using Splat;
 using ReactiveUI;
 using HanumanInstitute.MvvmDialogs;
-using Avalonia.Media;
 using FluentIcons.Common;
 using FluentIcons.Avalonia.Fluent;
 using IconSource = FluentAvalonia.UI.Controls.IconSource;
 
 using Xabbo.Extension;
-using Xabbo.Messages.Flash;
-
 using Xabbo.Components;
-using Xabbo.Services.Abstractions;
 using Xabbo.Configuration;
+using Xabbo.Services.Abstractions;
 
 namespace Xabbo.ViewModels;
 
@@ -25,7 +20,8 @@ public class GeneralPageViewModel : PageViewModel
     private readonly IConfigProvider<AppConfig> _settingsProvider;
     private readonly IExtension _ext;
 
-    public AppConfig Config => _settingsProvider.Value;
+    private readonly ObservableAsPropertyHelper<AppConfig> _config;
+    public AppConfig Config => _config.Value;
 
     public GeneralPageViewModel(IConfigProvider<AppConfig> settingsProvider,
         IAppPathProvider appPathProvider,
@@ -35,22 +31,10 @@ public class GeneralPageViewModel : PageViewModel
         _settingsProvider = settingsProvider;
         _ext = ext;
 
-        _settingsProvider
+        _config = _settingsProvider
             .WhenAnyValue(x => x.Value)
-            .Subscribe(_ => this.RaisePropertyChanged(nameof(Config)));
-
-        this.ObservableForProperty(x => x.TonerColor)
-            .Sample(TimeSpan.FromMilliseconds(300))
-            .Subscribe(change =>
-            {
-                var color = change.Value.ToHsl();
-                Debug.WriteLine(color.ToString());
-                _ext.Send(Out.SetRoomBackgroundColorData,
-                    831085267, (int)Math.Round(color.H / 360 * 255), (int)Math.Round(color.S * 255), (int)Math.Round(color.L * 255));
-            });
+            .ToProperty(this, x => x.Config);
     }
-
-    [Reactive] public Color TonerColor { get; set; } = Colors.Black;
 
     [Reactive] public bool IsRoomExpanded { get; set; } = true;
     [Reactive] public bool IsMovementExpanded { get; set; } = true;
@@ -80,4 +64,5 @@ public class GeneralPageViewModel : PageViewModel
     [DependencyInjectionProperty] public FlattenRoomComponent? Flatten { get; set; }
     [DependencyInjectionProperty] public AvatarOverlayComponent? Overlay { get; set; }
     [DependencyInjectionProperty] public AntiHcGiftNotificationComponent? AntiHcNotification { get; set; }
+    [DependencyInjectionProperty] public LightingComponent? Lighting { get; set; }
 }

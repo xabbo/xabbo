@@ -8,6 +8,7 @@ using Xabbo.Core.Events;
 using Xabbo.Core.Game;
 using Xabbo.Core.GameData;
 using Xabbo.Models;
+using Xabbo.Core.Messages.Outgoing;
 
 namespace Xabbo.Components;
 
@@ -24,8 +25,7 @@ public class LightingComponent : Component
     private HslU8? _lastTonerColorUpdate;
 
     [Reactive] public bool IsTonerAvailable { get; set; }
-
-    [Reactive] public bool TonerActive { get; set; }
+    [Reactive] public bool IsTonerActive { get; set; }
     [Reactive] public HslU8 TonerColor { get; set; }
 
     public LightingComponent(IExtension ext, IGameDataManager gameData, RoomManager room)
@@ -35,61 +35,85 @@ public class LightingComponent : Component
         _roomManager = room;
 
         _gameData.Loaded += OnGameDataLoaded;
+        _roomManager.Entered += OnEnteredRoom;
+        _roomManager.Left += OnLeftRoom;
         _roomManager.FloorItemAdded += OnFloorItemAdded;
+        _roomManager.FloorItemUpdated += OnFloorItemUpdated;
 
         this.ObservableForProperty(x => x.TonerColor)
             .Sample(TimeSpan.FromMilliseconds(500))
             .Subscribe(x => UpdateToner(x.Value));
+
+        this.ObservableForProperty(x => x.IsTonerActive)
+            .Subscribe(x => EnableToner(x.Value));
     }
 
-    private IFloorItem? GetBgToner(long id)
+    private void OnGameDataLoaded() => FindToner();
+
+    private void FindToner()
     {
-        IFloorItem? toner = null;
-        if (Extensions.IsInitialized)
+        if (!Extensions.IsInitialized)
+            return;
+
+        if (_roomManager.Room is not { } room)
+            return;
+
+        var toner = room.FloorItems.OfKind(TonerIdentifier).FirstOrDefault();
+        if (toner is null)
         {
-            var room = _roomManager.Room;
-            if (room is not null)
-            {
-                if (id > 0)
-                {
-                    toner = room.GetFloorItem(id);
-                }
-                else
-                {
-                    toner = room.FloorItems.OfKind(TonerIdentifier).FirstOrDefault();
-                }
-            }
+            IsTonerAvailable = false;
         }
-        return toner;
+        else
+        {
+            SetToner(toner);
+        }
+    }
+
+    private void SetToner(IFloorItem toner)
+    {
+        _currentBgTonerId = toner.Id;
+        if (toner.Data is IIntArrayData data && data.Count == 4)
+        {
+            _lastTonerActiveUpdate = data[0] != 0;
+            IsTonerActive = _lastTonerActiveUpdate.Value;
+
+            _lastTonerColorUpdate = new HslU8((byte)data[1], (byte)data[2], (byte)data[3]);
+            TonerColor = _lastTonerColorUpdate.Value;
+
+            IsTonerAvailable = true;
+        }
     }
 
     private void UpdateToner(HslU8 color)
     {
         if (_lastTonerColorUpdate.Equals(color)) return;
         if (!Ext.IsConnected || _currentBgTonerId <= 0) return;
+        _lastTonerColorUpdate = color;
         Ext.Send(Out.SetRoomBackgroundColorData, _currentBgTonerId, color);
     }
 
-    private void OnGameDataLoaded()
+    private void EnableToner(bool enable)
     {
-        var room = _roomManager.Room;
-        if (room is null) return;
+        if (_lastTonerActiveUpdate == enable ||
+            _currentBgTonerId <= 0) return;
+        _lastTonerActiveUpdate = enable;
+        Ext.Send(new UseFloorItemMsg(_currentBgTonerId));
+    }
 
-        var toner = room.FloorItems.OfKind(TonerIdentifier).FirstOrDefault();
-        if (toner is null) return;
+    private void OnEnteredRoom(RoomEventArgs args)
+    {
+        FindToner();
+    }
 
-        _currentBgTonerId = toner.Id;
-        if (toner.Data is IIntArrayData data && data.Count == 4)
-        {
-            _lastTonerActiveUpdate = data[0] != 0;
-            TonerActive = _lastTonerActiveUpdate.Value;
+    private void OnLeftRoom()
+    {
+        _currentBgTonerId = -1;
+        _lastTonerActiveUpdate = null;
+        _lastTonerColorUpdate = null;
 
-            _lastTonerColorUpdate = new HslU8((byte)data[1], (byte)data[2], (byte)data[3]);
-            TonerColor = _lastTonerColorUpdate.Value;
-
-            this.RaisePropertyChanged(nameof(TonerActive));
-            this.RaisePropertyChanged(nameof(TonerColor));
-        }
+        IsTonerAvailable = false;
+        IsTonerActive = false;
+        TonerColor = default;
     }
 
     private void OnFloorItemAdded(FloorItemEventArgs e)
@@ -101,5 +125,16 @@ public class LightingComponent : Component
         {
             _currentBgTonerId = e.Item.Id;
         }
+    }
+
+    private void OnFloorItemUpdated(FloorItemUpdatedEventArgs e)
+    {
+        if (!_roomManager.EnsureRoom(out var room))
+            return;
+
+        if (e.Item.Id != _currentBgTonerId)
+            return;
+
+        SetToner(e.Item);
     }
 }
