@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -156,6 +156,7 @@ public static class ViewModelLocator
         Splatr.RegisterLazySingleton<FurniActionsComponent>();
         Splatr.RegisterLazySingleton<RoomEntryComponent>();
         Splatr.RegisterLazySingleton<RoomModeratorComponent>();
+        Splatr.RegisterLazySingleton<LightingComponent>();
 
         // Xabbo commands
         Splatr.RegisterLazySingleton<CommandManager>();
