@@ -1,40 +1,56 @@
-﻿using Xabbo.Messages.Flash;
+﻿using Xabbo.Core;
+using Xabbo.Core.Messages.Outgoing.Modern;
 
 namespace Xabbo.Command.Modules;
 
-[CommandModule]
+[CommandModule(SupportedClients = ClientType.Modern)]
 public sealed class InfoCommands : CommandModule
 {
     public InfoCommands() { }
 
-    [Command("profile", "prof", "p")]
-    public Task ShowProfileAsync(CommandArgs args)
+    [Command("profile", "p")]
+    public async Task ShowProfileAsync(CommandArgs args)
     {
         string name = string.Join(' ', args);
+
+        UserProfile profile;
         if (name.StartsWith("id:"))
         {
             name = name[3..].Trim();
 
             if (Id.TryParse(name, out Id id))
             {
-                Ext.Send(Out.GetExtendedProfile, id, true);
+                profile = await Ext.RequestAsync(new GetProfileMsg(id, true), block: false, timeout: 3000);
             }
             else
             {
-                ShowMessage($"Invalid ID specified: '{name}'.");
+                ShowMessage($"Invalid ID: '{name}'.");
+                return;
             }
         }
         else
         {
-            Ext.Send(Out.GetExtendedProfileByName, name);
+            profile = await Ext.RequestAsync(new GetProfileByNameMsg(name), block: false, timeout: 3000);
         }
-        return Task.CompletedTask;
+
+        if (!profile.DisplayInClient)
+        {
+            ShowMessage($"{profile.Name}'s profile is not visible.");
+        }
     }
 
-    [Command("group", "grp", "g")]
-    public Task ShowGroupInfoAsync(CommandArgs args)
+    [Command("group", "g")]
+    public async Task ShowGroupInfoAsync(CommandArgs args)
     {
-        Ext.Send(Out.GetHabboGroupDetails, long.Parse(args[0]), true);
-        return Task.CompletedTask;
+        if (args.Length < 1)
+            throw new InvalidArgsException();
+
+        if (args.Length < 1 || !Id.TryParse(args[0], out Id id))
+        {
+            ShowMessage($"Invalid ID: '{args[0]}'.");
+            return;
+        }
+
+        await Ext.RequestAsync(new GetGroupDataMsg(id, true), block: false, timeout: 3000);
     }
 }
