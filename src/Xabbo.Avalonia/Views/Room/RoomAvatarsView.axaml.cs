@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using Avalonia;
 using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.LogicalTree;
@@ -24,6 +24,18 @@ public partial class RoomAvatarsView : UserControl
         DataContextChanged += OnDataContextChanged;
         AvatarDataGrid.Sorting += OnSorting;
         DetachedFromLogicalTree += OnDetached;
+        AttachedToVisualTree += OnAttachedToVisualTree;
+        DetachedFromVisualTree += OnDetachedFromVisualTree;
+    }
+
+    private void OnAttachedToVisualTree(object? sender, VisualTreeAttachmentEventArgs e)
+    {
+        AvatarDataGrid.ItemsSource = _collectionView;
+    }
+
+    private void OnDetachedFromVisualTree(object? sender, VisualTreeAttachmentEventArgs e)
+    {
+        AvatarDataGrid.ItemsSource = null;
     }
 
     private void OnDetached(object? sender, LogicalTreeAttachmentEventArgs e)
