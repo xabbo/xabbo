@@ -108,6 +108,8 @@
       <c:HumanizerConverter x:Key="HumanizerConverter"/>
       <c:WhitespaceNewlineConverter x:Key="WhitespaceNewlineConverter" />
       <c:GtConverter x:Key="GtConverter" />
+      <c:EqualityConverter x:Key="EqConverter"/>
+      <c:InequalityConverter x:Key="NeqConverter"/>
 
     </ResourceDictionary>
   </Application.Resources>

@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using DynamicData;
 using DynamicData.Kernel;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 
+using Xabbo.Configuration;
 using Xabbo.Core;
 using Xabbo.Core.Events;
 using Xabbo.Core.Game;
@@ -14,6 +13,7 @@ namespace Xabbo.ViewModels;
 
 public class RoomAvatarsViewModel : ViewModelBase
 {
+    private readonly IConfigProvider<AppConfig> _config;
     private readonly IUiContext _uiContext;
     private readonly RoomManager _roomManager;
 
@@ -22,36 +22,49 @@ public class RoomAvatarsViewModel : ViewModelBase
     private readonly ReadOnlyObservableCollection<AvatarViewModel> _avatars;
     public ReadOnlyObservableCollection<AvatarViewModel> Avatars => _avatars;
 
-    [Reactive] public bool ShowPets { get; set; }
-    [Reactive] public bool ShowBots { get; set; }
     [Reactive] public string FilterText { get; set; } = "";
 
-    public RoomAvatarsViewModel(IUiContext uiContext, RoomManager roomManager)
+    public event Action? RefreshList;
+
+    public RoomUsersConfig Config => _config.Value.Room.Users;
+
+    public RoomAvatarsViewModel(IConfigProvider<AppConfig> config, IUiContext uiContext, RoomManager roomManager)
     {
+        _config = config;
         _uiContext = uiContext;
         _roomManager = roomManager;
 
         _avatarCache
             .Connect()
             .Filter(FilterAvatar)
-            .SortBy(x => x.Name)
+            .Sort(AvatarViewModelGroupComparer.Default)
             .Bind(out _avatars)
             .Subscribe();
+
+        _config
+            .WhenAnyValue(
+                x => x.Value.Room.Users.ShowPets,
+                x => x.Value.Room.Users.ShowBots
+            )
+            .Subscribe(x => {
+                _avatarCache.Refresh();
+                RefreshList?.Invoke();
+            });
 
         this.WhenAnyValue(x => x.FilterText).Subscribe(_ => _avatarCache.Refresh());
 
         _roomManager.Left += OnLeftRoom;
-        _roomManager.AvatarAdded += OnAvatarAdded;
+        _roomManager.AvatarsAdded += OnAvatarsAdded;
         _roomManager.AvatarRemoved += OnAvatarRemoved;
         _roomManager.AvatarIdle += OnAvatarIdle;
-        _roomManager.AvatarUpdated += OnAvatarUpdated;
+        _roomManager.AvatarsUpdated += OnAvatarsUpdated;
     }
 
     private bool FilterAvatar(AvatarViewModel avatar)
     {
-        if (!ShowPets && avatar.Type == AvatarType.Pet)
+        if (!Config.ShowPets && avatar.Type == AvatarType.Pet)
             return false;
-        if (!ShowBots && (avatar.Type == AvatarType.PublicBot || avatar.Type == AvatarType.PrivateBot))
+        if (!Config.ShowBots && avatar.Type is AvatarType.PublicBot or AvatarType.PrivateBot)
             return false;
         if (!string.IsNullOrWhiteSpace(FilterText) && !avatar.Name.Contains(FilterText, StringComparison.CurrentCultureIgnoreCase))
             return false;
@@ -59,14 +72,32 @@ public class RoomAvatarsViewModel : ViewModelBase
         return true;
     }
 
-    private void OnAvatarUpdated(AvatarEventArgs e)
+    private void OnAvatarsUpdated(AvatarsEventArgs e)
     {
-        _avatarCache.Lookup(e.Avatar.Index).IfHasValue(vm =>
+        bool shouldRefresh = false;
+
+        foreach (var avatar in e.Avatars)
         {
-            var currentUpdate = e.Avatar.CurrentUpdate;
-            if (currentUpdate is null) return;
-            vm.IsTrading = currentUpdate.IsTrading;
-        });
+            _avatarCache.Lookup(avatar.Index).IfHasValue(vm =>
+            {
+                var update = avatar.CurrentUpdate;
+                if (update is null) return;
+                vm.IsTrading = update.IsTrading;
+                if (vm.ControlLevel != update.ControlLevel)
+                {
+                    vm.ControlLevel = update.ControlLevel;
+                    shouldRefresh = true;
+                }
+            });
+        }
+
+        if (shouldRefresh)
+        {
+            _uiContext.InvokeAsync(() => {
+                _avatarCache.Refresh();
+                RefreshList?.Invoke();
+            });
+        }
     }
 
     private void OnLeftRoom()
@@ -74,9 +105,20 @@ public class RoomAvatarsViewModel : ViewModelBase
         _uiContext.Invoke(_avatarCache.Clear);
     }
 
-    private void OnAvatarAdded(AvatarEventArgs e)
+    private void OnAvatarsAdded(AvatarsEventArgs e)
     {
-        _uiContext.Invoke(() => _avatarCache.AddOrUpdate(new AvatarViewModel(e.Avatar)));
+        _uiContext.Invoke(() => {
+            foreach (var avatar in e.Avatars)
+            {
+                var vm = new AvatarViewModel(avatar);
+                if (avatar.Id == _roomManager?.CurrentRoomId)
+                    vm.IsOwner = true;
+                if (avatar is User user && user.IsModerator)
+                    vm.IsStaff = true;
+
+                _avatarCache.AddOrUpdate(vm);
+            }
+        });
     }
 
     private void OnAvatarRemoved(AvatarEventArgs e)
@@ -92,4 +134,3 @@ public class RoomAvatarsViewModel : ViewModelBase
         });
     }
 }
-

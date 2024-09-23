@@ -7,10 +7,39 @@
   xmlns:vm="using:Xabbo.ViewModels"
   xmlns:ui="using:FluentAvalonia.UI.Controls"
   xmlns:ic="using:FluentIcons.Avalonia.Fluent"
+  xmlns:collections="using:Avalonia.Collections"
   mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
   x:Class="Xabbo.Views.RoomAvatarsView"
   x:DataType="vm:RoomAvatarsViewModel"
 >
+  <UserControl.Styles>
+    <Style Selector="DataGridRowGroupHeader">
+      <Setter Property="Template">
+        <ControlTemplate x:DataType="collections:DataGridCollectionViewGroup">
+          <Grid Background="Transparent">
+            <StackPanel Margin="10,5" HorizontalAlignment="Center" VerticalAlignment="Center">
+              <Image
+                IsVisible="{Binding Key, Converter={StaticResource EqConverter} ConverterParameter={x:Static vm:AvatarViewModelGroup.Staff}}"
+                HorizontalAlignment="Center"
+                Source="avares://Xabbo.Avalonia/Assets/Images/staff.png"
+              />
+              <TextBlock
+                FontSize="18"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Text="{Binding Key, Converter={StaticResource HumanizerConverter}}"
+              />
+            </StackPanel>
+            <TextBlock
+              IsVisible="{Binding Key, Converter={StaticResource NeqConverter} ConverterParameter={x:Static vm:AvatarViewModelGroup.RoomOwner}}"
+              Margin="10,10,14,10" HorizontalAlignment="Right"
+              FontSize="14" Text="{Binding ItemCount}"
+            />
+          </Grid>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+  </UserControl.Styles>
   <Grid RowDefinitions="Auto,*">
     <TextBox
       Margin="10,0,10,10"
@@ -20,19 +49,26 @@
     <DataGrid
       x:Name="AvatarDataGrid"
       Grid.Row="1"
-      ItemsSource="{Binding Avatars}"
       CanUserReorderColumns="True"
       CanUserResizeColumns="True"
       CanUserSortColumns="True"
+      Background="Transparent"
     >
       <DataGrid.ContextFlyout>
         <MenuFlyout>
-          <MenuItem Header="Test" />
+          <MenuFlyout.ItemContainerTheme>
+            <ControlTheme TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
+              <Setter Property="Margin" Value="0" />
+              <Setter Property="Padding" Value="8,0" />
+            </ControlTheme>
+          </MenuFlyout.ItemContainerTheme>
+          <CheckBox IsChecked="{Binding Config.ShowBots}">Show bots</CheckBox>
+          <CheckBox IsChecked="{Binding Config.ShowPets}">Show pets</CheckBox>
         </MenuFlyout>
       </DataGrid.ContextFlyout>
       <DataGrid.Columns>
-        <DataGridTextColumn Header="index" Binding="{Binding Index}" />
-        <DataGridTextColumn Header="id" Binding="{Binding Id}" IsVisible="{DynamicResource IsModern}" />
+        <DataGridTextColumn SortMemberPath="Index" Header="index" Binding="{Binding Index, DataType={x:Type vm:AvatarViewModel}}" />
+        <DataGridTextColumn SortMemberPath="Id" Header="id" Binding="{Binding Id, DataType={x:Type vm:AvatarViewModel}}" IsVisible="{DynamicResource IsModern}" />
         <DataGridTemplateColumn
           x:DataType="vm:AvatarViewModel"
           Header="name" SortMemberPath="Name"
