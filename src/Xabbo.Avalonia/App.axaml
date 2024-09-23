@@ -41,7 +41,8 @@
         </Style>
       </Style>
 
-      <Style Selector=":is(Control).origins :is(Control).modern">
+      <!-- Hide modern components on origins sessions -->
+      <Style Selector=":is(Window)#Root.origins :is(Control).modern">
         <Setter Property="IsVisible" Value="False" />
       </Style>
 
