@@ -227,7 +227,13 @@ public partial class CommandManager
                 return;
             }
 
-            ShowMessage("An error occurred while executing that command");
+            if (ex is TimeoutException)
+            {
+                ShowMessage($"/{command}: The request timed out.");
+                return;
+            }
+
+            ShowMessage($"/{command}: An error occurred.");
 
             if (ex is null) return;
 
