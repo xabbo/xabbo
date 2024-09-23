@@ -1,9 +1,4 @@
-using System.Collections.Generic;
-using ReactiveUI.Fody.Helpers;
-using Splat;
-using Avalonia.Controls.ApplicationLifetimes;
-
-using Xabbo.Extension;
+﻿using Splat;
 
 namespace Xabbo.ViewModels;
 
@@ -30,11 +25,12 @@ public class MainViewModel : ViewModelBase
         FriendsPageViewModel friends,
         ChatPageViewModel chat,
         RoomPageViewModel room,
-        SettingsPageViewModel settings,
-        GameDataPageViewModel gameData)
+        GameDataPageViewModel gameData,
+        InfoPageViewModel info,
+        SettingsPageViewModel settings)
     {
         Pages = [general, wardrobe, friends, chat, room, gameData];
-        FooterPages = [settings];
+        FooterPages = [info, settings];
         SelectedPage = general;
     }
 }

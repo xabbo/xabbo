@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -96,6 +96,7 @@ public static class ViewModelLocator
         Splatr.RegisterLazySingleton<RoomPageViewModel>();
         Splatr.RegisterLazySingleton<NavigatorPageViewModel>();
         Splatr.RegisterLazySingleton<GameDataPageViewModel>();
+        Splatr.RegisterLazySingleton<InfoPageViewModel>();
         Splatr.RegisterLazySingleton<SettingsPageViewModel>();
 
         Splatr.RegisterLazySingleton<RoomInfoViewModel>();

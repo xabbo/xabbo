@@ -1,0 +1,76 @@
+<UserControl
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+  x:Class="Xabbo.Views.InfoPageView"
+  x:Name="InfoPageRoot"
+>
+  <Grid>
+    <Grid.Styles>
+      <Style Selector="Button.link">
+        <Setter Property="Padding" Value="2,0" />
+        <Setter Property="Theme" Value="{StaticResource TransparentButton}" />
+        <Setter Property="Foreground" Value="#ceb4ff" />
+        <Setter Property="FontWeight" Value="Bold" />
+      </Style>
+      <Style Selector="TextBlock">
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="TextAlignment" Value="Center" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+      </Style>
+    </Grid.Styles>
+    <StackPanel Margin="10" Spacing="10">
+      <Image
+        Width="128"
+        Height="128"
+        Source="avares://Xabbo.Avalonia/Assets/xabbo-skull-128.png"
+      />
+      <TextBlock FontSize="18" TextAlignment="Center">
+        <Bold FontSize="24">xabbo</Bold><LineBreak />
+        <Span>
+          developed by
+          <InlineUIContainer>
+            <Button Margin="0,0,-6,0" Classes="link" Command="{Binding #InfoPageRoot.OpenUrlCmd}" CommandParameter="https://b7c.io">
+              <TextBlock ClipToBounds="False" FontSize="18" FontWeight="Bold" Text="b7" />
+            </Button>
+          </InlineUIContainer>
+        </Span>
+      </TextBlock>
+      <TextBlock TextAlignment="Center">
+        Powered by the xabbo
+        <InlineUIContainer>
+          <Button Margin="0,0,-6,0" Classes="link" Command="{Binding #InfoPageRoot.OpenUrlCmd}" CommandParameter="https://github.com/xabbo/common">
+            <TextBlock ClipToBounds="False" Text="common" />
+          </Button>
+        </InlineUIContainer>
+        <Run>, </Run>
+        <InlineUIContainer>
+          <Button Margin="0,0,-6,0" Classes="link" Command="{Binding #InfoPageRoot.OpenUrlCmd}" CommandParameter="https://github.com/xabbo/gearth">
+            <TextBlock ClipToBounds="False" Text="gearth" />
+          </Button>
+        </InlineUIContainer>
+        <Run>, and </Run>
+        <InlineUIContainer>
+          <Button Classes="link" Command="{Binding #InfoPageRoot.OpenUrlCmd}" CommandParameter="https://github.com/xabbo/core">
+            <TextBlock ClipToBounds="False" Text="core" />
+          </Button>
+        </InlineUIContainer>
+        libraries
+      </TextBlock>
+      <TextBlock>
+        Create an issue on
+        <InlineUIContainer>
+          <Button Classes="link" Command="{Binding #InfoPageRoot.OpenUrlCmd}" CommandParameter="https://github.com/xabbo/xabbo">
+            <StackPanel Orientation="Horizontal" Spacing="4">
+              <Path Width="24" Height="24" Stretch="Uniform" Fill="White" Data="M48.854 0C21.839 0 0 22 0 49.217c0 21.756 13.993 40.172 33.405 46.69 2.427.49 3.316-1.059 3.316-2.362 0-1.141-.08-5.052-.08-9.127-13.59 2.934-16.42-5.867-16.42-5.867-2.184-5.704-5.42-7.17-5.42-7.17-4.448-3.015.324-3.015.324-3.015 4.934.326 7.523 5.052 7.523 5.052 4.367 7.496 11.404 5.378 14.235 4.074.404-3.178 1.699-5.378 3.074-6.6-10.839-1.141-22.243-5.378-22.243-24.283 0-5.378 1.94-9.778 5.014-13.2-.485-1.222-2.184-6.275.486-13.038 0 0 4.125-1.304 13.426 5.052a46.97 46.97 0 0 1 12.214-1.63c4.125 0 8.33.571 12.213 1.63 9.302-6.356 13.427-5.052 13.427-5.052 2.67 6.763.97 11.816.485 13.038 3.155 3.422 5.015 7.822 5.015 13.2 0 18.905-11.404 23.06-22.324 24.283 1.78 1.548 3.316 4.481 3.316 9.126 0 6.6-.08 11.897-.08 13.526 0 1.304.89 2.853 3.316 2.364 19.412-6.52 33.405-24.935 33.405-46.691C97.707 22 75.788 0 48.854 0z" />
+              <TextBlock Text="GitHub" />
+            </StackPanel>
+          </Button>
+        </InlineUIContainer>
+        to report a bug or request a feature
+      </TextBlock>
+    </StackPanel>
+  </Grid>
+</UserControl>

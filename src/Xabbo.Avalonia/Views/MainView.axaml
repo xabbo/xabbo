@@ -40,6 +40,9 @@
       <DataTemplate DataType="{x:Type vm:GameDataPageViewModel}">
         <v:GameDataPage />
       </DataTemplate>
+      <DataTemplate DataType="{x:Type vm:InfoPageViewModel}">
+        <v:InfoPageView />
+      </DataTemplate>
       <DataTemplate DataType="{x:Type vm:SettingsPageViewModel}">
         <v:SettingsPageView />
       </DataTemplate>
