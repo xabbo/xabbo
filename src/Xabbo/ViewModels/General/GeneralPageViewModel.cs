@@ -1,4 +1,4 @@
-﻿using System.Reactive.Linq;
+using System.Reactive.Linq;
 using System.Diagnostics;
 using Splat;
 using ReactiveUI;
@@ -37,7 +37,7 @@ public class GeneralPageViewModel : PageViewModel
 
         _settingsProvider
             .WhenAnyValue(x => x.Value)
-            .Subscribe(_ => this.RaisePropertyChanged(nameof(AppConfig)));
+            .Subscribe(_ => this.RaisePropertyChanged(nameof(Config)));
 
         this.ObservableForProperty(x => x.TonerColor)
             .Sample(TimeSpan.FromMilliseconds(300))

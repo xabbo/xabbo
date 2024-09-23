@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using ReactiveUI.Fody.Helpers;
 using Splat;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -24,8 +24,7 @@ public class MainViewModel : ViewModelBase
     }
 
     [DependencyInjectionConstructor]
-    public MainViewModel(IControlledApplicationLifetime lt,
-        IExtension extension,
+    public MainViewModel(
         GeneralPageViewModel general,
         WardrobePageViewModel wardrobe,
         FriendsPageViewModel friends,

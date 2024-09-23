@@ -52,14 +52,13 @@
               >
                 <img:AdvancedImage.Styles>
                   <Style Selector="img|AdvancedImage">
-                    <Setter Property="Opacity" Value="1" />
                     <!--
                       TODO no fade in when loaded from cache
                       (may require modifications to AsyncImageLoader library)
                     -->
                     <Style Selector="^[IsLoading=false]">
                       <Style.Animations>
-                          <Animation Duration="0:0:1">
+                          <Animation Duration="0:0:1" FillMode="Forward">
                               <KeyFrame Cue="0%">
                                   <Setter Property="Opacity" Value="0.0"/>
                               </KeyFrame>

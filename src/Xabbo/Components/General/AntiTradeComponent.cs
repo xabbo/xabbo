@@ -1,5 +1,4 @@
-using Microsoft.Extensions.Configuration;
-using ReactiveUI;
+﻿using ReactiveUI;
 
 using Xabbo.Messages.Flash;
 using Xabbo.Extension;
