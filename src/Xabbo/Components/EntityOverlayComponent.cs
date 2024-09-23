@@ -7,6 +7,7 @@ using Xabbo.Core;
 using Xabbo.Core.Events;
 using Xabbo.Core.Game;
 using Xabbo.Core.Messages.Incoming;
+using Xabbo.Core.Messages.Incoming.Modern;
 
 namespace Xabbo.Components;
 

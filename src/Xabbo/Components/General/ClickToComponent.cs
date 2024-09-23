@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel;
-using Microsoft.Extensions.Configuration;
 
 using Xabbo.Messages.Flash;
 using Xabbo.Extension;
@@ -9,6 +8,7 @@ using Xabbo.Core.Messages.Outgoing;
 using Xabbo.Core.Messages.Incoming;
 using Xabbo.Services.Abstractions;
 using Xabbo.Configuration;
+using Xabbo.Core.Messages.Outgoing.Modern;
 
 namespace Xabbo.Components;
 
