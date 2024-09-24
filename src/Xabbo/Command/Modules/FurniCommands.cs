@@ -6,6 +6,7 @@ using Xabbo.Core.GameData;
 using Xabbo.Services.Abstractions;
 using Xabbo.Configuration;
 using Xabbo.Utility;
+using Xabbo.Core.Messages.Outgoing;
 
 namespace Xabbo.Command.Modules;
 
@@ -156,7 +157,7 @@ public sealed class FurniCommands(
             foreach (var furni in matched)
             {
                 if (!Session.IsOrigins && eject == (furni.OwnerId == userData.Id)) continue;
-                _roomManager.Pickup(furni);
+                Ext.Send(new PickupItemMsg(furni.Type, furni.Id));
                 await Task.Delay(pickupInterval, ct);
             }
         });
