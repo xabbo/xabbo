@@ -7,6 +7,7 @@
   x:DataType="vm:ChatPageViewModel"
   mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
   x:Class="Xabbo.Views.ChatPage"
+  x:Name="ChatPageRoot"
 >
   <Design.DataContext>
     <vm:ChatPageViewModel />
@@ -41,7 +42,7 @@
         IsChecked="{Binding Config.LogToFile}"
         Content="Log to file" />
       <CheckBox
-        IsEnabled="False"
+        IsChecked="{Binding #ChatPageRoot.IsAutoScrollEnabled}"
         Content="Autoscroll" />
     </WrapPanel>
   </Grid>
