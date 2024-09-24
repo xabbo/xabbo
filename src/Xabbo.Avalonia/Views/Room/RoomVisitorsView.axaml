@@ -19,7 +19,8 @@
       Name="DataGridVisitors"
       Grid.Row="1"
       ItemsSource="{Binding Visitors}"
-      CanUserReorderColumns="False"
+      CanUserSortColumns="False"
+      CanUserReorderColumns="True"
       CanUserResizeColumns="True"
     >
       <DataGrid.Columns>
