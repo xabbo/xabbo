@@ -49,10 +49,6 @@
   </ItemGroup>
 
   <ItemGroup Label="Xabbo">
-    <ProjectReference Include="$(XabboCommonDir)src\Xabbo.Common\Xabbo.Common.csproj" />
-    <ProjectReference Include="$(XabboCommonDir)src\Xabbo.Common.Generator\Xabbo.Common.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="$(XabboCoreDir)src\Xabbo.Core\Xabbo.Core.csproj" />
-    <ProjectReference Include="$(XabboGEarthDir)src\Xabbo.GEarth\Xabbo.GEarth.csproj" />
     <ProjectReference Include="..\Xabbo\Xabbo.csproj" />
   </ItemGroup>
 

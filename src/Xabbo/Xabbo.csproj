@@ -32,7 +32,7 @@
     <PackageReference Include="Humanizer.Core" Version="2.14.1" />
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Label="Xabbo">
     <ProjectReference Include="$(XabboCommonDir)src\Xabbo.Common\Xabbo.Common.csproj" />
     <ProjectReference Include="$(XabboCommonDir)src\Xabbo.Common.Generator\Xabbo.Common.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     <ProjectReference Include="$(XabboCoreDir)src\Xabbo.Core\Xabbo.Core.csproj" />
