@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading.Tasks;
 using DynamicData;
 using DynamicData.Binding;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 
 using Xabbo.Extension;
 using Xabbo.Core;
@@ -24,12 +19,12 @@ public class RoomVisitorsViewModel : ViewModelBase
     private readonly ProfileManager _profileManager;
     private readonly RoomManager _roomManager;
 
-    private readonly ConcurrentDictionary<long, VisitorViewModel> _visitorMap = new();
+    private readonly ConcurrentDictionary<string, VisitorViewModel> _visitorMap = new();
 
     private readonly ReadOnlyObservableCollection<VisitorViewModel> _visitors;
     public ReadOnlyObservableCollection<VisitorViewModel> Visitors => _visitors;
 
-    private readonly SourceCache<VisitorViewModel, long> _visitorCache = new(x => x.Id);
+    private readonly SourceCache<VisitorViewModel, string> _visitorCache = new(x => x.Name);
 
     [Reactive] public bool IsAvailable { get; set; }
     [Reactive] public string FilterText { get; set; } = ""; // RefreshList on set
@@ -173,7 +168,7 @@ public class RoomVisitorsViewModel : ViewModelBase
 
         foreach (var user in e.Avatars.OfType<IUser>())
         {
-            if (_visitorMap.TryGetValue(user.Id, out VisitorViewModel? visitorLog))
+            if (_visitorMap.TryGetValue(user.Name, out VisitorViewModel? visitorLog))
             {
                 /* User already exists in the dictionary,
                  * so they have re-entered the room */
@@ -190,7 +185,7 @@ public class RoomVisitorsViewModel : ViewModelBase
             else
             {
                 visitorLog = new VisitorViewModel(user.Index, user.Id, user.Name);
-                if (_visitorMap.TryAdd(user.Id, visitorLog))
+                if (_visitorMap.TryAdd(user.Name, visitorLog))
                 {
                     /* Avatars received when first loading the room were already in the room,
                      * so we don't know when they entered, but we can see what order they
@@ -226,7 +221,7 @@ public class RoomVisitorsViewModel : ViewModelBase
 
     private void OnAvatarsRemoved(AvatarEventArgs e)
     {
-        if (_visitorMap.TryGetValue(e.Avatar.Id, out VisitorViewModel? visitor))
+        if (_visitorMap.TryGetValue(e.Avatar.Name, out VisitorViewModel? visitor))
         {
             visitor.Left = DateTime.Now;
 #if ENABLE_LOGGING
