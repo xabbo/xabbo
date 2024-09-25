@@ -3,11 +3,11 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-  xmlns:v="using:Xabbo.Views"
+  xmlns:v="using:Xabbo.Avalonia.Views"
   xmlns:vm="using:Xabbo.ViewModels"
   xmlns:ic="using:FluentIcons.Avalonia.Fluent"
   mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-  x:Class="Xabbo.Views.RoomPage"
+  x:Class="Xabbo.Avalonia.Views.RoomPage"
   x:DataType="vm:RoomPageViewModel"
 >
   <TabControl Padding="0,4,0,0">

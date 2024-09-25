@@ -9,7 +9,7 @@ using Avalonia.LogicalTree;
 
 using Xabbo.ViewModels;
 
-namespace Xabbo.Views;
+namespace Xabbo.Avalonia.Views;
 
 public partial class RoomAvatarsView : UserControl
 {

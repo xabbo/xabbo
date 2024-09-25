@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 using Avalonia.Data;
 using Avalonia.Data.Converters;
 
-namespace Xabbo.Converters;
+namespace Xabbo.Avalonia.Converters;
 
 public class WhitespaceNewlineConverter : IValueConverter
 {

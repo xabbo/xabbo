@@ -2,9 +2,9 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Threading;
 
-using Xabbo.Views;
-using Xabbo.ViewModels;
 using Xabbo.Services.Abstractions;
+using Xabbo.ViewModels;
+using Xabbo.Avalonia.Views;
 
 namespace Xabbo.Avalonia.Services;
 

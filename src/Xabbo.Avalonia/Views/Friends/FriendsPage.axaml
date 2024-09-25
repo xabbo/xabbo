@@ -6,12 +6,12 @@
   xmlns:ic="using:FluentIcons.Avalonia.Fluent"
   xmlns:img="using:AsyncImageLoader"
   xmlns:services="using:Xabbo.Avalonia.Services"
-  xmlns:v="using:Xabbo.Views"
+  xmlns:v="using:Xabbo.Avalonia.Views"
   xmlns:vm="using:Xabbo.ViewModels"
   xmlns:controls="using:Xabbo.Avalonia.Controls"
   x:DataType="vm:FriendsPageViewModel"
   mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-  x:Class="Xabbo.Views.FriendsPage"
+  x:Class="Xabbo.Avalonia.Views.FriendsPage"
   x:Name="friendsPage"
 >
   <Design.DataContext>

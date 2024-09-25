@@ -1,14 +1,14 @@
 <Application
   xmlns="https://github.com/avaloniaui"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-  x:Class="Xabbo.App"
-  xmlns:local="using:Xabbo"
+  x:Class="Xabbo.Avalonia.App"
+  xmlns:local="using:Xabbo.Avalonia"
   xmlns:sty="using:FluentAvalonia.Styling"
   xmlns:ui="using:FluentAvalonia.UI.Controls"
   xmlns:ic="using:FluentIcons.Avalonia.Fluent"
   xmlns:img="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
   xmlns:services="using:Xabbo.Avalonia.Services"
-  xmlns:c="using:Xabbo.Converters"
+  xmlns:c="using:Xabbo.Avalonia.Converters"
   RequestedThemeVariant="Dark"
 >
     <Application.DataTemplates>

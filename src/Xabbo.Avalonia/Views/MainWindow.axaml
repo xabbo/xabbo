@@ -1,7 +1,7 @@
 <wnd:AppWindow
   xmlns="https://github.com/avaloniaui"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-  xmlns:v="using:Xabbo.Views"
+  xmlns:v="using:Xabbo.Avalonia.Views"
   xmlns:vm="using:Xabbo.ViewModels"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -10,7 +10,7 @@
   xmlns:ui="using:FluentAvalonia.UI.Controls"
   mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
   x:Name="Root"
-  x:Class="Xabbo.Views.MainWindow"
+  x:Class="Xabbo.Avalonia.Views.MainWindow"
   x:DataType="vm:MainViewModel"
   Icon="/Assets/xabbo-skull-64.png"
   WindowStartupLocation="CenterScreen"

@@ -4,10 +4,10 @@
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:ui="using:FluentAvalonia.UI.Controls"
-  xmlns:v="using:Xabbo.Views"
+  xmlns:v="using:Xabbo.Avalonia.Views"
   xmlns:vm="using:Xabbo.ViewModels"
   mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-  x:Class="Xabbo.Views.MainView"
+  x:Class="Xabbo.Avalonia.Views.MainView"
   x:DataType="vm:MainViewModel"
 >
   <ui:NavigationView

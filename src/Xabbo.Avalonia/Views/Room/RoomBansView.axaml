@@ -7,7 +7,7 @@
   xmlns:controls="using:Xabbo.Avalonia.Controls"
   xmlns:vm="using:Xabbo.ViewModels"
   mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-  x:Class="Xabbo.Views.RoomBansView"
+  x:Class="Xabbo.Avalonia.Views.RoomBansView"
   x:DataType="vm:RoomBansViewModel"
 >
   <Grid RowDefinitions="Auto,*,Auto">

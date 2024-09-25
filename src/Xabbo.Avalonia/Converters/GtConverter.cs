@@ -2,7 +2,7 @@
 using System.Globalization;
 using Avalonia.Data.Converters;
 
-namespace Xabbo.Converters;
+namespace Xabbo.Avalonia.Converters;
 
 public class GtConverter : IValueConverter
 {

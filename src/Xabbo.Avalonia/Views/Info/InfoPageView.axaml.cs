@@ -4,7 +4,7 @@ using ReactiveUI;
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 
-namespace Xabbo.Views;
+namespace Xabbo.Avalonia.Views;
 
 public partial class InfoPageView : UserControl
 {

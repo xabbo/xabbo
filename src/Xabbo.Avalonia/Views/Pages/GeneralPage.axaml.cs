@@ -4,7 +4,7 @@ using Xabbo.ViewModels;
 
 using ReactiveUI;
 
-namespace Xabbo.Views;
+namespace Xabbo.Avalonia.Views;
 
 public partial class GeneralPage : UserControl, IViewFor<GeneralPageViewModel>
 {

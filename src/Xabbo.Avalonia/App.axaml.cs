@@ -12,7 +12,7 @@ using Xabbo.Avalonia.Services;
 
 using IHostApplicationLifetime = Microsoft.Extensions.Hosting.IHostApplicationLifetime;
 
-namespace Xabbo;
+namespace Xabbo.Avalonia;
 
 public partial class App : Application
 {

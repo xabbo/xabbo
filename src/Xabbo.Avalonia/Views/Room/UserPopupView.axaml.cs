@@ -2,7 +2,7 @@
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
-namespace Xabbo.Views;
+namespace Xabbo.Avalonia.Views;
 
 public partial class UserPopupView : UserControl
 {

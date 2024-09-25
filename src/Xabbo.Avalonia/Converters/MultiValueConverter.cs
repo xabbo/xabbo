@@ -5,7 +5,7 @@ using System.Linq;
 using Avalonia.Data;
 using Avalonia.Data.Converters;
 
-namespace Xabbo.Converters;
+namespace Xabbo.Avalonia.Converters;
 
 public class MultiValueConverter : List<IValueConverter>, IValueConverter
 {

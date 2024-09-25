@@ -5,7 +5,7 @@ using Avalonia.Data.Converters;
 
 using Xabbo.Core;
 
-namespace Xabbo.Converters;
+namespace Xabbo.Avalonia.Converters;
 
 public class HabboStringConverter : IValueConverter
 {

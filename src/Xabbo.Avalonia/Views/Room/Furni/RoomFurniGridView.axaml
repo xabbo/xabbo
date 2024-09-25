@@ -7,10 +7,10 @@
   xmlns:ui="using:FluentAvalonia.UI.Controls"
   xmlns:img="using:AsyncImageLoader"
   xmlns:services="using:Xabbo.Avalonia.Services"
-  xmlns:v="using:Xabbo.Views"
+  xmlns:v="using:Xabbo.Avalonia.Views"
   xmlns:vm="using:Xabbo.ViewModels"
   mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-  x:Class="Xabbo.Views.RoomFurniGridView"
+  x:Class="Xabbo.Avalonia.Views.RoomFurniGridView"
   x:DataType="vm:RoomFurniViewModel"
 >
   <UserControl.Resources>

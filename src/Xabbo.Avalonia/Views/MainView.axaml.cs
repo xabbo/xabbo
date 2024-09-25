@@ -3,7 +3,7 @@ using Avalonia.Interactivity;
 
 using Xabbo.ViewModels;
 
-namespace Xabbo.Views;
+namespace Xabbo.Avalonia.Views;
 
 public partial class MainView : UserControl
 {

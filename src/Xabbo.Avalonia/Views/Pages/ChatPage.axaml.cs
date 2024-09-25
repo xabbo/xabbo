@@ -7,7 +7,7 @@ using ReactiveUI.Fody.Helpers;
 
 using Xabbo.ViewModels;
 
-namespace Xabbo.Views;
+namespace Xabbo.Avalonia.Views;
 
 public partial class ChatPage : UserControl
 {

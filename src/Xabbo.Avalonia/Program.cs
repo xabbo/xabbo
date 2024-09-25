@@ -3,7 +3,7 @@ using ReactiveUI;
 using Avalonia;
 using Avalonia.ReactiveUI;
 
-namespace Xabbo;
+namespace Xabbo.Avalonia;
 
 internal sealed class Program
 {

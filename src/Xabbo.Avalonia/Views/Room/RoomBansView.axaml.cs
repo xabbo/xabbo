@@ -1,6 +1,6 @@
 ﻿using Avalonia.Controls;
 
-namespace Xabbo.Views;
+namespace Xabbo.Avalonia.Views;
 
 public partial class RoomBansView : UserControl
 {

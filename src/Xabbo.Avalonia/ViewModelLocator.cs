@@ -26,7 +26,7 @@ using Xabbo.ViewModels;
 using IHostApplicationLifetime = Microsoft.Extensions.Hosting.IHostApplicationLifetime;
 using Splatr = Splat.SplatRegistrations;
 
-namespace Xabbo;
+namespace Xabbo.Avalonia;
 
 public static class ViewModelLocator
 {

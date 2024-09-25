@@ -5,7 +5,7 @@ using Avalonia.Data.Converters;
 
 using Humanizer;
 
-namespace Xabbo.Converters;
+namespace Xabbo.Avalonia.Converters;
 
 public class HumanizerConverter : IValueConverter
 {

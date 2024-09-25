@@ -5,7 +5,7 @@ using Avalonia.Media;
 
 using Xabbo.Models;
 
-namespace Xabbo.Converters;
+namespace Xabbo.Avalonia.Converters;
 
 public sealed class HslU8Converter : IValueConverter
 {

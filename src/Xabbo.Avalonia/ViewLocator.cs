@@ -1,9 +1,9 @@
 ﻿using HanumanInstitute.MvvmDialogs.Avalonia;
 
-using Xabbo.Views;
+using Xabbo.Avalonia.Views;
 using Xabbo.ViewModels;
 
-namespace Xabbo;
+namespace Xabbo.Avalonia;
 
 public class ViewLocator : StrongViewLocator
 {

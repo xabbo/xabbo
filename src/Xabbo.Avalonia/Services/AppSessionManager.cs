@@ -11,8 +11,6 @@ using Xabbo.Core.GameData;
 using Xabbo.Core.Messages.Incoming.Modern;
 
 using Xabbo.Extension;
-using Xabbo.Messages;
-using Xabbo.Messages.Flash;
 using Xabbo.Services.Abstractions;
 
 namespace Xabbo.Avalonia.Services;

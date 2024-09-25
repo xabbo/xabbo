@@ -2,7 +2,7 @@
 using Avalonia.Controls;
 using Avalonia.Threading;
 
-namespace Xabbo.Views;
+namespace Xabbo.Avalonia.Views;
 
 public partial class RoomFurniGridView : UserControl
 {

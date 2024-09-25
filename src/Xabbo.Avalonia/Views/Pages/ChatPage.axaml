@@ -6,7 +6,7 @@
   xmlns:vm="using:Xabbo.ViewModels"
   x:DataType="vm:ChatPageViewModel"
   mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-  x:Class="Xabbo.Views.ChatPage"
+  x:Class="Xabbo.Avalonia.Views.ChatPage"
   x:Name="ChatPageRoot"
 >
   <Design.DataContext>

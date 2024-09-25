@@ -6,7 +6,7 @@ using FluentAvalonia.UI.Windowing;
 
 using Xabbo.ViewModels;
 
-namespace Xabbo.Views;
+namespace Xabbo.Avalonia.Views;
 
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
 public partial class MainWindow : AppWindow
