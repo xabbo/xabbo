@@ -18,4 +18,10 @@ public static class UrlHelper
 
         return $"https://habbo.com/habbo-imaging/avatarimage?{query}";
     }
+
+    public static string FurniIconUrl(string identifier, int revision)
+    {
+        identifier = identifier.Replace('*', '_');
+        return $"https://images.habbo.com/dcr/hof_furni/{revision}/{identifier}_icon.png";
+    }
 }

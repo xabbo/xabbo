@@ -1,0 +1,119 @@
+<UserControl
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:converters="using:Avalonia.Controls.Converters"
+  xmlns:ic="using:FluentIcons.Avalonia.Fluent"
+  xmlns:vm="using:Xabbo.ViewModels"
+  xmlns:services="using:Xabbo.Avalonia.Services"
+  xmlns:img="using:AsyncImageLoader"
+  mc:Ignorable="d" d:DesignWidth="600"
+  x:Class="Xabbo.Avalonia.Views.GiftView"
+  x:DataType="vm:GiftViewModel"
+  Classes.peek="{Binding IsPeeking}"
+>
+  <Design.DataContext>
+    <x:Static Member='vm:DesignViewModels.GiftViewModel' />
+  </Design.DataContext>
+  <UserControl.Styles>
+    <Style Selector="Grid#GiftContents">
+      <Setter Property="IsVisible" Value="False" />
+      <Setter Property="Opacity" Value="0" />
+      <Style Selector="^.fadein">
+        <Setter Property="Transitions">
+          <Transitions>
+            <DoubleTransition Property="Opacity" Duration="0:0:0.5" />
+          </Transitions>
+        </Setter>
+      </Style>
+    </Style>
+    <Style Selector=".peek">
+      <Style Selector="^ Button#PeekButton">
+        <Setter Property="IsVisible" Value="False" />
+      </Style>
+      <Style Selector="^ Grid#GiftContents">
+        <Setter Property="IsVisible" Value="True" />
+        <Setter Property="Opacity" Value="1" />
+      </Style>
+    </Style>
+  </UserControl.Styles>
+  <StackPanel>
+    <Border
+      BorderThickness="1,1,1,0"
+      BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+      Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+      CornerRadius="{Binding Source={StaticResource ControlCornerRadius}, Converter={StaticResource TopCornerRadiusFilterConverter}}"
+    >
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <img:AdvancedImage
+          Classes="avatarimage head"
+          Margin="10,0,0,0"
+          Stretch="None"
+          IsVisible="{
+            Binding SenderImageUrl,
+            Converter={x:Static StringConverters.IsNotNullOrEmpty},
+            FallbackValue='avares://Xabbo.Avalonia/Assets/Images/avatarhead.png'
+          }"
+          Source="{Binding SenderImageUrl}"
+          Loader="{x:Static services:XabboImageLoader.Instance}"
+        />
+        <Grid Grid.Column="1">
+          <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+          </Grid.RowDefinitions>
+          <TextBlock Margin="8" Text="{Binding Message, Converter={StaticResource HabboStringConverter}}" TextWrapping="Wrap" />
+          <TextBlock Grid.Row="1" HorizontalAlignment="Right" Margin="8" Text="{Binding SenderName}" />
+        </Grid>
+      </Grid>
+    </Border>
+    <Border
+      BorderThickness="1"
+      BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+      Background="{DynamicResource CardBackgroundFillColorSecondaryBrush}"
+      CornerRadius="{Binding Source={StaticResource ControlCornerRadius}, Converter={StaticResource BottomCornerRadiusFilterConverter}}"
+    >
+      <Grid>
+        <Button
+          x:Name="PeekButton"
+          Theme="{StaticResource TransparentButton}"
+          Padding="5"
+          HorizontalAlignment="Center"
+          HorizontalContentAlignment="Center"
+          Background="Transparent"
+          Opacity="0.5"
+          FontSize="10"
+          Command="{Binding PeekCmd}"
+          ToolTip.Tip="Peek"
+        >
+          <ic:SymbolIcon Symbol="Eye" />
+        </Button>
+        <Grid
+          x:Name="GiftContents"
+          Margin="10"
+          ColumnDefinitions="Auto,*"
+        >
+          <img:AdvancedImage
+            Margin="0,0,8,0"
+            Classes="itemicon"
+            IsVisible="{Binding ItemImageUrl, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+            Source="{Binding ItemImageUrl}"
+            Loader="{x:Static services:XabboImageLoader.Instance}"
+            VerticalAlignment="Center"
+          />
+          <StackPanel Grid.Column="1" VerticalAlignment="Center">
+            <TextBlock Text="{Binding ItemName}" FontWeight="Bold" />
+            <TextBlock IsVisible="{Binding !IsTrophy}" Text="{Binding ExtraParameter}" />
+            <TextBlock IsVisible="{Binding IsTrophy}" Text="{Binding TrophyMessage}" />
+            <TextBlock IsVisible="{Binding IsTrophy}" Text="{Binding TrophyDate}" FontWeight="Bold" HorizontalAlignment="Right" />
+          </StackPanel>
+        </Grid>
+      </Grid>
+    </Border>
+  </StackPanel>
+</UserControl>

@@ -104,6 +104,7 @@ public static class ViewModelLocator
         Splatr.RegisterLazySingleton<RoomVisitorsViewModel>();
         Splatr.RegisterLazySingleton<RoomBansViewModel>();
         Splatr.RegisterLazySingleton<RoomFurniViewModel>();
+        Splatr.RegisterLazySingleton<RoomGiftsViewModel>();
 
         Splatr.RegisterLazySingleton<FurniDataViewModel>();
 

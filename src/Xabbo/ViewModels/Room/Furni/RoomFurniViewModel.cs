@@ -30,15 +30,22 @@ public class RoomFurniViewModel : ViewModelBase
     public ReadOnlyObservableCollection<FurniViewModel> Furni => _furni;
     public ReadOnlyObservableCollection<FurniStackViewModel> Stacks => _furniStacks;
 
-    [Reactive] public string FilterText { get; set; } = "";
+    public RoomGiftsViewModel GiftsViewModel { get; }
 
+    [Reactive] public string FilterText { get; set; } = "";
     [Reactive] public bool ShowGrid { get; set; }
 
-    public RoomFurniViewModel(IUiContext uiContext, IGameDataManager gameData, RoomManager roomManager)
+    public RoomFurniViewModel(
+        IUiContext uiContext,
+        IGameDataManager gameData,
+        RoomManager roomManager,
+        RoomGiftsViewModel gifts)
     {
         _uiCtx = uiContext;
         _gameData = gameData;
         _roomManager = roomManager;
+
+        GiftsViewModel = gifts;
 
         _roomManager.FurniVisibilityToggled += OnFurniVisibilityToggled;
 
