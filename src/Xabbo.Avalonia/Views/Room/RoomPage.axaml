@@ -26,7 +26,21 @@
     <TabItem>
       <TabItem.Header>
         <StackPanel Orientation="Horizontal" Spacing="4">
-          <ic:SymbolIcon VerticalAlignment="Center" Symbol="People" />
+          <Grid VerticalAlignment="Center">
+            <ic:SymbolIcon
+              HorizontalAlignment="Center"
+              VerticalAlignment="Center"
+              Symbol="People"
+            />
+            <TextBlock
+              Margin="0,-10,0,0"
+              VerticalAlignment="Top"
+              HorizontalAlignment="Center"
+              FontSize="10"
+              IsVisible="{Binding Avatars.Avatars.Count, Converter={StaticResource GtConverter} ConverterParameter=0}"
+              Text="{Binding Avatars.Avatars.Count}"
+            />
+          </Grid>
           <TextBlock VerticalAlignment="Center" Text="Users" />
         </StackPanel>
       </TabItem.Header>
@@ -35,7 +49,21 @@
     <TabItem>
       <TabItem.Header>
         <StackPanel Orientation="Horizontal" Spacing="4">
-          <ic:SymbolIcon VerticalAlignment="Center" Symbol="Guest" />
+          <Grid VerticalAlignment="Center">
+            <ic:SymbolIcon
+              HorizontalAlignment="Center"
+              VerticalAlignment="Center"
+              Symbol="Guest"
+            />
+            <TextBlock
+              Margin="0,-10,0,0"
+              VerticalAlignment="Top"
+              HorizontalAlignment="Center"
+              FontSize="10"
+              IsVisible="{Binding Visitors.Visitors.Count, Converter={StaticResource GtConverter} ConverterParameter=0}"
+              Text="{Binding Visitors.Visitors.Count}"
+            />
+          </Grid>
           <TextBlock VerticalAlignment="Center" Text="Visitors" />
         </StackPanel>
       </TabItem.Header>
@@ -53,7 +81,21 @@
     <TabItem>
       <TabItem.Header>
         <StackPanel Orientation="Horizontal" Spacing="4">
-          <ic:SymbolIcon VerticalAlignment="Center" Symbol="Couch" />
+          <Grid VerticalAlignment="Center">
+            <ic:SymbolIcon
+              HorizontalAlignment="Center"
+              VerticalAlignment="Center"
+              Symbol="Couch"
+            />
+            <TextBlock
+              Margin="0,-10,0,0"
+              VerticalAlignment="Top"
+              HorizontalAlignment="Center"
+              FontSize="10"
+              IsVisible="{Binding Furni.Furni.Count, Converter={StaticResource GtConverter} ConverterParameter=0}"
+              Text="{Binding Furni.Furni.Count}"
+            />
+          </Grid>
           <TextBlock VerticalAlignment="Center" Text="Furni" />
         </StackPanel>
       </TabItem.Header>
