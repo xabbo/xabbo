@@ -56,6 +56,7 @@ public class AppSessionManager
 
     private void OnConnected(GameConnectedArgs e)
     {
+        _currentDisconnectReason = DisconnectReason.Unknown;
         _extension.Intercept<DisconnectReasonMsg>(HandleDisconnectReason);
 
         _uiContext.Invoke(() =>
