@@ -54,12 +54,8 @@
           Classes="avatarimage head"
           Margin="10,0,0,0"
           Stretch="None"
-          IsVisible="{
-            Binding SenderImageUrl,
-            Converter={x:Static StringConverters.IsNotNullOrEmpty},
-            FallbackValue='avares://Xabbo.Avalonia/Assets/Images/avatarhead.png'
-          }"
-          Source="{Binding SenderImageUrl}"
+          IsVisible="{Binding SenderImageUrl, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+          Source="{Binding SenderImageUrl, FallbackValue='avares://Xabbo.Avalonia/Assets/Images/avatarhead.png'}"
           Loader="{x:Static services:XabboImageLoader.Instance}"
         />
         <Grid Grid.Column="1">
@@ -108,9 +104,16 @@
           />
           <StackPanel Grid.Column="1" VerticalAlignment="Center">
             <TextBlock Text="{Binding ItemName}" FontWeight="Bold" />
-            <TextBlock IsVisible="{Binding !IsTrophy}" Text="{Binding ExtraParameter}" />
-            <TextBlock IsVisible="{Binding IsTrophy}" Text="{Binding TrophyMessage}" />
-            <TextBlock IsVisible="{Binding IsTrophy}" Text="{Binding TrophyDate}" FontWeight="Bold" HorizontalAlignment="Right" />
+            <TextBlock IsVisible="{Binding !IsTrophy}" Text="{Binding ExtraParameter}">
+              <TextBlock.IsVisible>
+                <MultiBinding Converter="{x:Static BoolConverters.And}">
+                  <Binding Path="ExtraParameter" Converter="{x:Static StringConverters.IsNotNullOrEmpty}" />
+                  <Binding Path="!IsTrophy" />
+                </MultiBinding>
+              </TextBlock.IsVisible>
+            </TextBlock>
+            <TextBlock IsVisible="{Binding TrophyMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" Text="{Binding TrophyMessage}" />
+            <TextBlock IsVisible="{Binding TrophyDate, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" Text="{Binding TrophyDate}" FontWeight="Bold" HorizontalAlignment="Right" />
           </StackPanel>
         </Grid>
       </Grid>

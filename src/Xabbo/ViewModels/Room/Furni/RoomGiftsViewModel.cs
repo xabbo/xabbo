@@ -1,16 +1,21 @@
 using System.Collections.ObjectModel;
+using System.Reactive;
 using DynamicData;
+using ReactiveUI;
 
 using Xabbo.Core;
 using Xabbo.Core.Events;
 using Xabbo.Core.Game;
 using Xabbo.Core.GameData;
+using Xabbo.Core.Messages.Incoming;
+using Xabbo.Extension;
 using Xabbo.Utility;
 
 namespace Xabbo.ViewModels;
 
 public sealed class RoomGiftsViewModel : ViewModelBase
 {
+    private readonly IExtension _ext;
     private readonly IGameDataManager _gameData;
     private readonly RoomManager _roomManager;
 
@@ -19,10 +24,17 @@ public sealed class RoomGiftsViewModel : ViewModelBase
     private readonly ReadOnlyObservableCollection<GiftViewModel> _gifts;
     public ReadOnlyObservableCollection<GiftViewModel> Gifts => _gifts;
 
+    [Reactive] public GiftViewModel? TargetGift { get; set; }
+
+    public ReactiveCommand<Unit, Unit> PeekAllCmd { get; }
+    public ReactiveCommand<GiftViewModel?, Unit> LocateGiftCmd { get; }
+
     public RoomGiftsViewModel(
+        IExtension ext,
         IGameDataManager gameData,
         RoomManager roomManager)
     {
+        _ext = ext;
         _gameData = gameData;
         _roomManager = roomManager;
 
@@ -35,6 +47,47 @@ public sealed class RoomGiftsViewModel : ViewModelBase
         _roomManager.FloorItemAdded += OnFloorItemAdded;
         _roomManager.FloorItemRemoved += OnFloorItemRemoved;
         _roomManager.Left += OnLeftRoom;
+
+        PeekAllCmd = ReactiveCommand.Create(PeekAll);
+        LocateGiftCmd = ReactiveCommand.Create<GiftViewModel?>(LocateGift);
+    }
+
+    private void ShowFurniTransition(IFloorItem item, Tile? from = null, Tile? to = null, int duration = 1000)
+    {
+        _ext.Send(new WiredMovementsMsg([
+            new FloorItemWiredMovement
+            {
+                FurniId = item.Id,
+                Source = from ?? item.Location,
+                Destination = to ?? item.Location,
+                AnimationTime = duration,
+                Rotation = item.Direction,
+            }
+        ]));
+    }
+
+    private void LocateGift(GiftViewModel? model)
+    {
+        if (model is null || model.Item is null) return;
+
+        Task.Run(async () => {
+            for (int i = 0; i < 3; i++)
+            {
+                ShowFurniTransition(model.Item, to: model.Item.Location + (0, 0, 2), duration: 150);
+                await Task.Delay(150);
+                ShowFurniTransition(model.Item, from: model.Item.Location + (0, 0, 2), duration: 150);
+                await Task.Delay(150);
+            }
+        });
+    }
+
+
+    private void PeekAll()
+    {
+        foreach (var (_, vm) in _cache.KeyValues)
+        {
+            vm.IsPeeking = true;
+        }
     }
 
     private void OnLeftRoom()
