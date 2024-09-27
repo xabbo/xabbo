@@ -1,5 +1,3 @@
-using System;
-using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia;
@@ -8,7 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.GameData;
-using Xabbo.Core.Messages.Incoming.Modern;
+using Xabbo.Core.Messages.Incoming;
 
 using Xabbo.Extension;
 using Xabbo.Services.Abstractions;

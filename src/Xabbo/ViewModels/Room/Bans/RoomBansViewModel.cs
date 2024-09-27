@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.ObjectModel;
 using System.Reactive;
+using Microsoft.Extensions.Logging;
 using DynamicData;
 using ReactiveUI;
 using HanumanInstitute.MvvmDialogs;
@@ -8,9 +9,8 @@ using HanumanInstitute.MvvmDialogs.Avalonia.Fluent;
 
 using Xabbo.Extension;
 using Xabbo.Core.Game;
-using Xabbo.Core.Messages.Outgoing.Modern;
+using Xabbo.Core.Messages.Outgoing;
 using Xabbo.Services.Abstractions;
-using Microsoft.Extensions.Logging;
 
 namespace Xabbo.ViewModels;
 
@@ -82,17 +82,12 @@ public class RoomBansViewModel : ViewModelBase
 
             IsLoading = true;
 
-            var msg = await _ext.RequestAsync(new GetBannedUsersMsg(currentRoomId), timeout: 3000);
+            var users = await _ext.RequestAsync(new GetBannedUsersMsg(currentRoomId), timeout: 3000);
             _banCache.Clear();
 
-            if (msg.RoomId != currentRoomId)
-            {
-                throw new Exception("Room ID mismatch");
-            }
+            Log.LogInformation("Loaded {Count} bans.", users.Length);
 
-            Log.LogInformation("Loaded {Count} bans.", msg.Users.Count);
-
-            var viewModels = msg.Users.Select(x => new RoomBanViewModel(x.Id, x.Name)).ToArray();
+            var viewModels = users.Select(x => new RoomBanViewModel(x.Id, x.Name)).ToArray();
 
             _uiCtx.Invoke(() =>
             {

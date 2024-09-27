@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-
-using Xabbo.Messages.Flash;
+﻿using Xabbo.Messages.Flash;
 using Xabbo.Extension;
 using Xabbo.Core;
 using Xabbo.Core.Game;
@@ -51,9 +49,9 @@ public partial class RespectedComponent : Component
             return;
 
         int index = e.Packet.Read<int>();
-        Actions action = (Actions)e.Packet.Read<int>();
+        AvatarAction action = (AvatarAction)e.Packet.Read<int>();
 
-        if (action == Actions.ThumbsUp)
+        if (action == AvatarAction.ThumbsUp)
         {
             _lastRespect = DateTime.Now;
             _lastRespecterIndex = index;

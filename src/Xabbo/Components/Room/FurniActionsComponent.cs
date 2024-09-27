@@ -3,7 +3,6 @@ using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.GameData;
 using Xabbo.Core.Messages.Outgoing;
-using Xabbo.Core.Messages.Outgoing.Modern;
 
 namespace Xabbo.Components;
 

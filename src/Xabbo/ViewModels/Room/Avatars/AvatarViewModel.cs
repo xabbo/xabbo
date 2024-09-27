@@ -17,7 +17,7 @@ public class AvatarViewModel : ViewModelBase
 
     [Reactive] public bool IsStaff { get; set; }
     [Reactive] public bool IsOwner { get; set; }
-    [Reactive] public int ControlLevel { get; set; }
+    [Reactive] public RightsLevel RightsLevel { get; set; }
 
     [Reactive] public bool IsIdle { get; set; }
     [Reactive] public bool IsTrading { get; set; }
@@ -37,7 +37,7 @@ public class AvatarViewModel : ViewModelBase
             .WhenAnyValue(
                 x => x.IsStaff,
                 x => x.IsOwner,
-                x => x.ControlLevel,
+                x => x.RightsLevel,
                 (isStaff, isOwner, controlLevel) => _avatar.Type switch
                 {
                     AvatarType.Pet => AvatarViewModelGroup.Pets,
@@ -46,9 +46,9 @@ public class AvatarViewModel : ViewModelBase
                     _ when isOwner => AvatarViewModelGroup.RoomOwner,
                     _ => controlLevel switch
                     {
-                        >= 4 => AvatarViewModelGroup.RoomOwner,
-                        >= 3 => AvatarViewModelGroup.GroupAdmins,
-                        >= 1 => AvatarViewModelGroup.RightsHolders,
+                        >= RightsLevel.Owner => AvatarViewModelGroup.RoomOwner,
+                        >= RightsLevel.GroupAdmin => AvatarViewModelGroup.GroupAdmins,
+                        >= RightsLevel.Standard => AvatarViewModelGroup.RightsHolders,
                         _ => AvatarViewModelGroup.Users
                     }
                 }

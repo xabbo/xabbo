@@ -78,8 +78,8 @@ public class RoomFurniViewModel : ViewModelBase
     private void OnFurniVisibilityToggled(FurniEventArgs e)
     {
         _furniCache
-            .Lookup((e.Item.Type, e.Item.Id))
-            .IfHasValue(vm => vm.IsHidden = e.Item.IsHidden);
+            .Lookup((e.Furni.Type, e.Furni.Id))
+            .IfHasValue(vm => vm.IsHidden = e.Furni.IsHidden);
     }
 
     private bool FilterFurni(FurniViewModel vm)

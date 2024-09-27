@@ -83,9 +83,9 @@ public class RoomAvatarsViewModel : ViewModelBase
                 var update = avatar.CurrentUpdate;
                 if (update is null) return;
                 vm.IsTrading = update.IsTrading;
-                if (vm.ControlLevel != update.ControlLevel)
+                if (vm.RightsLevel != update.RightsLevel)
                 {
-                    vm.ControlLevel = update.ControlLevel;
+                    vm.RightsLevel = update.RightsLevel;
                     shouldRefresh = true;
                 }
             });
@@ -113,7 +113,7 @@ public class RoomAvatarsViewModel : ViewModelBase
                 var vm = new AvatarViewModel(avatar);
                 if (avatar.Id == _roomManager?.CurrentRoomId)
                     vm.IsOwner = true;
-                if (avatar is User user && user.IsModerator)
+                if (avatar is User user && user.IsStaff)
                     vm.IsStaff = true;
 
                 _avatarCache.AddOrUpdate(vm);

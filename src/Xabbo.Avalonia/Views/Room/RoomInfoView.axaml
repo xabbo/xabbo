@@ -172,7 +172,7 @@
               Classes="modern"
               Grid.Row="10" Grid.Column="1"
               TextWrapping="Wrap"
-              Text="{Binding Moderation.WhoCanMute, Mode=OneWay, Converter={StaticResource HumanizerConverter}}"
+              Text="{Binding Moderation.Mute, Mode=OneWay, Converter={StaticResource HumanizerConverter}}"
             />
 
             <TextBlock Classes="modern" Grid.Row="11" Text="Who can kick" />
@@ -180,7 +180,7 @@
               Classes="modern"
               Grid.Row="11" Grid.Column="1"
               TextWrapping="Wrap"
-              Text="{Binding Moderation.WhoCanKick, Mode=OneWay, Converter={StaticResource HumanizerConverter}}"
+              Text="{Binding Moderation.Kick, Mode=OneWay, Converter={StaticResource HumanizerConverter}}"
             />
 
             <TextBlock Classes="modern" Grid.Row="12" Text="Who can ban" />
@@ -188,7 +188,7 @@
               Classes="modern"
               Grid.Row="12" Grid.Column="1"
               TextWrapping="Wrap"
-              Text="{Binding Moderation.WhoCanBan, Mode=OneWay, Converter={StaticResource HumanizerConverter}}"
+              Text="{Binding Moderation.Ban, Mode=OneWay, Converter={StaticResource HumanizerConverter}}"
             />
 
             <!-- Chat settings -->

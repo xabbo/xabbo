@@ -2,7 +2,7 @@
 using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.Tasks;
-using Xabbo.Core.Messages.Outgoing.Modern;
+using Xabbo.Core.Messages.Outgoing;
 
 namespace Xabbo.Command.Modules;
 

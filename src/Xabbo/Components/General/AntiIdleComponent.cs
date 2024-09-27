@@ -77,15 +77,15 @@ public partial class AntiIdleComponent : Component
                 _roomManager.Room.TryGetUserById(_profileManager.UserData.Id, out IUser? self))
             {
                 if (self.IsIdle && Settings.General.AntiIdleOut)
-                    antiIdleMsg = new ActionMsg(Actions.Idle);
+                    antiIdleMsg = new ActionMsg(AvatarAction.Idle);
                 else if (self.Dance != 0 && Settings.General.AntiIdle)
                     antiIdleMsg = new WalkMsg(0, 0);
                 else if (Settings.General.AntiIdle)
-                    antiIdleMsg = new ActionMsg(Actions.None);
+                    antiIdleMsg = new ActionMsg(AvatarAction.None);
             }
             else
             {
-                antiIdleMsg = new ActionMsg(Actions.None);
+                antiIdleMsg = new ActionMsg(AvatarAction.None);
             }
         }
 

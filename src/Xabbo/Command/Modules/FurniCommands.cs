@@ -107,7 +107,7 @@ public sealed class FurniCommands(
             return;
         }
 
-        if (Session.IsOrigins && _roomManager.RightsLevel < 4)
+        if (Session.IsOrigins && _roomManager.RightsLevel != RightsLevel.Owner)
         {
             ShowMessage("You must be the room owner to pick up furni.");
             return;

@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using System.Collections.ObjectModel;
 using System.Reactive;
 using DynamicData;
@@ -9,13 +7,12 @@ using FluentAvalonia.UI.Controls;
 
 using Xabbo.Extension;
 using Xabbo.Core;
+using Xabbo.Core.Messages.Outgoing;
 using Xabbo.Services.Abstractions;
 using Xabbo.Models;
 
 using Symbol = FluentIcons.Common.Symbol;
 using SymbolIconSource = FluentIcons.Avalonia.Fluent.SymbolIconSource;
-
-using Modern = Xabbo.Core.Messages.Outgoing.Modern;
 
 namespace Xabbo.ViewModels;
 
@@ -94,7 +91,7 @@ public sealed class WardrobePageViewModel : PageViewModel
 
     private void WearFigure(OutfitViewModel model)
     {
-        _ext.Send(new Modern.UpdateAvatarMsg(
+        _ext.Send(new UpdateAvatarMsg(
             Gender: H.ToGender(model.Gender),
             Figure: model.Figure
         ));

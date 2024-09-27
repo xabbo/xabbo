@@ -1,8 +1,0 @@
-<Project>
-  <PropertyGroup>
-    <XabboCommonDir>$(MSBuildThisFileDirectory)common/</XabboCommonDir>
-    <XabboCoreDir>$(MSBuildThisFileDirectory)core/</XabboCoreDir>
-    <XabboGEarthDir>$(MSBuildThisFileDirectory)gearth/</XabboGEarthDir>
-    <XabboMessagesDir>$(MSBuildThisFileDirectory)messages/</XabboMessagesDir>
-  </PropertyGroup>
-</Project>

@@ -7,7 +7,6 @@ using Xabbo.Core;
 using Xabbo.Core.Events;
 using Xabbo.Core.Game;
 using Xabbo.Core.Messages.Incoming;
-using Xabbo.Core.Messages.Incoming.Modern;
 
 namespace Xabbo.Components;
 
@@ -31,7 +30,7 @@ public class AvatarOverlayComponent : Component
 
         _roomManager = roomManager;
         _roomManager.Entered += OnEnteredRoom;
-        _roomManager.AvatarDataUpdated += OnAvatarDataUpdated;
+        _roomManager.AvatarChanged += OnAvatarChanged;
         _roomManager.Left += OnLeftRoom;
 
         Task initialization = Task.Run(InitializeAsync);
@@ -64,7 +63,7 @@ public class AvatarOverlayComponent : Component
         }
     }
 
-    private void OnAvatarDataUpdated(AvatarDataUpdatedEventArgs e)
+    private void OnAvatarChanged(AvatarChangedEventArgs e)
     {
         if (_isInjected &&
             e.Avatar.Id == _profileManager.UserData?.Id &&
