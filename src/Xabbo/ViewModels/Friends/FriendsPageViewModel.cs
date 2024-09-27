@@ -63,8 +63,8 @@ public sealed class FriendsPageViewModel : PageViewModel
             .Connect()
             .Filter(friend => {
                 if (ShowOnlineOnly && !friend.IsOnline) return false;
-                if (!string.IsNullOrWhiteSpace(FilterText)
-                    && friend.Name.Contains(FilterText, StringComparison.CurrentCultureIgnoreCase))
+                if (!string.IsNullOrWhiteSpace(FilterText) &&
+                    !friend.Name.Contains(FilterText, StringComparison.CurrentCultureIgnoreCase))
                     return false;
                 return true;
             })
