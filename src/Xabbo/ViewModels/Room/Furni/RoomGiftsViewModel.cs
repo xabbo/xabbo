@@ -97,6 +97,9 @@ public sealed class RoomGiftsViewModel : ViewModelBase
 
     private void AddGifts(IEnumerable<IFloorItem> floorItems)
     {
+        if (!Xabbo.Core.Extensions.IsInitialized)
+            return;
+
         if (_gameData.Furni is not { } furniData ||
             _gameData.Products is not { } productData) return;
 
