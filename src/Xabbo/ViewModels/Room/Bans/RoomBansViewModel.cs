@@ -73,8 +73,8 @@ public class RoomBansViewModel : ViewModelBase
 
     private async Task LoadBansAsync()
     {
-        long currentRoomId = _roomManager.CurrentRoomId;
-        if (currentRoomId <= 0) return;
+        if (_roomManager.Room is not { Id: Id currentRoomId })
+            return;
 
         try
         {
@@ -112,8 +112,8 @@ public class RoomBansViewModel : ViewModelBase
         if (!_roomManager.IsInRoom)
             return;
 
-        Id roomId = _roomManager.CurrentRoomId;
-        if (roomId <= 0) return;
+        if (!_roomManager.EnsureInRoom(out var room))
+            return;
 
         try
         {
@@ -128,7 +128,7 @@ public class RoomBansViewModel : ViewModelBase
                     if (i > 0)
                         await Task.Delay(500, cancellationToken);
                     Log.LogTrace("Unbanning user '{Name}'.", array[i].Name);
-                    await _ext.RequestAsync(new UnbanUserMsg(roomId, array[i].Id), cancellationToken: cancellationToken);
+                    await _ext.RequestAsync(new UnbanUserMsg(room.Id, array[i].Id), cancellationToken: cancellationToken);
                     _banCache.RemoveKey(array[i].Id);
                 }
             });

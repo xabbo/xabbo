@@ -41,17 +41,20 @@ public class RoomModeratorComponent : Component
     // [RequiredOut(nameof(Out.RoomMuteUser))]
     public bool MuteUser(Avatar e, int minutes)
     {
-        if (!_roomManager.CanMute || e == null)
+        if (!_roomManager.EnsureInRoom(out var room) ||
+            _roomManager.CanMute)
             return false;
-        Ext.Send(new MuteUserMsg(e.Id, _roomManager.CurrentRoomId, minutes));
+
+        Ext.Send(new MuteUserMsg(e.Id, room.Id, minutes));
         return true;
     }
 
     // [RequiredOut(nameof(Out.KickUser))]
     public bool KickUser(Avatar user)
     {
-        if (!_roomManager.CanKick || user == null)
+        if (!_roomManager.CanKick)
             return false;
+
         Ext.Send(new KickUserMsg
         {
             Id = user.Id,
@@ -63,18 +66,18 @@ public class RoomModeratorComponent : Component
     // [RequiredOut(nameof(Out.RoomBanWithDuration))]
     public bool BanUser(Avatar user, BanDuration duration)
     {
-        if (!_roomManager.CanBan || user == null)
+        if (!_roomManager.EnsureInRoom(out var room) || !_roomManager.CanBan)
             return false;
-        Ext.Send(new BanUserMsg(user.Id, _roomManager.CurrentRoomId, user.Name, duration));
+        Ext.Send(new BanUserMsg(user.Id, room.Id, user.Name, duration));
         return true;
     }
 
     // [RequiredOut(nameof(Out.RoomUnbanUser))]
     public bool UnbanUser(Avatar e)
     {
-        if (!_roomManager.IsOwner || e == null)
+        if (!_roomManager.EnsureInRoom(out var room) || !_roomManager.IsOwner)
             return false;
-        Ext.Send(Out.UnbanUserFromRoom, e.Id, _roomManager.CurrentRoomId);
+        Ext.Send(Out.UnbanUserFromRoom, e.Id, room.Id);
         return true;
     }
 }

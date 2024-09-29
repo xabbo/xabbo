@@ -59,8 +59,7 @@ public partial class ClickToComponent(IExtension extension,
     [InterceptOut(nameof(Out.GetSelectedBadges))]
     protected void OnGetSelectedBadges(Intercept e)
     {
-        IRoom? room = _roomManager.Room;
-        if (!Enabled || room is null)
+        if (!Enabled || !_roomManager.EnsureInRoom(out var room))
             return;
 
         Id userId = e.Packet.Read<Id>();
@@ -84,7 +83,7 @@ public partial class ClickToComponent(IExtension extension,
                 muteMinutes = 30000;
 
             SendInfoMessage($"(click-muting user for {MuteValue} {(MuteInMinutes ? "minute(s)" : "hour(s)")})", user.Index);
-            Ext.Send(new MuteUserMsg(user.Id, _roomManager.CurrentRoomId, muteMinutes));
+            Ext.Send(new MuteUserMsg(user.Id, room.Id, muteMinutes));
         }
         else if (Kick)
         {
@@ -121,7 +120,7 @@ public partial class ClickToComponent(IExtension extension,
                 return;
 
             SendInfoMessage($"(click-banning user {banText})", user.Index);
-            Ext.Send(new BanUserMsg(user.Id, _roomManager.CurrentRoomId, user.Name, duration));
+            Ext.Send(new BanUserMsg(user.Id, room.Id, user.Name, duration));
         }
         else if (Bounce)
         {
@@ -130,10 +129,10 @@ public partial class ClickToComponent(IExtension extension,
 
             Task.Run(async () => {
                 SendInfoMessage($"(click-bouncing user)", user.Index);
-                Ext.Send(new BanUserMsg(user.Id, _roomManager.CurrentRoomId, user.Name, BanDuration.Hour));
+                Ext.Send(new BanUserMsg(user.Id, room.Id, user.Name, BanDuration.Hour));
                 if (Config.General.BounceUnbanDelay > 0)
                     await Task.Delay(Config.General.BounceUnbanDelay);
-                Ext.Send(Out.UnbanUserFromRoom, user.Id, _roomManager.CurrentRoomId);
+                Ext.Send(Out.UnbanUserFromRoom, user.Id, room.Id);
             });
         }
     }

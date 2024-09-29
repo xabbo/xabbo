@@ -76,8 +76,9 @@ public sealed class RoomCommands(RoomManager roomManager) : CommandModule
     // [RequiredIn(nameof(In.RoomForward))]
     public Task ReloadCommandHandler(CommandArgs args)
     {
-        if (_roomMgr.IsInRoom)
-            Ext.Send(In.RoomForward, _roomMgr.CurrentRoomId);
+        if (_roomMgr.EnsureInRoom(out var room))
+            Ext.Send(In.RoomForward, room.Id);
+
         return Task.CompletedTask;
     }
 
@@ -91,7 +92,7 @@ public sealed class RoomCommands(RoomManager roomManager) : CommandModule
 
     public async Task UpdateRoomSettingsAsync(Action<RoomSettings> update)
     {
-        if (!_roomMgr.IsInRoom)
+        if (!_roomMgr.EnsureInRoom(out var room))
         {
             ShowMessage("Room state is not being tracked, please re-enter the room.");
             return;
@@ -103,7 +104,7 @@ public sealed class RoomCommands(RoomManager roomManager) : CommandModule
             return;
         }
 
-        var settings = await Ext.RequestAsync(new GetRoomSettingsMsg(_roomMgr.CurrentRoomId));
+        var settings = await Ext.RequestAsync(new GetRoomSettingsMsg(room.Id));
         update(settings);
 
         var receiver = Ext.ReceiveAsync(

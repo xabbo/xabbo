@@ -22,11 +22,31 @@ public sealed class ModerationCommands(RoomManager roomManager) : CommandModule
         IsAvailable = true;
     }
 
-    private void MuteUser(IUser user, int minutes) => Ext.Send(new MuteUserMsg(user, _roomManager.CurrentRoomId, minutes));
-    private void UnmuteUser(IUser user) => Ext.Send(new MuteUserMsg(user, _roomManager.CurrentRoomId, 0));
+    private void MuteUser(IUser user, int minutes)
+    {
+        if (_roomManager.EnsureInRoom(out var room))
+            Ext.Send(new MuteUserMsg(user, room.Id, minutes));
+    }
+
+    private void UnmuteUser(IUser user)
+    {
+        if (_roomManager.EnsureInRoom(out var room))
+            Ext.Send(new MuteUserMsg(user, room.Id, 0));
+    }
+
     private void KickUser(IUser user) => Ext.Send(new KickUserMsg(user));
-    private void BanUser(IUser user, BanDuration duration) => Ext.Send(new BanUserMsg(user, _roomManager.CurrentRoomId, duration));
-    private void UnbanUser(Id userId) => Ext.Send(Out.UnbanUserFromRoom, userId, _roomManager.CurrentRoomId);
+
+    private void BanUser(IUser user, BanDuration duration)
+    {
+        if (_roomManager.EnsureInRoom(out var room))
+            Ext.Send(new BanUserMsg(user, room.Id, duration));
+    }
+
+    private void UnbanUser(Id userId)
+    {
+        if (_roomManager.EnsureInRoom(out var room))
+            Ext.Send(Out.UnbanUserFromRoom, userId, room.Id);
+    }
 
     private void RoomManager_Left()
     {

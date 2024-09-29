@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -109,7 +109,7 @@ public static class ViewModelLocator
         Splatr.RegisterLazySingleton<FurniDataViewModel>();
 
         // Logic
-        Splatr.RegisterConstant(GEarthOptions.Default.WithAssemblyVersion() with
+        Splatr.RegisterConstant(new GEarthOptions() with
         {
             Name = "xabbo",
             Description = "enhanced habbo",

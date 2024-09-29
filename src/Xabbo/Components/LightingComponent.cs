@@ -129,7 +129,7 @@ public class LightingComponent : Component
 
     private void OnFloorItemUpdated(FloorItemUpdatedEventArgs e)
     {
-        if (!_roomManager.EnsureRoom(out var room))
+        if (!_roomManager.EnsureInRoom(out var room))
             return;
 
         if (e.Item.Id != _currentBgTonerId)
