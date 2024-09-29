@@ -44,7 +44,7 @@ public sealed class FurniCommands(
                 await PickupFurniAsync(args, false); break;
             case "e":
             case "eject":
-                if (Session.IsOrigins)
+                if (Session.Is(ClientType.Origins))
                 {
                     ShowMessage("Origins does not support ejecting furni.");
                     return;
@@ -107,7 +107,7 @@ public sealed class FurniCommands(
             return;
         }
 
-        if (Session.IsOrigins && _roomManager.RightsLevel != RightsLevel.Owner)
+        if (Session.Is(ClientType.Origins) && _roomManager.RightsLevel != RightsLevel.Owner)
         {
             ShowMessage("You must be the room owner to pick up furni.");
             return;
@@ -121,7 +121,7 @@ public sealed class FurniCommands(
             bool all = pattern.Equals("all", StringComparison.OrdinalIgnoreCase);
             Regex regex = StringUtility.CreateWildcardRegex(pattern);
 
-            var allFurni = Session.IsOrigins
+            var allFurni = Session.Is(ClientType.Origins)
                 ? room.Furni.ToArray()
                 : room.Furni.Where(x =>
                     eject == (x.OwnerId != userData.Id)
@@ -144,7 +144,7 @@ public sealed class FurniCommands(
                 return;
             }
 
-            int pickupInterval = Session.IsOrigins
+            int pickupInterval = Session.Is(ClientType.Origins)
                 ? _settingsProvider.Value.Furni.PickupIntervalOrigins
                 : _settingsProvider.Value.Furni.PickupInterval;
 
@@ -156,7 +156,7 @@ public sealed class FurniCommands(
 
             foreach (var furni in matched)
             {
-                if (!Session.IsOrigins && eject == (furni.OwnerId == userData.Id)) continue;
+                if (!Session.Is(ClientType.Origins) && eject == (furni.OwnerId == userData.Id)) continue;
                 Ext.Send(new PickupItemMsg(furni.Type, furni.Id));
                 await Task.Delay(pickupInterval, ct);
             }

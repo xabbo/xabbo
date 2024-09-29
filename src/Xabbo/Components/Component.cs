@@ -35,9 +35,9 @@ public abstract class Component : ReactiveObject
         Ext.Disconnected += OnDisconnected;
     }
 
-    protected virtual void OnInitialized(InitializedArgs e) { }
+    protected virtual void OnInitialized(InitializedEventArgs e) { }
 
-    protected virtual void OnConnected(GameConnectedArgs e)
+    protected virtual void OnConnected(ConnectedEventArgs e)
     {
         if (this is IMessageHandler handler)
         {

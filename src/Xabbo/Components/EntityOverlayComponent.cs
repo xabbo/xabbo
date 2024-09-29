@@ -164,7 +164,7 @@ public class AvatarOverlayComponent : Component
         };
 
         // Append the overlay update
-        e.Packet.ModifyAt<Length>(0, n => n + 1);
+        e.Packet.ModifyAt<Length>(0, n => (Length)(n + 1));
         e.Packet.WriteAt(e.Packet.Length, overlayUpdate);
     }
 }

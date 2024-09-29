@@ -50,7 +50,7 @@ public class AppSessionManager
         _uiContext.Invoke(() => _application.Resources["AppStatus"] = status);
     }
 
-    private void OnConnected(GameConnectedArgs e)
+    private void OnConnected(ConnectedEventArgs e)
     {
         _currentDisconnectReason = DisconnectReason.Unknown;
         _extension.Intercept<DisconnectReasonMsg>(HandleDisconnectReason);
@@ -59,8 +59,8 @@ public class AppSessionManager
         {
             _application.Resources["IsConnecting"] = false;
             _application.Resources["IsConnected"] = true;
-            _application.Resources["IsOrigins"] = e.Session.IsShockwave;
-            _application.Resources["IsModern"] = !e.Session.IsShockwave;
+            _application.Resources["IsOrigins"] = e.Session.Is(ClientType.Origins);
+            _application.Resources["IsModern"] = !e.Session.Is(ClientType.Origins);
         });
 
         CancellationToken ct = _extension.DisconnectToken;

@@ -45,7 +45,7 @@ public class FigureConverterService : IFigureConverterService
 
     private async Task InitializeFigureConverter()
     {
-        if (!_gameState.Session.IsShockwave)
+        if (!_gameState.Session.Is(ClientType.Origins))
             return;
 
         try

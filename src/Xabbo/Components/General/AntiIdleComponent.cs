@@ -38,7 +38,7 @@ public partial class AntiIdleComponent : Component
             .Subscribe(_ => OnActiveChanged());
     }
 
-    protected override void OnConnected(GameConnectedArgs e)
+    protected override void OnConnected(ConnectedEventArgs e)
     {
         base.OnConnected(e);
     }

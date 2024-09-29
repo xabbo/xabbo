@@ -58,7 +58,7 @@ public class FurniDataViewModel : ViewModelBase
         });
     }
 
-    private async void OnGameConnected(GameConnectedArgs e)
+    private async void OnGameConnected(ConnectedEventArgs e)
     {
         try
         {

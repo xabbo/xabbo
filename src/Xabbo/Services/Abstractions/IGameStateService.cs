@@ -5,7 +5,7 @@ namespace Xabbo.Services.Abstractions;
 
 public interface IGameStateService
 {
-    event Action<GameConnectedArgs>? Connected;
+    event Action<ConnectedEventArgs>? Connected;
     event Action? Disconnected;
 
     Session Session { get; }

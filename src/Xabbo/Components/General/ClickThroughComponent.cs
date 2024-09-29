@@ -18,7 +18,7 @@ public partial class ClickThroughComponent : Component
             .Subscribe(x => OnIsActiveChanged(x.Value));
     }
 
-    protected override void OnConnected(GameConnectedArgs e)
+    protected override void OnConnected(ConnectedEventArgs e)
     {
         base.OnConnected(e);
 

@@ -56,7 +56,7 @@ public partial class CommandManager
         Extension.Connected += OnConnected;
     }
 
-    private void OnConnected(GameConnectedArgs e)
+    private void OnConnected(ConnectedEventArgs e)
     {
         Initialize();
 

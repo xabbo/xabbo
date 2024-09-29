@@ -13,7 +13,7 @@ public class GameStateService : IGameStateService
     private readonly ILogger Log;
     private readonly IExtension _ext;
 
-    public event Action<GameConnectedArgs>? Connected;
+    public event Action<ConnectedEventArgs>? Connected;
     public event Action? Disconnected;
 
     public Session Session { get; private set; } = Session.None;
@@ -50,7 +50,7 @@ public class GameStateService : IGameStateService
         ext.Disconnected += OnDisconnected;
     }
 
-    private async void OnConnected(GameConnectedArgs e)
+    private async void OnConnected(ConnectedEventArgs e)
     {
         Session = e.Session;
         Connected?.Invoke(e);

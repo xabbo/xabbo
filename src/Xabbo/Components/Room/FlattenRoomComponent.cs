@@ -17,7 +17,7 @@ public partial class FlattenRoomComponent(IExtension extension, RoomManager room
 
     [Reactive] public bool Enabled { get; set; }
 
-    protected override void OnInitialized(InitializedArgs e)
+    protected override void OnInitialized(InitializedEventArgs e)
     {
         _roomManager.Entering += RoomManager_Entering;
     }
