@@ -48,12 +48,13 @@ public partial class CommandManager
 
         Extension = extension;
         _modules = modules.ToArray();
-        Console.WriteLine($"loaded {_modules.Length} command modules");
         _profileManager = profileManager;
         _roomManager = roomManager;
         _xabbot = xabbot;
 
         Extension.Connected += OnConnected;
+
+        Log.LogInformation("Loaded {n} command modules.", _modules.Length);
     }
 
     private void OnConnected(ConnectedEventArgs e)
@@ -113,7 +114,8 @@ public partial class CommandManager
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Failed to bind command '{commandAttribute.CommandName}': {ex.Message}");
+                    Log.LogError("Failed to bind command '{CommandName}': {Message}",
+                        commandAttribute.CommandName, ex.Message);
                     continue;
                 }
 
