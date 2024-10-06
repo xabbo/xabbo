@@ -14,6 +14,7 @@
         <Setter Property="Theme" Value="{StaticResource TransparentButton}" />
         <Setter Property="Foreground" Value="#ceb4ff" />
         <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Cursor" Value="Hand" />
       </Style>
       <Style Selector="TextBlock">
         <Setter Property="FontSize" Value="16" />
