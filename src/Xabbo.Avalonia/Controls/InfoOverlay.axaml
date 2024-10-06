@@ -1,0 +1,32 @@
+<ResourceDictionary
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:ic="using:FluentIcons.Avalonia.Fluent"
+  xmlns:controls="using:Xabbo.Avalonia.Controls"
+>
+  <Design.PreviewWith>
+    <StackPanel Width="400" Spacing="10">
+        <StackPanel Background="{DynamicResource SystemRegionBrush}">
+          <controls:InfoOverlay />
+        </StackPanel>
+    </StackPanel>
+  </Design.PreviewWith>
+
+  <ControlTheme x:Key="{x:Type controls:InfoOverlay}" TargetType="controls:InfoOverlay">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <StackPanel
+          Orientation="Horizontal"
+          HorizontalAlignment="Center"
+          VerticalAlignment="Center"
+          TextElement.FontSize="18"
+          Spacing="4"
+          Opacity="0.5"
+        >
+          <ic:SymbolIcon Symbol="Info" FontSize="24" VerticalAlignment="Center" />
+          <ContentPresenter Content="{TemplateBinding Content}" />
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>
