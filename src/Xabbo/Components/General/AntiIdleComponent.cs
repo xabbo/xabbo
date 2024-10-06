@@ -20,7 +20,7 @@ public partial class AntiIdleComponent : Component
     private readonly ProfileManager _profileManager;
     private readonly RoomManager _roomManager;
 
-    private int _pingCount = -1;
+    private int _pingCount = 0;
 
     public AntiIdleComponent(IExtension extension,
         IConfigProvider<AppConfig> settingsProvider,
@@ -47,16 +47,26 @@ public partial class AntiIdleComponent : Component
     {
         base.OnDisconnected();
 
-        _pingCount = -1;
+        _pingCount = 0;
     }
 
     protected void OnActiveChanged() => SendAntiIdlePacket();
 
+    [Intercept(ClientType.Modern)]
+    [InterceptOut(nameof(Out.LatencyPingRequest))]
+    protected void HandleLatencyPingRequest(Intercept e)
+    {
+        _pingCount++;
+        SendAntiIdlePacket();
+    }
+
+    [Intercept(ClientType.Origins)]
     [InterceptIn(nameof(In.Ping))]
     protected void HandlePing(Intercept e)
     {
-        SendAntiIdlePacket();
-        _pingCount++;
+        _pingCount = e.Packet.Read<int>();
+        if (_pingCount % 5 == 0)
+            SendAntiIdlePacket();
     }
 
     private void SendAntiIdlePacket()
@@ -65,7 +75,7 @@ public partial class AntiIdleComponent : Component
 
         IMessage? antiIdleMsg = null;
 
-        if (Ext.Session.Client.Type is ClientType.Shockwave)
+        if (Ext.Session.Is(ClientType.Origins))
         {
             if (Settings.General.AntiIdle)
                 antiIdleMsg = new WalkMsg(0, 0);
@@ -76,16 +86,23 @@ public partial class AntiIdleComponent : Component
                 _roomManager.Room is not null &&
                 _roomManager.Room.TryGetUserById(_profileManager.UserData.Id, out IUser? self))
             {
-                if (self.IsIdle && Settings.General.AntiIdleOut)
-                    antiIdleMsg = new ActionMsg(AvatarAction.Idle);
-                else if (self.Dance != 0 && Settings.General.AntiIdle)
-                    antiIdleMsg = new WalkMsg(0, 0);
-                else if (Settings.General.AntiIdle)
-                    antiIdleMsg = new ActionMsg(AvatarAction.None);
+                if (Settings.General.AntiIdle)
+                {
+                    if (self.Dance != 0 && Settings.General.AntiIdle)
+                        antiIdleMsg = new WalkMsg(0, 0);
+                    else if (Settings.General.AntiIdle)
+                        antiIdleMsg = new ActionMsg(AvatarAction.None);
+                }
+                else if (Settings.General.AntiIdleOut)
+                {
+                    if (self.IsIdle)
+                        antiIdleMsg = new ActionMsg(AvatarAction.Idle);
+                }
             }
             else
             {
-                antiIdleMsg = new ActionMsg(AvatarAction.None);
+                if (Settings.General.AntiIdle)
+                    antiIdleMsg = new ActionMsg(AvatarAction.None);
             }
         }
 
