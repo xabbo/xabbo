@@ -3,8 +3,13 @@
 version: '3'
 
 tasks:
+  new-control:
+    desc: Creates a new control
+    interactive: true
+    cmds:
+      - ./.scripts/new-control.sh
   new-view:
-    silent: true
+    desc: Creates a new view
     interactive: true
     cmds:
       - ./.scripts/new-view.sh
