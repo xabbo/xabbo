@@ -1,26 +1,26 @@
 ﻿using Xabbo.Extension;
 using Xabbo.Core.Messages.Outgoing;
+using Xabbo.Services.Abstractions;
+using Xabbo.Configuration;
 
 namespace Xabbo.Components;
 
 [Intercept]
-public partial class AntiWalkComponent(IExtension extension) : Component(extension)
+public partial class AntiWalkComponent(
+    IExtension extension,
+    IConfigProvider<AppConfig> config
+)
+    : Component(extension)
 {
-    [Reactive] bool Enabled { get; set; }
-
-    private bool _faceDirection;
-    public bool FaceDirection
-    {
-        get => _faceDirection;
-        set => Set(ref _faceDirection, value);
-    }
-
     [Intercept]
-    private void OnMove(Intercept e, WalkMsg walk)
+    private void OnMove(Intercept<WalkMsg> e)
     {
-        if (Enabled) e.Block();
+        if (config.Value.Movement.NoWalk)
+        {
+            e.Block();
 
-        if (FaceDirection)
-            Ext.Send(new LookToMsg(walk.Point));
+            if (config.Value.Movement.TurnTowardsClickedTile)
+                Ext.Send(new LookToMsg(e.Msg.Point));
+        }
     }
 }
