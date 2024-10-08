@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
+using Microsoft.Extensions.Hosting;
 using DynamicData;
 using DynamicData.Binding;
 using ReactiveUI;
@@ -29,21 +30,8 @@ public class RoomVisitorsViewModel : ViewModelBase
     [Reactive] public bool IsAvailable { get; set; }
     [Reactive] public string FilterText { get; set; } = ""; // RefreshList on set
 
-#if ENABLE_LOGGING
-    private bool _isLogging;
-    public bool IsLogging
-    {
-        get => _isLogging;
-        set => SetProperty(ref _isLogging, value);
-    }
-
-    const string LOG_DIRECTORY = "logs/visitors";
-    string _currentFilePath;
-    DateTime _lastDate;
-    long lastRoomId;
-#endif
-
     public RoomVisitorsViewModel(
+        IHostApplicationLifetime lifetime,
         IUiContext context,
         IExtension extension,
         ProfileManager profileManager, RoomManager roomManager)
@@ -64,8 +52,7 @@ public class RoomVisitorsViewModel : ViewModelBase
         this.WhenAnyValue(x => x.FilterText)
             .Subscribe(x => _visitorCache.Refresh());
 
-        // lifetime.ApplicationStarted.Register(() => Task.Run(InitializeAsync));
-        Task.Run(InitializeAsync);
+        lifetime.ApplicationStarted.Register(() => Task.Run(InitializeAsync));
     }
 
     private bool Filter(VisitorViewModel visitor)
@@ -95,12 +82,6 @@ public class RoomVisitorsViewModel : ViewModelBase
 
     private void RefreshList()
     {
-        /*if (!_context.IsSynchronized)
-        {
-            _context.InvokeAsync(() => RefreshList());
-            return;
-        }*/
-
         _visitorCache.Refresh();
     }
 
