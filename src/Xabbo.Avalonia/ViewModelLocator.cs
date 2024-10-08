@@ -23,6 +23,7 @@ using Xabbo.Controllers;
 using Xabbo.Command;
 using Xabbo.Command.Modules;
 using Xabbo.ViewModels;
+using Xabbo.Avalonia.Views;
 
 using IHostApplicationLifetime = Microsoft.Extensions.Hosting.IHostApplicationLifetime;
 using Splatr = Splat.SplatRegistrations;
@@ -182,6 +183,9 @@ public static class ViewModelLocator
         #pragma warning restore SPLATDI006
 
         container.RegisterLazySingleton(() => Locator.Current.GetServices<CommandModule>());
+
+        // Views
+        Splatr.RegisterLazySingleton<MainWindow>();
 
         Splatr.SetupIOC();
     }
