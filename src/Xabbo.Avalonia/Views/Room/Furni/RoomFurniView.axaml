@@ -3,6 +3,8 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:sys="clr-namespace:System;assembly=mscorlib"
+  xmlns:controls="using:Xabbo.Avalonia.Controls"
   xmlns:v="using:Xabbo.Avalonia.Views"
   xmlns:vm="using:Xabbo.ViewModels"
   xmlns:ic="using:FluentIcons.Avalonia.Fluent"
@@ -20,40 +22,33 @@
       <Setter Property="IsVisible" Value="False" />
     </Style>
   </UserControl.Styles>
-  <Grid RowDefinitions="Auto,*,Auto">
-    <TextBox
-      Margin="10,0,10,10"
-      Watermark="Filter"
-      Text="{Binding FilterText}"
-    />
-    <TabControl Grid.Row="1" Padding="0" TabStripPlacement="Bottom">
-      <TabItem>
-        <TabItem.Header>
-          <StackPanel Orientation="Horizontal" Spacing="4">
-            <ic:SymbolIcon VerticalAlignment="Center" Symbol="List" />
-            <TextBlock VerticalAlignment="Center" Text="List" />
-          </StackPanel>
-        </TabItem.Header>
-        <v:RoomFurniListView />
-      </TabItem>
-      <TabItem>
-        <TabItem.Header>
-          <StackPanel Orientation="Horizontal" Spacing="4">
-            <ic:SymbolIcon VerticalAlignment="Center" Symbol="Grid" />
-            <TextBlock VerticalAlignment="Center" Text="Grid" />
-          </StackPanel>
-        </TabItem.Header>
-        <v:RoomFurniGridView Margin="0,-8,0,0" />
-      </TabItem>
-      <TabItem>
-        <TabItem.Header>
-          <StackPanel Orientation="Horizontal" Spacing="4">
-            <ic:SymbolIcon VerticalAlignment="Center" Symbol="Gift" />
-            <TextBlock VerticalAlignment="Center" Text="Gifts" />
-          </StackPanel>
-        </TabItem.Header>
-        <v:RoomGiftsView DataContext="{Binding GiftsViewModel}" />
-      </TabItem>
-    </TabControl>
-  </Grid>
+  <TabControl x:Name="FurniTabs" Padding="0" TabStripPlacement="Bottom">
+    <TabItem>
+      <TabItem.Header>
+        <StackPanel Orientation="Horizontal" Spacing="4">
+          <ic:SymbolIcon VerticalAlignment="Center" Symbol="List" />
+          <TextBlock VerticalAlignment="Center" Text="List" />
+        </StackPanel>
+      </TabItem.Header>
+      <v:RoomFurniListView />
+    </TabItem>
+    <TabItem>
+      <TabItem.Header>
+        <StackPanel Orientation="Horizontal" Spacing="4">
+          <ic:SymbolIcon VerticalAlignment="Center" Symbol="Grid" />
+          <TextBlock VerticalAlignment="Center" Text="Grid" />
+        </StackPanel>
+      </TabItem.Header>
+      <v:RoomFurniGridView />
+    </TabItem>
+    <TabItem>
+      <TabItem.Header>
+        <StackPanel Orientation="Horizontal" Spacing="4">
+          <ic:SymbolIcon VerticalAlignment="Center" Symbol="Gift" />
+          <TextBlock VerticalAlignment="Center" Text="Gifts" />
+        </StackPanel>
+      </TabItem.Header>
+      <v:RoomGiftsView DataContext="{Binding GiftsViewModel}" />
+    </TabItem>
+  </TabControl>
 </UserControl>

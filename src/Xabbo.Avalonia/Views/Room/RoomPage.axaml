@@ -10,96 +10,111 @@
   x:Class="Xabbo.Avalonia.Views.RoomPage"
   x:DataType="vm:RoomPageViewModel"
 >
-  <TabControl Padding="0,4,0,0">
-    <TabItem>
-      <TabItem.Header>
-        <StackPanel Orientation="Horizontal" Spacing="4">
-          <ic:SymbolIcon VerticalAlignment="Center" Symbol="Info" />
-          <TextBlock VerticalAlignment="Center" Text="Info" />
-        </StackPanel>
-      </TabItem.Header>
-      <v:RoomInfoView
-        Padding="10,0,10,10"
-        DataContext="{Binding Info}"
-      />
-    </TabItem>
-    <TabItem>
-      <TabItem.Header>
-        <StackPanel Orientation="Horizontal" Spacing="4">
-          <Grid VerticalAlignment="Center">
-            <ic:SymbolIcon
-              HorizontalAlignment="Center"
-              VerticalAlignment="Center"
-              Symbol="People"
-            />
-            <TextBlock
-              Margin="0,-10,0,0"
-              VerticalAlignment="Top"
-              HorizontalAlignment="Center"
-              FontSize="10"
-              IsVisible="{Binding Avatars.Avatars.Count, Converter={StaticResource GtConverter} ConverterParameter=0}"
-              Text="{Binding Avatars.Avatars.Count}"
-            />
-          </Grid>
-          <TextBlock VerticalAlignment="Center" Text="Users" />
-        </StackPanel>
-      </TabItem.Header>
-      <v:RoomAvatarsView DataContext="{Binding Avatars}" />
-    </TabItem>
-    <TabItem>
-      <TabItem.Header>
-        <StackPanel Orientation="Horizontal" Spacing="4">
-          <Grid VerticalAlignment="Center">
-            <ic:SymbolIcon
-              HorizontalAlignment="Center"
-              VerticalAlignment="Center"
-              Symbol="Guest"
-            />
-            <TextBlock
-              Margin="0,-10,0,0"
-              VerticalAlignment="Top"
-              HorizontalAlignment="Center"
-              FontSize="10"
-              IsVisible="{Binding Visitors.Visitors.Count, Converter={StaticResource GtConverter} ConverterParameter=0}"
-              Text="{Binding Visitors.Visitors.Count}"
-            />
-          </Grid>
-          <TextBlock VerticalAlignment="Center" Text="Visitors" />
-        </StackPanel>
-      </TabItem.Header>
-      <v:RoomVisitorsView DataContext="{Binding Visitors}" />
-    </TabItem>
-    <TabItem Classes="modern">
-      <TabItem.Header>
-        <StackPanel Orientation="Horizontal" Spacing="4">
-          <ic:SymbolIcon VerticalAlignment="Center" Symbol="Warning" />
-          <TextBlock VerticalAlignment="Center" Text="Bans" />
-        </StackPanel>
-      </TabItem.Header>
-      <v:RoomBansView DataContext="{Binding Bans}" />
-    </TabItem>
-    <TabItem>
-      <TabItem.Header>
-        <StackPanel Orientation="Horizontal" Spacing="4">
-          <Grid VerticalAlignment="Center">
-            <ic:SymbolIcon
-              HorizontalAlignment="Center"
-              VerticalAlignment="Center"
-              Symbol="Couch"
-            />
-            <TextBlock
-              Margin="0,-10,0,0"
-              VerticalAlignment="Top"
-              HorizontalAlignment="Center"
-              FontSize="10"
-              IsVisible="{Binding Furni.Furni.Count, Converter={StaticResource GtConverter} ConverterParameter=0}"
-              Text="{Binding Furni.Furni.Count}"
-            />
-          </Grid>
-          <TextBlock VerticalAlignment="Center" Text="Furni" />
-        </StackPanel>
-      </TabItem.Header>
-      <v:RoomFurniView DataContext="{Binding Furni}" />
-    </TabItem>
-  </TabControl>
+  <Panel>
+    <TabControl IsVisible="{Binding RoomManager.IsInRoom}" Padding="0,4,0,0">
+      <TabItem>
+        <TabItem.Header>
+          <StackPanel Orientation="Horizontal" Spacing="4">
+            <ic:SymbolIcon VerticalAlignment="Center" Symbol="Info" />
+            <TextBlock VerticalAlignment="Center" Text="Info" />
+          </StackPanel>
+        </TabItem.Header>
+        <v:RoomInfoView
+          Padding="10,0,10,10"
+          DataContext="{Binding Info}"
+        />
+      </TabItem>
+      <TabItem>
+        <TabItem.Header>
+          <StackPanel Orientation="Horizontal" Spacing="4">
+            <Grid VerticalAlignment="Center">
+              <ic:SymbolIcon
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Symbol="People"
+              />
+              <TextBlock
+                Margin="0,-10,0,0"
+                VerticalAlignment="Top"
+                HorizontalAlignment="Center"
+                FontSize="10"
+                IsVisible="{Binding Avatars.Avatars.Count, Converter={StaticResource GtConverter} ConverterParameter=0}"
+                Text="{Binding Avatars.Avatars.Count}"
+              />
+            </Grid>
+            <TextBlock VerticalAlignment="Center" Text="Users" />
+          </StackPanel>
+        </TabItem.Header>
+        <v:RoomAvatarsView DataContext="{Binding Avatars}" />
+      </TabItem>
+      <TabItem>
+        <TabItem.Header>
+          <StackPanel Orientation="Horizontal" Spacing="4">
+            <Grid VerticalAlignment="Center">
+              <ic:SymbolIcon
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Symbol="Guest"
+              />
+              <TextBlock
+                Margin="0,-10,0,0"
+                VerticalAlignment="Top"
+                HorizontalAlignment="Center"
+                FontSize="10"
+                IsVisible="{Binding Visitors.Visitors.Count, Converter={StaticResource GtConverter} ConverterParameter=0}"
+                Text="{Binding Visitors.Visitors.Count}"
+              />
+            </Grid>
+            <TextBlock VerticalAlignment="Center" Text="Visitors" />
+          </StackPanel>
+        </TabItem.Header>
+        <v:RoomVisitorsView DataContext="{Binding Visitors}" />
+      </TabItem>
+      <TabItem Classes="modern">
+        <TabItem.Header>
+          <StackPanel Orientation="Horizontal" Spacing="4">
+            <ic:SymbolIcon VerticalAlignment="Center" Symbol="Warning" />
+            <TextBlock VerticalAlignment="Center" Text="Bans" />
+          </StackPanel>
+        </TabItem.Header>
+        <v:RoomBansView DataContext="{Binding Bans}" />
+      </TabItem>
+      <TabItem>
+        <TabItem.Header>
+          <StackPanel Orientation="Horizontal" Spacing="4">
+            <Grid VerticalAlignment="Center">
+              <ic:SymbolIcon
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Symbol="Couch"
+              />
+              <TextBlock
+                Margin="0,-10,0,0"
+                VerticalAlignment="Top"
+                HorizontalAlignment="Center"
+                FontSize="10"
+                IsVisible="{Binding Furni.Furni.Count, Converter={StaticResource GtConverter} ConverterParameter=0}"
+                Text="{Binding Furni.Furni.Count}"
+              />
+            </Grid>
+            <TextBlock VerticalAlignment="Center" Text="Furni" />
+          </StackPanel>
+        </TabItem.Header>
+        <v:RoomFurniView DataContext="{Binding Furni}" />
+      </TabItem>
+    </TabControl>
+    <Panel IsVisible="{Binding !RoomManager.IsInRoom}">
+      <StackPanel
+        Orientation="Horizontal"
+        HorizontalAlignment="Center"
+        VerticalAlignment="Center"
+        TextElement.FontSize="18"
+        Spacing="4"
+        Opacity="0.5"
+      >
+        <ic:SymbolIcon Symbol="Info" FontSize="24" VerticalAlignment="Center" />
+        <TextBlock Margin="0" VerticalAlignment="Center" FontWeight="Light">Enter a room</TextBlock>
+      </StackPanel>
+    </Panel>
+  </Panel>
 </UserControl>

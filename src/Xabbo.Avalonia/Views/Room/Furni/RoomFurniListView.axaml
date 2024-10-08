@@ -10,46 +10,53 @@
   x:Class="Xabbo.Avalonia.Views.RoomFurniListView"
   x:DataType="vm:RoomFurniViewModel"
 >
-  <DataGrid
-    Name="DataGridFurni"
-    Grid.Row="1"
-    ItemsSource="{Binding Furni}"
-    CanUserReorderColumns="True"
-    CanUserResizeColumns="True"
-    CanUserSortColumns="True"
-  >
-    <DataGrid.Columns>
-      <DataGridTextColumn Width="100" Header="id" Binding="{Binding Id}" />
-      <DataGridTemplateColumn
-        x:DataType="vm:FurniViewModel"
-        Width="250" Header="name"
-        SortMemberPath="Name"
-        ClipboardContentBinding="{Binding Name}"
-      >
-        <DataTemplate x:DataType="vm:FurniViewModel">
-          <Grid>
-            <Grid.ColumnDefinitions>
-              <ColumnDefinition Width="*" />
-              <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <TextBlock
-              Grid.Column="0"
-              Margin="12,0"
-              HorizontalAlignment="Stretch"
-              VerticalAlignment="Center"
-              TextTrimming="CharacterEllipsis"
-              Text="{Binding Name}"
-            >
-              <ToolTip.Tip>
-                <v:FurniPopupView />
-              </ToolTip.Tip>
-            </TextBlock>
-            <ic:SymbolIcon Grid.Column="1" Symbol="EyeOff" Opacity="0.5" IsVisible="{Binding IsHidden}" />
-          </Grid>
-        </DataTemplate>
-      </DataGridTemplateColumn>
-      <DataGridTextColumn IsVisible="{DynamicResource IsModern}" Width="100" Header="owner id" Binding="{Binding OwnerId}" />
-      <DataGridTextColumn IsVisible="{DynamicResource IsModern}" Width="150" Header="owner name" Binding="{Binding OwnerName}" />
-    </DataGrid.Columns>
-  </DataGrid>
+  <Grid RowDefinitions="Auto,*">
+    <TextBox
+      Margin="10,0,10,10"
+      Watermark="Filter"
+      Text="{Binding FilterText}"
+    />
+    <DataGrid
+      Grid.Row="1"
+      Name="DataGridFurni"
+      ItemsSource="{Binding Furni}"
+      CanUserReorderColumns="True"
+      CanUserResizeColumns="True"
+      CanUserSortColumns="True"
+    >
+      <DataGrid.Columns>
+        <DataGridTextColumn Width="100" Header="id" Binding="{Binding Id}" />
+        <DataGridTemplateColumn
+          x:DataType="vm:FurniViewModel"
+          Width="250" Header="name"
+          SortMemberPath="Name"
+          ClipboardContentBinding="{Binding Name}"
+        >
+          <DataTemplate x:DataType="vm:FurniViewModel">
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+              </Grid.ColumnDefinitions>
+              <TextBlock
+                Grid.Column="0"
+                Margin="12,0"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Center"
+                TextTrimming="CharacterEllipsis"
+                Text="{Binding Name}"
+              >
+                <ToolTip.Tip>
+                  <v:FurniPopupView />
+                </ToolTip.Tip>
+              </TextBlock>
+              <ic:SymbolIcon Grid.Column="1" Symbol="EyeOff" Opacity="0.5" IsVisible="{Binding IsHidden}" />
+            </Grid>
+          </DataTemplate>
+        </DataGridTemplateColumn>
+        <DataGridTextColumn IsVisible="{DynamicResource IsModern}" Width="100" Header="owner id" Binding="{Binding OwnerId}" />
+        <DataGridTextColumn IsVisible="{DynamicResource IsModern}" Width="150" Header="owner name" Binding="{Binding OwnerName}" />
+      </DataGrid.Columns>
+    </DataGrid>
+  </Grid>
 </UserControl>

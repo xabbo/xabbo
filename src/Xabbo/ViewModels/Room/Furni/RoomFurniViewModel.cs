@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
+using System.Reactive.Linq;
 using DynamicData;
+using DynamicData.Binding;
 using DynamicData.Kernel;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 
 using Xabbo.Core;
 using Xabbo.Core.Events;
@@ -34,6 +33,12 @@ public class RoomFurniViewModel : ViewModelBase
 
     [Reactive] public string FilterText { get; set; } = "";
     [Reactive] public bool ShowGrid { get; set; }
+
+    private readonly ObservableAsPropertyHelper<bool> _isEmpty;
+    public bool IsEmpty => _isEmpty.Value;
+
+    private readonly ObservableAsPropertyHelper<string> _emptyStatus;
+    public string EmptyStatus => _emptyStatus.Value;
 
     public RoomFurniViewModel(
         IUiContext uiContext,
@@ -73,6 +78,24 @@ public class RoomFurniViewModel : ViewModelBase
             _furniCache.Refresh();
             _furniStackCache.Refresh();
         });
+
+        _isEmpty =
+            Observable.CombineLatest(
+                roomManager.WhenAnyValue(x => x.IsInRoom),
+                _furni.WhenAnyValue(x => x.Count),
+                (isInRoom, count) => isInRoom && count == 0
+            )
+            .ToProperty(this, x => x.IsEmpty);
+
+        _emptyStatus =
+            Observable.CombineLatest(
+                _furniCache.CountChanged,
+                _furni.WhenAnyValue(x => x.Count),
+                (actualCount, filteredCount) => actualCount == 0
+                    ? "No furni in room"
+                    : "No furni matches"
+            )
+            .ToProperty(this, x => x.EmptyStatus);
     }
 
     private void OnFurniVisibilityToggled(FurniEventArgs e)
