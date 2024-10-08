@@ -50,6 +50,7 @@
               Content="Idle-out"
               Classes="modern"
               ToolTip.Tip="Allows you to idle, but prevents you from leaving the room"
+              IsEnabled="{Binding !Config.General.AntiIdle}"
               IsChecked="{Binding Config.General.AntiIdleOut}"
             />
             <CheckBox
@@ -78,6 +79,7 @@
                 />
                 <CheckBox
                   Content="except when re-selecting user"
+                  IsEnabled="{Binding Config.Movement.NoTurn}"
                   IsChecked="{Binding Config.Movement.TurnOnReselectUser}"
                 />
               </StackPanel>
@@ -88,6 +90,7 @@
                 />
                 <CheckBox
                   Content="turn towards tile clicked"
+                  IsEnabled="{Binding Config.Movement.NoWalk}"
                   IsChecked="{Binding Config.Movement.TurnTowardsClickedTile}"
                 />
               </StackPanel>
