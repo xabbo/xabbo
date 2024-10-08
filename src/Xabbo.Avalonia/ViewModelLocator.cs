@@ -54,6 +54,7 @@ public static class ViewModelLocator
                 {
                     console.SingleLine = true;
                     console.IncludeScopes = true;
+                    console.TimestampFormat = "[HH:mm:ss.fff] ";
                 });
         });
         container.RegisterConstant(loggerFactory);
