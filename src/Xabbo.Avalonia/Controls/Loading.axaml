@@ -17,8 +17,16 @@
       <ControlTemplate>
         <Grid x:Name="PART_Root" Classes.loading="{TemplateBinding IsLoading}">
           <Grid.Styles>
-            <Style Selector="ContentPresenter#PART_Content">
-              <Style Selector="^:not(.loading)">
+            <Style Selector="Grid#PART_Overlay">
+              <Setter Property="Opacity" Value="1"/>
+              <Setter Property="Transitions">
+                <Transitions>
+                  <DoubleTransition Property="Opacity" Duration="0:0:0.2"/>
+                </Transitions>
+              </Setter>
+            </Style>
+            <Style Selector=":not(.loading)">
+              <Style Selector="^ ContentPresenter#PART_Content">
                 <Setter Property="Transitions">
                   <Transitions>
                     <DoubleTransition Property="Opacity" Duration="{Binding FadeOutDuration, RelativeSource={RelativeSource TemplatedParent}}" />
@@ -26,7 +34,20 @@
                 </Setter>
                 <Setter Property="Opacity" Value="1" />
               </Style>
-              <Style Selector="^.loading">
+              <Style Selector="^ Grid#PART_Overlay">
+                <Setter Property="Opacity" Value="0"/>
+              </Style>
+              <Style Selector="^ StackPanel#PART_LoadingContent">
+                <Setter Property="Transitions">
+                  <Transitions>
+                    <DoubleTransition Property="Opacity" Delay="0:0:0" Duration="0:0:0"/>
+                  </Transitions>
+                </Setter>
+                <Setter Property="Opacity" Value="0"/>
+              </Style>
+            </Style>
+            <Style Selector=".loading">
+              <Style Selector="^ ContentPresenter#PART_Content">
                 <Setter Property="Transitions">
                   <Transitions>
                     <DoubleTransition Property="Opacity" Duration="{Binding FadeInDuration, RelativeSource={RelativeSource TemplatedParent}}" />
@@ -35,15 +56,10 @@
                 <Setter Property="Opacity" Value="{Binding ContentFadeOpacity, RelativeSource={RelativeSource TemplatedParent}}" />
                 <Setter Property="IsHitTestVisible" Value="False" />
               </Style>
-            </Style>
-            <Style Selector="Grid#PART_Overlay">
-              <Setter Property="Opacity" Value="1"/>
-              <Setter Property="Transitions">
-                <Transitions>
-                  <DoubleTransition Property="Opacity" Duration="0:0:0.2"/>
-                </Transitions>
-              </Setter>
-              <Style Selector="^.loading StackPanel#PART_LoadingContent">
+              <Style Selector="^ Grid#PART_Overlay">
+                <Setter Property="Opacity" Value="1"/>
+              </Style>
+              <Style Selector="^ StackPanel#PART_LoadingContent">
                 <Setter Property="Transitions">
                   <Transitions>
                     <DoubleTransition Property="Opacity" Delay="0:0:0.4" Duration="0:0:0.3"/>
@@ -51,32 +67,23 @@
                 </Setter>
                 <Setter Property="Opacity" Value="1"/>
               </Style>
-              <Style Selector="^:not(.loading)">
-                <Setter Property="Opacity" Value="0"/>
-                <Style Selector="^ StackPanel#PART_LoadingContent">
-                  <Setter Property="Transitions">
-                    <Transitions>
-                      <DoubleTransition Property="Opacity" Delay="0:0:0" Duration="0:0:0.1"/>
-                    </Transitions>
-                  </Setter>
-                  <Setter Property="Opacity" Value="0"/>
-                </Style>
-              </Style>
             </Style>
           </Grid.Styles>
+          <!-- Main content -->
           <ContentPresenter
             x:Name="PART_Content"
-            Classes.loading="{TemplateBinding IsLoading}"
             Content="{TemplateBinding Content}"
             HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
             VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
           />
-          <Grid
-            x:Name="PART_Overlay"
-            Classes.loading="{TemplateBinding IsLoading}"
-            IsHitTestVisible="{TemplateBinding IsLoading}"
-          >
-            <StackPanel x:Name="PART_LoadingContent" Spacing="10" HorizontalAlignment="Center" VerticalAlignment="Center">
+          <!-- Overlay -->
+          <Grid x:Name="PART_Overlay" IsHitTestVisible="{TemplateBinding IsLoading}">
+            <StackPanel
+              x:Name="PART_LoadingContent"
+              Spacing="10"
+              HorizontalAlignment="Center"
+              VerticalAlignment="Center"
+            >
               <ui:ProgressRing Width="32" Height="32" />
               <ContentPresenter
                 x:Name="PART_LoadingContentPresenter"
@@ -93,8 +100,8 @@
               </ContentPresenter>
               <Button
                 HorizontalAlignment="Center"
-                IsVisible="{TemplateBinding Cancel, Converter={x:Static ObjectConverters.IsNotNull}}"
-                Command="{TemplateBinding Cancel}"
+                IsVisible="{TemplateBinding CancelCommand, Converter={x:Static ObjectConverters.IsNotNull}}"
+                Command="{TemplateBinding CancelCommand}"
                 Content="Cancel"
               />
             </StackPanel>

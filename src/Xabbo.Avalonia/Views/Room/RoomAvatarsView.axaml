@@ -3,10 +3,14 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:sys="clr-namespace:System;assembly=mscorlib"
   xmlns:v="using:Xabbo.Avalonia.Views"
   xmlns:vm="using:Xabbo.ViewModels"
+  xmlns:controls="using:Xabbo.Avalonia.Controls"
+  xmlns:xc="using:Xabbo.Core"
   xmlns:ui="using:FluentAvalonia.UI.Controls"
   xmlns:ic="using:FluentIcons.Avalonia.Fluent"
+  xmlns:icm="using:FluentIcons.Avalonia.Fluent.MarkupExtensions"
   xmlns:collections="using:Avalonia.Collections"
   mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
   x:Class="Xabbo.Avalonia.Views.RoomAvatarsView"
@@ -40,83 +44,174 @@
       </Setter>
     </Style>
   </UserControl.Styles>
-  <Grid RowDefinitions="Auto,*">
-    <TextBox
-      Margin="10,0,10,10"
-      Watermark="Filter"
-      Text="{Binding FilterText}"
-    />
-    <DataGrid
-      x:Name="AvatarDataGrid"
-      Grid.Row="1"
-      CanUserReorderColumns="True"
-      CanUserResizeColumns="True"
-      CanUserSortColumns="True"
-      Background="Transparent"
-    >
-      <DataGrid.ContextFlyout>
-        <MenuFlyout>
-          <MenuFlyout.ItemContainerTheme>
-            <ControlTheme TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
-              <Setter Property="Margin" Value="0" />
-              <Setter Property="Padding" Value="8,0" />
-            </ControlTheme>
-          </MenuFlyout.ItemContainerTheme>
-          <CheckBox IsChecked="{Binding Config.ShowBots}">Show bots</CheckBox>
-          <CheckBox IsChecked="{Binding Config.ShowPets}">Show pets</CheckBox>
-        </MenuFlyout>
-      </DataGrid.ContextFlyout>
-      <DataGrid.Columns>
-        <DataGridTextColumn SortMemberPath="Index" Header="index" Binding="{Binding Index, DataType={x:Type vm:AvatarViewModel}}" />
-        <DataGridTextColumn SortMemberPath="Id" Header="id" Binding="{Binding Id, DataType={x:Type vm:AvatarViewModel}}" IsVisible="{DynamicResource IsModern}" />
-        <DataGridTemplateColumn
-          x:DataType="vm:AvatarViewModel"
-          Header="name" SortMemberPath="Name"
-          ClipboardContentBinding="{Binding Name}"
-        >
-          <DataGridTemplateColumn.CellTemplate>
-            <DataTemplate DataType="{x:Type vm:AvatarViewModel}">
-              <DockPanel
-                HorizontalAlignment="Stretch"
-                Margin="12,0"
-                Classes.IsUser="{Binding IsUser}"
+  <controls:Loading
+    Grid.RowSpan="2"
+    IsLoading="{Binding IsBusy}"
+    LoadingContent="{Binding StatusText}"
+    CancelCommand="{Binding CancelCmd}"
+    ContentFadeOpacity="0.1"
+  >
+    <Grid RowDefinitions="Auto,*">
+      <TextBox
+        Margin="10,0,10,10"
+        Watermark="Filter"
+        Text="{Binding FilterText}"
+      />
+      <DataGrid
+        x:Name="AvatarDataGrid"
+        Grid.Row="1"
+        CanUserReorderColumns="True"
+        CanUserResizeColumns="True"
+        CanUserSortColumns="True"
+        AutoGenerateColumns="False"
+        Background="Transparent"
+        ContextRequested="OnContextRequested"
+      >
+        <DataGrid.ContextFlyout>
+          <ui:FAMenuFlyout>
+            <ui:MenuFlyoutItem
+              IconSource="{icm:SymbolIconSource Symbol=Search}"
+              Text="Find" Command="{Binding FindAvatarCmd}"
+            />
+            <ui:MenuFlyoutItem
+              IconSource="{icm:SymbolIconSource Symbol=BackpackAdd}"
+              Text="Add to wardrobe"
+              Command="{Binding CopyAvatarToWardrobeCmd}"
+            />
+            <ui:MenuFlyoutSubItem
+              IsEnabled="{Binding CopyAvatarFieldCmd.CanExecute^}"
+              IconSource="{icm:SymbolIconSource Symbol=Copy}"
+              Text="Copy..."
+            >
+              <ui:MenuFlyoutItem Text="ID" Command="{Binding CopyAvatarFieldCmd}" CommandParameter="id" />
+              <ui:MenuFlyoutItem Text="Name" Command="{Binding CopyAvatarFieldCmd}" CommandParameter="name" />
+              <ui:MenuFlyoutItem Text="Motto" Command="{Binding CopyAvatarFieldCmd}" CommandParameter="motto" />
+              <ui:MenuFlyoutItem Text="Figure" Command="{Binding CopyAvatarFieldCmd}" CommandParameter="figure" />
+            </ui:MenuFlyoutSubItem>
+            <ui:MenuFlyoutSubItem
+              IsEnabled="{Binding OpenUserProfileCmd.CanExecute^}"
+              IconSource="{icm:SymbolIconSource Symbol=Person}"
+              Text="Open profile..."
+            >
+              <ui:MenuFlyoutItem Text="In-game" Command="{Binding OpenUserProfileCmd}" CommandParameter="game" />
+              <ui:MenuFlyoutItem Text="On the web" Command="{Binding OpenUserProfileCmd}" CommandParameter="web" />
+              <ui:MenuFlyoutItem Text="On HabboWidgets" Command="{Binding OpenUserProfileCmd}" CommandParameter="habbowidgets" />
+            </ui:MenuFlyoutSubItem>
+            <ui:MenuFlyoutSubItem
+              IconSource="{icm:SymbolIconSource Symbol=Warning}"
+              Text="Moderate..."
+            >
+              <ui:MenuFlyoutSubItem.IsEnabled>
+                <MultiBinding Converter="{x:Static BoolConverters.Or}">
+                  <Binding Path="MuteUsersCmd.CanExecute^" />
+                  <Binding Path="KickUsersCmd.CanExecute^" />
+                  <Binding Path="BanUsersCmd.CanExecute^" />
+                  <Binding Path="BounceUsersCmd.CanExecute^" />
+                </MultiBinding>
+              </ui:MenuFlyoutSubItem.IsEnabled>
+              <ui:MenuFlyoutSubItem
+                IsEnabled="{Binding MuteUsersCmd.CanExecute^}"
+                IconSource="{icm:SymbolIconSource Symbol=ChatOff}"
+                Text="Mute"
               >
-                <DockPanel.Styles>
-                  <Style Selector="DockPanel.IsUser">
-                    <Setter Property="ToolTip.Tip">
-                      <Template>
-                        <v:UserPopupView />
-                      </Template>
-                    </Setter>
-                  </Style>
-                </DockPanel.Styles>
-                <TextBlock
-                  VerticalAlignment="Center"
-                  TextTrimming="CharacterEllipsis"
-                  Text="{Binding Name}"
-                />
-                <StackPanel
-                  DockPanel.Dock="Right"
-                  Orientation="Horizontal"
+                <ui:MenuFlyoutItem Text="2 mins" Command="{Binding MuteUsersCmd}" CommandParameter="2" />
+                <ui:MenuFlyoutItem Text="5 mins" Command="{Binding MuteUsersCmd}" CommandParameter="5" />
+                <ui:MenuFlyoutItem Text="10 mins" Command="{Binding MuteUsersCmd}" CommandParameter="10" />
+                <ui:MenuFlyoutItem Text="15 mins" Command="{Binding MuteUsersCmd}" CommandParameter="15" />
+                <ui:MenuFlyoutItem Text="30 mins" Command="{Binding MuteUsersCmd}" CommandParameter="30" />
+                <ui:MenuFlyoutItem Text="1 hour" Command="{Binding MuteUsersCmd}" CommandParameter="60" />
+                <ui:MenuFlyoutItem Text="6 hours" Command="{Binding MuteUsersCmd}" CommandParameter="360" />
+                <ui:MenuFlyoutItem Text="12 hours" Command="{Binding MuteUsersCmd}" CommandParameter="720" />
+                <ui:MenuFlyoutItem Text="24 hours" Command="{Binding MuteUsersCmd}" CommandParameter="1440" />
+              </ui:MenuFlyoutSubItem>
+              <ui:MenuFlyoutItem
+                Text="Unmute"
+                IconSource="{icm:SymbolIconSource Symbol=Chat}"
+                Command="{Binding MuteUsersCmd}"
+                CommandParameter="0"
+              />
+              <ui:MenuFlyoutItem
+                Text="Kick"
+                IconSource="{icm:SymbolIconSource Symbol=SignOut}"
+                Command="{Binding KickUsersCmd}"
+              />
+              <ui:MenuFlyoutSubItem
+                IsEnabled="{Binding BanUsersCmd.CanExecute^}"
+                IconSource="{icm:SymbolIconSource Symbol=PersonProhibited}"
+                Text="Ban"
+              >
+                <ui:MenuFlyoutItem Text="For an hour" Command="{Binding BanUsersCmd}" CommandParameter="{x:Static xc:BanDuration.Hour}" />
+                <ui:MenuFlyoutItem Text="For a day" Command="{Binding BanUsersCmd}" CommandParameter="{x:Static xc:BanDuration.Day}" />
+                <ui:MenuFlyoutItem Text="Permanently" Command="{Binding BanUsersCmd}" CommandParameter="{x:Static xc:BanDuration.Permanent}" />
+              </ui:MenuFlyoutSubItem>
+              <ui:MenuFlyoutItem
+                Text="Bounce"
+                IconSource="{icm:SymbolIconSource Symbol=ArrowBounce}"
+                Command="{Binding BounceUsersCmd}"
+              />
+            </ui:MenuFlyoutSubItem>
+            <ui:MenuFlyoutSeparator />
+            <ui:ToggleMenuFlyoutItem Text="Show bots" IconSource="{icm:SymbolIconSource Symbol=Bot}" IsChecked="{Binding Config.ShowBots}" />
+            <ui:ToggleMenuFlyoutItem Text="Show pets" IconSource="{icm:SymbolIconSource Symbol=AnimalCat}" IsChecked="{Binding Config.ShowPets}" />
+          </ui:FAMenuFlyout>
+          <!--<MenuFlyout>
+            <Separator />
+            <CheckBox Margin="-4" IsChecked="{Binding Config.ShowBots}">Show bots</CheckBox>
+            <CheckBox Margin="-4" IsChecked="{Binding Config.ShowPets}">Show pets</CheckBox>
+          </MenuFlyout>-->
+        </DataGrid.ContextFlyout>
+        <DataGrid.Columns>
+          <DataGridTextColumn SortMemberPath="Index" Header="index" Binding="{Binding Index, DataType={x:Type vm:AvatarViewModel}}" />
+          <DataGridTextColumn SortMemberPath="Id" Header="id" Binding="{Binding Id, DataType={x:Type vm:AvatarViewModel}}" IsVisible="{DynamicResource IsModern}" />
+          <DataGridTemplateColumn
+            x:DataType="vm:AvatarViewModel"
+            Header="name" SortMemberPath="Name"
+            ClipboardContentBinding="{Binding Name}"
+          >
+            <DataGridTemplateColumn.CellTemplate>
+              <DataTemplate DataType="{x:Type vm:AvatarViewModel}">
+                <DockPanel
+                  HorizontalAlignment="Stretch"
+                  Margin="12,0"
+                  Classes.IsUser="{Binding IsUser}"
                 >
-                  <ic:SymbolIcon
-                    FontSize="14"
+                  <DockPanel.Styles>
+                    <Style Selector="DockPanel.IsUser">
+                      <Setter Property="ToolTip.Tip">
+                        <Template>
+                          <v:UserPopupView />
+                        </Template>
+                      </Setter>
+                    </Style>
+                  </DockPanel.Styles>
+                  <TextBlock
                     VerticalAlignment="Center"
-                    Symbol="Snooze"
-                    IsVisible="{Binding IsIdle, Mode=OneWay}"
+                    TextTrimming="CharacterEllipsis"
+                    Text="{Binding Name}"
                   />
-                  <Image
-                    Margin="4,0,0,0"
-                    Source="avares://Xabbo.Avalonia/Assets/Images/trading.png"
-                    VerticalAlignment="Center"
-                    IsVisible="{Binding IsTrading, Mode=OneWay}"
-                  />
-                </StackPanel>
-              </DockPanel>
-            </DataTemplate>
-          </DataGridTemplateColumn.CellTemplate>
-        </DataGridTemplateColumn>
-      </DataGrid.Columns>
-    </DataGrid>
-  </Grid>
+                  <StackPanel
+                    DockPanel.Dock="Right"
+                    Orientation="Horizontal"
+                  >
+                    <ic:SymbolIcon
+                      FontSize="14"
+                      VerticalAlignment="Center"
+                      Symbol="Snooze"
+                      IsVisible="{Binding IsIdle, Mode=OneWay}"
+                    />
+                    <Image
+                      Margin="4,0,0,0"
+                      Source="avares://Xabbo.Avalonia/Assets/Images/trading.png"
+                      VerticalAlignment="Center"
+                      IsVisible="{Binding IsTrading, Mode=OneWay}"
+                    />
+                  </StackPanel>
+                </DockPanel>
+              </DataTemplate>
+            </DataGridTemplateColumn.CellTemplate>
+          </DataGridTemplateColumn>
+        </DataGrid.Columns>
+      </DataGrid>
+    </Grid>
+  </controls:Loading>
 </UserControl>

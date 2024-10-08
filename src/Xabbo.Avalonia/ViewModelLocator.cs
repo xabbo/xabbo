@@ -19,6 +19,7 @@ using Xabbo.Services.Abstractions;
 using Xabbo.Services;
 using Xabbo.Avalonia.Services;
 using Xabbo.Components;
+using Xabbo.Controllers;
 using Xabbo.Command;
 using Xabbo.Command.Modules;
 using Xabbo.ViewModels;
@@ -75,6 +76,8 @@ public static class ViewModelLocator
 
         Splatr.RegisterLazySingleton<IApplicationManager, AvaloniaAppManager>();
         Splatr.RegisterLazySingleton<IUiContext, AvaloniaUiContext>();
+        Splatr.RegisterLazySingleton<IClipboardService, ClipboardService>();
+        Splatr.RegisterLazySingleton<ILauncherService, LauncherService>();
         container.RegisterLazySingleton(() => (IDialogService)new DialogService(
             new DialogManager(
                 viewLocator: new ViewLocator(),
@@ -87,7 +90,6 @@ public static class ViewModelLocator
         // ViewModels
         Splatr.RegisterLazySingleton<MainViewModel>();
 
-        // Pages
         Splatr.RegisterLazySingleton<GeneralPageViewModel>();
         Splatr.RegisterLazySingleton<ChatPageViewModel>();
         Splatr.RegisterLazySingleton<ProfilePageViewModel>();
@@ -137,6 +139,8 @@ public static class ViewModelLocator
         // Xabbo components
         Splatr.RegisterLazySingleton<IOperationManager, OperationManager>();
 
+        Splatr.RegisterLazySingleton<RoomModerationController>();
+
         Splatr.RegisterLazySingleton<XabbotComponent>();
         Splatr.RegisterLazySingleton<NotificationComponent>();
         Splatr.RegisterLazySingleton<AvatarOverlayComponent>();
@@ -157,7 +161,6 @@ public static class ViewModelLocator
         Splatr.RegisterLazySingleton<FlattenRoomComponent>();
         Splatr.RegisterLazySingleton<FurniActionsComponent>();
         Splatr.RegisterLazySingleton<RoomEntryComponent>();
-        Splatr.RegisterLazySingleton<RoomModeratorComponent>();
         Splatr.RegisterLazySingleton<LightingComponent>();
 
         // Xabbo commands

@@ -69,23 +69,28 @@ public sealed class WardrobePageViewModel : PageViewModel
         figureConverter.Available += OnFigureConverterAvailable;
     }
 
+    public void AddFigure(Gender gender, string figure)
+    {
+        FigureModel figureModel = new()
+        {
+            Gender = gender.ToClientString(),
+            FigureString = figure,
+            IsOrigins = _gameState.Session.Is(ClientType.Origins)
+        };
+
+        if (_repository.Add(figureModel))
+        {
+            OutfitViewModel vm = new(figureModel);
+            UpdateModernFigure(vm);
+            _cache.AddOrUpdate(vm);
+        }
+    }
+
     private void AddCurrentFigure()
     {
         if (_gameState.Profile.UserData is { } userData)
         {
-            FigureModel figureModel = new()
-            {
-                FigureString = userData.Figure,
-                Gender = userData.Gender.ToClientString(),
-                IsOrigins = _gameState.Session.IsOrigins
-            };
-
-            if (_repository.Add(figureModel))
-            {
-                OutfitViewModel vm = new(figureModel);
-                UpdateModernFigure(vm);
-                _cache.AddOrUpdate(vm);
-            }
+            AddFigure(userData.Gender, userData.Figure);
         }
     }
 
@@ -122,5 +127,4 @@ public sealed class WardrobePageViewModel : PageViewModel
             vm.ModernFigure = figure.ToString();
         }
     }
-
 }

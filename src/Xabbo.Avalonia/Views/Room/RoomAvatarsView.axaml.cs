@@ -28,6 +28,17 @@ public partial class RoomAvatarsView : UserControl
         DetachedFromVisualTree += OnDetachedFromVisualTree;
     }
 
+    private void OnContextRequested(object? sender, ContextRequestedEventArgs e)
+    {
+        if (DataContext is not RoomAvatarsViewModel avatarsViewModel)
+            return;
+
+        avatarsViewModel.ContextSelection = AvatarDataGrid
+            .SelectedItems
+            .OfType<AvatarViewModel>()
+            .ToList();
+    }
+
     private void OnAttachedToVisualTree(object? sender, VisualTreeAttachmentEventArgs e)
     {
         AvatarDataGrid.ItemsSource = _collectionView;

@@ -1,16 +1,21 @@
 ﻿using System.Collections;
 using System.Collections.ObjectModel;
 using System.Reactive;
+using System.Reactive.Linq;
 using Microsoft.Extensions.Logging;
 using DynamicData;
 using ReactiveUI;
 using HanumanInstitute.MvvmDialogs;
-using HanumanInstitute.MvvmDialogs.Avalonia.Fluent;
 
 using Xabbo.Extension;
+using Xabbo.Core;
 using Xabbo.Core.Game;
+using Xabbo.Core.Messages.Incoming;
 using Xabbo.Core.Messages.Outgoing;
 using Xabbo.Services.Abstractions;
+using Xabbo.Controllers;
+using Xabbo.Exceptions;
+using Xabbo.Utility;
 
 namespace Xabbo.ViewModels;
 
@@ -22,6 +27,7 @@ public class RoomBansViewModel : ViewModelBase
     private readonly IOperationManager _operationManager;
     private readonly IExtension _ext;
     private readonly RoomManager _roomManager;
+    private readonly RoomModerationController _moderation;
 
     private readonly SourceCache<RoomBanViewModel, Id> _banCache = new(x => x.Id);
     private readonly ReadOnlyObservableCollection<RoomBanViewModel> _bans;
@@ -30,6 +36,15 @@ public class RoomBansViewModel : ViewModelBase
     [Reactive] public string FilterText { get; set; } = "";
     [Reactive] public bool CanLoad { get; set; } = true;
     [Reactive] public bool IsLoading { get; set; }
+    [Reactive] public bool HasLoaded { get; set; }
+
+    private readonly ObservableAsPropertyHelper<bool> _isUnbanning;
+    public bool IsUnbanning => _isUnbanning.Value;
+
+    private readonly ObservableAsPropertyHelper<string> _statusText;
+    public string StatusText => _statusText.Value;
+
+    [Reactive] public IList<RoomBanViewModel>? SelectedBans { get; set; }
 
     public ReactiveCommand<Unit, Unit> LoadBansCmd { get; }
     public ReactiveCommand<IList, Unit> UnbanSelectedUsersCmd { get; }
@@ -40,7 +55,8 @@ public class RoomBansViewModel : ViewModelBase
         IDialogService dialogService,
         IOperationManager operationManager,
         IExtension extension,
-        RoomManager roomManager)
+        RoomManager roomManager,
+        RoomModerationController moderation)
     {
         Log = loggerFactory.CreateLogger<RoomBansViewModel>();
         _uiCtx = uiContext;
@@ -48,6 +64,7 @@ public class RoomBansViewModel : ViewModelBase
         _operationManager = operationManager;
         _ext = extension;
         _roomManager = roomManager;
+        _moderation = moderation;
 
         _banCache
             .Connect()
@@ -57,8 +74,52 @@ public class RoomBansViewModel : ViewModelBase
 
         _roomManager.Left += OnLeftRoom;
 
-        LoadBansCmd = ReactiveCommand.CreateFromTask(LoadBansAsync);
-        UnbanSelectedUsersCmd = ReactiveCommand.CreateFromTask<IList>(UnbanSelectedUsersAsync);
+        _isUnbanning =
+            _moderation.WhenAnyValue(
+                x => x.CurrentOperation,
+                x => x is RoomModerationController.ModerationType.Unban
+            )
+            .ToProperty(this, x => x.IsUnbanning);
+
+        _statusText =
+            _moderation.WhenAnyValue(
+                x => x.CurrentOperation,
+                x => x.CurrentProgress,
+                x => x.TotalProgress,
+                (op, current, total) => op is RoomModerationController.ModerationType.Unban
+                    ? $"Unbanning users...\n{current} / {total}"
+                    : ""
+            )
+            .ToProperty(this, x => x.StatusText);
+
+        LoadBansCmd = ReactiveCommand.CreateFromTask(
+            LoadBansAsync,
+            _moderation.WhenAnyValue(
+                x => x.CanUnban,
+                x => x.CurrentOperation,
+                (canUnban, op) => canUnban && op is RoomModerationController.ModerationType.None
+            )
+            .ObserveOn(RxApp.MainThreadScheduler)
+        );
+
+        UnbanSelectedUsersCmd = ReactiveCommand.CreateFromTask<IList>(
+            UnbanSelectedUsersAsync,
+            Observable.CombineLatest(
+                this.WhenAnyValue(
+                    x => x.SelectedBans,
+                    x => x is { Count: > 0 }
+                ),
+                _moderation.WhenAnyValue(
+                    x => x.CanUnban,
+                    x => x.CurrentOperation,
+                    (canUnban, op) => canUnban && op is RoomModerationController.ModerationType.None
+                ),
+                (hasSelection, canUnban) => hasSelection && canUnban
+            )
+            .ObserveOn(RxApp.MainThreadScheduler)
+        );
+
+        _ext.Intercept<UserUnbannedMsg>(unbanned => _banCache.RemoveKey(unbanned.UserId));
     }
 
     private bool FilterBans(RoomBanViewModel ban)
@@ -68,6 +129,8 @@ public class RoomBansViewModel : ViewModelBase
 
     private void OnLeftRoom()
     {
+        HasLoaded = false;
+
         _uiCtx.Invoke(_banCache.Clear);
     }
 
@@ -80,6 +143,7 @@ public class RoomBansViewModel : ViewModelBase
         {
             Log.LogDebug("Loading bans...");
 
+            HasLoaded = false;
             IsLoading = true;
 
             var users = await _ext.RequestAsync(new GetBannedUsersMsg(currentRoomId), timeout: 3000);
@@ -94,10 +158,18 @@ public class RoomBansViewModel : ViewModelBase
                 foreach (var vm in viewModels)
                     _banCache.AddOrUpdate(vm);
             });
+
+            HasLoaded = true;
         }
-        catch
+        catch (Exception ex)
         {
             _banCache.Clear();
+            if (ex is TimeoutException)
+            {
+                await _dialogService.ShowAsync(
+                    "Operation timed out",
+                    "Failed to retrieve the ban list.");
+            }
         }
         finally
         {
@@ -109,45 +181,20 @@ public class RoomBansViewModel : ViewModelBase
 
     private async Task UnbanAsync(IEnumerable<RoomBanViewModel> users)
     {
-        if (!_roomManager.IsInRoom)
-            return;
-
         if (!_roomManager.EnsureInRoom(out var room))
             return;
 
         try
         {
-            var array = users.ToArray();
-            if (array.Length == 0) return;
-
-            Log.LogDebug("Unbanning {Count} users.", array.Length);
-
-            await _operationManager.RunAsync("unban users", async cancellationToken => {
-                for (int i = 0; i < array.Length; i++)
-                {
-                    if (i > 0)
-                        await Task.Delay(500, cancellationToken);
-                    Log.LogTrace("Unbanning user '{Name}'.", array[i].Name);
-                    await _ext.RequestAsync(new UnbanUserMsg(room.Id, array[i].Id), cancellationToken: cancellationToken);
-                    _banCache.RemoveKey(array[i].Id);
-                }
-            });
+            await _moderation.UnbanUsersAsync(
+                users.Select(vm => new IdName(vm.Id, vm.Name)));
         }
-        catch (Exception ex)
+        catch (OperationInProgressException ex)
         {
-            await _dialogService.ShowContentDialogAsync(
-                _dialogService.CreateViewModel<MainViewModel>(),
-                new ContentDialogSettings
-                {
-                    Title = "Error",
-                    Content = $"Failed to retrieve ban list: {ex.Message}",
-                    PrimaryButtonText = "OK"
-                }
-            );
+            await _dialogService.ShowAsync(
+                "Operation in progess",
+                $"An operation is already in progress: {ex.OperationName}");
         }
-        finally
-        {
-
-        }
+        catch { }
     }
 }

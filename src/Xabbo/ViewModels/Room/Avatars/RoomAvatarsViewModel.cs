@@ -1,20 +1,39 @@
 ﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Reactive;
+using System.Reactive.Linq;
+using System.Web;
 using DynamicData;
 using DynamicData.Kernel;
+using HanumanInstitute.MvvmDialogs;
 using ReactiveUI;
 
 using Xabbo.Configuration;
+using Xabbo.Controllers;
 using Xabbo.Core;
 using Xabbo.Core.Events;
 using Xabbo.Core.Game;
+using Xabbo.Core.Messages.Incoming;
+using Xabbo.Core.Messages.Outgoing;
+using Xabbo.Exceptions;
+using Xabbo.Extension;
 using Xabbo.Services.Abstractions;
+using Xabbo.Utility;
 
 namespace Xabbo.ViewModels;
 
 public class RoomAvatarsViewModel : ViewModelBase
 {
+    private readonly IExtension _ext;
     private readonly IConfigProvider<AppConfig> _config;
     private readonly IUiContext _uiContext;
+    private readonly IDialogService _dialog;
+    private readonly IClipboardService _clipboard;
+    private readonly ILauncherService _launcher;
+    private readonly WardrobePageViewModel _wardrobe;
+    private readonly IOperationManager _operations;
+    private readonly RoomModerationController _moderation;
+    private readonly ProfileManager _profileManager;
     private readonly RoomManager _roomManager;
 
     private readonly SourceCache<AvatarViewModel, int> _avatarCache = new(x => x.Index);
@@ -24,15 +43,95 @@ public class RoomAvatarsViewModel : ViewModelBase
 
     [Reactive] public string FilterText { get; set; } = "";
 
+    [Reactive] public IList<AvatarViewModel>? ContextSelection { get; set; }
+
+    private readonly ObservableAsPropertyHelper<IEnumerable<IUser>> _selectedUsers;
+    public IEnumerable<IUser> SelectedUsers => _selectedUsers.Value;
+
     public event Action? RefreshList;
 
     public RoomUsersConfig Config => _config.Value.Room.Users;
 
-    public RoomAvatarsViewModel(IConfigProvider<AppConfig> config, IUiContext uiContext, RoomManager roomManager)
+    public ReactiveCommand<Unit, Unit> FindAvatarCmd { get; }
+    public ReactiveCommand<Unit, Unit> CopyAvatarToWardrobeCmd { get; }
+    public ReactiveCommand<string, Unit> CopyAvatarFieldCmd { get; }
+    public ReactiveCommand<string, Task> OpenUserProfileCmd { get; }
+
+    public ReactiveCommand<string, Task> MuteUsersCmd { get; }
+    public ReactiveCommand<Unit, Task> KickUsersCmd { get; }
+    public ReactiveCommand<BanDuration, Task> BanUsersCmd { get; }
+    public ReactiveCommand<Unit, Task> BounceUsersCmd { get; }
+
+    public ReactiveCommand<Unit, Unit> CancelCmd { get; }
+
+    private readonly ObservableAsPropertyHelper<bool> _isBusy;
+    public bool IsBusy => _isBusy.Value;
+
+    private readonly ObservableAsPropertyHelper<string> _statusText;
+    public string StatusText => _statusText.Value;
+
+    public RoomAvatarsViewModel(
+        IExtension ext,
+        IConfigProvider<AppConfig> config,
+        IUiContext uiContext,
+        IDialogService dialog,
+        IClipboardService clipboard,
+        ILauncherService launcher,
+        IOperationManager operations,
+        RoomModerationController moderation,
+        WardrobePageViewModel wardrobe,
+        ProfileManager profileManager,
+        RoomManager roomManager)
     {
+        _ext = ext;
         _config = config;
         _uiContext = uiContext;
+        _dialog = dialog;
+        _clipboard = clipboard;
+        _launcher = launcher;
+        _operations = operations;
+        _wardrobe = wardrobe;
+        _moderation = moderation;
+        _profileManager = profileManager;
         _roomManager = roomManager;
+
+        _selectedUsers = this
+            .WhenAnyValue(
+                x => x.ContextSelection,
+                x => x?.Select(vm => vm.Avatar).OfType<IUser>() ?? []
+            )
+            .ToProperty(this, x => x.SelectedUsers);
+
+        _isBusy = moderation
+            .WhenAnyValue(
+                x => x.CurrentOperation,
+                x => x.TotalProgress,
+                (op, totalProgress) =>
+                    op is not RoomModerationController.ModerationType.None
+                    and not RoomModerationController.ModerationType.Unban &&
+                    totalProgress > 1
+            )
+            .ToProperty(this, x => x.IsBusy);
+
+        _statusText = moderation
+            .WhenAnyValue(
+                x => x.CurrentOperation,
+                x => x.CurrentProgress,
+                x => x.TotalProgress,
+                (op, current, total) => $"{
+                    op switch
+                    {
+                        RoomModerationController.ModerationType.Mute => "Muting",
+                        RoomModerationController.ModerationType.Unmute => "Unmuting",
+                        RoomModerationController.ModerationType.Kick => "Kicking",
+                        RoomModerationController.ModerationType.Ban => "Banning",
+                        RoomModerationController.ModerationType.Bounce => "Bouncing",
+                        _ => "Moderating"
+                    }
+                } users...\n{current} / {total}"
+            )
+            .ObserveOn(RxApp.MainThreadScheduler)
+            .ToProperty(this, x => x.StatusText);
 
         _avatarCache
             .Connect()
@@ -58,6 +157,233 @@ public class RoomAvatarsViewModel : ViewModelBase
         _roomManager.AvatarRemoved += OnAvatarRemoved;
         _roomManager.AvatarIdle += OnAvatarIdle;
         _roomManager.AvatarsUpdated += OnAvatarsUpdated;
+
+        var hasSingleContextAvatar = this
+            .WhenAnyValue(x => x.ContextSelection)
+            .Select(x => x is [ { } ]);
+
+        var hasSingleContextUser = this
+            .WhenAnyValue(x => x.ContextSelection)
+            .Select(x => x is [ { Avatar.Type: AvatarType.User } ]);
+
+        var hasAnyContextUser = this
+            .WhenAnyValue(x => x.ContextSelection)
+            .Select(x => x?.Any(avatar => avatar.Type is AvatarType.User) == true);
+
+        var hasAnyNonSelfUser = this
+            .WhenAnyValue(x => x.ContextSelection)
+            .Select(x => x?.Any(avatar =>
+                avatar.Type is AvatarType.User &&
+                avatar.Id != _profileManager.UserData?.Id
+            ) == true);
+
+        FindAvatarCmd = ReactiveCommand.Create(FindAvatar, hasSingleContextAvatar);
+        CopyAvatarToWardrobeCmd = ReactiveCommand.Create(CopyAvatarsToWardrobe, hasAnyContextUser);
+        CopyAvatarFieldCmd = ReactiveCommand.Create<string>(CopyAvatarField, hasSingleContextUser);
+        OpenUserProfileCmd = ReactiveCommand.Create<string, Task>(OpenUserProfile, hasSingleContextUser);
+
+        var selectedUsers = this.WhenAnyValue(
+            x => x.ContextSelection,
+            x => x?.Select(x => x.Avatar).OfType<IUser>() ?? []
+        );
+
+        MuteUsersCmd = ReactiveCommand.Create<string, Task>(
+            MuteUsersAsync,
+            Observable.CombineLatest(
+                profileManager.WhenAnyValue(x => x.UserData),
+                moderation.WhenAnyValue(
+                    x => x.CurrentOperation,
+                    x => x.CanMute,
+                    x => x.RightsLevel,
+                    (op, canMute, rightsLevel) => (
+                        canModerate: op is RoomModerationController.ModerationType.None && canMute,
+                        rightsLevel
+                    )
+                ),
+                selectedUsers,
+                (userData, mod, users) =>
+                    mod.canModerate &&
+                    users.Any(user =>
+                        user.Id != userData?.Id &&
+                        user.RightsLevel < mod.rightsLevel &&
+                        !user.IsStaff
+                    ) == true
+            )
+        );
+
+        KickUsersCmd = ReactiveCommand.Create<Task>(
+            KickUsersAsync,
+            Observable.CombineLatest(
+                profileManager.WhenAnyValue(x => x.UserData),
+                moderation.WhenAnyValue(
+                    x => x.CurrentOperation,
+                    x => x.CanKick,
+                    x => x.RightsLevel,
+                    (op, canKick, rightsLevel) => (
+                        canModerate: op is RoomModerationController.ModerationType.None && canKick,
+                        rightsLevel
+                    )
+                ),
+                selectedUsers,
+                (userData, mod, users) =>
+                    mod.canModerate &&
+                    users.Any(user =>
+                        user.Id != userData?.Id &&
+                        user.RightsLevel < mod.rightsLevel &&
+                        !user.IsStaff
+                    ) == true
+            )
+        );
+
+        BanUsersCmd = ReactiveCommand.Create<BanDuration, Task>(
+            BanUsersAsync,
+            Observable.CombineLatest(
+                profileManager.WhenAnyValue(x => x.UserData),
+                moderation.WhenAnyValue(
+                    x => x.CurrentOperation,
+                    x => x.CanBan,
+                    x => x.RightsLevel,
+                    (op, canBan, rightsLevel) => (
+                        canModerate: op is RoomModerationController.ModerationType.None && canBan,
+                        rightsLevel
+                    )
+                ),
+                selectedUsers,
+                (userData, mod, users) => {
+                    return mod.canModerate &&
+                    users.Any(user =>
+                        user.Id != userData?.Id &&
+                        user.RightsLevel < mod.rightsLevel &&
+                        !user.IsStaff
+                    ) == true;
+                }
+            )
+        );
+
+        BounceUsersCmd = ReactiveCommand.Create<Task>(
+            BounceUsersAsync,
+            Observable.CombineLatest(
+                profileManager.WhenAnyValue(x => x.UserData),
+                moderation.WhenAnyValue(
+                    x => x.CurrentOperation,
+                    x => x.RightsLevel,
+                    x => x.IsOwner,
+                    (op, rightsLevel, isOwner) =>
+                        op is RoomModerationController.ModerationType.None &&
+                        (rightsLevel is RightsLevel.Owner || isOwner)
+                ),
+                selectedUsers,
+                (userData, canModerate, users) =>
+                    canModerate &&
+                    users.Any(user =>
+                        user.Id != userData?.Id &&
+                        !user.IsStaff
+                    ) == true
+            )
+        );
+
+        CancelCmd = ReactiveCommand.Create(
+            () => { _operations.TryCancelOperation(out _); },
+            this.WhenAnyValue(x => x.IsBusy)
+        );
+    }
+
+    private void CopyAvatarsToWardrobe()
+    {
+        if (ContextSelection is { } selection)
+        {
+            foreach (var vm in selection)
+            {
+                if (vm.Avatar is User user)
+                {
+                    _wardrobe.AddFigure(user.Gender, user.Figure);
+                }
+            }
+        }
+    }
+
+    private Task MuteUsersAsync(string minutesStr) => TryModerate(() => _moderation.MuteUsersAsync(SelectedUsers, int.Parse(minutesStr)));
+    private Task KickUsersAsync() => TryModerate(() => _moderation.KickUsersAsync(SelectedUsers));
+    private Task BanUsersAsync(BanDuration duration) => TryModerate(() => _moderation.BanUsersAsync(SelectedUsers, duration));
+    private Task BounceUsersAsync() => TryModerate(() => _moderation.BounceUsersAsync(SelectedUsers));
+
+    private async Task TryModerate(Func<Task> moderate)
+    {
+        try
+        {
+            await moderate();
+        }
+        catch (OperationInProgressException ex)
+        {
+            await _dialog.ShowAsync("Error", ex.Message);
+        }
+        catch (Exception ex)
+        {
+            await _dialog.ShowAsync("Error", ex.Message);
+        }
+    }
+
+    private void FindAvatar()
+    {
+        if (ContextSelection is not [ var avatar ])
+            return;
+
+        _ext.Send(new AvatarWhisperMsg(avatar.Index, "(click here to find)"));
+    }
+
+    private void CopyAvatarField(string field)
+    {
+        if (ContextSelection is not [ var avatar ])
+            return;
+
+        switch (field)
+        {
+            case "id":
+                _clipboard.SetText(avatar.Id.ToString());
+                break;
+            case "name":
+                _clipboard.SetText(avatar.Name);
+                break;
+            case "motto":
+                _clipboard.SetText(avatar.Motto);
+                break;
+            case "figure":
+                _clipboard.SetText(avatar.Avatar.Figure);
+                break;
+        }
+    }
+
+    private async Task OpenUserProfile(string type)
+    {
+        if (ContextSelection is not [ { Avatar: IUser user } ])
+            return;
+
+        switch (type)
+        {
+            case "game":
+                var profile = await _ext.RequestAsync(new GetProfileByNameMsg(user.Name), block: false);
+                if (!profile.DisplayInClient)
+                {
+                    Console.WriteLine("profile hidden");
+                    var result = await _dialog.ShowContentDialogAsync(
+                        _dialog.CreateViewModel<MainViewModel>(),
+                        new HanumanInstitute.MvvmDialogs.Avalonia.Fluent.ContentDialogSettings
+                        {
+                            Title = "Failed to open profile",
+                            Content = $"{user.Name}'s profile is not visible.",
+                            PrimaryButtonText = "OK",
+                        }
+                    );
+                    Console.WriteLine(result);
+                }
+                break;
+            case "web":
+                _launcher.Launch($"https://{_ext.Session.Hotel.WebHost}/profile/{HttpUtility.UrlEncode(user.Name)}");
+                break;
+            case "habbowidgets":
+                _launcher.Launch($"https://www.habbowidgets.com/habinfo/{_ext.Session.Hotel.Domain}/{HttpUtility.UrlEncode(user.Name)}");
+                break;
+        }
     }
 
     private bool FilterAvatar(AvatarViewModel avatar)
@@ -111,7 +437,7 @@ public class RoomAvatarsViewModel : ViewModelBase
             foreach (var avatar in e.Avatars)
             {
                 var vm = new AvatarViewModel(avatar);
-                if (avatar.Id == _roomManager?.CurrentRoomId)
+                if (avatar.Id == _roomManager.Room?.Data?.OwnerId)
                     vm.IsOwner = true;
                 if (avatar is User user && user.IsStaff)
                     vm.IsStaff = true;
