@@ -3,6 +3,8 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:ui="using:FluentAvalonia.UI.Controls"
+  xmlns:icm="using:FluentIcons.Avalonia.Fluent.MarkupExtensions"
   xmlns:vm="using:Xabbo.ViewModels"
   xmlns:v="using:Xabbo.Avalonia.Views"
   mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
@@ -12,14 +14,20 @@
   ContextRequested="OnContextRequested"
 >
   <UserControl.ContextFlyout>
-    <MenuFlyout>
-      <MenuItem Header="Peek all gifts" Command="{Binding PeekAllCmd}" />
-      <MenuItem Header="Locate gift"
+    <ui:FAMenuFlyout>
+      <ui:MenuFlyoutItem
+        IconSource="{icm:SymbolIconSource Symbol=Search}"
+        Text="Locate gift"
         IsVisible="{Binding TargetGift, Converter={x:Static ObjectConverters.IsNotNull}}"
         Command="{Binding LocateGiftCmd}"
         CommandParameter="{Binding TargetGift}"
       />
-    </MenuFlyout>
+      <ui:MenuFlyoutItem
+        IconSource="{icm:SymbolIconSource Symbol=Eye}"
+        Text="Peek all gifts"
+        Command="{Binding PeekAllCmd}"
+      />
+    </ui:FAMenuFlyout>
   </UserControl.ContextFlyout>
   <Grid>
     <ScrollViewer Padding="10,0,10,0">
