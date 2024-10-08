@@ -71,12 +71,13 @@ public sealed class RoomGiftsViewModel : ViewModelBase
         if (model is null || model.Item is null) return;
 
         Task.Run(async () => {
-            for (int i = 0; i < 3; i++)
+            const int delay = 75;
+            for (int i = 0; i < 5; i++)
             {
-                ShowFurniTransition(model.Item, to: model.Item.Location + (0, 0, 2), duration: 150);
-                await Task.Delay(150);
-                ShowFurniTransition(model.Item, from: model.Item.Location + (0, 0, 2), duration: 150);
-                await Task.Delay(150);
+                ShowFurniTransition(model.Item, to: model.Item.Location + (0, 0, 1), duration: delay);
+                await Task.Delay(delay);
+                ShowFurniTransition(model.Item, from: model.Item.Location + (0, 0, 1), duration: delay);
+                await Task.Delay(delay);
             }
         });
     }
