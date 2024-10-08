@@ -2,6 +2,7 @@
   xmlns="https://github.com/avaloniaui"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   x:Class="Xabbo.Avalonia.App"
+  xmlns:sys="using:System"
   xmlns:local="using:Xabbo.Avalonia"
   xmlns:sty="using:FluentAvalonia.Styling"
   xmlns:ui="using:FluentAvalonia.UI.Controls"
@@ -11,90 +12,9 @@
   xmlns:c="using:Xabbo.Avalonia.Converters"
   RequestedThemeVariant="Dark"
 >
-    <Application.DataTemplates>
-      <local:ViewLocator/>
-    </Application.DataTemplates>
-
-    <Application.Styles>
-      <sty:FluentAvaloniaTheme  />
-      <StyleInclude Source="avares://FluentAvalonia.ProgressRing/Styling/Controls/ProgressRing.axaml" />
-      <StyleInclude Source="avares://AsyncImageLoader.Avalonia/AdvancedImage.axaml" />
-      <Style Selector="img|AdvancedImage">
-        <Setter Property="Template">
-          <ControlTemplate>
-            <Grid/>
-          </ControlTemplate>
-        </Setter>
-        <Style Selector="^.spinner">
-          <Setter Property="Template">
-            <ControlTemplate>
-              <Grid>
-                <ui:ProgressRing
-                  HorizontalAlignment="Center"
-                  VerticalAlignment="Center"
-                  Width="24" Height="24"
-                  IsVisible="{TemplateBinding IsLoading}"
-                />
-              </Grid>
-            </ControlTemplate>
-          </Setter>
-        </Style>
-      </Style>
-
-      <!-- Hide modern components on origins sessions -->
-      <Style Selector=":is(Window)#Root.origins :is(Control).modern">
-        <Setter Property="IsVisible" Value="False" />
-      </Style>
-
-      <Style Selector="SelectableTextBlock">
-        <Setter Property="SelectionBrush" Value="Purple" />
-      </Style>
-
-      <Style Selector="DataGrid DataGridCell:current /template/ Grid#FocusVisual">
-        <Setter Property="IsVisible" Value="False" />
-      </Style>
-
-      <Style Selector="ic|SymbolIcon.filled">
-        <Setter Property="IconVariant" Value="Filled" />
-      </Style>
-
-      <Style Selector="RadioButton">
-        <Setter Property="Margin" Value="0,0,5,0" />
-      </Style>
-
-      <!-- Slimmer tab items -->
-      <Style Selector="TabItem">
-        <Setter Property="MinHeight" Value="40" />
-        <Setter Property="FontSize" Value="14" />
-      </Style>
-
-      <!-- DataGrid -->
-      <Style Selector="TextBlock#CellTextBlock">
-        <Setter Property="TextTrimming" Value="CharacterEllipsis" />
-      </Style>
-      <Style Selector="DataGridColumnHeader:sortascending /template/ ui|FontIcon#SortIcon">
-        <Setter Property="FontSize" Value="10" />
-        <Setter Property="Margin" Value="0" />
-      </Style>
-      <Style Selector="DataGridColumnHeader:sortdescending /template/ ui|FontIcon#SortIcon">
-        <Setter Property="FontSize" Value="10" />
-        <Setter Property="Margin" Value="0" />
-      </Style>
-
-      <Style Selector="img|AdvancedImage.avatarimage">
-        <Setter Property="Width" Value="64" />
-        <Setter Property="Height" Value="110" />
-      </Style>
-      <Style Selector="img|AdvancedImage.avatarimage.head">
-        <Setter Property="Width" Value="54" />
-        <Setter Property="Height" Value="62" />
-      </Style>
-      <Style Selector="img|AdvancedImage.itemicon">
-        <Setter Property="Width" Value="32" />
-        <Setter Property="Height" Value="32" />
-        <Setter Property="Stretch" Value="None" />
-      </Style>
-    </Application.Styles>
+  <Application.DataTemplates>
+    <local:ViewLocator/>
+  </Application.DataTemplates>
 
   <Application.Resources>
     <ResourceDictionary>
@@ -102,6 +22,12 @@
         <ResourceInclude Source="Controls/Loading.axaml" />
         <ResourceInclude Source="Controls/InfoOverlay.axaml" />
       </ResourceDictionary.MergedDictionaries>
+
+      <sys:Double x:Key="ControlContentThemeFontSize">16</sys:Double>
+      <sys:Double x:Key="TabItemHeaderFontSize">30</sys:Double>
+
+      <FontFamily x:Key="Sans">avares://Xabbo.Avalonia/Assets/Fonts#IBM Plex Sans</FontFamily>
+      <FontFamily x:Key="Mono">avares://Xabbo.Avalonia/Assets/Fonts#IBM Plex Mono</FontFamily>
 
       <!-- Session -->
       <x:Boolean x:Key="IsConnecting">True</x:Boolean>
@@ -130,4 +56,101 @@
 
     </ResourceDictionary>
   </Application.Resources>
+
+  <Application.Styles>
+    <sty:FluentAvaloniaTheme  />
+    <StyleInclude Source="avares://FluentAvalonia.ProgressRing/Styling/Controls/ProgressRing.axaml" />
+    <StyleInclude Source="avares://AsyncImageLoader.Avalonia/AdvancedImage.axaml" />
+    <Style Selector="img|AdvancedImage">
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Grid/>
+        </ControlTemplate>
+      </Setter>
+      <Style Selector="^.spinner">
+        <Setter Property="Template">
+          <ControlTemplate>
+            <Grid>
+              <ui:ProgressRing
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Width="24" Height="24"
+                IsVisible="{TemplateBinding IsLoading}"
+              />
+            </Grid>
+          </ControlTemplate>
+        </Setter>
+      </Style>
+    </Style>
+
+    <!-- Hide modern components on origins sessions -->
+    <Style Selector=":is(Window)#Root.origins :is(Control).modern">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+
+    <Style Selector="SelectableTextBlock">
+      <Setter Property="SelectionBrush" Value="Purple" />
+    </Style>
+
+    <Style Selector="ic|SymbolIcon.filled">
+      <Setter Property="IconVariant" Value="Filled" />
+    </Style>
+
+    <Style Selector="RadioButton">
+      <Setter Property="Margin" Value="0,0,5,0" />
+    </Style>
+
+    <Style Selector=":is(Window), :is(Popup), :is(ToolTip)">
+      <Setter Property="TextElement.FontSize" Value="14" />
+      <Setter Property="TextElement.FontFamily" Value="{StaticResource Sans}" />
+    </Style>
+
+    <Style Selector=":is(Window)">
+      <Setter Property="FontSize" Value="16" />
+    </Style>
+
+    <!-- Slimmer tab items -->
+    <Style Selector="TabItem">
+      <Setter Property="MinHeight" Value="40" />
+      <Setter Property="FontSize" Value="16" />
+    </Style>
+
+    <!-- DataGrid -->
+    <Style Selector="DataGridColumnHeader /template/ Grid#PART_ColumnHeaderRoot TextBlock">
+      <Setter Property="FontSize" Value="14" />
+    </Style>
+    <Style Selector="DataGridColumnHeader:sortascending /template/ ui|FontIcon#SortIcon">
+      <Setter Property="FontSize" Value="14" />
+      <Setter Property="Margin" Value="0" />
+    </Style>
+    <Style Selector="DataGridColumnHeader:sortdescending /template/ ui|FontIcon#SortIcon">
+      <Setter Property="FontSize" Value="14" />
+      <Setter Property="Margin" Value="0" />
+    </Style>
+    <Style Selector="DataGridCell">
+      <Setter Property="FontSize" Value="16" />
+    </Style>
+    <Style Selector="DataGrid DataGridCell:current /template/ Grid#FocusVisual">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="TextBlock#CellTextBlock">
+      <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+    </Style>
+
+    <!-- AdvancedImage -->
+    <Style Selector="img|AdvancedImage.avatarimage">
+      <Setter Property="Width" Value="64" />
+      <Setter Property="Height" Value="110" />
+    </Style>
+    <Style Selector="img|AdvancedImage.avatarimage.head">
+      <Setter Property="Width" Value="54" />
+      <Setter Property="Height" Value="62" />
+    </Style>
+    <Style Selector="img|AdvancedImage.itemicon">
+      <Setter Property="Width" Value="32" />
+      <Setter Property="Height" Value="32" />
+      <Setter Property="Stretch" Value="None" />
+    </Style>
+  </Application.Styles>
+
 </Application>

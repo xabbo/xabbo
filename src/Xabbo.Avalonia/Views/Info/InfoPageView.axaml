@@ -17,7 +17,7 @@
         <Setter Property="Cursor" Value="Hand" />
       </Style>
       <Style Selector="TextBlock">
-        <Setter Property="FontSize" Value="16" />
+        <Setter Property="FontSize" Value="18" />
         <Setter Property="TextAlignment" Value="Center" />
         <Setter Property="TextWrapping" Value="Wrap" />
       </Style>
@@ -28,13 +28,13 @@
         Height="128"
         Source="avares://Xabbo.Avalonia/Assets/xabbo-skull-128.png"
       />
-      <TextBlock FontSize="18" TextAlignment="Center">
-        <Bold FontSize="24">xabbo</Bold><LineBreak />
+      <TextBlock Margin="0,0,0,-8" FontSize="28" Text="xabbo" />
+      <TextBlock FontSize="20">
         <Span>
           developed by
           <InlineUIContainer>
-            <Button Margin="0,0,-6,0" Classes="link" Command="{Binding #InfoPageRoot.OpenUrlCmd}" CommandParameter="https://b7c.io">
-              <TextBlock ClipToBounds="False" FontSize="18" FontWeight="Bold" Text="b7" />
+            <Button Classes="link" Command="{Binding #InfoPageRoot.OpenUrlCmd}" CommandParameter="https://b7c.io">
+              <TextBlock ClipToBounds="False" FontSize="20" FontWeight="Bold" Text="b7" />
             </Button>
           </InlineUIContainer>
         </Span>

@@ -54,6 +54,9 @@
 
   <ItemGroup>
     <AvaloniaResource Include="Assets/**/*" />
+    <Content Include="Assets/Fonts/OFL.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>

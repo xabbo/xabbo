@@ -15,7 +15,6 @@
 >
   <UserControl.Styles>
     <Style Selector="TabItem">
-      <Setter Property="FontSize" Value="14" />
       <Setter Property="MinHeight" Value="32" />
     </Style>
     <Style Selector="TabItem:selected /template/ Rectangle#PART_SelectedPipe">
@@ -32,7 +31,7 @@
       </TabItem.Header>
       <v:RoomFurniListView />
     </TabItem>
-    <TabItem>
+    <TabItem Classes="modern">
       <TabItem.Header>
         <StackPanel Orientation="Horizontal" Spacing="4">
           <ic:SymbolIcon VerticalAlignment="Center" Symbol="Grid" />
@@ -41,7 +40,7 @@
       </TabItem.Header>
       <v:RoomFurniGridView />
     </TabItem>
-    <TabItem>
+    <TabItem Classes="modern">
       <TabItem.Header>
         <StackPanel Orientation="Horizontal" Spacing="4">
           <ic:SymbolIcon VerticalAlignment="Center" Symbol="Gift" />

@@ -60,7 +60,7 @@
         <Grid RowDefinitions="Auto,*">
           <TextBlock
             Grid.Row="0" Margin="15,10,0,0"
-            FontSize="16" FontWeight="Bold"
+            FontSize="18" FontWeight="Bold"
             Text="{Binding Header}"
           />
           <ContentControl Grid.Row="1" Content="{Binding}" />

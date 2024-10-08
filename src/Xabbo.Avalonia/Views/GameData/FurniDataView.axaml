@@ -35,10 +35,10 @@
         >
           <DataTemplate>
             <TextBlock
-              Margin="12,8,12,0"
+              Margin="12,0,12,0"
               VerticalAlignment="Center"
-              FontFamily="Consolas"
-              FontSize="12"
+              FontFamily="{StaticResource Mono}"
+              FontSize="14"
               Text="{Binding Identifier}"
               TextTrimming="CharacterEllipsis"
             />
@@ -46,37 +46,34 @@
         </DataGridTemplateColumn>
         <DataGridTemplateColumn
           x:DataType="vm:FurniInfoViewModel"
-          Width="100"
-          IsVisible="{DynamicResource IsModern}"
-          Header="type/kind"
-          ClipboardContentBinding="{Binding TypeKind}"
+          Width="80"
+          Header="type"
+          ClipboardContentBinding="{Binding Type}"
         >
           <DataTemplate DataType="vm:FurniInfoViewModel">
             <TextBlock
-              Margin="12,8,12,0"
+              Margin="12,0,12,0"
               VerticalAlignment="Center"
-              FontFamily="Consolas"
-              FontSize="12"
-              Text="{Binding TypeKind}"
+              Text="{Binding Type}"
               TextTrimming="CharacterEllipsis"
             />
           </DataTemplate>
         </DataGridTemplateColumn>
         <DataGridTemplateColumn
           x:DataType="vm:FurniInfoViewModel"
-          Width="100"
-          IsVisible="{DynamicResource IsOrigins}"
-          Header="type"
-          ClipboardContentBinding="{Binding Type}"
+          Header="kind"
+          Width="80"
+          IsVisible="{DynamicResource IsModern}"
+          ClipboardContentBinding="{Binding Kind}"
         >
           <DataTemplate DataType="vm:FurniInfoViewModel">
             <TextBlock
-              Margin="12,8,12,0"
+              Margin="12,0,12,0"
               VerticalAlignment="Center"
-              FontFamily="Consolas"
-              FontSize="12"
-              Text="{Binding Type}"
+              Text="{Binding Kind}"
               TextTrimming="CharacterEllipsis"
+              FontFamily="{StaticResource Mono}"
+              FontSize="14"
             />
           </DataTemplate>
         </DataGridTemplateColumn>

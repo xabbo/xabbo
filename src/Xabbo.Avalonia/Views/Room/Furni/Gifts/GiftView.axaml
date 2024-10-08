@@ -53,13 +53,13 @@
           Source="{Binding SenderImageUrl, FallbackValue='avares://Xabbo.Avalonia/Assets/Images/avatarhead.png'}"
           Loader="{x:Static services:XabboImageLoader.Instance}"
         />
-        <Grid Grid.Column="1">
+        <Grid Grid.Column="1" Margin="8">
           <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
           </Grid.RowDefinitions>
-          <TextBlock Margin="8" Text="{Binding Message, Converter={StaticResource HabboStringConverter}}" TextWrapping="Wrap" />
-          <TextBlock Grid.Row="1" HorizontalAlignment="Right" Margin="8" Text="{Binding SenderName}" />
+          <TextBlock Text="{Binding Message, Converter={StaticResource HabboStringConverter}}" TextWrapping="Wrap" />
+          <TextBlock Grid.Row="1" HorizontalAlignment="Right" Text="{Binding SenderName}" />
         </Grid>
       </Grid>
     </Border>

@@ -16,7 +16,7 @@
     <ScrollViewer x:Name="ChatScrollViewer" VerticalScrollBarVisibility="Auto">
       <SelectableTextBlock
         Margin="10"
-        FontFamily="Consolas"
+        FontFamily="{StaticResource Mono}"
         Text="{Binding LogText}"
         TextWrapping="Wrap"
       />

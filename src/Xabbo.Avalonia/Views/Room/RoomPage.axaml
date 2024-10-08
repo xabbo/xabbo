@@ -3,6 +3,8 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:sys="clr-namespace:System;assembly=mscorlib"
+  xmlns:controls="using:Xabbo.Avalonia.Controls"
   xmlns:v="using:Xabbo.Avalonia.Views"
   xmlns:vm="using:Xabbo.ViewModels"
   xmlns:ic="using:FluentIcons.Avalonia.Fluent"
@@ -10,6 +12,9 @@
   x:Class="Xabbo.Avalonia.Views.RoomPage"
   x:DataType="vm:RoomPageViewModel"
 >
+  <UserControl.Resources>
+    <sys:Double x:Key="IconCountFontSize">12</sys:Double>
+  </UserControl.Resources>
   <Panel>
     <TabControl IsVisible="{Binding RoomManager.IsInRoom}" Padding="0,4,0,0">
       <TabItem>
@@ -37,7 +42,7 @@
                 Margin="0,-10,0,0"
                 VerticalAlignment="Top"
                 HorizontalAlignment="Center"
-                FontSize="10"
+                FontSize="{StaticResource IconCountFontSize}"
                 IsVisible="{Binding Avatars.Avatars.Count, Converter={StaticResource GtConverter} ConverterParameter=0}"
                 Text="{Binding Avatars.Avatars.Count}"
               />
@@ -60,7 +65,7 @@
                 Margin="0,-10,0,0"
                 VerticalAlignment="Top"
                 HorizontalAlignment="Center"
-                FontSize="10"
+                FontSize="{StaticResource IconCountFontSize}"
                 IsVisible="{Binding Visitors.Visitors.Count, Converter={StaticResource GtConverter} ConverterParameter=0}"
                 Text="{Binding Visitors.Visitors.Count}"
               />
@@ -92,7 +97,7 @@
                 Margin="0,-10,0,0"
                 VerticalAlignment="Top"
                 HorizontalAlignment="Center"
-                FontSize="10"
+                FontSize="{StaticResource IconCountFontSize}"
                 IsVisible="{Binding Furni.Furni.Count, Converter={StaticResource GtConverter} ConverterParameter=0}"
                 Text="{Binding Furni.Furni.Count}"
               />
@@ -103,18 +108,6 @@
         <v:RoomFurniView DataContext="{Binding Furni}" />
       </TabItem>
     </TabControl>
-    <Panel IsVisible="{Binding !RoomManager.IsInRoom}">
-      <StackPanel
-        Orientation="Horizontal"
-        HorizontalAlignment="Center"
-        VerticalAlignment="Center"
-        TextElement.FontSize="18"
-        Spacing="4"
-        Opacity="0.5"
-      >
-        <ic:SymbolIcon Symbol="Info" FontSize="24" VerticalAlignment="Center" />
-        <TextBlock Margin="0" VerticalAlignment="Center" FontWeight="Light">Enter a room</TextBlock>
-      </StackPanel>
-    </Panel>
+    <controls:InfoOverlay IsVisible="{Binding !RoomManager.IsInRoom}" Content="Enter a room" />
   </Panel>
 </UserControl>
