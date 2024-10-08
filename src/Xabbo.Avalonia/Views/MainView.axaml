@@ -13,7 +13,7 @@
   <ui:NavigationView
     Grid.Row="1"
     Name="NavView"
-    PaneDisplayMode="Left"
+    PaneDisplayMode="LeftCompact"
     IsPaneOpen="False"
     IsSettingsVisible="False"
     MenuItemsSource="{Binding Pages}"
@@ -22,33 +22,33 @@
     Content="{Binding SelectedPage, Mode=OneWay}"
   >
     <ui:NavigationView.DataTemplates>
-      <DataTemplate DataType="{x:Type vm:GeneralPageViewModel}">
+      <DataTemplate DataType="vm:GeneralPageViewModel">
         <v:GeneralPage />
       </DataTemplate>
-      <DataTemplate DataType="{x:Type vm:FriendsPageViewModel}">
+      <DataTemplate DataType="vm:FriendsPageViewModel">
         <v:FriendsPage />
       </DataTemplate>
-      <DataTemplate DataType="{x:Type vm:WardrobePageViewModel}">
+      <DataTemplate DataType="vm:WardrobePageViewModel">
         <v:WardrobePageView />
       </DataTemplate>
-      <DataTemplate DataType="{x:Type vm:ChatPageViewModel}">
+      <DataTemplate DataType="vm:ChatPageViewModel">
         <v:ChatPage />
       </DataTemplate>
-      <DataTemplate DataType="{x:Type vm:RoomPageViewModel}">
+      <DataTemplate DataType="vm:RoomPageViewModel">
         <v:RoomPage />
       </DataTemplate>
-      <DataTemplate DataType="{x:Type vm:GameDataPageViewModel}">
+      <DataTemplate DataType="vm:GameDataPageViewModel">
         <v:GameDataPage />
       </DataTemplate>
-      <DataTemplate DataType="{x:Type vm:InfoPageViewModel}">
+      <DataTemplate DataType="vm:InfoPageViewModel">
         <v:InfoPageView />
       </DataTemplate>
-      <DataTemplate DataType="{x:Type vm:SettingsPageViewModel}">
+      <DataTemplate DataType="vm:SettingsPageViewModel">
         <v:SettingsPageView />
       </DataTemplate>
     </ui:NavigationView.DataTemplates>
     <ui:NavigationView.MenuItemTemplate>
-      <DataTemplate DataType="{x:Type vm:PageViewModel}">
+      <DataTemplate DataType="vm:PageViewModel">
         <ui:NavigationViewItem
           IconSource="{Binding Icon}"
           Content="{Binding Header}"
@@ -56,7 +56,7 @@
       </DataTemplate>
     </ui:NavigationView.MenuItemTemplate>
     <ui:NavigationView.ContentTemplate>
-      <DataTemplate DataType="{x:Type vm:PageViewModel}">
+      <DataTemplate DataType="vm:PageViewModel">
         <Grid RowDefinitions="Auto,*">
           <TextBlock
             Grid.Row="0" Margin="15,10,0,0"
