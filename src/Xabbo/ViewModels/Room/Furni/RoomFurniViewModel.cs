@@ -58,6 +58,9 @@ public class RoomFurniViewModel : ViewModelBase
         _roomManager.FloorItemsLoaded += OnFloorItemsLoaded;
         _roomManager.FloorItemAdded += OnFloorItemAdded;
         _roomManager.FloorItemRemoved += OnFloorItemRemoved;
+        _roomManager.WallItemsLoaded += OnWallItemsLoaded;
+        _roomManager.WallItemAdded += OnWallItemAdded;
+        _roomManager.WallItemRemoved += OnWallItemRemoved;
 
         _furniCache
             .Connect()
@@ -163,18 +166,10 @@ public class RoomFurniViewModel : ViewModelBase
 
     private void OnLeftRoom() => ClearItems();
 
-    private void OnFloorItemsLoaded(FloorItemsEventArgs e)
-    {
-        AddItems(e.Items);
-    }
-
-    private void OnFloorItemAdded(FloorItemEventArgs e)
-    {
-        AddItems([e.Item]);
-    }
-
-    private void OnFloorItemRemoved(FloorItemEventArgs e)
-    {
-        RemoveItem(e.Item);
-    }
+    private void OnFloorItemsLoaded(FloorItemsEventArgs e) => AddItems(e.Items);
+    private void OnFloorItemAdded(FloorItemEventArgs e) => AddItems([e.Item]);
+    private void OnFloorItemRemoved(FloorItemEventArgs e) => RemoveItem(e.Item);
+    private void OnWallItemsLoaded(WallItemsEventArgs e) => AddItems(e.Items);
+    private void OnWallItemAdded(WallItemEventArgs e) => AddItems([e.Item]);
+    private void OnWallItemRemoved(WallItemEventArgs e) => RemoveItem(e.Item);
 }
