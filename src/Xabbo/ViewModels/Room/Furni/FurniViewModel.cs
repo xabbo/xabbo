@@ -14,9 +14,8 @@ public abstract class ItemViewModelBase : ViewModelBase
     public ItemType Type => _info?.Type ?? (ItemType)(-1);
     public int Kind => _info?.Kind ?? 0;
     public string Identifier => _info?.Identifier ?? "?";
-    public string Name => _info?.Name ?? _item.Identifier ?? "?";
-    public string Description => _info?.Description ?? "";
-    public bool HasDescription { get; }
+    public string Name { get; }
+    public string? Description { get; }
 
     [Reactive] public bool IsHidden { get; set; }
 
@@ -25,21 +24,30 @@ public abstract class ItemViewModelBase : ViewModelBase
     public ItemViewModelBase(IItem item)
     {
         _item = item;
-        if (Extensions.IsInitialized)
+
+        if (Extensions.IsInitialized &&
+            _item.TryGetInfo(out _info))
         {
-            if (_item.TryGetInfo(out _info) && _info.Revision > 0)
+            if (_info.Revision > 0)
             {
                 string identifier = _info.Identifier.Replace('*', '_');
                 if (identifier == "poster" && _item is IWallItem wallItem)
                     identifier += "_" + wallItem.Data;
                 IconUrl = $"http://images.habbo.com/dcr/hof_furni/{_info.Revision}/{identifier}_icon.png";
             }
-        }
 
-        HasDescription =
-            _info is not null &&
-            !string.IsNullOrWhiteSpace(_info.Description) &&
-            !_info.Description.EndsWith(" desc");
+            if (item.TryGetName(out string? name))
+                Name = name;
+            else
+                Name = _info.Identifier;
+
+            if (item.TryGetDescription(out string? desc))
+                Description = desc;
+        }
+        else
+        {
+            Name = item.Identifier ?? "?";
+        }
     }
 }
 

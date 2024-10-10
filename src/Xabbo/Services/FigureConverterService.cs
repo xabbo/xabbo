@@ -55,7 +55,7 @@ public class FigureConverterService : IFigureConverterService
 
             Log.LogDebug("Loading modern figure data...");
             GameDataManager modernGameData = new(null, _loggerFactory);
-            await modernGameData.LoadAsync(Hotel.FromIdentifier("us"), [GameDataType.Figure]);
+            await modernGameData.LoadAsync(Hotel.FromIdentifier("us"), [GameDataType.FigureData]);
 
             if (modernGameData is not { } modernFigureData)
                 throw new Exception("Failed to load modern figure data.");

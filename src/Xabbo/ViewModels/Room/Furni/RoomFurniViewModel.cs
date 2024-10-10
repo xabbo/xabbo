@@ -141,8 +141,11 @@ public class RoomFurniViewModel : ViewModelBase
             {
                 foreach (var item in items)
                 {
-                    var vm = new FurniStackViewModel(item);
-                    cache.Lookup(vm.Descriptor).IfHasValue(vm => vm.Count++).Else(() => cache.AddOrUpdate(vm));
+                    var key = FurniStackViewModel.GetDescriptor(item);
+                    cache
+                        .Lookup(key)
+                        .IfHasValue(vm => vm.Count++)
+                        .Else(() => cache.AddOrUpdate(new FurniStackViewModel(item)));
                 }
             });
         });
