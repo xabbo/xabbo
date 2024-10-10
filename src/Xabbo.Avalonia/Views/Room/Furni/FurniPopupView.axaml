@@ -10,6 +10,7 @@
   mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
   x:Class="Xabbo.Avalonia.Views.FurniPopupView"
   x:DataType="vm:FurniViewModel"
+  FontSize="16"
 >
   <StackPanel Grid.Row="1">
     <Border
@@ -29,7 +30,7 @@
     </Border>
     <TextBlock HorizontalAlignment="Center" Text="{Binding Name}" FontWeight="Bold" />
     <TextBlock HorizontalAlignment="Center" Text="{Binding Description}"
-               IsVisible="{Binding HasDescription}" />
+               IsVisible="{Binding Description, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
     <Separator Margin="0,5" />
     <TextBlock IsVisible="{DynamicResource IsModern}">
       <Run FontWeight="Bold">Kind:</Run>
@@ -37,7 +38,7 @@
     </TextBlock>
     <TextBlock>
       <Run FontWeight="Bold">Identifier:</Run>
-      <Run FontFamily="{DynamicResource Mono}" Text="{Binding Identifier}" />
+      <Run FontFamily="{DynamicResource Mono}" FontSize="14" Text="{Binding Identifier}" />
     </TextBlock>
   </StackPanel>
 </UserControl>

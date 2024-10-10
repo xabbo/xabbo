@@ -6,6 +6,7 @@
   xmlns:sys="clr-namespace:System;assembly=mscorlib"
   xmlns:ui="using:FluentAvalonia.UI.Controls"
   xmlns:img="using:AsyncImageLoader"
+  xmlns:controls="using:Xabbo.Avalonia.Controls"
   xmlns:services="using:Xabbo.Avalonia.Services"
   xmlns:v="using:Xabbo.Avalonia.Views"
   xmlns:vm="using:Xabbo.ViewModels"
@@ -13,9 +14,6 @@
   x:Class="Xabbo.Avalonia.Views.RoomFurniGridView"
   x:DataType="vm:RoomFurniViewModel"
 >
-  <UserControl.Resources>
-    <sys:Int32 x:Key="One">1</sys:Int32>
-  </UserControl.Resources>
   <UserControl.Styles>
     <Style Selector="Border.Btn">
       <Setter Property="Background" Value="Transparent" />
@@ -25,6 +23,7 @@
     </Style>
   </UserControl.Styles>
   <Grid RowDefinitions="Auto,*">
+    <controls:InfoOverlay Grid.RowSpan="2" IsVisible="{Binding IsEmpty}" Content="{Binding EmptyStatus}" />
     <TextBox
       Margin="10,0,10,10"
       Watermark="Filter"

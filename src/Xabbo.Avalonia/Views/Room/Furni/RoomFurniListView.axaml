@@ -4,6 +4,7 @@
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:ic="using:FluentIcons.Avalonia.Fluent"
+  xmlns:controls="using:Xabbo.Avalonia.Controls"
   xmlns:v="using:Xabbo.Avalonia.Views"
   xmlns:vm="using:Xabbo.ViewModels"
   mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
@@ -11,6 +12,7 @@
   x:DataType="vm:RoomFurniViewModel"
 >
   <Grid RowDefinitions="Auto,*">
+    <controls:InfoOverlay Grid.RowSpan="2" IsVisible="{Binding IsEmpty}" Content="{Binding EmptyStatus}" />
     <TextBox
       Margin="10,0,10,10"
       Watermark="Filter"
@@ -25,7 +27,7 @@
       CanUserSortColumns="True"
     >
       <DataGrid.Columns>
-        <DataGridTextColumn Width="100" Header="id" Binding="{Binding Id}" />
+        <DataGridTextColumn Width="120" Header="id" Binding="{Binding Id}" />
         <DataGridTemplateColumn
           x:DataType="vm:FurniViewModel"
           Width="250" Header="name"
@@ -54,7 +56,7 @@
             </Grid>
           </DataTemplate>
         </DataGridTemplateColumn>
-        <DataGridTextColumn IsVisible="{DynamicResource IsModern}" Width="100" Header="owner id" Binding="{Binding OwnerId}" />
+        <DataGridTextColumn IsVisible="{DynamicResource IsModern}" Width="120" Header="owner id" Binding="{Binding OwnerId}" />
         <DataGridTextColumn IsVisible="{DynamicResource IsModern}" Width="150" Header="owner name" Binding="{Binding OwnerName}" />
       </DataGrid.Columns>
     </DataGrid>

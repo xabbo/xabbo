@@ -5,6 +5,7 @@
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:ui="using:FluentAvalonia.UI.Controls"
   xmlns:icm="using:FluentIcons.Avalonia.Fluent.MarkupExtensions"
+  xmlns:controls="using:Xabbo.Avalonia.Controls"
   xmlns:vm="using:Xabbo.ViewModels"
   xmlns:v="using:Xabbo.Avalonia.Views"
   mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
@@ -30,6 +31,7 @@
     </ui:FAMenuFlyout>
   </UserControl.ContextFlyout>
   <Grid>
+    <controls:InfoOverlay IsVisible="{Binding IsEmpty}" Content="No gifts found" />
     <ScrollViewer Padding="10,0,10,0">
       <ItemsRepeater ItemsSource="{Binding Gifts}">
         <ItemsRepeater.Layout>

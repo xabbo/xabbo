@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Reactive;
+using System.Reactive.Linq;
 using DynamicData;
 using ReactiveUI;
 
@@ -24,6 +25,9 @@ public sealed class RoomGiftsViewModel : ViewModelBase
     private readonly ReadOnlyObservableCollection<GiftViewModel> _gifts;
     public ReadOnlyObservableCollection<GiftViewModel> Gifts => _gifts;
 
+    private readonly ObservableAsPropertyHelper<bool> _isEmpty;
+    public bool IsEmpty => _isEmpty.Value;
+
     [Reactive] public GiftViewModel? TargetGift { get; set; }
 
     public ReactiveCommand<Unit, Unit> PeekAllCmd { get; }
@@ -42,6 +46,10 @@ public sealed class RoomGiftsViewModel : ViewModelBase
             .Connect()
             .Bind(out _gifts)
             .Subscribe();
+
+        _isEmpty = _cache.CountChanged
+            .Select(count => count == 0)
+            .ToProperty(this, x => x.IsEmpty);
 
         _roomManager.FloorItemsLoaded += OnFloorItemsLoaded;
         _roomManager.FloorItemAdded += OnFloorItemAdded;

@@ -88,6 +88,11 @@
       <Setter Property="IsVisible" Value="False" />
     </Style>
 
+    <!-- Hide origins components on modern sessions -->
+    <Style Selector=":is(Window)#Root.modern :is(Control).origins">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+
     <Style Selector="SelectableTextBlock">
       <Setter Property="SelectionBrush" Value="Purple" />
     </Style>
