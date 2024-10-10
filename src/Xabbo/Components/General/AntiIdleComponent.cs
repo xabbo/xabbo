@@ -1,4 +1,4 @@
-﻿using ReactiveUI;
+using ReactiveUI;
 
 using Xabbo.Messages;
 using Xabbo.Messages.Flash;
@@ -56,7 +56,7 @@ public partial class AntiIdleComponent : Component
     [InterceptOut(nameof(Out.LatencyPingRequest))]
     protected void HandleLatencyPingRequest(Intercept e)
     {
-        _pingCount++;
+        _pingCount = e.Packet.Read<int>();
         SendAntiIdlePacket();
     }
 
@@ -64,7 +64,7 @@ public partial class AntiIdleComponent : Component
     [InterceptIn(nameof(In.Ping))]
     protected void HandlePing(Intercept e)
     {
-        _pingCount = e.Packet.Read<int>();
+        _pingCount++;
         if (_pingCount % 5 == 0)
             SendAntiIdlePacket();
     }
