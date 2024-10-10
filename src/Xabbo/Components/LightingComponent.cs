@@ -120,8 +120,8 @@ public class LightingComponent : Component
     {
         if (!Extensions.IsInitialized) return;
 
-        string identifier = e.Item.GetIdentifier();
-        if (identifier == TonerIdentifier)
+        if (e.Item.TryGetIdentifier(out string? identifier) &&
+            identifier == TonerIdentifier)
         {
             _currentBgTonerId = e.Item.Id;
         }
