@@ -11,6 +11,8 @@ public abstract partial class ControllerBase : ReactiveObject, IInterceptorConte
 
     IInterceptor IInterceptorContext.Interceptor => _extension;
 
+    protected Session Session => _extension.Session;
+
     public ControllerBase(IExtension extension)
     {
         _extension = extension;
