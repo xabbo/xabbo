@@ -91,7 +91,7 @@
         </ListBox.ItemTemplate>
       </ListBox>
       <Grid Grid.Row="2" ColumnDefinitions="Auto,*">
-        <CheckBox Margin="10,0,0,0" IsChecked="{Binding ShowOnlineOnly}" Content="Online" />
+        <CheckBox Margin="10,5" VerticalAlignment="Bottom" IsChecked="{Binding ShowOnlineOnly}" Content="Online" />
         <StackPanel Grid.Column="1" Margin="10" HorizontalAlignment="Right">
           <Button Command="{Binding RemoveFriendsCmd}">Remove</Button>
         </StackPanel>
