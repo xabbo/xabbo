@@ -166,6 +166,7 @@ public static class ViewModelLocator
 
         Splatr.RegisterLazySingleton<ClickToController>();
         Splatr.RegisterLazySingleton<RoomModerationController>();
+        Splatr.RegisterLazySingleton<RoomFurniController>();
 
         // Xabbo commands
         Splatr.RegisterLazySingleton<CommandManager>();
