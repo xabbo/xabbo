@@ -51,15 +51,17 @@ public partial class RoomModerationController : ControllerBase
         _roomManager.Left += OnLeftRoom;
     }
 
-    public bool CanModerate(ModerationType type, IUser user) => type switch
-    {
-        ModerationType.Mute or ModerationType.Unmute => CanMute && RightsLevel > user.RightsLevel && !user.IsStaff,
-        ModerationType.Kick => CanKick && RightsLevel > user.RightsLevel && !user.IsStaff,
-        ModerationType.Ban => CanBan && RightsLevel > user.RightsLevel && !user.IsStaff,
-        ModerationType.Unban => RightsLevel >= RightsLevel.GroupAdmin,
-        ModerationType.Bounce => IsOwner && !user.IsStaff,
-        _ => false,
-    };
+    public bool CanModerate(ModerationType type, IUser user) =>
+        user.Name != _profileManager.UserData?.Name &&
+        type switch
+        {
+            ModerationType.Mute or ModerationType.Unmute => CanMute && RightsLevel > user.RightsLevel && !user.IsStaff,
+            ModerationType.Kick => CanKick && RightsLevel > user.RightsLevel && !user.IsStaff,
+            ModerationType.Ban => CanBan && RightsLevel > user.RightsLevel && !user.IsStaff,
+            ModerationType.Unban => RightsLevel >= RightsLevel.GroupAdmin,
+            ModerationType.Bounce => IsOwner && !user.IsStaff,
+            _ => false,
+        };
 
     public Task MuteUsersAsync(IEnumerable<IUser> users, int minutes) => ModerateUsersAsync(
         minutes == 0 ? ModerationType.Unmute : ModerationType.Mute,
