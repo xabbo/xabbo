@@ -173,6 +173,7 @@ public static class ViewModelLocator
         Splatr.RegisterLazySingleton<CommandModule, OperationCommands>();
         Splatr.RegisterLazySingleton<CommandModule, EffectCommands>();
         Splatr.RegisterLazySingleton<CommandModule, FindFriendCommand>();
+        Splatr.RegisterLazySingleton<CommandModule, VisibilityCommands>();
         Splatr.RegisterLazySingleton<CommandModule, FurniCommands>();
         Splatr.RegisterLazySingleton<CommandModule, InfoCommands>();
         Splatr.RegisterLazySingleton<CommandModule, ModerationCommands>();

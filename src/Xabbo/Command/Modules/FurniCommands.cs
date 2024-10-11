@@ -24,77 +24,17 @@ public sealed class FurniCommands(
     private readonly ProfileManager _profileManager = profileManager;
     private readonly RoomManager _roomManager = roomManager;
 
-    [Command("furni", "f")]
-    public async Task OnExecuteAsync(CommandArgs args)
+    [Command("pickup", "pick")]
+    public Task HandlePickupAsync(CommandArgs args) => PickupFurniAsync(string.Join(" ", args), false, false);
+
+    [Command("eject")]
+    public Task HandleEjectAsync(CommandArgs args) => PickupFurniAsync(string.Join(" ", args), false, true);
+
+    private async Task PickupFurniAsync(string pattern, bool matchAll, bool eject)
     {
-        if (args.Length < 1) return;
-        string subCommand = args[0].ToLower();
+        if (string.IsNullOrWhiteSpace(pattern))
+            return;
 
-        switch (subCommand)
-        {
-            case "s":
-            case "show":
-                await ShowFurniAsync(args); break;
-            case "h":
-            case "hide":
-                await HideFurniAsync(args); break;
-            case "p":
-            case "pick":
-            case "pickup":
-                await PickupFurniAsync(args, false); break;
-            case "e":
-            case "eject":
-                if (Session.Is(ClientType.Origins))
-                {
-                    ShowMessage("Origins does not support ejecting furni.");
-                    return;
-                }
-                await PickupFurniAsync(args, true); break;
-        }
-    }
-
-    private Task ShowFurniAsync(CommandArgs args)
-    {
-        IRoom? room = _roomManager.Room;
-        if (room is not null)
-        {
-            string pattern = string.Join(' ', args.Skip(1));
-            Regex regex = StringUtility.CreateWildcardRegex(pattern);
-            foreach (IFurni furni in room.Furni)
-            {
-                if (furni.TryGetName(out string? name) &&
-                    regex.IsMatch(name))
-                {
-                    _roomManager.ShowFurni(furni);
-                }
-            }
-        }
-
-        return Task.CompletedTask;
-    }
-
-    private Task HideFurniAsync(CommandArgs args)
-    {
-        IRoom? room = _roomManager.Room;
-        if (room is not null)
-        {
-            string pattern = string.Join(" ", args.Skip(1));
-            Regex regex = StringUtility.CreateWildcardRegex(pattern);
-            foreach (IFurni furni in room.Furni)
-            {
-                if (furni.TryGetName(out string? name) &&
-                    regex.IsMatch(name))
-                {
-                    _roomManager.HideFurni(furni);
-                }
-            }
-        }
-
-        return Task.CompletedTask;
-    }
-
-    private async Task PickupFurniAsync(CommandArgs args, bool eject)
-    {
         IUserData? userData = _profileManager.UserData;
         IRoom? room = _roomManager.Room;
 
@@ -107,7 +47,13 @@ public sealed class FurniCommands(
             return;
         }
 
-        if (Session.Is(ClientType.Origins) && _roomManager.RightsLevel != RightsLevel.Owner)
+        if (eject && !_roomManager.IsOwner)
+        {
+            ShowMessage("You must be the room owner to eject furni.");
+            return;
+        }
+
+        if (Session.Is(ClientType.Origins) && !_roomManager.IsOwner)
         {
             ShowMessage("You must be the room owner to pick up furni.");
             return;
@@ -115,10 +61,6 @@ public sealed class FurniCommands(
 
         await _operationManager.RunAsync($"{(eject ? "eject" : "pickup")} furni", async ct =>
         {
-            string pattern = string.Join(" ", args.Skip(1));
-            if (string.IsNullOrWhiteSpace(pattern)) return;
-
-            bool all = pattern.Equals("all", StringComparison.OrdinalIgnoreCase);
             Regex regex = StringUtility.CreateWildcardRegex(pattern);
 
             var allFurni = Session.Is(ClientType.Origins)
@@ -127,9 +69,8 @@ public sealed class FurniCommands(
                     eject == (x.OwnerId != userData.Id)
                 ).ToArray();
 
-            var matched = all ? allFurni : allFurni.Where(furni =>
-                furni.TryGetName(out string? name) &&
-                (all || regex.IsMatch(name))
+            var matched = matchAll ? allFurni : allFurni.Where(furni =>
+                matchAll || (furni.TryGetName(out string? name) && regex.IsMatch(name))
             ).ToArray();
 
             if (matched.Length == 0)
@@ -138,19 +79,13 @@ public sealed class FurniCommands(
                 return;
             }
 
-            if (matched.Length == allFurni.Length && !all)
-            {
-                ShowMessage($"[Warning] Pattern matched all furni. Use '/{args.Command} {args[0]} all' to {(eject ? "eject" : "pick up")} all furni.");
-                return;
-            }
-
             int pickupInterval = Session.Is(ClientType.Origins)
-                ? _settingsProvider.Value.Furni.PickupIntervalOrigins
-                : _settingsProvider.Value.Furni.PickupInterval;
+                ? _settingsProvider.Value.Timing.Origins.FurniPickupInterval
+                : _settingsProvider.Value.Timing.Modern.FurniPickupInterval;
 
             int totalDelay = pickupInterval * matched.Length;
             string message = $"Picking up {matched.Length} furni...";
-            if (totalDelay >= 2500)
+            if (totalDelay >= 1500)
                 message += " Use /c to cancel.";
             ShowMessage(message);
 
