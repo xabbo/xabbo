@@ -126,11 +126,11 @@
       <Setter Property="FontSize" Value="14" />
     </Style>
     <Style Selector="DataGridColumnHeader:sortascending /template/ ui|FontIcon#SortIcon">
-      <Setter Property="FontSize" Value="14" />
+      <Setter Property="FontSize" Value="10" />
       <Setter Property="Margin" Value="0" />
     </Style>
     <Style Selector="DataGridColumnHeader:sortdescending /template/ ui|FontIcon#SortIcon">
-      <Setter Property="FontSize" Value="14" />
+      <Setter Property="FontSize" Value="10" />
       <Setter Property="Margin" Value="0" />
     </Style>
     <Style Selector="DataGridCell">
