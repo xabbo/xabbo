@@ -141,8 +141,6 @@ public static class ViewModelLocator
         // Xabbo components
         Splatr.RegisterLazySingleton<IOperationManager, OperationManager>();
 
-        Splatr.RegisterLazySingleton<RoomModerationController>();
-
         Splatr.RegisterLazySingleton<XabbotComponent>();
         Splatr.RegisterLazySingleton<NotificationComponent>();
         Splatr.RegisterLazySingleton<AvatarOverlayComponent>();
@@ -155,7 +153,6 @@ public static class ViewModelLocator
         Splatr.RegisterLazySingleton<AntiTypingComponent>();
         Splatr.RegisterLazySingleton<AntiWalkComponent>();
         Splatr.RegisterLazySingleton<ClickThroughComponent>();
-        Splatr.RegisterLazySingleton<ClickToComponent>();
         Splatr.RegisterLazySingleton<RespectedComponent>();
 
         Splatr.RegisterLazySingleton<ChatComponent>();
@@ -164,6 +161,11 @@ public static class ViewModelLocator
         Splatr.RegisterLazySingleton<FurniActionsComponent>();
         Splatr.RegisterLazySingleton<RoomEntryComponent>();
         Splatr.RegisterLazySingleton<LightingComponent>();
+
+        // Controllers
+
+        Splatr.RegisterLazySingleton<ClickToController>();
+        Splatr.RegisterLazySingleton<RoomModerationController>();
 
         // Xabbo commands
         Splatr.RegisterLazySingleton<CommandManager>();
