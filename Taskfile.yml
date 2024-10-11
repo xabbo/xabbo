@@ -13,3 +13,7 @@ tasks:
     interactive: true
     cmds:
       - ./.scripts/new-view.sh
+  run:
+    desc: Builds and runs the application
+    cmds:
+      - dotnet run --project src/Xabbo.Avalonia
