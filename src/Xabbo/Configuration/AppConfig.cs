@@ -9,5 +9,6 @@ public sealed partial class AppConfig : ReactiveObject
     [Reactive] public RoomConfig Room { get; set; } = new();
     [Reactive] public MovementConfig Movement { get; set; } = new();
     [Reactive] public ChatConfig Chat { get; set; } = new();
-    [Reactive] public FurniConfig Furni { get; set; } = new();
+
+    [Reactive] public TimingConfigs Timing { get; set; } = new();
 }

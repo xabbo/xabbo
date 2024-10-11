@@ -52,6 +52,7 @@
       <c:GtConverter x:Key="GtConverter" />
       <c:EqualityConverter x:Key="EqConverter"/>
       <c:InequalityConverter x:Key="NeqConverter"/>
+      <c:RoundingConverter x:Key="RoundingConverter"/>
       <c:HslU8Converter x:Key="HslU8Converter"/>
 
     </ResourceDictionary>

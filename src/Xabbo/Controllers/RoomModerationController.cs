@@ -1,4 +1,5 @@
 using ReactiveUI;
+using Xabbo.Configuration;
 
 using Xabbo.Core;
 using Xabbo.Core.Game;
@@ -15,11 +16,16 @@ public partial class RoomModerationController : ControllerBase
     public enum ModerationType { None, Mute, Unmute, Kick, Ban, Unban, Bounce }
     delegate Task ModerateUserCallback(IUser user, Id roomId, CancellationToken cancellationToken);
 
-    private readonly SemaphoreSlim _workingSemaphore = new(1, 1);
+    private readonly IConfigProvider<AppConfig> _config;
     private readonly IOperationManager _operationManager;
     private readonly ProfileManager _profileManager;
     private readonly RoomManager _roomManager;
+    private readonly SemaphoreSlim _workingSemaphore = new(1, 1);
     private CancellationTokenSource? _cts;
+
+    private TimingConfigBase GetTiming() => Session.Is(ClientType.Origins)
+        ? _config.Value.Timing.Origins
+        : _config.Value.Timing.Modern;
 
     [Reactive] public ModerationType CurrentOperation { get; set; }
     [Reactive] public int CurrentProgress { get; set; }
@@ -35,12 +41,14 @@ public partial class RoomModerationController : ControllerBase
 
     public RoomModerationController(
         IExtension extension,
+        IConfigProvider<AppConfig> config,
         IOperationManager operationManager,
         ProfileManager profileManager,
         RoomManager roomManager
     )
         : base(extension)
     {
+        _config = config;
         _operationManager = operationManager;
         _profileManager = profileManager;
         _roomManager = roomManager;
@@ -130,7 +138,7 @@ public partial class RoomModerationController : ControllerBase
     private async Task BounceUserAsync(IUser user, Id roomId, CancellationToken cancellationToken)
     {
         Send(new BanUserMsg(user, roomId, BanDuration.Hour));
-        await Task.Delay(500, cancellationToken);
+        await Task.Delay(_config.Value.Timing.Modern.BounceUnbanDelay, cancellationToken);
         Send(new UnbanUserMsg(user.Id, roomId));
     }
 
@@ -195,7 +203,7 @@ public partial class RoomModerationController : ControllerBase
                 if (users[i].IsRemoved)
                     continue;
                 if (i > 0)
-                    await Task.Delay(5000, cancellationToken);
+                    await Task.Delay(GetTiming().ModerationInterval, cancellationToken);
                 await moderateUser(users[i], room?.Id ?? -1, cancellationToken);
                 CurrentProgress = i+1;
             }
