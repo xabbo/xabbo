@@ -69,6 +69,7 @@ public class RoomBansViewModel : ViewModelBase
         _banCache
             .Connect()
             .Filter(FilterBans)
+            .ObserveOn(RxApp.MainThreadScheduler)
             .Bind(out _bans)
             .Subscribe();
 
@@ -79,6 +80,7 @@ public class RoomBansViewModel : ViewModelBase
                 x => x.CurrentOperation,
                 x => x is RoomModerationController.ModerationType.Unban
             )
+            .ObserveOn(RxApp.MainThreadScheduler)
             .ToProperty(this, x => x.IsUnbanning);
 
         _statusText =
@@ -90,6 +92,7 @@ public class RoomBansViewModel : ViewModelBase
                     ? $"Unbanning users...\n{current} / {total}"
                     : ""
             )
+            .ObserveOn(RxApp.MainThreadScheduler)
             .ToProperty(this, x => x.StatusText);
 
         LoadBansCmd = ReactiveCommand.CreateFromTask(

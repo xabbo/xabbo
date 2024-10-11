@@ -1,4 +1,5 @@
-﻿using ReactiveUI;
+﻿using System.Reactive.Linq;
+using ReactiveUI;
 
 using Xabbo.Core;
 
@@ -53,6 +54,7 @@ public class AvatarViewModel : ViewModelBase
                     }
                 }
             )
+            .ObserveOn(RxApp.MainThreadScheduler)
             .ToProperty(this, x => x.Group);
     }
 }

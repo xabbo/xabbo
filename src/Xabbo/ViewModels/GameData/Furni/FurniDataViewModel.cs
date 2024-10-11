@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Reactive.Linq;
 using DynamicData;
 using ReactiveUI;
 
@@ -36,9 +37,16 @@ public class FurniDataViewModel : ViewModelBase
 
         _gameDataManager.Loaded += OnGameDataLoaded;
 
-        _furniCache.Connect().Filter(Filter).Bind(out _furni).Subscribe();
+        _furniCache
+            .Connect()
+            .Filter(Filter)
+            .ObserveOn(RxApp.MainThreadScheduler)
+            .Bind(out _furni)
+            .Subscribe();
 
-        this.WhenAnyValue(x => x.FilterText).Subscribe(_ => _furniCache.Refresh());
+        this.WhenAnyValue(x => x.FilterText)
+            .ObserveOn(RxApp.MainThreadScheduler)
+            .Subscribe(_ => _furniCache.Refresh());
 
         _extension.Connected += OnGameConnected;
         _extension.Disconnected += OnGameDisconnected;

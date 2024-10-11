@@ -66,6 +66,7 @@ public class RoomFurniViewModel : ViewModelBase
             .Connect()
             .Filter(FilterFurni)
             .SortBy(x => x.Name)
+            .ObserveOn(RxApp.MainThreadScheduler)
             .Bind(out _furni)
             .Subscribe();
 
@@ -73,14 +74,17 @@ public class RoomFurniViewModel : ViewModelBase
             .Connect()
             .Filter(FilterFurniStack)
             .SortBy(x => x.Name)
+            .ObserveOn(RxApp.MainThreadScheduler)
             .Bind(out _furniStacks)
             .Subscribe();
 
-        this.WhenAnyValue(x => x.FilterText).Subscribe(_ =>
-        {
-            _furniCache.Refresh();
-            _furniStackCache.Refresh();
-        });
+        this.WhenAnyValue(x => x.FilterText)
+            .ObserveOn(RxApp.MainThreadScheduler)
+            .Subscribe(_ =>
+            {
+                _furniCache.Refresh();
+                _furniStackCache.Refresh();
+            });
 
         _isEmpty =
             Observable.CombineLatest(
@@ -88,6 +92,7 @@ public class RoomFurniViewModel : ViewModelBase
                 _furni.WhenAnyValue(x => x.Count),
                 (isInRoom, count) => isInRoom && count == 0
             )
+            .ObserveOn(RxApp.MainThreadScheduler)
             .ToProperty(this, x => x.IsEmpty);
 
         _emptyStatus =
@@ -98,6 +103,7 @@ public class RoomFurniViewModel : ViewModelBase
                     ? "No furni in room"
                     : "No furni matches"
             )
+            .ObserveOn(RxApp.MainThreadScheduler)
             .ToProperty(this, x => x.EmptyStatus);
     }
 

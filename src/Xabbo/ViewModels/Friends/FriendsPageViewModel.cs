@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Reactive;
+using System.Reactive.Linq;
 using DynamicData;
 using DynamicData.Kernel;
 using ReactiveUI;
@@ -69,6 +70,7 @@ public sealed class FriendsPageViewModel : PageViewModel
                 return true;
             })
             .SortBy(x => x.Name)
+            .ObserveOn(RxApp.MainThreadScheduler)
             .Bind(out _friends)
             .Subscribe();
 

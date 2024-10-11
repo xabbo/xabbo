@@ -111,6 +111,7 @@ public class RoomAvatarsViewModel : ViewModelBase
                     and not RoomModerationController.ModerationType.Unban &&
                     totalProgress > 1
             )
+            .ObserveOn(RxApp.MainThreadScheduler)
             .ToProperty(this, x => x.IsBusy);
 
         _statusText = moderation
@@ -137,6 +138,7 @@ public class RoomAvatarsViewModel : ViewModelBase
             .Connect()
             .Filter(FilterAvatar)
             .Sort(AvatarViewModelGroupComparer.Default)
+            .ObserveOn(RxApp.MainThreadScheduler)
             .Bind(out _avatars)
             .Subscribe();
 
@@ -145,12 +147,15 @@ public class RoomAvatarsViewModel : ViewModelBase
                 x => x.Value.Room.Users.ShowPets,
                 x => x.Value.Room.Users.ShowBots
             )
+            .ObserveOn(RxApp.MainThreadScheduler)
             .Subscribe(x => {
                 _avatarCache.Refresh();
                 RefreshList?.Invoke();
             });
 
-        this.WhenAnyValue(x => x.FilterText).Subscribe(_ => _avatarCache.Refresh());
+        this.WhenAnyValue(x => x.FilterText)
+            .ObserveOn(RxApp.MainThreadScheduler)
+            .Subscribe(_ => _avatarCache.Refresh());
 
         _roomManager.Left += OnLeftRoom;
         _roomManager.AvatarsAdded += OnAvatarsAdded;
@@ -160,22 +165,26 @@ public class RoomAvatarsViewModel : ViewModelBase
 
         var hasSingleContextAvatar = this
             .WhenAnyValue(x => x.ContextSelection)
-            .Select(x => x is [ { } ]);
+            .Select(x => x is [ { } ])
+            .ObserveOn(RxApp.MainThreadScheduler);
 
         var hasSingleContextUser = this
             .WhenAnyValue(x => x.ContextSelection)
-            .Select(x => x is [ { Avatar.Type: AvatarType.User } ]);
+            .Select(x => x is [ { Avatar.Type: AvatarType.User } ])
+            .ObserveOn(RxApp.MainThreadScheduler);
 
         var hasAnyContextUser = this
             .WhenAnyValue(x => x.ContextSelection)
-            .Select(x => x?.Any(avatar => avatar.Type is AvatarType.User) == true);
+            .Select(x => x?.Any(avatar => avatar.Type is AvatarType.User) == true)
+            .ObserveOn(RxApp.MainThreadScheduler);
 
         var hasAnyNonSelfUser = this
             .WhenAnyValue(x => x.ContextSelection)
             .Select(x => x?.Any(avatar =>
                 avatar.Type is AvatarType.User &&
                 avatar.Id != _profileManager.UserData?.Id
-            ) == true);
+            ) == true)
+            .ObserveOn(RxApp.MainThreadScheduler);
 
         FindAvatarCmd = ReactiveCommand.Create(FindAvatar, hasSingleContextAvatar);
         CopyAvatarToWardrobeCmd = ReactiveCommand.Create(CopyAvatarsToWardrobe, hasAnyContextUser);
@@ -209,6 +218,7 @@ public class RoomAvatarsViewModel : ViewModelBase
                         !user.IsStaff
                     ) == true
             )
+            .ObserveOn(RxApp.MainThreadScheduler)
         );
 
         KickUsersCmd = ReactiveCommand.Create<Task>(
@@ -233,6 +243,7 @@ public class RoomAvatarsViewModel : ViewModelBase
                         !user.IsStaff
                     ) == true
             )
+            .ObserveOn(RxApp.MainThreadScheduler)
         );
 
         BanUsersCmd = ReactiveCommand.Create<BanDuration, Task>(
@@ -258,6 +269,7 @@ public class RoomAvatarsViewModel : ViewModelBase
                     ) == true;
                 }
             )
+            .ObserveOn(RxApp.MainThreadScheduler)
         );
 
         BounceUsersCmd = ReactiveCommand.Create<Task>(
@@ -280,11 +292,12 @@ public class RoomAvatarsViewModel : ViewModelBase
                         !user.IsStaff
                     ) == true
             )
+            .ObserveOn(RxApp.MainThreadScheduler)
         );
 
         CancelCmd = ReactiveCommand.Create(
             () => { _operations.TryCancelOperation(out _); },
-            this.WhenAnyValue(x => x.IsBusy)
+            this.WhenAnyValue(x => x.IsBusy).ObserveOn(RxApp.MainThreadScheduler)
         );
     }
 

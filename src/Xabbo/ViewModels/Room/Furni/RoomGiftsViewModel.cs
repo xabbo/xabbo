@@ -44,11 +44,13 @@ public sealed class RoomGiftsViewModel : ViewModelBase
 
         _cache
             .Connect()
+            .ObserveOn(RxApp.MainThreadScheduler)
             .Bind(out _gifts)
             .Subscribe();
 
         _isEmpty = _cache.CountChanged
             .Select(count => count == 0)
+            .ObserveOn(RxApp.MainThreadScheduler)
             .ToProperty(this, x => x.IsEmpty);
 
         _roomManager.FloorItemsLoaded += OnFloorItemsLoaded;

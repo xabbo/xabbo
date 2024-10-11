@@ -24,6 +24,7 @@ public sealed partial class FriendViewModel : ViewModelBase
                 x => x.Figure,
                 x => x.IsModernFigure
             )
+            .ObserveOn(RxApp.MainThreadScheduler)
             .Subscribe(values => {
                 var (name, figure, isModern) = values;
                 AvatarImageUrl = isModern ? UrlHelper.AvatarImageUrl(name, figure, headOnly: true) : null;

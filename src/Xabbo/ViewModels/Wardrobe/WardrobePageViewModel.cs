@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Reactive;
+using System.Reactive.Linq;
 using DynamicData;
 using ReactiveUI;
 using Avalonia.Controls.Selection;
@@ -53,6 +54,7 @@ public sealed class WardrobePageViewModel : PageViewModel
 
         _cache
             .Connect()
+            .ObserveOn(RxApp.MainThreadScheduler)
             .Bind(out _outfits)
             .Subscribe();
 

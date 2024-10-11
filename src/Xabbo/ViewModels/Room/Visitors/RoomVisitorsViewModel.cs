@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
+using System.Reactive.Linq;
 using Microsoft.Extensions.Hosting;
 using DynamicData;
 using DynamicData.Binding;
@@ -46,10 +47,12 @@ public class RoomVisitorsViewModel : ViewModelBase
             .Sort(SortExpressionComparer<VisitorViewModel>
                 .Descending(x => x.Entered ?? DateTime.MinValue)
                 .ThenByDescending(x => x.Index))
+            .ObserveOn(RxApp.MainThreadScheduler)
             .Bind(out _visitors)
             .Subscribe();
 
         this.WhenAnyValue(x => x.FilterText)
+            .ObserveOn(RxApp.MainThreadScheduler)
             .Subscribe(x => _visitorCache.Refresh());
 
         lifetime.ApplicationStarted.Register(() => Task.Run(InitializeAsync));
@@ -82,7 +85,9 @@ public class RoomVisitorsViewModel : ViewModelBase
 
     private void RefreshList()
     {
-        _visitorCache.Refresh();
+        _context.Invoke(() => {
+            _visitorCache.Refresh();
+        });
     }
 
     private void AddVisitors(IEnumerable<VisitorViewModel> newVisitors)

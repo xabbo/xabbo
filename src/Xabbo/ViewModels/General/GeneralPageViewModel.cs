@@ -9,6 +9,7 @@ using Xabbo.Extension;
 using Xabbo.Components;
 using Xabbo.Configuration;
 using Xabbo.Services.Abstractions;
+using System.Reactive.Linq;
 
 namespace Xabbo.ViewModels;
 
@@ -33,6 +34,7 @@ public class GeneralPageViewModel : PageViewModel
 
         _config = _settingsProvider
             .WhenAnyValue(x => x.Value)
+            .ObserveOn(RxApp.MainThreadScheduler)
             .ToProperty(this, x => x.Config);
     }
 

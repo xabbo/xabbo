@@ -86,6 +86,10 @@ public class FurniStackViewModel : ItemViewModelBase
     {
         Descriptor = GetDescriptor(item);
 
-        _showCount = this.WhenAnyValue(x => x.Count).Select(x => x > 1).ToProperty(this, x => x.ShowCount);
+        _showCount = this
+            .WhenAnyValue(x => x.Count)
+            .Select(x => x > 1)
+            .ObserveOn(RxApp.MainThreadScheduler)
+            .ToProperty(this, x => x.ShowCount);
     }
 }

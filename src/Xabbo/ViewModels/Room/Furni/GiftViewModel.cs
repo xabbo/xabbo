@@ -49,6 +49,7 @@ public sealed partial class GiftViewModel : ViewModelBase
                 )
                 : null
             )
+            .ObserveOn(RxApp.MainThreadScheduler)
             .ToProperty(this, x => x.SenderImageUrl);
     }
 

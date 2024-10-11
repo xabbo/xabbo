@@ -13,6 +13,7 @@ using Xabbo.Services.Abstractions;
 using Xabbo.Configuration;
 using Xabbo.Models.Enums;
 using Xabbo.ViewModels;
+using System.Reactive.Linq;
 
 namespace Xabbo.Components;
 
@@ -53,6 +54,7 @@ public partial class RoomEntryComponent : Component
 
         _configProvider
             .WhenAnyValue(x => x.Value.Room.RememberPasswords)
+            .ObserveOn(RxApp.MainThreadScheduler)
             .Subscribe(async rememberPasswords => {
                 if (rememberPasswords && !Config.Room.RememberPasswordsConfirmed)
                 {
