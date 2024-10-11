@@ -3,7 +3,9 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:ui="using:FluentAvalonia.UI.Controls"
   xmlns:ic="using:FluentIcons.Avalonia.Fluent"
+  xmlns:icm="using:FluentIcons.Avalonia.Fluent.MarkupExtensions"
   xmlns:controls="using:Xabbo.Avalonia.Controls"
   xmlns:v="using:Xabbo.Avalonia.Views"
   xmlns:vm="using:Xabbo.ViewModels"
@@ -20,12 +22,25 @@
     />
     <DataGrid
       Grid.Row="1"
-      Name="DataGridFurni"
+      x:Name="DataGridFurni"
       ItemsSource="{Binding Furni}"
       CanUserReorderColumns="True"
       CanUserResizeColumns="True"
       CanUserSortColumns="True"
+      ContextRequested="OnContextRequested"
     >
+      <DataGrid.ContextFlyout>
+        <ui:FAMenuFlyout>
+          <ui:MenuFlyoutItem
+            IconSource="{icm:SymbolIconSource Symbol=Eye}"
+            Text="Show" Command="{Binding ShowFurniCmd}"
+          />
+          <ui:MenuFlyoutItem
+            IconSource="{icm:SymbolIconSource Symbol=EyeOff}"
+            Text="Hide" Command="{Binding HideFurniCmd}"
+          />
+        </ui:FAMenuFlyout>
+      </DataGrid.ContextFlyout>
       <DataGrid.Columns>
         <DataGridTextColumn Width="120" Header="id" Binding="{Binding Id}" />
         <DataGridTemplateColumn

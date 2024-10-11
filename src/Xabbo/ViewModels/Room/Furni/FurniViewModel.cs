@@ -11,6 +11,8 @@ public abstract class ItemViewModelBase : ViewModelBase
     protected readonly IItem _item;
     protected readonly FurniInfo? _info;
 
+    public IItem Item => _item;
+
     public ItemType Type => _info?.Type ?? (ItemType)(-1);
     public int Kind => _info?.Kind ?? 0;
     public string Identifier => _info?.Identifier ?? "?";
@@ -54,6 +56,8 @@ public abstract class ItemViewModelBase : ViewModelBase
 public class FurniViewModel(IFurni furni) : ItemViewModelBase(furni)
 {
     private readonly IFurni _furni = furni;
+
+    public IFurni Furni => _furni;
 
     public long Id => _furni.Id;
     public long OwnerId => _furni.OwnerId;

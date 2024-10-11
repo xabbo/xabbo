@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
+using System.Reactive;
 using System.Reactive.Linq;
 using DynamicData;
-using DynamicData.Binding;
 using DynamicData.Kernel;
 using ReactiveUI;
 
@@ -39,6 +39,11 @@ public class RoomFurniViewModel : ViewModelBase
 
     private readonly ObservableAsPropertyHelper<string> _emptyStatus;
     public string EmptyStatus => _emptyStatus.Value;
+
+    [Reactive] public IList<FurniViewModel>? ContextSelection { get; set; }
+
+    public ReactiveCommand<Unit, Unit> HideFurniCmd { get; }
+    public ReactiveCommand<Unit, Unit> ShowFurniCmd { get; }
 
     public RoomFurniViewModel(
         IUiContext uiContext,
@@ -105,6 +110,48 @@ public class RoomFurniViewModel : ViewModelBase
             )
             .ObserveOn(RxApp.MainThreadScheduler)
             .ToProperty(this, x => x.EmptyStatus);
+
+        HideFurniCmd = ReactiveCommand.Create(
+            HideFurni,
+            this
+                .WhenAnyValue(
+                    x => x.ContextSelection,
+                    selection => selection?.Any(it => !it.IsHidden) == true
+                )
+                .ObserveOn(RxApp.MainThreadScheduler)
+        );
+
+        ShowFurniCmd = ReactiveCommand.Create(
+            ShowFurni,
+            this
+                .WhenAnyValue(
+                    x => x.ContextSelection,
+                    selection => selection?.Any(it => it.IsHidden) == true
+                )
+                .ObserveOn(RxApp.MainThreadScheduler)
+        );
+    }
+
+    private void HideFurni()
+    {
+        if (ContextSelection is { } selection)
+        {
+            foreach (var vm in selection)
+            {
+                _roomManager.HideFurni(vm.Furni);
+            }
+        }
+    }
+
+    private void ShowFurni()
+    {
+        if (ContextSelection is { } selection)
+        {
+            foreach (var vm in selection)
+            {
+                _roomManager.ShowFurni(vm.Furni);
+            }
+        }
     }
 
     private void OnFurniVisibilityToggled(FurniEventArgs e)
