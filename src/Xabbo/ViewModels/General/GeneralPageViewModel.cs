@@ -57,7 +57,7 @@ public class GeneralPageViewModel : PageViewModel
     [DependencyInjectionProperty] public AntiTypingComponent? AntiTyping { get; set; }
     [DependencyInjectionProperty] public AntiWalkComponent? AntiWalk { get; set; }
     [DependencyInjectionProperty] public ClickThroughComponent? ClickThrough { get; set; }
-    [DependencyInjectionProperty] public ClickToComponent? ClickTo { get; set; }
+    [DependencyInjectionProperty] public ClickToController? ClickTo { get; set; }
     [DependencyInjectionProperty] public RespectedComponent? Respected { get; set; }
     [DependencyInjectionProperty] public RoomEntryComponent? RoomEntry { get; set; }
     [DependencyInjectionProperty] public DoorbellComponent? Doorbell { get; set; }
