@@ -7,7 +7,7 @@
   x:Class="Xabbo.Avalonia.Views.InfoPageView"
   x:Name="InfoPageRoot"
 >
-  <Grid Margin="20,0">
+  <Grid Margin="20">
     <Grid.Styles>
       <Style Selector="Button.link">
         <Setter Property="Padding" Value="2,0" />
@@ -22,7 +22,7 @@
         <Setter Property="TextWrapping" Value="Wrap" />
       </Style>
     </Grid.Styles>
-    <StackPanel Margin="10" Spacing="10">
+    <StackPanel Spacing="10">
       <Image
         Width="128"
         Height="128"
