@@ -39,6 +39,14 @@
             IconSource="{icm:SymbolIconSource Symbol=EyeOff}"
             Text="Hide" Command="{Binding HideFurniCmd}"
           />
+          <ui:MenuFlyoutItem
+            IconSource="{icm:SymbolIconSource Symbol=ArrowExportUp}"
+            Text="Pick up" Command="{Binding PickupCmd}"
+          />
+          <ui:MenuFlyoutItem
+            IconSource="{icm:SymbolIconSource Symbol=ArrowBounce}"
+            Text="Eject" Command="{Binding EjectCmd}"
+          />
         </ui:FAMenuFlyout>
       </DataGrid.ContextFlyout>
       <DataGrid.Columns>

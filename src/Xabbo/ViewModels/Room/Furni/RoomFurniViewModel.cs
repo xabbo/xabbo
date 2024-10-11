@@ -5,21 +5,23 @@ using DynamicData;
 using DynamicData.Kernel;
 using ReactiveUI;
 
+using Xabbo.Controllers;
 using Xabbo.Core;
 using Xabbo.Core.Events;
 using Xabbo.Core.Game;
-using Xabbo.Core.GameData;
+using Xabbo.Extension;
 using Xabbo.Services.Abstractions;
 
 namespace Xabbo.ViewModels;
 
 public class RoomFurniViewModel : ViewModelBase
 {
+    private readonly RoomFurniController _furniController;
     private readonly IUiContext _uiCtx;
-    private readonly IGameDataManager _gameData;
+    private readonly IExtension _ext;
+    private readonly ProfileManager _profileManager;
     private readonly RoomManager _roomManager;
 
-    private readonly Dictionary<ItemDescriptor, FurniStackViewModel> _stackMap = [];
     private readonly SourceCache<FurniStackViewModel, StackDescriptor> _furniStackCache = new(x => x.Descriptor);
     private readonly SourceCache<FurniViewModel, (ItemType, long)> _furniCache = new(x => (x.Type, x.Id));
 
@@ -44,15 +46,28 @@ public class RoomFurniViewModel : ViewModelBase
 
     public ReactiveCommand<Unit, Unit> HideFurniCmd { get; }
     public ReactiveCommand<Unit, Unit> ShowFurniCmd { get; }
+    public ReactiveCommand<Unit, Task> PickupCmd { get; }
+    public ReactiveCommand<Unit, Task> EjectCmd { get; }
+    public ReactiveCommand<Unit, Unit> CancelCmd { get; }
+
+    private readonly ObservableAsPropertyHelper<bool> _isBusy;
+    public bool IsBusy => _isBusy.Value;
+
+    private readonly ObservableAsPropertyHelper<string> _statusText;
+    public string StatusText => _statusText.Value;
 
     public RoomFurniViewModel(
+        RoomFurniController furniController,
         IUiContext uiContext,
-        IGameDataManager gameData,
+        IExtension extension,
+        ProfileManager profileManager,
         RoomManager roomManager,
         RoomGiftsViewModel gifts)
     {
+        _furniController = furniController;
         _uiCtx = uiContext;
-        _gameData = gameData;
+        _ext = extension;
+        _profileManager = profileManager;
         _roomManager = roomManager;
 
         GiftsViewModel = gifts;
@@ -100,6 +115,31 @@ public class RoomFurniViewModel : ViewModelBase
             .ObserveOn(RxApp.MainThreadScheduler)
             .ToProperty(this, x => x.IsEmpty);
 
+        _isBusy =
+            _furniController.WhenAnyValue(
+                x => x.CurrentOperation,
+                op => op is not RoomFurniController.Operation.None
+            )
+            .ObserveOn(RxApp.MainThreadScheduler)
+            .ToProperty(this, x => x.IsBusy);
+
+        _statusText =
+            _furniController.WhenAnyValue(
+                x => x.CurrentOperation,
+                x => x.CurrentProgress,
+                x => x.TotalProgress,
+                (op, current, total) => op switch
+                {
+                    RoomFurniController.Operation.Pickup or
+                    RoomFurniController.Operation.Eject =>
+                        $"{(op is RoomFurniController.Operation.Eject ? "Ejecting" : "Picking up")} furni..."
+                        + $"\n{current}/{total}",
+                    _ => ""
+                }
+            )
+            .ObserveOn(RxApp.MainThreadScheduler)
+            .ToProperty(this, x => x.StatusText);
+
         _emptyStatus =
             Observable.CombineLatest(
                 _furniCache.CountChanged,
@@ -130,6 +170,67 @@ public class RoomFurniViewModel : ViewModelBase
                 )
                 .ObserveOn(RxApp.MainThreadScheduler)
         );
+
+        PickupCmd = ReactiveCommand.Create(
+            PickupAsync,
+            Observable.CombineLatest(
+                _ext.WhenAnyValue(x => x.Session),
+                _roomManager.WhenAnyValue(x => x.IsOwner),
+                _profileManager.WhenAnyValue(Xabbo => Xabbo.UserData),
+                this.WhenAnyValue(x => x.ContextSelection),
+                _furniController.WhenAnyValue(x => x.CurrentOperation),
+                (session, isOwner, userData, selection, op) =>
+                    op is RoomFurniController.Operation.None &&
+                    session.Is(ClientType.Shockwave)
+                        ? isOwner && selection?.Any() == true
+                        : selection?.Any(it => it.OwnerId == userData?.Id) == true
+            )
+            .ObserveOn(RxApp.MainThreadScheduler)
+        );
+
+        EjectCmd = ReactiveCommand.Create(
+            EjectAsync,
+            Observable.CombineLatest(
+                _ext.WhenAnyValue(x => x.Session),
+                _roomManager.WhenAnyValue(x => x.IsOwner),
+                _profileManager.WhenAnyValue(Xabbo => Xabbo.UserData),
+                this.WhenAnyValue(x => x.ContextSelection),
+                _furniController.WhenAnyValue(x => x.CurrentOperation),
+                (session, isOwner, userData, selection, op) =>
+                    op is RoomFurniController.Operation.None &&
+                    session.Is(ClientType.Modern) &&
+                    isOwner &&
+                    userData is not null &&
+                    selection?.Any(it => it.OwnerId != userData.Id) == true
+            )
+            .ObserveOn(RxApp.MainThreadScheduler)
+        );
+
+        CancelCmd = ReactiveCommand.Create(_furniController.CancelCurrentOperation);
+    }
+
+    private Task PickupAsync()
+    {
+        if (ContextSelection is { } selection)
+        {
+            return _furniController.PickupFurniAsync(selection.Select(x => x.Furni));
+        }
+        else
+        {
+            return Task.CompletedTask;
+        }
+    }
+
+    private Task EjectAsync()
+    {
+        if (ContextSelection is { } selection)
+        {
+            return _furniController.EjectFurniAsync(selection.Select(x => x.Furni));
+        }
+        else
+        {
+            return Task.CompletedTask;
+        }
     }
 
     private void HideFurni()
