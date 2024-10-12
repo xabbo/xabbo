@@ -1,155 +1,142 @@
-﻿using Xabbo.Extension;
+﻿using ReactiveUI;
+using System.Reactive.Linq;
+
+using Xabbo.Extension;
 using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.GameData;
 using Xabbo.Core.Messages.Outgoing;
+using Xabbo.Core.Messages.Incoming;
+using Xabbo.Controllers;
+using Microsoft.Extensions.Logging;
+using Xabbo.Utility;
 
 namespace Xabbo.Components;
 
 [Intercept]
 public partial class FurniActionsComponent : Component
 {
+    private readonly ILogger _logger;
     private readonly IGameDataManager _gameDataManager;
+    private readonly RoomRightsController _rightsController;
     private readonly RoomManager _roomManager;
     private readonly XabbotComponent _xabbot;
+
+    private IDisposable? _requiredRights;
 
     private FurniData? FurniData => _gameDataManager.Furni;
     private ExternalTexts? Texts => _gameDataManager.Texts;
 
-    private bool _preventUse;
-    public bool PreventUse
-    {
-        get => _preventUse;
-        set => Set(ref _preventUse, value);
-    }
-
-    private bool _useToHide;
-    public bool UseToHide
-    {
-        get => _useToHide;
-        set => Set(ref _useToHide, value);
-    }
-
-    private bool _useToFindLink;
-    public bool UseToFindLink
-    {
-        get => _useToFindLink;
-        set => Set(ref _useToFindLink, value);
-    }
-
-    private bool _canShowInfo;
-    public bool CanShowInfo
-    {
-        get => _canShowInfo;
-        set => Set(ref _canShowInfo, value);
-    }
-
-    private bool _useToShowInfo;
-    public bool UseToShowInfo
-    {
-        get => _useToShowInfo;
-        set => Set(ref _useToShowInfo, value);
-    }
+    [Reactive] public bool PreventUse { get; set; }
+    [Reactive] public bool PickToHide { get; set; }
+    [Reactive] public bool PickToFindLink { get; set; }
+    [Reactive] public bool CanShowInfo { get; set; }
+    [Reactive] public bool PickToShowInfo { get; set; }
 
     public FurniActionsComponent(IExtension extension,
-        IGameDataManager gameDataManager, RoomManager roomManager,
+        ILoggerFactory loggerFactory,
+        IGameDataManager gameDataManager,
+        RoomRightsController rightsController,
+        RoomManager roomManager,
         XabbotComponent xabbot)
         : base(extension)
     {
+        _logger = loggerFactory.CreateLogger<FurniActionsComponent>();
         _gameDataManager = gameDataManager;
+        _rightsController = rightsController;
         _roomManager = roomManager;
         _xabbot = xabbot;
+
+        this.WhenAnyValue(
+                x => x.PickToHide,
+                x => x.PickToShowInfo,
+                x => x.PickToFindLink,
+                (x, y, z) => x || y || z
+            )
+            .DistinctUntilChanged()
+            .Subscribe(requiresRights => {
+                _logger.LogDebug("needs rights: {Test}", requiresRights);
+                if (requiresRights)
+                {
+                    _requiredRights ??= _rightsController.RequireRights();
+                }
+                else
+                {
+                    _requiredRights?.Dispose();
+                    _requiredRights = null;
+                }
+            });
 
         _gameDataManager.Loaded += () => CanShowInfo = true;
     }
 
     [Intercept]
-    private void HandleUseStuff(Intercept e, UseFloorItemMsg use)
+    private void HandleUseFloorItem(Intercept<UseFloorItemMsg> e)
     {
         if (PreventUse) e.Block();
-
-        IRoom? room = _roomManager.Room;
-        if (room is null) return;
-
-        IFloorItem? item = room.GetFloorItem(use.Id);
-        if (item == null) return;
-
-        if (UseToHide)
-        {
-            e.Block();
-            _roomManager.HideFurni(ItemType.Floor, use.Id);
-        }
-
-        if (UseToShowInfo && CanShowInfo && FurniData is not null)
-        {
-            FurniInfo info = FurniData.GetInfo(item);
-            if (info != null)
-            {
-                e.Block();
-
-                string name = info.Name;
-                if (string.IsNullOrWhiteSpace(name))
-                    name = info.Identifier;
-
-                _xabbot.ShowMessage($"{name} [{info.Identifier}] (id:{item.Id}) {item.Location} {item.Direction}", item.Location);
-            }
-        }
-
-        if (UseToFindLink)
-        {
-            IFloorItem? linkedItem = room.GetFloorItem(item.Extra);
-            if (linkedItem != null)
-            {
-                if (Client == ClientType.Flash)
-                {
-                    // TODO FloorItemDataUpdateMsg
-                    // Ext.Send(In.StuffDataUpdate, linkedItem.Id.ToString(), 0, "2");
-                    // await Task.Delay(500);
-                    // Extension.Send(In.StuffDataUpdate, linkedItem.Id.ToString(), 0, "0");
-                }
-                else
-                {
-                    // Extension.Send(In.StuffDataUpdate, linkedItem.Id, 0, "2");
-                    // await Task.Delay(500);
-                    // Extension.Send(In.StuffDataUpdate, linkedItem.Id, 0, "0");
-                }
-            }
-        }
     }
 
     [Intercept]
-    private void HandleUseWallItem(Intercept e, UseWallItemMsg use)
+    private void HandleUseWallItem(Intercept<UseWallItemMsg> e)
     {
-        IRoom? room = _roomManager.Room;
-        if (room is null) return;
-
         if (PreventUse) e.Block();
+    }
 
-        IWallItem? item = room.GetWallItem(use.Id);
-        if (item is null) return;
-
-        if (UseToHide)
-        {
-            _roomManager.HideFurni(ItemType.Wall, use.Id);
+    [Intercept]
+    private void HandlePick(Intercept e, PickupFurniMsg pick)
+    {
+        if (PickToHide || PickToShowInfo || PickToFindLink)
             e.Block();
+
+        IRoom? room = _roomManager.Room;
+        if (room is null)
+        {
+            _logger.LogWarning("User is not in a room.");
+            return;
         }
 
-        if (UseToShowInfo && CanShowInfo && FurniData is not null)
+        IFurni? furni = room.GetFurni(pick.Type, pick.Id);
+        if (furni is null)
         {
-            FurniInfo? info = FurniData.GetInfo(item);
-            if (info is not null)
+            _logger.LogWarning("Failed to find {Type} item #{Id}.", pick.Type, pick.Id);
+            return;
+        }
+
+        if (PickToHide)
+            _roomManager.HideFurni(furni);
+
+        if (PickToShowInfo && CanShowInfo && FurniData is not null)
+        {
+            if (furni.TryGetInfo(out var info))
             {
-                e.Block();
-
-                string? name = info.Name;
-
-                if (info.Identifier == "poster")
-                    Texts?.TryGetValue($"poster_{item.Data}_name", out name);
-
-                if (string.IsNullOrWhiteSpace(name))
+                if (!furni.TryGetName(out string? name))
                     name = info.Identifier;
 
-                _xabbot.ShowMessage($"{name} [{info.Identifier}] (id:{item.Id}) {item.Location}");
+                if (furni is IFloorItem floor)
+                {
+                    _xabbot.ShowMessage($"{name} [{info.Identifier}] (id:{furni.Id}) {floor.Location} {floor.Direction}", floor.Location);
+                }
+                else if (furni is IWallItem wallItem)
+                {
+                    _xabbot.ShowMessage($"{name} [{info.Identifier}] (id:{furni.Id}) {wallItem.Location}", wallItem.Location.Wall);
+                }
+            }
+        }
+
+        if (PickToFindLink && furni is IFloorItem floorItem)
+        {
+            IFloorItem? linkedItem = room.GetFloorItem(floorItem.Extra);
+            if (linkedItem is not null)
+            {
+                Task.Run(async () => {
+                    Ext.Send(new FloorItemDataUpdatedMsg(linkedItem.Id, new LegacyData { Value = "1" }));
+                    Ext.SlideFurni(linkedItem, to: linkedItem.Location + (0, 0, 1), duration: 500);
+                    await Task.Delay(1000);
+                    Ext.Send(new FloorItemDataUpdatedMsg(linkedItem.Id, new LegacyData { Value = "2" }));
+                    await Task.Delay(1000);
+                    Ext.SlideFurni(linkedItem, from: linkedItem.Location + (0, 0, 1), duration: 500);
+                    Ext.Send(new FloorItemDataUpdatedMsg(linkedItem.Id, new LegacyData { Value = "0" }));
+                });
             }
         }
     }

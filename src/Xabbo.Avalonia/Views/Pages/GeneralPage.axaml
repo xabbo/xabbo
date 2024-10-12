@@ -277,9 +277,9 @@
         <!-- Content -->
         <StackPanel>
           <CheckBox Content="Prevent using furni" IsChecked="{Binding Furni.PreventUse}" />
-          <CheckBox Content="Double-click to show info" IsChecked="{Binding Furni.UseToShowInfo}" />
-          <CheckBox Content="Double-click to hide" IsChecked="{Binding Furni.UseToHide}" />
-          <CheckBox Content="Double-click tele to find link" IsChecked="{Binding Furni.UseToFindLink}" />
+          <CheckBox Content="Ctrl-click to show info" IsChecked="{Binding Furni.PickToShowInfo}" />
+          <CheckBox Content="Ctrl-click to hide" IsChecked="{Binding Furni.PickToHide}" />
+          <CheckBox Content="Ctrl-click tele to find link" IsChecked="{Binding Furni.PickToFindLink}" />
         </StackPanel>
       </Expander>
 
