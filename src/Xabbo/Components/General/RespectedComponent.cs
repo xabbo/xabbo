@@ -92,6 +92,6 @@ public partial class RespectedComponent : Component
         if (ShowTotalRespects)
             message += $" ({totalRespects})";
 
-        Ext.Send(new AvatarWhisperMsg(respectee.Index, message, 1));
+        Ext.Send(new AvatarWhisperMsg(message, respectee.Index, 1));
     }
 }

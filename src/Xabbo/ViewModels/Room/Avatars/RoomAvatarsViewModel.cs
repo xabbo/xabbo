@@ -341,7 +341,7 @@ public class RoomAvatarsViewModel : ViewModelBase
         if (ContextSelection is not [ var avatar ])
             return;
 
-        _ext.Send(new AvatarWhisperMsg(avatar.Index, "(click here to find)"));
+        _ext.Send(new AvatarWhisperMsg("(click here to find)", avatar.Index));
     }
 
     private void CopyAvatarField(string field)

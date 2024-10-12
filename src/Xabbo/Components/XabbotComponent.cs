@@ -88,6 +88,6 @@ public partial class XabbotComponent : Component
                 HeadDirection = 4
             }
         });
-        Ext.Send(new AvatarTalkMsg(UserIndex, message, 30));
+        Ext.Send(new AvatarTalkMsg(message, UserIndex, 30));
     }
 }

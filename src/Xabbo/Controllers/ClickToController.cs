@@ -182,5 +182,5 @@ public partial class ClickToController(
 
     }
 
-    private void SendInfoMessage(string message, int avatarIndex = -1) => Send(new AvatarWhisperMsg(avatarIndex, message));
+    private void SendInfoMessage(string message, int avatarIndex = -1) => Send(new AvatarWhisperMsg(message, avatarIndex));
 }
