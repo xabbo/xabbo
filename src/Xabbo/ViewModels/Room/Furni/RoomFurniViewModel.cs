@@ -41,8 +41,8 @@ public partial class RoomFurniViewModel : ViewModelBase
     [Reactive] public string FilterText { get; set; } = "";
     [Reactive] public bool ShowGrid { get; set; }
 
-    private string? _filterName;
-    private Func<FurniViewModel, bool>? _filter;
+    private string? _nameFilter;
+    private Func<FurniViewModel, bool>? _queryFilter;
 
     private readonly ObservableAsPropertyHelper<bool> _isEmpty;
     public bool IsEmpty => _isEmpty.Value;
@@ -123,12 +123,12 @@ public partial class RoomFurniViewModel : ViewModelBase
                 var match = RegexExpression().Match(filterText);
                 if (match.Success)
                 {
-                    _filterName = match.Groups["name"].Value.Trim();
+                    _nameFilter = match.Groups["name"].Value.Trim();
                     if (match.Groups["expression"].Success)
                     {
                         try
                         {
-                            _filter = DynamicExpressionParser.ParseLambda<FurniViewModel, bool>(
+                            _queryFilter = DynamicExpressionParser.ParseLambda<FurniViewModel, bool>(
                                 new ParsingConfig(),
                                 false,
                                 match.Groups["expression"].Value
@@ -136,12 +136,12 @@ public partial class RoomFurniViewModel : ViewModelBase
                         }
                         catch
                         {
-                            _filter = (vm) => false;
+                            _queryFilter = (vm) => false;
                         }
                     }
                     else
                     {
-                        _filter = null;
+                        _queryFilter = null;
                     }
                 }
                 _furniCache.Refresh();
@@ -342,10 +342,10 @@ public partial class RoomFurniViewModel : ViewModelBase
     {
         return
             (
-                string.IsNullOrWhiteSpace(_filterName)
-                || vm.Name.Contains(_filterName, StringComparison.CurrentCultureIgnoreCase)
+                string.IsNullOrWhiteSpace(_nameFilter)
+                || vm.Name.Contains(_nameFilter, StringComparison.CurrentCultureIgnoreCase)
             )
-            && _filter?.Invoke(vm) != false;
+            && _queryFilter?.Invoke(vm) != false;
     }
 
     private bool FilterFurniStack(FurniStackViewModel vm)
@@ -407,7 +407,8 @@ public partial class RoomFurniViewModel : ViewModelBase
     private void UpdateFurni(IFurni furni) => _furniCache.Lookup((furni.Type, furni.Id))
         .IfHasValue(vm => {
             vm.Item = furni;
-            _furniCache.Refresh();
+            if (_queryFilter is not null)
+                _furniCache.Refresh();
         });
 
     private void OnFloorItemsLoaded(FloorItemsEventArgs e) => AddItems(e.Items);
