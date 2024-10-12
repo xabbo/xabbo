@@ -1,0 +1,49 @@
+<ResourceDictionary
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:sys="using:System"
+  xmlns:controls="using:Xabbo.Avalonia.Controls"
+  xmlns:converters="using:Xabbo.Avalonia.Converters"
+>
+  <Design.PreviewWith>
+    <StackPanel Width="400" Spacing="10">
+        <StackPanel Background="{DynamicResource SystemRegionBrush}">
+          <controls:TimingSlider />
+        </StackPanel>
+    </StackPanel>
+  </Design.PreviewWith>
+
+  <ControlTheme x:Key="{x:Type controls:TimingSlider}" TargetType="controls:TimingSlider">
+    <ControlTheme.Resources>
+      <sys:Int32 x:Key="Rounding">10</sys:Int32>
+      <converters:RoundingConverter x:Key="RoundingConverter" />
+    </ControlTheme.Resources>
+    <Setter Property="Template">
+      <ControlTemplate>
+        <StackPanel>
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock
+              Text="{TemplateBinding Text}"
+              ToolTip.Tip="{TemplateBinding Tip}"
+            />
+            <TextBlock Grid.Column="1">
+              <Run
+                Text="{TemplateBinding Value,
+                  Converter={StaticResource RoundingConverter},
+                  ConverterParameter={StaticResource Rounding}
+                }"
+              />
+              <Run>ms</Run>
+            </TextBlock>
+          </Grid>
+          <Slider
+            Minimum="0" Maximum="2000"
+            TickFrequency="100"
+            TickPlacement="BottomRight"
+            Value="{TemplateBinding Value, Mode=TwoWay}"
+          />
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

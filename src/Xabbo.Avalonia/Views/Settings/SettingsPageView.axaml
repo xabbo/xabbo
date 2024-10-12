@@ -7,6 +7,7 @@
   xmlns:ui="using:FluentAvalonia.UI.Controls"
   xmlns:ic="using:FluentIcons.Avalonia.Fluent"
   xmlns:icm="using:FluentIcons.Avalonia.Fluent.MarkupExtensions"
+  xmlns:controls="using:Xabbo.Avalonia.Controls"
   xmlns:v="using:Xabbo.Avalonia.Views"
   xmlns:vm="using:Xabbo.ViewModels"
   mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
@@ -25,84 +26,31 @@
       IconSource="{icm:SymbolIconSource Symbol=Timer}"
       Description="Adjust timing intervals"
     >
-      <ui:SettingsExpanderItem>
-        <StackPanel>
-          <Grid ColumnDefinitions="*,Auto">
-            <TextBlock
-              Text="User moderation interval"
-              ToolTip.Tip="The time interval between moderating multiple users"
-            />
-            <TextBlock Grid.Column="1">
-              <Run
-                Text="{Binding
-                  Config.Timing.Modern.ModerationInterval,
-                  Mode=OneWay,
-                  Converter={StaticResource RoundingConverter},
-                  ConverterParameter={StaticResource IntervalRounding}
-                }"
-              />
-              <Run>ms</Run>
-            </TextBlock>
-          </Grid>
-          <Slider
-            Minimum="0" Maximum="2000"
-            TickFrequency="100"
-            TickPlacement="BottomRight"
-            Value="{Binding Config.Timing.Modern.ModerationInterval}" />
-        </StackPanel>
-      </ui:SettingsExpanderItem>
-      <ui:SettingsExpanderItem>
-        <StackPanel>
-          <Grid ColumnDefinitions="*,Auto">
-            <TextBlock
-              Text="Bounce unban delay"
-              ToolTip.Tip="When bouncing a user, the time to wait after banning the user, before unbanning the user again"
-            />
-            <TextBlock Grid.Column="1">
-              <Run
-                Text="{Binding
-                  Config.Timing.Modern.BounceUnbanDelay,
-                  Mode=OneWay,
-                  Converter={StaticResource RoundingConverter},
-                  ConverterParameter={StaticResource IntervalRounding}
-                }"
-              />
-              <Run>ms</Run>
-            </TextBlock>
-          </Grid>
-          <Slider
-            Minimum="0" Maximum="2000"
-            TickFrequency="100"
-            TickPlacement="BottomRight"
-            Value="{Binding Config.Timing.Modern.BounceUnbanDelay}" />
-        </StackPanel>
-      </ui:SettingsExpanderItem>
-      <ui:SettingsExpanderItem>
-        <StackPanel>
-          <Grid ColumnDefinitions="*,Auto">
-            <TextBlock
-              Text="Furni pickup interval"
-              ToolTip.Tip="The time interval between picking up or ejecting multiple furni"
-            />
-            <TextBlock Grid.Column="1">
-              <Run
-                Text="{Binding
-                  Config.Timing.Modern.FurniPickupInterval,
-                  Mode=OneWay,
-                  Converter={StaticResource RoundingConverter},
-                  ConverterParameter={StaticResource IntervalRounding}
-                }"
-              />
-              <Run>ms</Run>
-            </TextBlock>
-          </Grid>
-          <Slider
-            Minimum="0" Maximum="2000"
-            TickFrequency="100"
-            TickPlacement="BottomRight"
-            Value="{Binding Config.Timing.Modern.FurniPickupInterval}" />
-        </StackPanel>
-      </ui:SettingsExpanderItem>
+      <controls:TimingSlider
+        Text="User moderation interval"
+        Tip="The time interval between moderating multiple users"
+        Value="{Binding Config.Timing.Modern.ModerationInterval}"
+      />
+      <controls:TimingSlider
+        Text="Bounce unban delay"
+        Tip="When bouncing a user, the time to wait after banning the user, before unbanning the user again"
+        Value="{Binding Config.Timing.Modern.BounceUnbanDelay}"
+      />
+      <controls:TimingSlider
+        Text="Furni pickup interval"
+        Tip="The time interval between picking up or ejecting multiple furni"
+        Value="{Binding Config.Timing.Modern.FurniPickupInterval}"
+      />
+      <controls:TimingSlider
+        Text="Furni toggle interval"
+        Tip="The time interval between toggling multiple furni"
+        Value="{Binding Config.Timing.Modern.FurniToggleInterval}"
+      />
+      <controls:TimingSlider
+        Text="Furni rotate interval"
+        Tip="The time interval between rotating multiple furni"
+        Value="{Binding Config.Timing.Modern.FurniRotateInterval}"
+      />
     </ui:SettingsExpander>
     <!-- Timing (Origins) -->
     <ui:SettingsExpander
@@ -111,50 +59,21 @@
       IconSource="{icm:SymbolIconSource Symbol=Timer}"
       Description="Adjust timing intervals"
     >
-      <ui:SettingsExpanderItem>
-        <StackPanel>
-          <Grid ColumnDefinitions="*,Auto">
-            <TextBlock Text="User moderation interval" />
-            <TextBlock Grid.Column="1">
-              <Run Text="{Binding
-                Config.Timing.Origins.ModerationInterval,
-                Converter={StaticResource RoundingConverter},
-                ConverterParameter={StaticResource IntervalRounding},
-                Mode=OneWay
-              }" />
-              <Run>ms</Run>
-            </TextBlock>
-          </Grid>
-          <Slider
-            Minimum="0" Maximum="2000"
-            TickFrequency="100"
-            TickPlacement="BottomRight"
-            Value="{Binding Config.Timing.Origins.ModerationInterval}"
-          />
-        </StackPanel>
-      </ui:SettingsExpanderItem>
-      <ui:SettingsExpanderItem>
-        <StackPanel>
-          <Grid ColumnDefinitions="*,Auto">
-            <TextBlock Text="Furni pickup interval" />
-            <TextBlock Grid.Column="1">
-              <Run Text="{Binding
-                Config.Timing.Origins.FurniPickupInterval,
-                Converter={StaticResource RoundingConverter},
-                ConverterParameter={StaticResource IntervalRounding},
-                Mode=OneWay
-              }" />
-              <Run>ms</Run>
-            </TextBlock>
-          </Grid>
-          <Slider
-            Minimum="0" Maximum="2000"
-            TickFrequency="100"
-            TickPlacement="BottomRight"
-            Value="{Binding Config.Timing.Origins.FurniPickupInterval}"
-          />
-        </StackPanel>
-      </ui:SettingsExpanderItem>
+      <controls:TimingSlider
+        Text="User moderation interval"
+        Tip="The time interval between moderating multiple users"
+        Value="{Binding Config.Timing.Origins.ModerationInterval}"
+      />
+      <controls:TimingSlider
+        Text="Furni pickup interval"
+        Tip="The time interval between picking up or ejecting multiple furni"
+        Value="{Binding Config.Timing.Origins.FurniPickupInterval}"
+      />
+      <controls:TimingSlider
+        Text="Furni toggle interval"
+        Tip="The time interval between toggling multiple furni"
+        Value="{Binding Config.Timing.Origins.FurniToggleInterval}"
+      />
     </ui:SettingsExpander>
   </StackPanel>
 </UserControl>
