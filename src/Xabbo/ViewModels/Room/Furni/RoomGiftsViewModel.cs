@@ -67,7 +67,7 @@ public sealed class RoomGiftsViewModel : ViewModelBase
         _ext.Send(new WiredMovementsMsg([
             new FloorItemWiredMovement
             {
-                FurniId = item.Id,
+                ItemId = item.Id,
                 Source = from ?? item.Location,
                 Destination = to ?? item.Location,
                 AnimationTime = duration,

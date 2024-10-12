@@ -85,9 +85,15 @@ public partial class RoomFurniViewModel : ViewModelBase
         _roomManager.Left += OnLeftRoom;
         _roomManager.FloorItemsLoaded += OnFloorItemsLoaded;
         _roomManager.FloorItemAdded += OnFloorItemAdded;
+        _roomManager.FloorItemUpdated += OnFloorItemUpdated;
+        _roomManager.FloorItemDataUpdated += OnFloorItemDataUpdated;
+        _roomManager.FloorItemWiredMovement += OnFloorItemWiredMovement;
         _roomManager.FloorItemRemoved += OnFloorItemRemoved;
+        _roomManager.FloorItemSlide += OnFloorItemSlide;
         _roomManager.WallItemsLoaded += OnWallItemsLoaded;
         _roomManager.WallItemAdded += OnWallItemAdded;
+        _roomManager.WallItemUpdated += OnWallItemUpdated;
+        _roomManager.WallItemWiredMovement += OnWallItemWiredMovement;
         _roomManager.WallItemRemoved += OnWallItemRemoved;
 
         _furniCache
@@ -362,10 +368,22 @@ public partial class RoomFurniViewModel : ViewModelBase
 
     private void OnLeftRoom() => ClearItems();
 
+    private void UpdateFurni(IFurni furni) => _furniCache.Lookup((furni.Type, furni.Id))
+        .IfHasValue(vm => {
+            vm.Item = furni;
+            _furniCache.Refresh();
+        });
+
     private void OnFloorItemsLoaded(FloorItemsEventArgs e) => AddItems(e.Items);
     private void OnFloorItemAdded(FloorItemEventArgs e) => AddItems([e.Item]);
+    private void OnFloorItemUpdated(FloorItemUpdatedEventArgs e) => UpdateFurni(e.Item);
+    private void OnFloorItemDataUpdated(FloorItemDataUpdatedEventArgs e) => UpdateFurni(e.Item);
+    private void OnFloorItemSlide(FloorItemSlideEventArgs e) => UpdateFurni(e.Item);
+    private void OnFloorItemWiredMovement(FloorItemWiredMovementEventArgs e) => UpdateFurni(e.Item);
     private void OnFloorItemRemoved(FloorItemEventArgs e) => RemoveItem(e.Item);
     private void OnWallItemsLoaded(WallItemsEventArgs e) => AddItems(e.Items);
     private void OnWallItemAdded(WallItemEventArgs e) => AddItems([e.Item]);
+    private void OnWallItemUpdated(WallItemUpdatedEventArgs e) => UpdateFurni(e.Item);
+    private void OnWallItemWiredMovement(WallItemWiredMovementEventArgs e) => UpdateFurni(e.Item);
     private void OnWallItemRemoved(WallItemEventArgs e) => RemoveItem(e.Item);
 }
