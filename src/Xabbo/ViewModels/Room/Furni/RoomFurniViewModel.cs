@@ -1,6 +1,8 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
+using System.Linq.Dynamic.Core;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Text.RegularExpressions;
 using DynamicData;
 using DynamicData.Kernel;
 using ReactiveUI;
@@ -14,8 +16,11 @@ using Xabbo.Services.Abstractions;
 
 namespace Xabbo.ViewModels;
 
-public class RoomFurniViewModel : ViewModelBase
+public partial class RoomFurniViewModel : ViewModelBase
 {
+    [GeneratedRegex(@"^(?<name>.*?)(\bwhere:(?<expression>.*))?$")]
+    private partial Regex RegexExpression();
+
     private readonly RoomFurniController _furniController;
     private readonly IUiContext _uiCtx;
     private readonly IExtension _ext;
@@ -35,6 +40,9 @@ public class RoomFurniViewModel : ViewModelBase
 
     [Reactive] public string FilterText { get; set; } = "";
     [Reactive] public bool ShowGrid { get; set; }
+
+    private string? _filterName;
+    private Func<FurniViewModel, bool>? _filter;
 
     private readonly ObservableAsPropertyHelper<bool> _isEmpty;
     public bool IsEmpty => _isEmpty.Value;
@@ -98,10 +106,36 @@ public class RoomFurniViewModel : ViewModelBase
             .Bind(out _furniStacks)
             .Subscribe();
 
-        this.WhenAnyValue(x => x.FilterText)
+        this.WhenAnyValue(
+                x => x.FilterText
+            )
             .ObserveOn(RxApp.MainThreadScheduler)
-            .Subscribe(_ =>
+            .Subscribe((filterText) =>
             {
+                var match = RegexExpression().Match(filterText);
+                if (match.Success)
+                {
+                    _filterName = match.Groups["name"].Value.Trim();
+                    if (match.Groups["expression"].Success)
+                    {
+                        try
+                        {
+                            _filter = DynamicExpressionParser.ParseLambda<FurniViewModel, bool>(
+                                new ParsingConfig(),
+                                false,
+                                match.Groups["expression"].Value
+                            ).Compile();
+                        }
+                        catch
+                        {
+                            _filter = (vm) => false;
+                        }
+                    }
+                    else
+                    {
+                        _filter = null;
+                    }
+                }
                 _furniCache.Refresh();
                 _furniStackCache.Refresh();
             });
@@ -264,7 +298,12 @@ public class RoomFurniViewModel : ViewModelBase
 
     private bool FilterFurni(FurniViewModel vm)
     {
-        return vm.Name.Contains(FilterText, StringComparison.CurrentCultureIgnoreCase);
+        return
+            (
+                string.IsNullOrWhiteSpace(_filterName)
+                || vm.Name.Contains(_filterName, StringComparison.CurrentCultureIgnoreCase)
+            )
+            && _filter?.Invoke(vm) != false;
     }
 
     private bool FilterFurniStack(FurniStackViewModel vm)

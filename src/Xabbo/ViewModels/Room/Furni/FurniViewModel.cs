@@ -8,11 +8,11 @@ namespace Xabbo.ViewModels;
 
 public abstract class ItemViewModelBase : ViewModelBase
 {
-    protected readonly IItem _item;
     protected readonly FurniInfo? _info;
 
-    public IItem Item => _item;
+    public IItem Item { get; set; }
 
+    public Id Id => Item.Id;
     public ItemType Type => _info?.Type ?? (ItemType)(-1);
     public int Kind => _info?.Kind ?? 0;
     public string Identifier => _info?.Identifier ?? "?";
@@ -25,15 +25,15 @@ public abstract class ItemViewModelBase : ViewModelBase
 
     public ItemViewModelBase(IItem item)
     {
-        _item = item;
+        Item = item;
 
         if (Extensions.IsInitialized &&
-            _item.TryGetInfo(out _info))
+            item.TryGetInfo(out _info))
         {
             if (_info.Revision > 0)
             {
                 string identifier = _info.Identifier.Replace('*', '_');
-                if (identifier == "poster" && _item is IWallItem wallItem)
+                if (identifier == "poster" && item is IWallItem wallItem)
                     identifier += "_" + wallItem.Data;
                 IconUrl = $"http://images.habbo.com/dcr/hof_furni/{_info.Revision}/{identifier}_icon.png";
             }
@@ -55,13 +55,37 @@ public abstract class ItemViewModelBase : ViewModelBase
 
 public class FurniViewModel(IFurni furni) : ItemViewModelBase(furni)
 {
-    private readonly IFurni _furni = furni;
+    public IFurni Furni => (IFurni)Item;
 
-    public IFurni Furni => _furni;
+    public bool IsFloorItem => Furni.Type is ItemType.Floor;
+    public bool IsWallItem => Furni.Type is ItemType.Wall;
 
-    public long Id => _furni.Id;
-    public long OwnerId => _furni.OwnerId;
-    public string OwnerName => _furni.OwnerName;
+    // Common properties
+    public string Owner => Furni.OwnerName;
+    public long OwnerId => Furni.OwnerId;
+    public int State => Furni.State;
+    public bool Hidden => Furni.IsHidden;
+
+    // Floor item properties
+    public int? X => (Furni as IFloorItem)?.X;
+    public int? Y => (Furni as IFloorItem)?.Y;
+    public double? Z => (Furni as IFloorItem)?.Z;
+    public int? Dir => (Furni as IFloorItem)?.Direction;
+
+    // Wall item properties
+    public int? WX => (Furni as IWallItem)?.WX;
+    public int? WY => (Furni as IWallItem)?.WY;
+    public int? LX => (Furni as IWallItem)?.LX;
+    public int? LY => (Furni as IWallItem)?.LY;
+    public bool? IsLeft => (Furni as IWallItem)?.Location.Orientation.IsLeft;
+    public bool? IsRight => (Furni as IWallItem)?.Location.Orientation.IsRight;
+
+    public string? Data => Furni switch
+    {
+        IFloorItem floorItem => floorItem.Data.Value,
+        IWallItem wallItem => wallItem.Data,
+        _ => null
+    };
 
     [Reactive] public int Count { get; set; }
 }
