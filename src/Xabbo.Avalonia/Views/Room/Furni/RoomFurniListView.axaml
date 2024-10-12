@@ -6,6 +6,7 @@
   xmlns:ui="using:FluentAvalonia.UI.Controls"
   xmlns:ic="using:FluentIcons.Avalonia.Fluent"
   xmlns:icm="using:FluentIcons.Avalonia.Fluent.MarkupExtensions"
+  xmlns:xc="using:Xabbo.Core"
   xmlns:controls="using:Xabbo.Avalonia.Controls"
   xmlns:v="using:Xabbo.Avalonia.Views"
   xmlns:vm="using:Xabbo.ViewModels"
@@ -39,6 +40,31 @@
             IconSource="{icm:SymbolIconSource Symbol=EyeOff}"
             Text="Hide" Command="{Binding HideFurniCmd}"
           />
+          <ui:MenuFlyoutItem
+            IconSource="{icm:SymbolIconSource Symbol=ArrowSwap}"
+            Text="Toggle" Command="{Binding ToggleCmd}"
+          />
+          <ui:MenuFlyoutSubItem
+            IconSource="{icm:SymbolIconSource Symbol=ArrowSync}"
+            Text="Rotate"
+          >
+            <ui:MenuFlyoutItem
+              IconSource="{icm:SymbolIconSource Symbol=ArrowUpRight}"
+              Text="North" Command="{Binding RotateCmd}" CommandParameter="{x:Static xc:Directions.North}"
+            />
+            <ui:MenuFlyoutItem
+              IconSource="{icm:SymbolIconSource Symbol=ArrowTrendingDown}"
+              Text="East" Command="{Binding RotateCmd}" CommandParameter="{x:Static xc:Directions.East}"
+            />
+            <ui:MenuFlyoutItem
+              IconSource="{icm:SymbolIconSource Symbol=ArrowDownLeft}"
+              Text="South" Command="{Binding RotateCmd}" CommandParameter="{x:Static xc:Directions.South}"
+            />
+            <ui:MenuFlyoutItem
+              IconSource="{icm:SymbolIconSource Symbol=ArrowUpLeft}"
+              Text="West" Command="{Binding RotateCmd}" CommandParameter="{x:Static xc:Directions.West}"
+            />
+          </ui:MenuFlyoutSubItem>
           <ui:MenuFlyoutItem
             IconSource="{icm:SymbolIconSource Symbol=ArrowExportUp}"
             Text="Pick up" Command="{Binding PickupCmd}"

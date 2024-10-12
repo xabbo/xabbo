@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Linq.Dynamic.Core;
 using System.Reactive;
 using System.Reactive.Linq;
@@ -56,6 +56,8 @@ public partial class RoomFurniViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> ShowFurniCmd { get; }
     public ReactiveCommand<Unit, Task> PickupCmd { get; }
     public ReactiveCommand<Unit, Task> EjectCmd { get; }
+    public ReactiveCommand<Unit, Task> ToggleCmd { get; }
+    public ReactiveCommand<Directions, Task> RotateCmd { get; }
     public ReactiveCommand<Unit, Unit> CancelCmd { get; }
 
     private readonly ObservableAsPropertyHelper<bool> _isBusy;
@@ -168,14 +170,14 @@ public partial class RoomFurniViewModel : ViewModelBase
                 x => x.CurrentOperation,
                 x => x.CurrentProgress,
                 x => x.TotalProgress,
-                (op, current, total) => op switch
-                {
-                    RoomFurniController.Operation.Pickup or
-                    RoomFurniController.Operation.Eject =>
-                        $"{(op is RoomFurniController.Operation.Eject ? "Ejecting" : "Picking up")} furni..."
-                        + $"\n{current}/{total}",
-                    _ => ""
-                }
+                (op, current, total) => $"{op switch {
+                    RoomFurniController.Operation.Eject => "Ejecting",
+                    RoomFurniController.Operation.Pickup => "Picking up",
+                    RoomFurniController.Operation.Toggle => "Toggling",
+                    RoomFurniController.Operation.Rotate => "Rotating",
+                    _ => "Processing"
+                }} furni..."
+                + $"\n{current}/{total}"
             )
             .ObserveOn(RxApp.MainThreadScheduler)
             .ToProperty(this, x => x.StatusText);
@@ -246,8 +248,42 @@ public partial class RoomFurniViewModel : ViewModelBase
             .ObserveOn(RxApp.MainThreadScheduler)
         );
 
+        ToggleCmd = ReactiveCommand.Create(
+            ToggleAsync,
+            Observable.CombineLatest(
+                this.WhenAnyValue(x => x.ContextSelection),
+                _furniController.WhenAnyValue(
+                    x => x.CurrentOperation,
+                    op => op is RoomFurniController.Operation.None
+                ),
+                (selection, isNotBusy) => isNotBusy && selection is { Count: > 0 }
+            )
+            .ObserveOn(RxApp.MainThreadScheduler)
+        );
+
+        RotateCmd = ReactiveCommand.Create<Directions, Task>(
+            RotateAsync,
+            Observable.CombineLatest(
+                this.WhenAnyValue(x => x.ContextSelection),
+                _furniController.WhenAnyValue(
+                    x => x.CurrentOperation,
+                    op => op is RoomFurniController.Operation.None
+                ),
+                (selection, isNotBusy) => isNotBusy && selection is { Count: > 0 }
+            )
+            .ObserveOn(RxApp.MainThreadScheduler)
+        );
+
         CancelCmd = ReactiveCommand.Create(_furniController.CancelCurrentOperation);
     }
+
+    private Task ToggleAsync() => ContextSelection is { } selection
+        ? _furniController.ToggleFurniAsync(selection.Select(x => x.Furni))
+        : Task.CompletedTask;
+
+    private Task RotateAsync(Directions direction) => ContextSelection is { } selection
+        ? _furniController.RotateFurniAsync(selection.Select(x => x.Furni), direction)
+        : Task.CompletedTask;
 
     private Task PickupAsync()
     {

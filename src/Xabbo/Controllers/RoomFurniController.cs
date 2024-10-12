@@ -10,7 +10,7 @@ namespace Xabbo.Controllers;
 [Intercept]
 public partial class RoomFurniController : ControllerBase
 {
-    public enum Operation { None, Pickup, Eject }
+    public enum Operation { None, Pickup, Eject, Toggle, Rotate }
 
     private readonly IConfigProvider<AppConfig> _config;
     private readonly IOperationManager _operationManager;
@@ -46,7 +46,33 @@ public partial class RoomFurniController : ControllerBase
 
     private void OnLeftRoom() => CancelCurrentOperation();
 
-    private async Task PickupOrEjectFurniAsync(IEnumerable<IFurni> furni, bool eject)
+    public Task ToggleFurniAsync(IEnumerable<IFurni> furni) => ProcessFurniAsync(
+        Operation.Toggle,
+        furni,
+        x => x.FurniToggleInterval,
+        f => Send(f is IFloorItem ? new UseFloorItemMsg(f.Id) : new UseWallItemMsg(f.Id))
+    );
+
+    public Task RotateFurniAsync(IEnumerable<IFurni> furni, Directions direction) => ProcessFurniAsync(
+        Operation.Rotate,
+        furni,
+        x => x.FurniRotateInterval,
+        f => Send(new MoveFloorItemMsg(f.Id, ((IFloorItem)f).Location, (int)direction)),
+        filter: f => f is IFloorItem floorItem && floorItem.Direction != (int)direction
+    );
+
+    private Task PickupOrEjectFurniAsync(IEnumerable<IFurni> furni, bool eject) => ProcessFurniAsync(
+        eject ? Operation.Eject : Operation.Pickup,
+        furni,
+        x => x.FurniPickupInterval,
+        f => Send(new PickupFurniMsg(f))
+    );
+
+    private async Task ProcessFurniAsync(Operation operation,
+        IEnumerable<IFurni> furni,
+        Func<TimingConfigBase, int> timingSelector,
+        Action<IFurni> action,
+        Func<IFurni, bool>? filter = null)
     {
         if (!_workingSemaphore.Wait(0))
             throw new Exception("An operation is currently in progress.");
@@ -55,18 +81,21 @@ public partial class RoomFurniController : ControllerBase
         {
             _cts = new CancellationTokenSource();
 
-            var toPick = furni.ToArray();
+            if (filter is not null)
+                furni = furni.Where(filter);
+
+            var toProcess = furni.ToArray();
 
             CurrentProgress = 0;
-            TotalProgress = toPick.Length;
-            CurrentOperation = eject ? Operation.Eject : Operation.Pickup;
+            TotalProgress = toProcess.Length;
+            CurrentOperation = operation;
 
-            await _operationManager.RunAsync($"{(eject ? "eject" : "pickup")} furni", async (ct) => {
-                for (int i = 0; i < toPick.Length; i++)
+            await _operationManager.RunAsync($"{operation} furni", async (ct) => {
+                for (int i = 0; i < toProcess.Length; i++)
                 {
                     if (i > 0)
-                        await Task.Delay(ClampInterval(GetTiming().FurniPickupInterval), ct);
-                    Send(new PickupFurniMsg(toPick[i]));
+                        await Task.Delay(ClampInterval(timingSelector(GetTiming())), ct);
+                    action(toProcess[i]);
                     CurrentProgress = i+1;
                 }
             }, _cts.Token);
