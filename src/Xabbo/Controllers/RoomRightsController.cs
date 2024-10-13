@@ -61,7 +61,7 @@ public partial class RoomRightsController : ControllerBase
             if (Session.Is(ClientType.Modern))
                 Send(In.YouAreController, room.Id, 4);
             else
-                Send(In.YouAreController);
+                Send(In.YouAreOwner);
         }
     }
 
