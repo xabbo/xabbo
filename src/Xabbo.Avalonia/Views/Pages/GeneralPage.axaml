@@ -278,6 +278,7 @@
         <StackPanel>
           <CheckBox Content="Prevent using furni" IsChecked="{Binding Furni.PreventUse}" />
           <CheckBox Content="Ctrl-click to show info" IsChecked="{Binding Furni.PickToShowInfo}" />
+          <CheckBox Classes="modern" Content="Ctrl-click to fetch marketplace stats" IsChecked="{Binding Furni.PickToFetchMarketplaceStats}" />
           <CheckBox Content="Ctrl-click to hide" IsChecked="{Binding Furni.PickToHide}" />
           <CheckBox Content="Ctrl-click tele to find link" IsChecked="{Binding Furni.PickToFindLink}" />
         </StackPanel>

@@ -1,5 +1,6 @@
-﻿using ReactiveUI;
-using System.Reactive.Linq;
+﻿using System.Reactive.Linq;
+using Microsoft.Extensions.Logging;
+using ReactiveUI;
 
 using Xabbo.Extension;
 using Xabbo.Core;
@@ -8,8 +9,8 @@ using Xabbo.Core.GameData;
 using Xabbo.Core.Messages.Outgoing;
 using Xabbo.Core.Messages.Incoming;
 using Xabbo.Controllers;
-using Microsoft.Extensions.Logging;
 using Xabbo.Utility;
+using Xabbo.Services.Abstractions;
 
 namespace Xabbo.Components;
 
@@ -17,6 +18,7 @@ namespace Xabbo.Components;
 public partial class FurniActionsComponent : Component
 {
     private readonly ILogger _logger;
+    private readonly IHabboApi _api;
     private readonly IGameDataManager _gameDataManager;
     private readonly RoomRightsController _rightsController;
     private readonly RoomManager _roomManager;
@@ -32,9 +34,11 @@ public partial class FurniActionsComponent : Component
     [Reactive] public bool PickToFindLink { get; set; }
     [Reactive] public bool CanShowInfo { get; set; }
     [Reactive] public bool PickToShowInfo { get; set; }
+    [Reactive] public bool PickToFetchMarketplaceStats { get; set; }
 
     public FurniActionsComponent(IExtension extension,
         ILoggerFactory loggerFactory,
+        IHabboApi api,
         IGameDataManager gameDataManager,
         RoomRightsController rightsController,
         RoomManager roomManager,
@@ -42,6 +46,7 @@ public partial class FurniActionsComponent : Component
         : base(extension)
     {
         _logger = loggerFactory.CreateLogger<FurniActionsComponent>();
+        _api = api;
         _gameDataManager = gameDataManager;
         _rightsController = rightsController;
         _roomManager = roomManager;
@@ -51,7 +56,8 @@ public partial class FurniActionsComponent : Component
                 x => x.PickToHide,
                 x => x.PickToShowInfo,
                 x => x.PickToFindLink,
-                (x, y, z) => x || y || z
+                x => x.PickToFetchMarketplaceStats,
+                (a1, a2, a3, a4) => a1 || a2 || a3 || a4
             )
             .DistinctUntilChanged()
             .Subscribe(requiresRights => {
@@ -85,7 +91,7 @@ public partial class FurniActionsComponent : Component
     [Intercept]
     private void HandlePick(Intercept e, PickupFurniMsg pick)
     {
-        if (PickToHide || PickToShowInfo || PickToFindLink)
+        if (PickToHide || PickToShowInfo || PickToFindLink || PickToFetchMarketplaceStats)
             e.Block();
 
         IRoom? room = _roomManager.Room;
@@ -136,6 +142,26 @@ public partial class FurniActionsComponent : Component
                     await Task.Delay(1000);
                     Ext.SlideFurni(linkedItem, from: linkedItem.Location + (0, 0, 1), duration: 500);
                     Ext.Send(new FloorItemDataUpdatedMsg(linkedItem.Id, new LegacyData { Value = "0" }));
+                });
+            }
+        }
+
+        if (PickToFetchMarketplaceStats)
+        {
+            if (furni.TryGetInfo(out var furniInfo))
+            {
+                Task.Run(async () => {
+                    try
+                    {
+                        var stats = await _api.FetchMarketplaceItemStats(Ext.Session.Hotel, furni.Type, furniInfo.Identifier);
+                        int totalSold = stats.History.Sum(x => x.TotalSoldItems);
+                        _xabbot.ShowMessage($"{furniInfo.Name} [{furniInfo.Identifier}]: average {stats.AveragePrice}c / "
+                            + $"{totalSold} sold in the last {stats.HistoryLimitInDays} days");
+                    }
+                    catch (Exception ex)
+                    {
+                        _xabbot.ShowMessage($"Failed to fetch marketplace stats: {ex.Message}");
+                    }
                 });
             }
         }

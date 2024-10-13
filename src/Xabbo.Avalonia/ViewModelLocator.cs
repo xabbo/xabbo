@@ -128,6 +128,7 @@ public static class ViewModelLocator
         Splatr.RegisterLazySingleton<IGameStateService, GameStateService>();
         Splatr.RegisterLazySingleton<IFigureConverterService, FigureConverterService>();
         Splatr.RegisterLazySingleton<IWardrobeRepository, JsonWardrobeRepository>();
+        Splatr.RegisterLazySingleton<IHabboApi, HabboApi>();
 
         // Xabbo core components
         Splatr.RegisterLazySingleton<ProfileManager>();
