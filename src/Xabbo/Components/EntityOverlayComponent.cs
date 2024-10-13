@@ -10,9 +10,10 @@ using Xabbo.Core.Messages.Incoming;
 
 namespace Xabbo.Components;
 
-public class AvatarOverlayComponent : Component
+[Intercept]
+public partial class AvatarOverlayComponent : Component
 {
-    private const int GHOST_INDEX = int.MinValue;
+    private const int GhostIndex = -183;
 
     private readonly ProfileManager _profileManager;
     private readonly RoomManager _roomManager;
@@ -70,7 +71,7 @@ public class AvatarOverlayComponent : Component
             e.Avatar is IUser self)
         {
             Ext.Send(In.UserChange,
-                GHOST_INDEX,
+                GhostIndex,
                 self.Figure,
                 self.Gender.ToClientString(),
                 self.Motto,
@@ -90,7 +91,7 @@ public class AvatarOverlayComponent : Component
     {
         if (!TryGetSelf(out IUser? self)) return;
 
-        User ghostUser = new User(self.Id, GHOST_INDEX)
+        User ghostUser = new User(self.Id, GhostIndex)
         {
             Name = self.Name,
             Figure = self.Figure,
@@ -126,7 +127,7 @@ public class AvatarOverlayComponent : Component
         Ext.Send(new AvatarStatusMsg {
             new AvatarStatus
             {
-                Index = GHOST_INDEX,
+                Index = GhostIndex,
                 Location = (0, 0, -1000)
             }
         });
@@ -158,7 +159,7 @@ public class AvatarOverlayComponent : Component
 
         AvatarStatus overlayUpdate = new AvatarStatus(selfUpdate)
         {
-            Index = GHOST_INDEX,
+            Index = GhostIndex,
             Location = selfUpdate.Location + (32, 32, 32),
             MovingTo = selfUpdate.MovingTo + (32, 32, 32)
         };
