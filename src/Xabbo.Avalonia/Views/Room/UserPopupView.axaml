@@ -3,7 +3,7 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-  xmlns:img="using:AsyncImageLoader"
+  xmlns:controls="using:Xabbo.Avalonia.Controls"
   xmlns:services="using:Xabbo.Avalonia.Services"
   xmlns:c="using:Xabbo.Avalonia.Converters"
   xmlns:vm="using:Xabbo.ViewModels"
@@ -13,11 +13,7 @@
   FontSize="16"
 >
   <Grid ColumnDefinitions="Auto,*">
-    <img:AdvancedImage
-      Width="64" Height="110"
-      Loader="{x:Static services:XabboImageLoader.Instance}"
-      Source="{Binding AvatarImageUrl}"
-    />
+    <controls:AvatarImage FigureString="{Binding ModernFigure}" />
     <StackPanel Grid.Column="1">
       <TextBlock FontWeight="Bold" Text="{Binding Name}" />
       <TextBlock>

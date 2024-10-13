@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Web;
@@ -32,6 +31,7 @@ public class RoomAvatarsViewModel : ViewModelBase
     private readonly ILauncherService _launcher;
     private readonly WardrobePageViewModel _wardrobe;
     private readonly IOperationManager _operations;
+    private readonly IFigureConverterService _figureConverter;
     private readonly RoomModerationController _moderation;
     private readonly ProfileManager _profileManager;
     private readonly RoomManager _roomManager;
@@ -78,6 +78,7 @@ public class RoomAvatarsViewModel : ViewModelBase
         IClipboardService clipboard,
         ILauncherService launcher,
         IOperationManager operations,
+        IFigureConverterService figureConverter,
         RoomModerationController moderation,
         WardrobePageViewModel wardrobe,
         ProfileManager profileManager,
@@ -90,6 +91,7 @@ public class RoomAvatarsViewModel : ViewModelBase
         _clipboard = clipboard;
         _launcher = launcher;
         _operations = operations;
+        _figureConverter = figureConverter;
         _wardrobe = wardrobe;
         _moderation = moderation;
         _profileManager = profileManager;
@@ -156,12 +158,6 @@ public class RoomAvatarsViewModel : ViewModelBase
         this.WhenAnyValue(x => x.FilterText)
             .ObserveOn(RxApp.MainThreadScheduler)
             .Subscribe(_ => _avatarCache.Refresh());
-
-        _roomManager.Left += OnLeftRoom;
-        _roomManager.AvatarsAdded += OnAvatarsAdded;
-        _roomManager.AvatarRemoved += OnAvatarRemoved;
-        _roomManager.AvatarIdle += OnAvatarIdle;
-        _roomManager.AvatarsUpdated += OnAvatarsUpdated;
 
         var hasSingleContextAvatar = this
             .WhenAnyValue(x => x.ContextSelection)
@@ -299,6 +295,32 @@ public class RoomAvatarsViewModel : ViewModelBase
             () => { _operations.TryCancelOperation(out _); },
             this.WhenAnyValue(x => x.IsBusy).ObserveOn(RxApp.MainThreadScheduler)
         );
+
+        _roomManager.Left += OnLeftRoom;
+        _roomManager.AvatarsAdded += OnAvatarsAdded;
+        _roomManager.AvatarRemoved += OnAvatarRemoved;
+        _roomManager.AvatarIdle += OnAvatarIdle;
+        _roomManager.AvatarsUpdated += OnAvatarsUpdated;
+
+        _figureConverter.Available += OnFigureConverterAvailable;
+    }
+
+    private void UpdateOriginsFigure(AvatarViewModel vm)
+    {
+        if (vm.Type is AvatarType.User && vm.IsOrigins &&
+            _figureConverter.TryConvertToModern(vm.Avatar.Figure, out Figure? figure))
+        {
+            vm.ModernFigure = figure.ToString();
+        }
+    }
+
+    private void OnFigureConverterAvailable()
+    {
+        if (_ext.Session.Is(ClientType.Origins))
+        {
+            foreach (var (_, vm) in _avatarCache.KeyValues)
+                UpdateOriginsFigure(vm);
+        }
     }
 
     private void CopyAvatarsToWardrobe()
@@ -447,11 +469,17 @@ public class RoomAvatarsViewModel : ViewModelBase
         _uiContext.Invoke(() => {
             foreach (var avatar in e.Avatars)
             {
-                var vm = new AvatarViewModel(avatar);
-                if (avatar.Id == _roomManager.Room?.Data?.OwnerId)
-                    vm.IsOwner = true;
-                if (avatar is User user && user.IsStaff)
-                    vm.IsStaff = true;
+                var vm = new AvatarViewModel(avatar) { IsOrigins = _ext.Session.Is(ClientType.Origins) };
+                if (avatar is User user)
+                {
+                    if (user.Id == _roomManager.Room?.Data?.OwnerId)
+                        vm.IsOwner = true;
+                    vm.IsStaff = user.IsStaff;
+                    if (_ext.Session.Is(ClientType.Modern))
+                        vm.ModernFigure = avatar.Figure;
+                    else
+                        UpdateOriginsFigure(vm);
+                }
 
                 _avatarCache.AddOrUpdate(vm);
             }

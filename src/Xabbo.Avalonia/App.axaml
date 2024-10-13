@@ -22,6 +22,7 @@
         <ResourceInclude Source="Controls/Loading.axaml" />
         <ResourceInclude Source="Controls/InfoOverlay.axaml" />
         <ResourceInclude Source="Controls/TimingSlider.axaml" />
+        <ResourceInclude Source="Controls/AvatarImage.axaml" />
       </ResourceDictionary.MergedDictionaries>
 
       <sys:Double x:Key="ControlContentThemeFontSize">16</sys:Double>
@@ -145,14 +146,6 @@
     </Style>
 
     <!-- AdvancedImage -->
-    <Style Selector="img|AdvancedImage.avatarimage">
-      <Setter Property="Width" Value="64" />
-      <Setter Property="Height" Value="110" />
-    </Style>
-    <Style Selector="img|AdvancedImage.avatarimage.head">
-      <Setter Property="Width" Value="54" />
-      <Setter Property="Height" Value="62" />
-    </Style>
     <Style Selector="img|AdvancedImage.itemicon">
       <Setter Property="Width" Value="32" />
       <Setter Property="Height" Value="32" />

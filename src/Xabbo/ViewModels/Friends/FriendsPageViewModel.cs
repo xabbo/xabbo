@@ -95,14 +95,10 @@ public sealed class FriendsPageViewModel : PageViewModel
 
     private void UpdateOriginsFigure(FriendViewModel vm)
     {
-        if (!vm.IsModernFigure &&
+        if (vm.IsOrigins &&
             _figureConverter.TryConvertToModern(vm.Figure, out Figure? figure))
         {
-            using (vm.DelayChangeNotifications())
-            {
-                vm.Figure = figure.ToString();
-                vm.IsModernFigure = true;
-            }
+            vm.ModernFigure = figure.ToString();
         }
     }
 
@@ -115,10 +111,17 @@ public sealed class FriendsPageViewModel : PageViewModel
             Name = friend.Name,
             Motto = friend.Motto,
             Figure = friend.Figure,
-            IsModernFigure = !_interceptor.Session.Hotel.IsOrigins
+            IsOrigins = _interceptor.Session.Is(ClientType.Origins)
         };
 
-        UpdateOriginsFigure(vm);
+        if (vm.IsOrigins)
+        {
+            UpdateOriginsFigure(vm);
+        }
+        else
+        {
+            vm.ModernFigure = vm.Figure;
+        }
 
         return vm;
     }
@@ -138,10 +141,13 @@ public sealed class FriendsPageViewModel : PageViewModel
                 vm.Motto = friend.Motto;
                 if (vm.Figure != friend.Figure)
                 {
-                    using (vm.DelayChangeNotifications())
+                    vm.Figure = friend.Figure;
+                    if (_interceptor.Session.Is(ClientType.Modern))
                     {
-                        vm.IsModernFigure = !_interceptor.Session.Hotel.IsOrigins;
-                        vm.Figure = friend.Figure;
+                        vm.ModernFigure = vm.Figure;
+                    }
+                    else
+                    {
                         UpdateOriginsFigure(vm);
                     }
                 }

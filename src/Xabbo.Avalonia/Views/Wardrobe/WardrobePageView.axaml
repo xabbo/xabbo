@@ -3,6 +3,7 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:controls="using:Xabbo.Avalonia.Controls"
   xmlns:v="using:Xabbo.Avalonia.Views"
   xmlns:vm="using:Xabbo.ViewModels"
   xmlns:services="using:Xabbo.Avalonia.Services"
@@ -41,19 +42,9 @@
                   />
                 </Interactions:EventTriggerBehavior>
               </Interactivity:Interaction.Behaviors>
-              <Image
-                x:Name="AvatarImagePlaceholder"
+              <controls:AvatarImage
                 Margin="0,0,0,24"
-                Width="64" Height="110"
-                Source="avares://Xabbo.Avalonia/Assets/Images/avatar.png"
-                IsVisible="{Binding #AvatarImage.IsLoading, Mode=OneWay}"
-              />
-              <img:AdvancedImage
-                x:Name="AvatarImage"
-                Margin="0,0,0,24"
-                Width="64" Height="110"
-                Source="{Binding AvatarImageUrl}"
-                Loader="{x:Static services:XabboImageLoader.Instance}"
+                FigureString="{Binding ModernFigure}"
               />
             </Grid>
           </DataTemplate>

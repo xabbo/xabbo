@@ -53,16 +53,9 @@
                 Margin="-10,-10,10,-10"
                 Width="54" Height="62"
               >
-                <Image
-                  Width="54" Height="62"
-                  Source="avares://Xabbo.Avalonia/Assets/Images/avatarhead.png"
-                  IsVisible="{Binding #AvatarHeadImage.IsLoading, Mode=OneWay}"
-                />
-                <img:AdvancedImage
-                  x:Name="AvatarHeadImage"
-                  Width="54" Height="62"
-                  Source="{Binding AvatarImageUrl}"
-                  Loader="{x:Static services:XabboImageLoader.Instance}"
+                <controls:AvatarImage
+                  HeadOnly="true"
+                  FigureString="{Binding ModernFigure}"
                 />
               </Grid>
               <StackPanel

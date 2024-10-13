@@ -1,10 +1,8 @@
 using System.Reactive;
-using System.Reactive.Linq;
 using System.Text.RegularExpressions;
 using ReactiveUI;
 
 using Xabbo.Core;
-using Xabbo.Utility;
 
 namespace Xabbo.ViewModels;
 
@@ -26,8 +24,6 @@ public sealed partial class GiftViewModel : ViewModelBase
     [Reactive] public string? ItemName { get; set; }
     [Reactive] public string? ItemIdentifier { get; set; }
     [Reactive] public string? ItemImageUrl { get; set; }
-    private readonly ObservableAsPropertyHelper<string?> _senderImageUrl;
-    public string? SenderImageUrl => _senderImageUrl.Value;
 
     [Reactive] public bool IsTrophy { get; set; }
     [Reactive] public string? TrophyMessage { get; set; }
@@ -38,19 +34,6 @@ public sealed partial class GiftViewModel : ViewModelBase
     public GiftViewModel()
     {
         PeekCmd = ReactiveCommand.Create(Peek);
-
-        _senderImageUrl = this.WhenAnyValue(x => x.SenderFigure)
-            .Select(figure =>
-                !string.IsNullOrWhiteSpace(figure)
-                ? UrlHelper.AvatarImageUrl(
-                    figure: figure,
-                    headOnly: true,
-                    direction: 2
-                )
-                : null
-            )
-            .ObserveOn(RxApp.MainThreadScheduler)
-            .ToProperty(this, x => x.SenderImageUrl);
     }
 
     public GiftViewModel(IFloorItem item) : this()

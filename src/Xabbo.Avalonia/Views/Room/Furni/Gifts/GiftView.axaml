@@ -5,6 +5,7 @@
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:converters="using:Avalonia.Controls.Converters"
   xmlns:ic="using:FluentIcons.Avalonia.Fluent"
+  xmlns:controls="using:Xabbo.Avalonia.Controls"
   xmlns:vm="using:Xabbo.ViewModels"
   xmlns:services="using:Xabbo.Avalonia.Services"
   xmlns:img="using:AsyncImageLoader"
@@ -45,13 +46,11 @@
           <ColumnDefinition Width="Auto" />
           <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <img:AdvancedImage
+        <controls:AvatarImage
           Classes="avatarimage head"
           Margin="10,0,0,0"
-          Stretch="None"
-          IsVisible="{Binding SenderImageUrl, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
-          Source="{Binding SenderImageUrl, FallbackValue='avares://Xabbo.Avalonia/Assets/Images/avatarhead.png'}"
-          Loader="{x:Static services:XabboImageLoader.Instance}"
+          HeadOnly="true"
+          FigureString="{Binding SenderFigure}"
         />
         <Grid Grid.Column="1" Margin="8">
           <Grid.RowDefinitions>

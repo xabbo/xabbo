@@ -14,7 +14,6 @@ public class AvatarViewModel : ViewModelBase
     public long Id => Avatar.Id;
     public string Name => Avatar.Name;
     public string Motto => Avatar.Motto;
-    public string AvatarImageUrl => $"https://www.habbo.com/habbo-imaging/avatarimage?figure=${Avatar.Figure}";
 
     [Reactive] public bool IsStaff { get; set; }
     [Reactive] public bool IsOwner { get; set; }
@@ -22,6 +21,9 @@ public class AvatarViewModel : ViewModelBase
 
     [Reactive] public bool IsIdle { get; set; }
     [Reactive] public bool IsTrading { get; set; }
+
+    public bool IsOrigins { get; set; }
+    [Reactive] public string? ModernFigure { get; set; }
 
     public bool IsUser => Avatar.Type == AvatarType.User;
 

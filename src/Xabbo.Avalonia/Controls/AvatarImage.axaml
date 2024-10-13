@@ -1,0 +1,56 @@
+<ResourceDictionary
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:sys="using:System"
+  xmlns:controls="using:Xabbo.Avalonia.Controls"
+  xmlns:services="using:Xabbo.Avalonia.Services"
+  xmlns:img="using:AsyncImageLoader"
+>
+
+  <sys:Double x:Key="AvatarBodyWidth">64</sys:Double>
+  <sys:Double x:Key="AvatarBodyHeight">110</sys:Double>
+  <sys:Double x:Key="AvatarHeadWidth">54</sys:Double>
+  <sys:Double x:Key="AvatarHeadHeight">62</sys:Double>
+
+  <Design.PreviewWith>
+    <StackPanel Width="400" Spacing="10">
+        <StackPanel Background="{DynamicResource SystemRegionBrush}">
+          <controls:AvatarImage />
+        </StackPanel>
+    </StackPanel>
+  </Design.PreviewWith>
+
+  <ControlTheme x:Key="{x:Type controls:AvatarImage}" TargetType="controls:AvatarImage">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel Classes.headonly="{TemplateBinding HeadOnly}">
+          <Panel.Styles>
+            <Style Selector="Panel">
+              <Style Selector="^:not(.headonly)">
+                <Setter Property="Width" Value="{StaticResource AvatarBodyWidth}" />
+                <Setter Property="Height" Value="{StaticResource AvatarBodyHeight}" />
+              </Style>
+              <Style Selector="^.headonly">
+                <Setter Property="Width" Value="{StaticResource AvatarHeadWidth}" />
+                <Setter Property="Height" Value="{StaticResource AvatarHeadHeight}" />
+              </Style>
+            </Style>
+          </Panel.Styles>
+          <img:AdvancedImage Source="{TemplateBinding Placeholder}">
+            <img:AdvancedImage.IsVisible>
+              <MultiBinding Converter="{x:Static BoolConverters.Or}">
+                <Binding Path="#AvatarImage.IsLoading" />
+                <TemplateBinding Property="AvatarImageUrl" Converter="{x:Static StringConverters.IsNullOrEmpty}" />
+              </MultiBinding>
+            </img:AdvancedImage.IsVisible>
+          </img:AdvancedImage>
+          <img:AdvancedImage
+            x:Name="AvatarImage"
+            Loader="{x:Static services:XabboImageLoader.Instance}"
+            Source="{TemplateBinding AvatarImageUrl}"
+          />
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>
