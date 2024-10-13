@@ -159,8 +159,8 @@ public partial class FlattenRoomComponent(IExtension extension, RoomManager room
             if (movingTo.HasValue)
                 update.MovingTo = AdjustTile(movingTo.Value);
 
-            if (update.ActionHeight.HasValue)
-                update.ActionHeight -= GetOffset(update.Location);
+            if (update.StanceHeight.HasValue)
+                update.StanceHeight -= GetOffset(update.Location);
         }
 
         e.Packet.Clear();
