@@ -8,8 +8,6 @@ public class RoundingConverter : IValueConverter
 {
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        Console.WriteLine(value);
-        Console.WriteLine(parameter);
         if (parameter is int frequency)
         {
             int integerValue = value switch

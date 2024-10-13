@@ -377,7 +377,6 @@ public class RoomAvatarsViewModel : ViewModelBase
                 var profile = await _ext.RequestAsync(new GetProfileByNameMsg(user.Name), block: false);
                 if (!profile.DisplayInClient)
                 {
-                    Console.WriteLine("profile hidden");
                     var result = await _dialog.ShowContentDialogAsync(
                         _dialog.CreateViewModel<MainViewModel>(),
                         new HanumanInstitute.MvvmDialogs.Avalonia.Fluent.ContentDialogSettings
@@ -387,7 +386,6 @@ public class RoomAvatarsViewModel : ViewModelBase
                             PrimaryButtonText = "OK",
                         }
                     );
-                    Console.WriteLine(result);
                 }
                 break;
             case "web":
