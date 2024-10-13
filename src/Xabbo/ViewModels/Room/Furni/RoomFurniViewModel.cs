@@ -28,7 +28,7 @@ public partial class RoomFurniViewModel : ViewModelBase
     private readonly RoomManager _roomManager;
 
     private readonly SourceCache<FurniStackViewModel, StackDescriptor> _furniStackCache = new(x => x.Descriptor);
-    private readonly SourceCache<FurniViewModel, (ItemType, long)> _furniCache = new(x => (x.Type, x.Id));
+    private readonly SourceCache<FurniViewModel, (ItemType, Id)> _furniCache = new(x => (x.Type, x.Id));
 
     private readonly ReadOnlyObservableCollection<FurniViewModel> _furni;
     private readonly ReadOnlyObservableCollection<FurniStackViewModel> _furniStacks;

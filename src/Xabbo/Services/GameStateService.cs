@@ -59,11 +59,6 @@ public class GameStateService : IGameStateService
         {
             var hotel = Hotel.FromGameHost(e.Host);
             await GameData.LoadAsync(hotel);
-            if (GameData.Furni is { } furniData &&
-                GameData.Texts is { } texts)
-            {
-                Xabbo.Core.Extensions.Initialize(furniData, texts);
-            }
         }
         catch (Exception ex)
         {

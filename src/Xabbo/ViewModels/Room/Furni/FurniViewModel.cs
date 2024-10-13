@@ -13,7 +13,7 @@ public abstract class ItemViewModelBase : ViewModelBase
     public IItem Item { get; set; }
 
     public Id Id => Item.Id;
-    public ItemType Type => _info?.Type ?? (ItemType)(-1);
+    public ItemType Type => Item.Type;
     public int Kind => _info?.Kind ?? 0;
     public string Identifier => _info?.Identifier ?? "?";
     public string Name { get; }
