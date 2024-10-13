@@ -89,6 +89,7 @@ public partial class RoomFurniViewModel : ViewModelBase
         _roomManager.FloorItemAdded += OnFloorItemAdded;
         _roomManager.FloorItemUpdated += OnFloorItemUpdated;
         _roomManager.FloorItemDataUpdated += OnFloorItemDataUpdated;
+        _roomManager.DiceUpdated += OnDiceUpdated;
         _roomManager.FloorItemWiredMovement += OnFloorItemWiredMovement;
         _roomManager.FloorItemRemoved += OnFloorItemRemoved;
         _roomManager.FloorItemSlide += OnFloorItemSlide;
@@ -415,6 +416,7 @@ public partial class RoomFurniViewModel : ViewModelBase
     private void OnFloorItemAdded(FloorItemEventArgs e) => AddItems([e.Item]);
     private void OnFloorItemUpdated(FloorItemUpdatedEventArgs e) => UpdateFurni(e.Item);
     private void OnFloorItemDataUpdated(FloorItemDataUpdatedEventArgs e) => UpdateFurni(e.Item);
+    private void OnDiceUpdated(DiceUpdatedEventArgs e) => UpdateFurni(e.Item);
     private void OnFloorItemSlide(FloorItemSlideEventArgs e) => UpdateFurni(e.Item);
     private void OnFloorItemWiredMovement(FloorItemWiredMovementEventArgs e) => UpdateFurni(e.Item);
     private void OnFloorItemRemoved(FloorItemEventArgs e) => RemoveItem(e.Item);
