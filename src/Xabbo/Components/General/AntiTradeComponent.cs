@@ -7,10 +7,12 @@ using Xabbo.Core.Events;
 using Xabbo.Core.Game;
 using Xabbo.Services.Abstractions;
 using Xabbo.Configuration;
+using Xabbo.Core.Messages.Incoming;
+using Xabbo.Core.Messages.Outgoing;
 
 namespace Xabbo.Components;
 
-[Intercept(~ClientType.Shockwave)]
+[Intercept]
 public partial class AntiTradeComponent : Component
 {
     private readonly IConfigProvider<AppConfig> _config;
@@ -42,10 +44,17 @@ public partial class AntiTradeComponent : Component
         _roomManager.RoomDataUpdated += OnRoomDataUpdated;
 
         config
-            .ObservableForProperty(config => config.Value.General.AntiTrade)
-            .Subscribe(change => OnIsActiveChanged(change.Value));
+            .WhenAnyValue(config => config.Value.General.AntiTrade)
+            .Subscribe(value => OnIsActiveChanged(value));
 
         Task initialization = Task.Run(InitializeAsync);
+    }
+
+    private async Task InitializeAsync()
+    {
+        await _profileManager.GetUserDataAsync();
+
+        IsAvailable = true;
     }
 
     private bool CanTrade()
@@ -54,28 +63,21 @@ public partial class AntiTradeComponent : Component
         if (roomData is null) return false;
 
         return (
-            roomData.Trading == TradePermissions.Allowed ||
-            (roomData.Trading == TradePermissions.RightsHolders && _roomManager.HasRights)
+            roomData.Trading is TradePermissions.Allowed ||
+            (roomData.Trading is TradePermissions.RightsHolders && _roomManager.HasRights)
         );
     }
 
     private void TradeSelf(IRoom? room)
     {
-        if (room is null) return;
-        if (!room.TryGetUserById(_profileManager.UserData?.Id ?? -1, out IUser? self))
+        if (Session.Is(ClientType.Origins))
+            return;
+
+        if (room is null || !room.TryGetUserById(_profileManager.UserData?.Id ?? -1, out IUser? self))
             return;
 
         if (CanTrade())
-        {
-            Ext.Send(Out.OpenTrading, self.Index);
-        }
-    }
-
-    private async Task InitializeAsync()
-    {
-        await _profileManager.GetUserDataAsync();
-
-        IsAvailable = true;
+            Ext.Send(new TradeUserMsg(self.Index));
     }
 
     protected void OnIsActiveChanged(bool isActive)
@@ -102,7 +104,7 @@ public partial class AntiTradeComponent : Component
                 _tradeManager.Partner is not null &&
                 _tradeManager.Partner.Id == userData.Id)
             {
-                Ext.Send(Out.CloseTrading);
+                Ext.Send(new CloseTradeMsg());
             }
         }
     }
@@ -116,21 +118,61 @@ public partial class AntiTradeComponent : Component
 
     private void OnRoomDataUpdated(RoomDataEventArgs e)
     {
-        if (Enabled && !_tradeManager.IsTrading)
-        {
+        if (Enabled && !_tradeManager.IsTrading && e.Data.Trading is not TradePermissions.NotAllowed)
             TradeSelf(_roomManager.Room);
-        }
     }
 
-    [InterceptIn(nameof(In.TradingOpen))]
-    protected void HandleTradeOpen(Intercept e)
+    [Intercept]
+    void HandleTradeOpened(Intercept<TradeOpenedMsg> e)
     {
         if (Enabled)
         {
             e.Block();
+            Ext.Send(new CloseTradeMsg());
         }
     }
 
+    [Intercept]
+    void HandleTradeUpdate(Intercept<TradeOffersMsg> e)
+    {
+        Console.WriteLine("got trade offers");
+        if (Enabled)
+        {
+            Console.WriteLine("blocking trade offers");
+            e.Block();
+            if (Session.Is(ClientType.Origins))
+            {
+                Console.WriteLine("closing trade");
+                Ext.Send(new CloseTradeMsg());
+            }
+        }
+    }
+
+    [Intercept]
+    void HandleTradeAccepted(Intercept<TradeAcceptedMsg> e)
+    {
+        if (Enabled) e.Block();
+    }
+
+    [Intercept]
+    void HandleTradeAwaitingConfirmation(Intercept<TradeAwaitingConfirmationMsg> e)
+    {
+        if (Enabled) e.Block();
+    }
+
+    [Intercept]
+    void HandleTradeCompleted(Intercept<TradeCompletedMsg> e)
+    {
+        if (Enabled) e.Block();
+    }
+
+    [Intercept]
+    void HandleTradeClosed(Intercept<TradeClosedMsg> e)
+    {
+        if (Enabled) e.Block();
+    }
+
+    [Intercept(ClientType.Modern)]
     [InterceptIn(nameof(In.NotificationDialog))]
     protected void HandleNotificationDialog(Intercept e)
     {

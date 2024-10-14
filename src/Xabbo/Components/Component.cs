@@ -27,6 +27,8 @@ public abstract class Component : ReactiveObject
     /// </summary>
     public Identifiers UnresolvedIdentifiers { get; set; } = [];
 
+    protected Session Session => Ext.Session;
+
     public Component(IExtension ext)
     {
         Ext = ext;
