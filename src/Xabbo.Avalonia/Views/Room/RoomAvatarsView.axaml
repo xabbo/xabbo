@@ -83,12 +83,13 @@
               IconSource="{icm:SymbolIconSource Symbol=Copy}"
               Text="Copy..."
             >
-              <ui:MenuFlyoutItem Text="ID" Command="{Binding CopyAvatarFieldCmd}" CommandParameter="id" />
+              <ui:MenuFlyoutItem Classes="modern" Text="ID" Command="{Binding CopyAvatarFieldCmd}" CommandParameter="id" />
               <ui:MenuFlyoutItem Text="Name" Command="{Binding CopyAvatarFieldCmd}" CommandParameter="name" />
               <ui:MenuFlyoutItem Text="Motto" Command="{Binding CopyAvatarFieldCmd}" CommandParameter="motto" />
               <ui:MenuFlyoutItem Text="Figure" Command="{Binding CopyAvatarFieldCmd}" CommandParameter="figure" />
             </ui:MenuFlyoutSubItem>
             <ui:MenuFlyoutSubItem
+              Classes="modern"
               IsEnabled="{Binding OpenUserProfileCmd.CanExecute^}"
               IconSource="{icm:SymbolIconSource Symbol=Person}"
               Text="Open profile..."
@@ -110,9 +111,10 @@
                 </MultiBinding>
               </ui:MenuFlyoutSubItem.IsEnabled>
               <ui:MenuFlyoutSubItem
+                Classes="modern"
+                Text="Mute"
                 IsEnabled="{Binding MuteUsersCmd.CanExecute^}"
                 IconSource="{icm:SymbolIconSource Symbol=ChatOff}"
-                Text="Mute"
               >
                 <ui:MenuFlyoutItem Text="2 mins" Command="{Binding MuteUsersCmd}" CommandParameter="2" />
                 <ui:MenuFlyoutItem Text="5 mins" Command="{Binding MuteUsersCmd}" CommandParameter="5" />
@@ -125,6 +127,7 @@
                 <ui:MenuFlyoutItem Text="24 hours" Command="{Binding MuteUsersCmd}" CommandParameter="1440" />
               </ui:MenuFlyoutSubItem>
               <ui:MenuFlyoutItem
+                Classes="modern"
                 Text="Unmute"
                 IconSource="{icm:SymbolIconSource Symbol=Chat}"
                 Command="{Binding MuteUsersCmd}"
@@ -145,6 +148,7 @@
                 <ui:MenuFlyoutItem Text="Permanently" Command="{Binding BanUsersCmd}" CommandParameter="{x:Static xc:BanDuration.Permanent}" />
               </ui:MenuFlyoutSubItem>
               <ui:MenuFlyoutItem
+                Classes="modern"
                 Text="Bounce"
                 IconSource="{icm:SymbolIconSource Symbol=ArrowBounce}"
                 Command="{Binding BounceUsersCmd}"
@@ -154,11 +158,6 @@
             <ui:ToggleMenuFlyoutItem Text="Show bots" IconSource="{icm:SymbolIconSource Symbol=Bot}" IsChecked="{Binding Config.ShowBots}" />
             <ui:ToggleMenuFlyoutItem Text="Show pets" IconSource="{icm:SymbolIconSource Symbol=AnimalCat}" IsChecked="{Binding Config.ShowPets}" />
           </ui:FAMenuFlyout>
-          <!--<MenuFlyout>
-            <Separator />
-            <CheckBox Margin="-4" IsChecked="{Binding Config.ShowBots}">Show bots</CheckBox>
-            <CheckBox Margin="-4" IsChecked="{Binding Config.ShowPets}">Show pets</CheckBox>
-          </MenuFlyout>-->
         </DataGrid.ContextFlyout>
         <DataGrid.Columns>
           <DataGridTextColumn SortMemberPath="Index" Header="index" Binding="{Binding Index, DataType={x:Type vm:AvatarViewModel}}" />

@@ -87,12 +87,12 @@
     </Style>
 
     <!-- Hide modern components on origins sessions -->
-    <Style Selector=":is(Window)#Root.origins :is(Control).modern">
+    <Style Selector=".isorigins :is(Control).modern">
       <Setter Property="IsVisible" Value="False" />
     </Style>
 
     <!-- Hide origins components on modern sessions -->
-    <Style Selector=":is(Window)#Root.modern :is(Control).origins">
+    <Style Selector=".ismodern :is(Control).origins">
       <Setter Property="IsVisible" Value="False" />
     </Style>
 

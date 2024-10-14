@@ -167,6 +167,7 @@
                 />
               </StackPanel>
               <RadioButton
+                Classes="modern"
                 GroupName="ClickTo"
                 Content="Bounce"
                 IsChecked="{Binding ClickTo.Bounce}"
