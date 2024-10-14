@@ -1,4 +1,4 @@
-using System.Reactive.Linq;
+﻿using System.Reactive.Linq;
 using ReactiveUI;
 
 using Xabbo.Core;
@@ -27,15 +27,25 @@ public abstract class ItemViewModelBase : ViewModelBase
     {
         Item = item;
 
-        if (Extensions.IsInitialized &&
-            item.TryGetInfo(out _info))
+        if (Extensions.IsInitialized && item.TryGetInfo(out _info))
         {
-            if (_info.Revision > 0)
+            // Hard-coded fix for Origins.
+            FurniInfo? iconInfo = _info;
+            if (iconInfo.Identifier == "post.it" &&
+                !Extensions.TryGetInfo(new WallItem { Identifier = "post_it" }, out iconInfo))
             {
-                string identifier = _info.Identifier.Replace('*', '_');
-                if (identifier == "poster" && item is IWallItem wallItem)
-                    identifier += wallItem.Data;
-                IconUrl = $"http://images.habbo.com/dcr/hof_furni/{_info.Revision}/{identifier}_icon.png";
+                iconInfo = _info;
+            }
+
+            if (iconInfo.Revision > 0)
+            {
+                string identifier = iconInfo.Identifier.Replace('*', '_');
+                if (identifier == "poster" && item.TryGetVariant(out string? variant))
+                {
+                    Variant = variant;
+                    identifier += variant;
+                }
+                IconUrl = $"http://images.habbo.com/dcr/hof_furni/{iconInfo.Revision}/{identifier}_icon.png";
             }
 
             if (item.TryGetName(out string? name))

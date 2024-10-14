@@ -48,7 +48,22 @@
                 <v:FurniPopupView ShowIcon="False" />
               </ToolTip.Tip>
               <Panel>
+                <TextBlock
+                  Text="?"
+                  FontSize="20"
+                  Opacity="0.33"
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                >
+                  <TextBlock.IsVisible>
+                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                      <Binding Path="!#IconImage.IsLoading" />
+                      <Binding Path="#IconImage.CurrentImage" Converter="{x:Static ObjectConverters.IsNull}" />
+                    </MultiBinding>
+                  </TextBlock.IsVisible>
+                </TextBlock>
                 <img:AdvancedImage
+                  x:Name="IconImage"
                   Classes="spinner"
                   Width="32" Height="32" Stretch="None"
                   HorizontalAlignment="Center" VerticalAlignment="Center"
