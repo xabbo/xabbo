@@ -473,8 +473,18 @@ public class RoomAvatarsViewModel : ViewModelBase
                 var vm = new AvatarViewModel(avatar) { IsOrigins = _ext.Session.Is(ClientType.Origins) };
                 if (avatar is User user)
                 {
-                    if (user.Id == _roomManager.Room?.Data?.OwnerId)
-                        vm.IsOwner = true;
+                    if (_roomManager.Room?.Data is { OwnerId: Id ownerId, OwnerName: string ownerName })
+                    {
+                        if (ownerId > 0)
+                        {
+                            if (user.Id == ownerId)
+                                vm.IsOwner = true;
+                        }
+                        else if (!string.IsNullOrWhiteSpace(ownerName) && user.Name == ownerName)
+                        {
+                            vm.IsOwner = true;
+                        }
+                    }
                     vm.IsStaff = user.IsStaff;
                     if (_ext.Session.Is(ClientType.Modern))
                         vm.ModernFigure = avatar.Figure;
