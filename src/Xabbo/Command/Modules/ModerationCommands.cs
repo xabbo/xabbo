@@ -1,4 +1,5 @@
-﻿using Xabbo.Messages.Flash;
+﻿using System.Collections.Concurrent;
+using Xabbo.Messages.Flash;
 using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.Events;
@@ -11,8 +12,8 @@ public sealed class ModerationCommands(RoomManager roomManager) : CommandModule
 {
     private readonly RoomManager _roomManager = roomManager;
 
-    private readonly Dictionary<string, int> _muteList = new(StringComparer.OrdinalIgnoreCase);
-    private readonly Dictionary<string, BanDuration> _banList = new(StringComparer.OrdinalIgnoreCase);
+    private readonly ConcurrentDictionary<string, int> _muteList = new(StringComparer.OrdinalIgnoreCase);
+    private readonly ConcurrentDictionary<string, BanDuration> _banList = new(StringComparer.OrdinalIgnoreCase);
 
     protected override void OnInitialize()
     {
@@ -65,19 +66,19 @@ public sealed class ModerationCommands(RoomManager roomManager) : CommandModule
                 ShowMessage($"Banning user '{user.Name}'");
                 await Task.Delay(100);
                 BanUser(user, banDuration);
-                _banList.Remove(user.Name);
+                _banList.TryRemove(user.Name, out _);
             }
             else if (_muteList.TryGetValue(user.Name, out int muteDuration))
             {
                 ShowMessage($"Muting user '{user.Name}'");
                 await Task.Delay(100);
                 MuteUser(user, muteDuration);
-                _muteList.Remove(user.Name);
+                _muteList.TryRemove(user.Name, out _);
             }
         });
     }
 
-    [Command("mute")]
+    [Command("mute", SupportedClients = ClientType.Modern)]
     public Task HandleMuteCommand(CommandArgs args)
     {
         if (args.Length < 2)
@@ -138,7 +139,7 @@ public sealed class ModerationCommands(RoomManager roomManager) : CommandModule
         return Task.CompletedTask;
     }
 
-    [Command("unmute")]
+    [Command("unmute", SupportedClients = ClientType.Modern)]
     public Task HandleUnmuteCommand(CommandArgs args)
     {
         if (args.Length < 1) return Task.CompletedTask;
@@ -247,34 +248,4 @@ public sealed class ModerationCommands(RoomManager roomManager) : CommandModule
         }
         return Task.CompletedTask;
     }
-
-    // [Command("unban"), RequiredOut(nameof(Out.UnbanUser))]
-    // public async Task HandleUnbanCommand(CommandArgs args)
-    // {
-    //     if (args.Count < 1) return;
-
-    //     if (!_roomManager.IsInRoom)
-    //     {
-    //         ShowMessage("Reload the room to initialize room state.");
-    //         return;
-    //     }
-
-    //     if (!_roomManager.IsOwner)
-    //     {
-    //         ShowMessage("You do not have permission to unban in this room.");
-    //         return;
-    //     }
-
-    //     string userName = args[0];
-
-    //     if (_banList.ContainsKey(userName))
-    //     {
-    //         _banList.Remove(userName);
-    //         ShowMessage($"Removing user '{userName}' from the ban list");
-    //     }
-    //     else
-    //     {
-    //         // ...
-    //     }
-    // }
 }
