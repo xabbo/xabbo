@@ -100,6 +100,15 @@ public partial class ChatComponent : Component
         if (Settings.Chat.MuteWired && e.BubbleStyle == 34) e.Block();
     }
 
+    [InterceptOut(nameof(Out.Chat))]
+    private void OnChat(Intercept e)
+    {
+        if (Settings.Chat.AlwaysShout)
+        {
+            e.Packet.Header = Ext.Messages.Resolve(Out.Shout);
+        }
+    }
+
     [Intercept(ClientType.Modern)]
     [InterceptIn(nameof(In.RespectNotification))]
     private void OnUserRespect(Intercept e)

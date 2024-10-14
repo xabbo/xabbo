@@ -238,6 +238,10 @@
             Classes="modern"
             IsChecked="{Binding Config.General.AntiTyping}"
           />
+          <CheckBox
+            Content="Always shout"
+            IsChecked="{Binding Config.Chat.AlwaysShout}"
+          />
           <Expander
             Margin="0,5,0,5"
             IsExpanded="{Binding IsMuteExpanded}"
