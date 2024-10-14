@@ -131,18 +131,22 @@ public partial class FurniActionsComponent : Component
 
         if (PickToFindLink && furni is IFloorItem floorItem)
         {
-            IFloorItem? linkedItem = room.GetFloorItem(floorItem.Extra);
-            if (linkedItem is not null)
+            if (Session.Is(ClientType.Origins))
             {
-                Task.Run(async () => {
-                    Ext.Send(new FloorItemDataUpdatedMsg(linkedItem.Id, new LegacyData { Value = "1" }));
-                    Ext.SlideFurni(linkedItem, to: linkedItem.Location + (0, 0, 1), duration: 500);
-                    await Task.Delay(1000);
-                    Ext.Send(new FloorItemDataUpdatedMsg(linkedItem.Id, new LegacyData { Value = "2" }));
-                    await Task.Delay(1000);
-                    Ext.SlideFurni(linkedItem, from: linkedItem.Location + (0, 0, 1), duration: 500);
-                    Ext.Send(new FloorItemDataUpdatedMsg(linkedItem.Id, new LegacyData { Value = "0" }));
-                });
+                // Find and flash teleporters with an adjacent ID.
+                if (furni.Identifier?.Contains("door") == true)
+                {
+                    FlashTele(room.GetFloorItem(furni.Id - 1));
+                    FlashTele(room.GetFloorItem(furni.Id + 1));
+                }
+            }
+            else
+            {
+                IFloorItem? linkedItem = room.GetFloorItem(floorItem.Extra);
+                if (linkedItem is not null)
+                {
+                    FlashTele(linkedItem);
+                }
             }
         }
 
@@ -164,6 +168,37 @@ public partial class FurniActionsComponent : Component
                     }
                 });
             }
+        }
+    }
+
+    private void FlashTele(IFloorItem? tele)
+    {
+        if (tele is null)
+            return;
+
+        if (Session.Is(ClientType.Origins))
+        {
+            if (tele.Identifier?.Contains("door") != true)
+                return;
+
+            Task.Run(async () => {
+                for (int i = 0; i < 5; i++) {
+                    Ext.Send(Xabbo.Messages.Shockwave.In.DOOR_IN, $"{tele.Id}//");
+                    await Task.Delay(100);
+                }
+            });
+        }
+        else
+        {
+            Task.Run(async () => {
+                Ext.Send(new FloorItemDataUpdatedMsg(tele.Id, new LegacyData { Value = "1" }));
+                Ext.SlideFurni(tele, to: tele.Location + (0, 0, 1), duration: 500);
+                await Task.Delay(1000);
+                Ext.Send(new FloorItemDataUpdatedMsg(tele.Id, new LegacyData { Value = "2" }));
+                await Task.Delay(1000);
+                Ext.SlideFurni(tele, from: tele.Location + (0, 0, 1), duration: 500);
+                Ext.Send(new FloorItemDataUpdatedMsg(tele.Id, new LegacyData { Value = "0" }));
+            });
         }
     }
 }
