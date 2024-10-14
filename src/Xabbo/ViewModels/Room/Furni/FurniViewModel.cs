@@ -1,4 +1,4 @@
-﻿using System.Reactive.Linq;
+using System.Reactive.Linq;
 using ReactiveUI;
 
 using Xabbo.Core;
@@ -15,7 +15,7 @@ public abstract class ItemViewModelBase : ViewModelBase
     public Id Id => Item.Id;
     public ItemType Type => Item.Type;
     public int Kind => _info?.Kind ?? 0;
-    public string Identifier => _info?.Identifier ?? "?";
+    public string Identifier => Item.Identifier ?? _info?.Identifier ?? "?";
     public string Name { get; }
     public string? Description { get; }
 
