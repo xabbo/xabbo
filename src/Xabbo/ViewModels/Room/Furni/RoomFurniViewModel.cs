@@ -253,11 +253,15 @@ public partial class RoomFurniViewModel : ViewModelBase
             ToggleAsync,
             Observable.CombineLatest(
                 this.WhenAnyValue(x => x.ContextSelection),
+                _roomManager.WhenAnyValue(x => x.RightsLevel),
                 _furniController.WhenAnyValue(
                     x => x.CurrentOperation,
                     op => op is RoomFurniController.Operation.None
                 ),
-                (selection, isNotBusy) => isNotBusy && selection is { Count: > 0 }
+                (selection, rights, isNotBusy) =>
+                    isNotBusy &&
+                    rights > RightsLevel.None &&
+                    selection is { Count: > 0 }
             )
             .ObserveOn(RxApp.MainThreadScheduler)
         );
@@ -266,11 +270,15 @@ public partial class RoomFurniViewModel : ViewModelBase
             RotateAsync,
             Observable.CombineLatest(
                 this.WhenAnyValue(x => x.ContextSelection),
+                _roomManager.WhenAnyValue(x => x.RightsLevel),
                 _furniController.WhenAnyValue(
                     x => x.CurrentOperation,
                     op => op is RoomFurniController.Operation.None
                 ),
-                (selection, isNotBusy) => isNotBusy && selection is { Count: > 0 }
+                (selection, rights, isNotBusy) =>
+                    isNotBusy &&
+                    rights > RightsLevel.None &&
+                    selection is { Count: > 0 }
             )
             .ObserveOn(RxApp.MainThreadScheduler)
         );

@@ -46,6 +46,7 @@
           />
           <ui:MenuFlyoutSubItem
             IconSource="{icm:SymbolIconSource Symbol=ArrowSync}"
+            IsEnabled="{Binding RotateCmd.CanExecute^}"
             Text="Rotate"
           >
             <ui:MenuFlyoutItem
