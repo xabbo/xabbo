@@ -54,9 +54,15 @@ public sealed class WardrobePageViewModel : PageViewModel
 
         _cache
             .Connect()
+            .Filter(FilterOutfits)
             .ObserveOn(RxApp.MainThreadScheduler)
             .Bind(out _outfits)
             .Subscribe();
+
+        _ext
+            .WhenAnyValue(x => x.Session)
+            .ObserveOn(RxApp.MainThreadScheduler)
+            .Subscribe(_ => _cache.Refresh());
 
         foreach (var model in _repository.Load())
         {
@@ -70,6 +76,9 @@ public sealed class WardrobePageViewModel : PageViewModel
 
         figureConverter.Available += OnFigureConverterAvailable;
     }
+
+    private bool FilterOutfits(OutfitViewModel model)
+        => model.IsOrigins == _ext.Session.Is(ClientType.Origins);
 
     public void AddFigure(Gender gender, string figure)
     {
