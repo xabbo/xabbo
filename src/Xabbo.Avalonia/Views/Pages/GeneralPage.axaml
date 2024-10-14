@@ -249,12 +249,13 @@
               </StackPanel>
             </Expander.Header>
             <WrapPanel>
-              <CheckBox Content="Bots" IsChecked="{Binding Config.Chat.MuteBots}" />
-              <CheckBox Content="Pets" IsChecked="{Binding Config.Chat.MutePets}" />
-              <CheckBox Content="Pet commands" Classes="modern" IsChecked="{Binding Config.Chat.MutePetCommands}" />
-              <CheckBox Content="Wired messages" Classes="modern" IsChecked="{Binding Config.Chat.MuteWired}" />
-              <CheckBox Content="Respects" Classes="modern" IsChecked="{Binding Config.Chat.MuteRespects}" />
-              <CheckBox Content="Scratches" Classes="modern" IsChecked="{Binding Config.Chat.MuteScratches}" />
+              <CheckBox x:Name="MuteAll" Content="All" IsChecked="{Binding Config.Chat.MuteAll}" />
+              <CheckBox Content="Bots" IsEnabled="{Binding !#MuteAll.IsChecked}" IsChecked="{Binding Config.Chat.MuteBots}" />
+              <CheckBox Content="Pets" IsEnabled="{Binding !#MuteAll.IsChecked}" IsChecked="{Binding Config.Chat.MutePets}" />
+              <CheckBox Content="Pet commands" Classes="modern" IsEnabled="{Binding !#MuteAll.IsChecked}" IsChecked="{Binding Config.Chat.MutePetCommands}" />
+              <CheckBox Content="Wired messages" Classes="modern" IsEnabled="{Binding !#MuteAll.IsChecked}" IsChecked="{Binding Config.Chat.MuteWired}" />
+              <CheckBox Content="Respects" Classes="modern" IsEnabled="{Binding !#MuteAll.IsChecked}" IsChecked="{Binding Config.Chat.MuteRespects}" />
+              <CheckBox Content="Scratches" Classes="modern" IsEnabled="{Binding !#MuteAll.IsChecked}" IsChecked="{Binding Config.Chat.MuteScratches}" />
             </WrapPanel>
           </Expander>
           <CheckBox Content="Show who respected" Classes="modern" IsChecked="{Binding Respected.ShowWhoRespected}" />
