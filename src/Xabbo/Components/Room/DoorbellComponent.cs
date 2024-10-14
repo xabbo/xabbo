@@ -1,37 +1,33 @@
 ﻿using Xabbo.Extension;
-using Xabbo.Messages.Flash;
 using Xabbo.Core.Game;
 using Xabbo.Services.Abstractions;
 using Xabbo.Configuration;
+using Xabbo.Core.Messages.Incoming;
+using Xabbo.Core.Messages.Outgoing;
 
 namespace Xabbo.Components;
 
-[Intercept(~ClientType.Shockwave)]
-public partial class DoorbellComponent : Component
+[Intercept]
+public partial class DoorbellComponent(
+    IExtension extension,
+    IConfigProvider<AppConfig> config,
+    XabbotComponent xabbot,
+    FriendManager friendManager) : Component(extension)
 {
-    private readonly IConfigProvider<AppConfig> _settings;
-    private AppConfig Settings => _settings.Value;
-    private readonly FriendManager _friendManager;
+    private readonly IConfigProvider<AppConfig> _config = config;
+    private AppConfig Config => _config.Value;
+    private readonly XabbotComponent _xabbot = xabbot;
+    private readonly FriendManager _friendManager = friendManager;
 
-    public DoorbellComponent(
-        IExtension extension,
-        IConfigProvider<AppConfig> settings,
-        FriendManager friendManager)
-        : base(extension)
+    [Intercept]
+    protected void HandleDoorbell(Intercept<DoorbellMsg> e)
     {
-        _settings = settings;
-        _friendManager = friendManager;
-    }
-
-    [InterceptIn(nameof(In.Doorbell))]
-    protected void HandleDoorbellRinging(Intercept e)
-    {
-        string name = e.Packet.Read<string>();
-        if (Settings.Room.AcceptFriendsAtDoor &&
-            _friendManager.IsFriend(name))
+        if (Config.Room.AcceptFriendsAtDoor &&
+            _friendManager.IsFriend(e.Msg.Name))
         {
             e.Block();
-            Ext.Send(Out.LetUserIn, name, true);
+            _xabbot.ShowMessage($"Accepting {e.Msg.Name} at door.");
+            Ext.Send(new AnswerDoorbellMsg(e.Msg.Name, true));
         }
     }
 }
