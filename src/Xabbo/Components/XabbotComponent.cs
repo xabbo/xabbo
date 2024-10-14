@@ -39,6 +39,26 @@ public partial class XabbotComponent : Component
             e.Block();
     }
 
+    [Intercept]
+    void HandleKickUser(Intercept<KickUserMsg> e)
+    {
+        if (e.Msg.Id == UserId || e.Msg.Name == "xabbo")
+        {
+            e.Block();
+            ShowMessage(":(");
+        }
+    }
+
+    [Intercept]
+    void HandleBanUser(Intercept<BanUserMsg> e)
+    {
+        if (e.Msg.Id == UserId || e.Msg.Name == "xabbo")
+        {
+            e.Block();
+            ShowMessage(":(");
+        }
+    }
+
     private void OnEnteredRoom(RoomEventArgs e)
     {
         Avatar avatar = Ext.Session.Client.Type switch
