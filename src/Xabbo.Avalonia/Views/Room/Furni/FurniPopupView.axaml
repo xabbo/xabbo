@@ -40,5 +40,9 @@
       <Run FontWeight="Bold">Identifier:</Run>
       <Run FontFamily="{DynamicResource Mono}" FontSize="14" Text="{Binding Identifier}" />
     </TextBlock>
+    <TextBlock IsVisible="{Binding Variant, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+      <Run FontWeight="Bold">Variant:</Run>
+      <Run FontFamily="{DynamicResource Mono}" FontSize="14" Text="{Binding Variant}" />
+    </TextBlock>
   </StackPanel>
 </UserControl>

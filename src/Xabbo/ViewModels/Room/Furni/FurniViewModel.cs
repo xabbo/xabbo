@@ -16,11 +16,11 @@ public abstract class ItemViewModelBase : ViewModelBase
     public ItemType Type => Item.Type;
     public int Kind => _info?.Kind ?? 0;
     public string Identifier => Item.Identifier ?? _info?.Identifier ?? "?";
+    public string? Variant { get; }
     public string Name { get; }
     public string? Description { get; }
 
     [Reactive] public bool IsHidden { get; set; }
-
     [Reactive] public string? IconUrl { get; set; }
 
     public ItemViewModelBase(IItem item)
