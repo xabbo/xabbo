@@ -21,12 +21,29 @@
       BorderThickness="1"
       BorderBrush="{StaticResource AccentControlElevationBorderBrush}"
     >
-      <img:AdvancedImage
-        Classes="spinner"
-        Width="32" Height="32" Stretch="None"
-        Source="{Binding IconUrl}"
-        Loader="{x:Static services:XabboImageLoader.Instance}"
-      />
+      <Panel>
+        <TextBlock
+          Text="?"
+          FontSize="20"
+          Opacity="0.33"
+          HorizontalAlignment="Center"
+          VerticalAlignment="Center"
+        >
+          <TextBlock.IsVisible>
+            <MultiBinding Converter="{x:Static BoolConverters.And}">
+              <Binding Path="!#IconImage.IsLoading" />
+              <Binding Path="#IconImage.CurrentImage" Converter="{x:Static ObjectConverters.IsNull}" />
+            </MultiBinding>
+          </TextBlock.IsVisible>
+        </TextBlock>
+        <img:AdvancedImage
+          x:Name="IconImage"
+          Classes="spinner"
+          Width="32" Height="32" Stretch="None"
+          Source="{Binding IconUrl}"
+          Loader="{x:Static services:XabboImageLoader.Instance}"
+        />
+      </Panel>
     </Border>
     <TextBlock HorizontalAlignment="Center" Text="{Binding Name}" FontWeight="Bold" />
     <TextBlock HorizontalAlignment="Center" Text="{Binding Description}"
