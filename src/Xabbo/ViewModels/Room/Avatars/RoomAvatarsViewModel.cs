@@ -285,6 +285,7 @@ public class RoomAvatarsViewModel : ViewModelBase
                     canModerate &&
                     users.Any(user =>
                         user.Id != userData?.Id &&
+                        user.Name != userData?.Name &&
                         !user.IsStaff
                     ) == true
             )
