@@ -50,6 +50,7 @@
       <c:MultiValueConverter x:Key="MultiValueConverter"/>
       <c:BoolToOpacityConverter x:Key="BoolToOpacityConverter"/>
       <c:HumanizerConverter x:Key="HumanizerConverter"/>
+      <c:FirstLetterConverter x:Key="FirstLetterConverter"/>
       <c:WhitespaceNewlineConverter x:Key="WhitespaceNewlineConverter" />
       <c:GtConverter x:Key="GtConverter" />
       <c:EqualityConverter x:Key="EqConverter"/>

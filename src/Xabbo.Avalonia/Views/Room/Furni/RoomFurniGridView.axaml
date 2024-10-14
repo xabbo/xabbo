@@ -49,7 +49,7 @@
               </ToolTip.Tip>
               <Panel>
                 <TextBlock
-                  Text="?"
+                  Text="{Binding Name, Converter={StaticResource FirstLetterConverter}}"
                   FontSize="20"
                   Opacity="0.33"
                   HorizontalAlignment="Center"
