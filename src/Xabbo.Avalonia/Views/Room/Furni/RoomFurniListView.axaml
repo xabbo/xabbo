@@ -54,7 +54,7 @@
               Text="North" Command="{Binding RotateCmd}" CommandParameter="{x:Static xc:Directions.North}"
             />
             <ui:MenuFlyoutItem
-              IconSource="{icm:SymbolIconSource Symbol=ArrowTrendingDown}"
+              IconSource="{icm:SymbolIconSource Symbol=ArrowDownRight}"
               Text="East" Command="{Binding RotateCmd}" CommandParameter="{x:Static xc:Directions.East}"
             />
             <ui:MenuFlyoutItem
