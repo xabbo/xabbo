@@ -184,12 +184,7 @@
                 />
                 <CheckBox
                   Content="Friends"
-                  IsEnabled="False"
-                />
-                <CheckBox
-                  Content="Group members"
-                  Classes="modern"
-                  IsEnabled="False"
+                  IsChecked="{Binding Config.General.ClickToIgnoresFriends}"
                 />
               </StackPanel>
             </StackPanel>
