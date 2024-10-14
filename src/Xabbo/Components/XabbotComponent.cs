@@ -88,6 +88,18 @@ public partial class XabbotComponent : Component
                 HeadDirection = 4
             }
         });
-        Ext.Send(new AvatarTalkMsg(message, UserIndex, 30));
+
+        if (Session.Is(ClientType.Origins))
+        {
+            // Required on Origins to show the chat bubble at the correct location consistently.
+            Task.Run(async () => {
+                await Task.Delay(333);
+                Ext.Send(new AvatarTalkMsg(message, UserIndex, 30));
+            });
+        }
+        else
+        {
+            Ext.Send(new AvatarTalkMsg(message, UserIndex, 30));
+        }
     }
 }
