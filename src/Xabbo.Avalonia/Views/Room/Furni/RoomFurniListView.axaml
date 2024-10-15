@@ -14,6 +14,11 @@
   x:Class="Xabbo.Avalonia.Views.RoomFurniListView"
   x:DataType="vm:RoomFurniViewModel"
 >
+  <UserControl.Styles>
+    <Style Selector=".icononly TextBlock">
+      <Setter Property="IsVisible" Value="false" />
+    </Style>
+  </UserControl.Styles>
   <Grid RowDefinitions="Auto,*">
     <controls:InfoOverlay Grid.RowSpan="2" IsVisible="{Binding IsEmpty}" Content="{Binding EmptyStatus}" />
     <TextBox
@@ -50,20 +55,24 @@
             Text="Rotate"
           >
             <ui:MenuFlyoutItem
+              Classes="icononly"
               IconSource="{icm:SymbolIconSource Symbol=ArrowUpRight}"
-              Text="North" Command="{Binding RotateCmd}" CommandParameter="{x:Static xc:Directions.North}"
+              Command="{Binding RotateCmd}" CommandParameter="{x:Static xc:Directions.North}"
             />
             <ui:MenuFlyoutItem
+              Classes="icononly"
               IconSource="{icm:SymbolIconSource Symbol=ArrowDownRight}"
-              Text="East" Command="{Binding RotateCmd}" CommandParameter="{x:Static xc:Directions.East}"
+              Command="{Binding RotateCmd}" CommandParameter="{x:Static xc:Directions.East}"
             />
             <ui:MenuFlyoutItem
+              Classes="icononly"
               IconSource="{icm:SymbolIconSource Symbol=ArrowDownLeft}"
-              Text="South" Command="{Binding RotateCmd}" CommandParameter="{x:Static xc:Directions.South}"
+              Command="{Binding RotateCmd}" CommandParameter="{x:Static xc:Directions.South}"
             />
             <ui:MenuFlyoutItem
+              Classes="icononly"
               IconSource="{icm:SymbolIconSource Symbol=ArrowUpLeft}"
-              Text="West" Command="{Binding RotateCmd}" CommandParameter="{x:Static xc:Directions.West}"
+              Command="{Binding RotateCmd}" CommandParameter="{x:Static xc:Directions.West}"
             />
           </ui:MenuFlyoutSubItem>
           <ui:MenuFlyoutItem
