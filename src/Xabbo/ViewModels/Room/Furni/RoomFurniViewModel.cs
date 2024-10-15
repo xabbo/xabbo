@@ -50,6 +50,12 @@ public partial class RoomFurniViewModel : ViewModelBase
     private readonly ObservableAsPropertyHelper<string> _emptyStatus;
     public string EmptyStatus => _emptyStatus.Value;
 
+    private readonly ObservableAsPropertyHelper<string> _emptyStatusGrid;
+    public string EmptyStatusGrid => _emptyStatusGrid.Value;
+
+    private readonly ObservableAsPropertyHelper<bool> _isQuery;
+    public bool IsQuery => _isQuery.Value;
+
     [Reactive] public IList<FurniViewModel>? ContextSelection { get; set; }
 
     public ReactiveCommand<Unit, Unit> HideFurniCmd { get; }
@@ -167,6 +173,13 @@ public partial class RoomFurniViewModel : ViewModelBase
             .ObserveOn(RxApp.MainThreadScheduler)
             .ToProperty(this, x => x.IsBusy);
 
+        _isQuery =
+            this.WhenAnyValue(
+               x => x.FilterText,
+               filterText => filterText.Contains("where:")
+            )
+            .ToProperty(this, x => x.IsQuery);
+
         _statusText =
             _furniController.WhenAnyValue(
                 x => x.CurrentOperation,
@@ -195,6 +208,22 @@ public partial class RoomFurniViewModel : ViewModelBase
             )
             .ObserveOn(RxApp.MainThreadScheduler)
             .ToProperty(this, x => x.EmptyStatus);
+
+        _emptyStatusGrid =
+            Observable.CombineLatest(
+                this.WhenAnyValue(
+                    x => x.FilterText,
+                    filterText => filterText.Contains("where:")
+                ),
+                _furniCache.CountChanged,
+                _furni.WhenAnyValue(x => x.Count),
+                (isQuery, actualCount, filteredCount)
+                    => actualCount == 0
+                    ? "No furni in room"
+                    : (isQuery ? "Grid view does not support query filters" : "No furni matches")
+            )
+            .ObserveOn(RxApp.MainThreadScheduler)
+            .ToProperty(this, x => x.EmptyStatusGrid);
 
         HideFurniCmd = ReactiveCommand.Create(
             HideFurni,
