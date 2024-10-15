@@ -76,6 +76,10 @@
             />
           </ui:MenuFlyoutSubItem>
           <ui:MenuFlyoutItem
+            IconSource="{icm:SymbolIconSource Symbol=ArrowMove}"
+            Text="Move" Command="{Binding MoveCmd}"
+          />
+          <ui:MenuFlyoutItem
             IconSource="{icm:SymbolIconSource Symbol=ArrowExportUp}"
             Text="Pick up" Command="{Binding PickupCmd}"
           />

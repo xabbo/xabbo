@@ -58,6 +58,7 @@ public partial class RoomFurniViewModel : ViewModelBase
     public ReactiveCommand<Unit, Task> EjectCmd { get; }
     public ReactiveCommand<Unit, Task> ToggleCmd { get; }
     public ReactiveCommand<Directions, Task> RotateCmd { get; }
+    public ReactiveCommand<Unit, Task> MoveCmd { get; }
     public ReactiveCommand<Unit, Unit> CancelCmd { get; }
 
     private readonly ObservableAsPropertyHelper<bool> _isBusy;
@@ -176,6 +177,7 @@ public partial class RoomFurniViewModel : ViewModelBase
                     RoomFurniController.Operation.Pickup => "Picking up",
                     RoomFurniController.Operation.Toggle => "Toggling",
                     RoomFurniController.Operation.Rotate => "Rotating",
+                    RoomFurniController.Operation.Move => "Click tiles to move",
                     _ => "Processing"
                 }} furni..."
                 + $"\n{current}/{total}"
@@ -278,7 +280,24 @@ public partial class RoomFurniViewModel : ViewModelBase
                 (selection, rights, isNotBusy) =>
                     isNotBusy &&
                     rights > RightsLevel.None &&
-                    selection is { Count: > 0 }
+                    selection?.Any(it => it.IsFloorItem) == true
+            )
+            .ObserveOn(RxApp.MainThreadScheduler)
+        );
+
+        MoveCmd = ReactiveCommand.Create<Task>(
+            MoveAsync,
+            Observable.CombineLatest(
+                this.WhenAnyValue(x => x.ContextSelection),
+                _roomManager.WhenAnyValue(x => x.RightsLevel),
+                _furniController.WhenAnyValue(
+                    x => x.CurrentOperation,
+                    op => op is RoomFurniController.Operation.None
+                ),
+                (selection, rights, isNotBusy) =>
+                    isNotBusy &&
+                    rights > RightsLevel.None &&
+                    selection?.Any(it => it.IsFloorItem) == true
             )
             .ObserveOn(RxApp.MainThreadScheduler)
         );
@@ -292,6 +311,10 @@ public partial class RoomFurniViewModel : ViewModelBase
 
     private Task RotateAsync(Directions direction) => ContextSelection is { } selection
         ? _furniController.RotateFurniAsync(selection.Select(x => x.Furni), direction)
+        : Task.CompletedTask;
+
+    private Task MoveAsync() => ContextSelection is { } selection
+        ? _furniController.MoveFurniAsync(selection.Select(x => x.Furni))
         : Task.CompletedTask;
 
     private Task PickupAsync()

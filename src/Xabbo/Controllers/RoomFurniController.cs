@@ -10,7 +10,7 @@ namespace Xabbo.Controllers;
 [Intercept]
 public partial class RoomFurniController : ControllerBase
 {
-    public enum Operation { None, Pickup, Eject, Toggle, Rotate }
+    public enum Operation { None, Pickup, Eject, Toggle, Rotate, Move }
 
     private readonly IConfigProvider<AppConfig> _config;
     private readonly IOperationManager _operationManager;
@@ -61,6 +61,17 @@ public partial class RoomFurniController : ControllerBase
         filter: f => f is IFloorItem floorItem && floorItem.Direction != (int)direction
     );
 
+    public Task MoveFurniAsync(IEnumerable<IFurni> furni) => ProcessFurniAsync(
+        Operation.Move,
+        furni,
+        x => 0,
+        async (f, ct) => {
+            var walk = await ReceiveAsync<WalkMsg>(timeout: -1, block: true, cancellationToken: ct);
+            Send(new MoveFloorItemMsg(f.Id, walk.Point, ((IFloorItem)f).Direction));
+        },
+        filter: f => f is IFloorItem
+    );
+
     private Task PickupOrEjectFurniAsync(IEnumerable<IFurni> furni, bool eject) => ProcessFurniAsync(
         eject ? Operation.Eject : Operation.Pickup,
         furni,
@@ -68,10 +79,25 @@ public partial class RoomFurniController : ControllerBase
         f => Send(new PickupFurniMsg(f))
     );
 
-    private async Task ProcessFurniAsync(Operation operation,
+    private Task ProcessFurniAsync(Operation operation,
         IEnumerable<IFurni> furni,
         Func<TimingConfigBase, int> timingSelector,
         Action<IFurni> action,
+        Func<IFurni, bool>? filter = null)
+    {
+        return ProcessFurniAsync(
+            operation,
+            furni,
+            timingSelector,
+            (f, _) => { action(f); return Task.CompletedTask; },
+            filter
+        );
+    }
+
+    private async Task ProcessFurniAsync(Operation operation,
+        IEnumerable<IFurni> furni,
+        Func<TimingConfigBase, int> timingSelector,
+        Func<IFurni, CancellationToken, Task> action,
         Func<IFurni, bool>? filter = null)
     {
         if (!_workingSemaphore.Wait(0))
@@ -93,10 +119,10 @@ public partial class RoomFurniController : ControllerBase
             await _operationManager.RunAsync($"{operation} furni", async (ct) => {
                 for (int i = 0; i < toProcess.Length; i++)
                 {
+                    CurrentProgress = i+1;
                     if (i > 0)
                         await Task.Delay(ClampInterval(timingSelector(GetTiming())), ct);
-                    action(toProcess[i]);
-                    CurrentProgress = i+1;
+                    await action(toProcess[i], ct);
                 }
             }, _cts.Token);
         }
