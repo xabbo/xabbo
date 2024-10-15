@@ -5,10 +5,13 @@ namespace Xabbo.Utility;
 public static class UrlHelper
 {
     public static string? AvatarImageUrl(string? name = null, string? figure = null,
-        int direction = 2, bool headOnly = false)
+        int direction = 2, int? headDirection = null, bool headOnly = false)
     {
+        headDirection ??= direction;
+
         var query = HttpUtility.ParseQueryString("");
         query.Add("direction", direction.ToString());
+        query.Add("head_direction", headDirection.Value.ToString());
         if (headOnly)
             query.Add("headonly", "1");
         if (string.IsNullOrWhiteSpace(figure))

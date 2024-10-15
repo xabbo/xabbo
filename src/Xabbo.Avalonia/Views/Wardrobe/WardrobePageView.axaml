@@ -3,6 +3,7 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:ic="using:FluentIcons.Avalonia.Fluent"
   xmlns:controls="using:Xabbo.Avalonia.Controls"
   xmlns:v="using:Xabbo.Avalonia.Views"
   xmlns:vm="using:Xabbo.ViewModels"
@@ -23,6 +24,14 @@
         Selection="{Binding Selection}"
         SelectionMode="Multiple"
       >
+        <ListBox.Styles>
+          <Style Selector="ListBoxItem">
+            <Setter Property="Padding" Value="0" />
+          </Style>
+          <Style Selector="ListBoxItem:selected /template/ Rectangle#SelectionIndicator">
+            <Setter Property="IsVisible" Value="false" />
+          </Style>
+        </ListBox.Styles>
         <ListBox.KeyBindings>
           <KeyBinding Gesture="Delete" Command="{Binding RemoveOutfitsCmd}" />
         </ListBox.KeyBindings>
@@ -33,20 +42,60 @@
         </ListBox.ItemsPanel>
         <ListBox.ItemTemplate>
           <DataTemplate x:DataType="vm:OutfitViewModel">
-            <Grid>
+            <Panel Background="Transparent">
+              <Panel.Styles>
+                <Style Selector="Panel > Button">
+                  <Setter Property="IsVisible" Value="False" />
+                </Style>
+                <Style Selector="Panel:pointerover > Button">
+                  <Setter Property="IsVisible" Value="True" />
+                </Style>
+              </Panel.Styles>
               <Interactivity:Interaction.Behaviors>
                 <Interactions:EventTriggerBehavior EventName="DoubleTapped">
-                  <Interactions:InvokeCommandAction
+                  <!--Interactions:InvokeCommandAction
                     Command="{Binding #WardrobePageViewRoot.((vm:WardrobePageViewModel)DataContext).WearFigureCmd}"
                     CommandParameter="{Binding}"
-                  />
+                  /-->
                 </Interactions:EventTriggerBehavior>
               </Interactivity:Interaction.Behaviors>
               <controls:AvatarImage
                 Margin="0,0,0,24"
+                Direction="{Binding Direction}"
                 FigureString="{Binding ModernFigure}"
               />
-            </Grid>
+              <Button
+                Margin="4" Padding="0"
+                HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                Opacity="0.5"
+                Theme="{StaticResource TransparentButton}"
+                Command="{Binding RotateCmd}"
+                CommandParameter="{StaticResource PositiveOne}"
+              >
+                <ic:SymbolIcon HorizontalAlignment="Center" VerticalAlignment="Center" Symbol="ArrowClockwise" />
+              </Button>
+              <Button
+                Margin="4" Padding="0"
+                HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                Opacity="0.5"
+                Theme="{StaticResource TransparentButton}"
+                Command="{Binding #WardrobePageViewRoot.((vm:WardrobePageViewModel)DataContext).WearFigureCmd}"
+                CommandParameter="{Binding}"
+                ToolTip.Tip="Wear figure"
+              >
+                <ic:SymbolIcon HorizontalAlignment="Center" VerticalAlignment="Center" Symbol="PersonArrowLeft" />
+              </Button>
+              <Button
+                Margin="4" Padding="0"
+                HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                Opacity="0.5"
+                Theme="{StaticResource TransparentButton}"
+                Command="{Binding RotateCmd}"
+                CommandParameter="{StaticResource NegativeOne}"
+              >
+                <ic:SymbolIcon HorizontalAlignment="Center" VerticalAlignment="Center" Symbol="ArrowCounterclockwise" />
+              </Button>
+            </Panel>
           </DataTemplate>
         </ListBox.ItemTemplate>
       </ListBox>

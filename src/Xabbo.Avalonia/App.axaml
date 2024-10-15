@@ -25,6 +25,10 @@
         <ResourceInclude Source="Controls/AvatarImage.axaml" />
       </ResourceDictionary.MergedDictionaries>
 
+      <!-- Common resources -->
+      <sys:Int32 x:Key="PositiveOne">1</sys:Int32>
+      <sys:Int32 x:Key="NegativeOne">-1</sys:Int32>
+
       <sys:Double x:Key="ControlContentThemeFontSize">16</sys:Double>
       <sys:Double x:Key="TabItemHeaderFontSize">30</sys:Double>
 

@@ -1,3 +1,5 @@
+using System.Reactive;
+using ReactiveUI;
 using Xabbo.Models;
 
 namespace Xabbo.ViewModels;
@@ -10,7 +12,10 @@ public sealed class OutfitViewModel : ViewModelBase
     public string Figure => Model.FigureString;
     public bool IsOrigins => Model.IsOrigins;
 
+    [Reactive] public int Direction { get; set; } = 2;
     [Reactive] public string? ModernFigure { get; set; }
+
+    public ReactiveCommand<int, Unit> RotateCmd { get; }
 
     public OutfitViewModel(FigureModel model)
     {
@@ -18,5 +23,16 @@ public sealed class OutfitViewModel : ViewModelBase
 
         if (!Model.IsOrigins)
             ModernFigure = Model.FigureString;
+
+        RotateCmd = ReactiveCommand.Create<int>(Rotate);
+    }
+
+    private void Rotate(int amount)
+    {
+        using (DelayChangeNotifications())
+        {
+            Direction = (Direction + amount) % 8;
+            if (Direction < 0) Direction += 8;
+        }
     }
 }
