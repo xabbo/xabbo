@@ -135,15 +135,13 @@ public partial class AntiTradeComponent : Component
     [Intercept]
     void HandleTradeUpdate(Intercept<TradeOffersMsg> e)
     {
-        Console.WriteLine("got trade offers");
         if (Enabled)
         {
-            Console.WriteLine("blocking trade offers");
             e.Block();
             if (Session.Is(ClientType.Origins))
             {
-                Console.WriteLine("closing trade");
-                Ext.Send(new CloseTradeMsg());
+                if (Config.General.AntiTradeCloseTrade)
+                    Ext.Send(new CloseTradeMsg());
             }
         }
     }
