@@ -46,55 +46,71 @@
             </InlineUIContainer>
           </Span>
         </TextBlock>
-        <TextBlock TextAlignment="Center">
-          Powered by the xabbo framework
+
+        <!-- Library versions -->
+        <TextBlock Margin="0,10,0,0" TextAlignment="Center">
+          Powered by the xabbo framework:
         </TextBlock>
-        <Grid ColumnDefinitions="*,5,*" RowDefinitions="Auto,Auto,Auto,Auto">
+        <UniformGrid HorizontalAlignment="Center">
+          <UniformGrid.Styles>
+            <Style Selector="StackPanel">
+              <Setter Property="Margin" Value="10" />
+              <Setter Property="TextElement.FontSize" Value="18" />
+            </Style>
+            <Style Selector="Button, TextBlock">
+              <Setter Property="HorizontalAlignment" Value="Center" />
+            </Style>
+            <Style Selector="TextBlock.version">
+              <Setter Property="FontSize" Value="16" />
+            </Style>
+          </UniformGrid.Styles>
+
           <!-- Xabbo.Common -->
-          <Button
-            Grid.Row="0" Grid.Column="0"
-            Classes="link"
-            HorizontalAlignment="Right"
-            Command="{Binding #InfoPageRoot.OpenUrlCmd}"
-            CommandParameter="https://github.com/xabbo/common"
-          >
-            <TextBlock ClipToBounds="False" Text="Xabbo.Common" />
-          </Button>
-          <TextBlock Grid.Row="0" Grid.Column="2" HorizontalAlignment="Left" Text="{Binding XabboCommonVersion}" />
+          <StackPanel>
+            <Button
+              Classes="link"
+              Content="Common"
+              Command="{Binding #InfoPageRoot.OpenUrlCmd}"
+              CommandParameter="https://github.com/xabbo/common"
+            />
+            <TextBlock Classes="version" Text="{Binding XabboCommonVersion}" />
+          </StackPanel>
+
           <!-- Xabbo.Messages -->
-          <Button
-            Grid.Row="1" Grid.Column="0"
-            Classes="link"
-            HorizontalAlignment="Right"
-            Command="{Binding #InfoPageRoot.OpenUrlCmd}"
-            CommandParameter="https://github.com/xabbo/messages"
-          >
-            <TextBlock ClipToBounds="False" Text="Xabbo.Messages" />
-          </Button>
-          <TextBlock Grid.Row="1" Grid.Column="2" HorizontalAlignment="Left" Text="{Binding XabboMessagesVersion}" />
+          <StackPanel Margin="10">
+            <Button
+              Classes="link"
+              Content="Messages"
+              Command="{Binding #InfoPageRoot.OpenUrlCmd}"
+              CommandParameter="https://github.com/xabbo/messages"
+            />
+            <TextBlock Classes="version" Text="{Binding XabboMessagesVersion}" />
+          </StackPanel>
+
           <!-- Xabbo.GEarth -->
-          <Button
-            Grid.Row="2" Grid.Column="0"
-            Classes="link"
-            HorizontalAlignment="Right"
-            Command="{Binding #InfoPageRoot.OpenUrlCmd}"
-            CommandParameter="https://github.com/xabbo/gearth"
-          >
-            <TextBlock ClipToBounds="False" Text="Xabbo.GEarth" />
-          </Button>
-          <TextBlock Grid.Row="2" Grid.Column="2" HorizontalAlignment="Left" Text="{Binding XabboGEarthVersion}" />
+          <StackPanel Margin="10">
+            <Button
+              Classes="link"
+              Content="GEarth"
+              Command="{Binding #InfoPageRoot.OpenUrlCmd}"
+              CommandParameter="https://github.com/xabbo/gearth"
+            />
+            <TextBlock Classes="version" Text="{Binding XabboGEarthVersion}" />
+          </StackPanel>
+
           <!-- Xabbo.Core -->
-          <Button
-            Grid.Row="3" Grid.Column="0"
-            Classes="link"
-            HorizontalAlignment="Right"
-            Command="{Binding #InfoPageRoot.OpenUrlCmd}"
-            CommandParameter="https://github.com/xabbo/core"
-          >
-            <TextBlock ClipToBounds="False" Text="Xabbo.Core" />
-          </Button>
-          <TextBlock Grid.Row="3" Grid.Column="2" HorizontalAlignment="Left" Text="{Binding XabboCoreVersion}" />
-        </Grid>
+          <StackPanel Margin="10">
+            <Button
+              Classes="link"
+              Content="Core"
+              Command="{Binding #InfoPageRoot.OpenUrlCmd}"
+              CommandParameter="https://github.com/xabbo/core"
+            />
+            <TextBlock Classes="version" Text="{Binding XabboCoreVersion}" />
+          </StackPanel>
+
+        </UniformGrid>
+
         <TextBlock TextAlignment="Center">
           <Run>Visit</Run>
           <InlineUIContainer>
