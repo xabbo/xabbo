@@ -108,6 +108,12 @@ public partial class FurniActionsComponent : Component
             return;
         }
 
+        Point? location = furni switch {
+            IWallItem it => it.Location.Wall,
+            IFloorItem it => it.Location,
+            _ => null
+        };
+
         if (PickToHide)
             _roomManager.HideFurni(furni);
 
@@ -159,12 +165,15 @@ public partial class FurniActionsComponent : Component
                     {
                         var stats = await _api.FetchMarketplaceItemStats(Ext.Session.Hotel, furni.Type, furniInfo.Identifier);
                         int totalSold = stats.History.Sum(x => x.TotalSoldItems);
-                        _xabbot.ShowMessage($"{furniInfo.Name} [{furniInfo.Identifier}]: average {stats.AveragePrice}c / "
-                            + $"{totalSold} sold in the last {stats.HistoryLimitInDays} days");
+                        _xabbot.ShowMessage(
+                            $"{furniInfo.Name} [{furniInfo.Identifier}]: average {stats.AveragePrice}c / "
+                            + $"{totalSold} sold in the last {stats.HistoryLimitInDays} days",
+                            location
+                        );
                     }
                     catch (Exception ex)
                     {
-                        _xabbot.ShowMessage($"Failed to fetch marketplace stats: {ex.Message}");
+                        _xabbot.ShowMessage($"Failed to fetch marketplace stats: {ex.Message}", location);
                     }
                 });
             }

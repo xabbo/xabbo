@@ -97,13 +97,15 @@ public partial class XabbotComponent : Component
         ShowMessage(message, location);
     }
 
-    public void ShowMessage(string message, Point location)
+    public void ShowMessage(string message, Point? location = null)
     {
-        _currentLocation = location;
+        if (location.HasValue)
+            _currentLocation = location.Value;
+
         Ext.Send(new AvatarStatusMsg {
             new AvatarStatus {
                 Index = UserIndex,
-                Location = new Tile(location.X, location.Y, -100),
+                Location = new Tile(_currentLocation.X, _currentLocation.Y, -100),
                 Direction = 4,
                 HeadDirection = 4
             }
