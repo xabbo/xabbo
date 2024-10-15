@@ -3,9 +3,11 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:vm="using:Xabbo.ViewModels"
   mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
   x:Class="Xabbo.Avalonia.Views.InfoPageView"
   x:Name="InfoPageRoot"
+  x:DataType="vm:InfoPageViewModel"
 >
   <Grid Margin="20">
     <Grid.Styles>
@@ -21,6 +23,9 @@
         <Setter Property="TextAlignment" Value="Center" />
         <Setter Property="TextWrapping" Value="Wrap" />
       </Style>
+      <Style Selector="StackPanel > :is(Control)">
+        <Setter Property="ClipToBounds" Value="false" />
+      </Style>
     </Grid.Styles>
     <StackPanel Spacing="10">
       <Image
@@ -29,6 +34,7 @@
         Source="avares://Xabbo.Avalonia/Assets/xabbo-skull-128.png"
       />
       <TextBlock Margin="0,0,0,-8" FontSize="28" Text="xabbo" />
+      <TextBlock Margin="0,0,0,-8" FontSize="14" Text="{Binding Version}" />
       <TextBlock FontSize="20">
         <Span>
           developed by
@@ -40,26 +46,54 @@
         </Span>
       </TextBlock>
       <TextBlock TextAlignment="Center">
-        Powered by the xabbo
-        <InlineUIContainer>
-          <Button Margin="0,0,-6,0" Classes="link" Command="{Binding #InfoPageRoot.OpenUrlCmd}" CommandParameter="https://github.com/xabbo/common">
-            <TextBlock ClipToBounds="False" Text="common" />
-          </Button>
-        </InlineUIContainer>
-        <Run>, </Run>
-        <InlineUIContainer>
-          <Button Margin="0,0,-6,0" Classes="link" Command="{Binding #InfoPageRoot.OpenUrlCmd}" CommandParameter="https://github.com/xabbo/gearth">
-            <TextBlock ClipToBounds="False" Text="gearth" />
-          </Button>
-        </InlineUIContainer>
-        <Run>, and </Run>
-        <InlineUIContainer>
-          <Button Classes="link" Command="{Binding #InfoPageRoot.OpenUrlCmd}" CommandParameter="https://github.com/xabbo/core">
-            <TextBlock ClipToBounds="False" Text="core" />
-          </Button>
-        </InlineUIContainer>
-        libraries
+        Powered by the xabbo framework
       </TextBlock>
+      <Grid ColumnDefinitions="*,5,*" RowDefinitions="Auto,Auto,Auto,Auto">
+        <!-- Xabbo.Common -->
+        <Button
+          Grid.Row="0" Grid.Column="0"
+          Classes="link"
+          HorizontalAlignment="Right"
+          Command="{Binding #InfoPageRoot.OpenUrlCmd}"
+          CommandParameter="https://github.com/xabbo/common"
+        >
+          <TextBlock ClipToBounds="False" Text="common" />
+        </Button>
+        <TextBlock Grid.Row="0" Grid.Column="2" HorizontalAlignment="Left" Text="{Binding XabboCommonVersion}" />
+        <!-- Xabbo.Messages -->
+        <Button
+          Grid.Row="1" Grid.Column="0"
+          Classes="link"
+          HorizontalAlignment="Right"
+          Command="{Binding #InfoPageRoot.OpenUrlCmd}"
+          CommandParameter="https://github.com/xabbo/messages"
+        >
+          <TextBlock ClipToBounds="False" Text="messages" />
+        </Button>
+        <TextBlock Grid.Row="1" Grid.Column="2" HorizontalAlignment="Left" Text="{Binding XabboMessagesVersion}" />
+        <!-- Xabbo.GEarth -->
+        <Button
+          Grid.Row="2" Grid.Column="0"
+          Classes="link"
+          HorizontalAlignment="Right"
+          Command="{Binding #InfoPageRoot.OpenUrlCmd}"
+          CommandParameter="https://github.com/xabbo/gearth"
+        >
+          <TextBlock ClipToBounds="False" Text="gearth" />
+        </Button>
+        <TextBlock Grid.Row="2" Grid.Column="2" HorizontalAlignment="Left" Text="{Binding XabboGEarthVersion}" />
+        <!-- Xabbo.Core -->
+        <Button
+          Grid.Row="3" Grid.Column="0"
+          Classes="link"
+          HorizontalAlignment="Right"
+          Command="{Binding #InfoPageRoot.OpenUrlCmd}"
+          CommandParameter="https://github.com/xabbo/core"
+        >
+          <TextBlock ClipToBounds="False" Text="core" />
+        </Button>
+        <TextBlock Grid.Row="3" Grid.Column="2" HorizontalAlignment="Left" Text="{Binding XabboCoreVersion}" />
+      </Grid>
       <TextBlock TextAlignment="Center">
         <Run>Visit</Run>
         <InlineUIContainer>

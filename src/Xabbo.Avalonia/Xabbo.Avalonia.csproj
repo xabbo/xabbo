@@ -12,7 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup Label="GitVersion">
-    <PackageReference Include="GitVersion.MsBuild" Version="5.10.3" PrivateAssets="all" />
+    <PackageReference Include="GitVersion.MsBuild" Version="6.0.2" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup Label="Avalonia">
