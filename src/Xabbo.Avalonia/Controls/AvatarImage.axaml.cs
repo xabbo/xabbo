@@ -9,6 +9,9 @@ public class AvatarImage : TemplatedControl
     public static readonly StyledProperty<string?> FigureStringProperty =
         AvaloniaProperty.Register<AvatarImage, string?>(nameof(FigureString));
 
+    public static readonly StyledProperty<string?> UserNameProperty =
+        AvaloniaProperty.Register<AvatarImage, string?>(nameof(UserName));
+
     public static readonly StyledProperty<int> DirectionProperty =
         AvaloniaProperty.Register<AvatarImage, int>(nameof(Direction), defaultValue: 2);
 
@@ -27,6 +30,12 @@ public class AvatarImage : TemplatedControl
     {
         get => GetValue(FigureStringProperty);
         set => SetValue(FigureStringProperty, value);
+    }
+
+    public string? UserName
+    {
+        get => GetValue(UserNameProperty);
+        set => SetValue(UserNameProperty, value);
     }
 
     public int Direction
@@ -57,13 +66,15 @@ public class AvatarImage : TemplatedControl
 
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
-        base.OnPropertyChanged(change);
-
-        if (change.Property.Name is nameof(FigureString) or nameof(Direction) or nameof(HeadOnly))
+        if (change.Property == FigureStringProperty ||
+            change.Property == DirectionProperty ||
+            change.Property == HeadOnlyProperty ||
+            change.Property == UserNameProperty)
         {
             Placeholder = $"avares://Xabbo.Avalonia/Assets/Images/Avatar/{(HeadOnly ? "head" : "body")}-{Direction}.png";
 
-            if (string.IsNullOrWhiteSpace(FigureString))
+            if (string.IsNullOrWhiteSpace(FigureString) &&
+                string.IsNullOrWhiteSpace(UserName))
             {
                 AvatarImageUrl = null;
             }
@@ -72,9 +83,12 @@ public class AvatarImage : TemplatedControl
                 AvatarImageUrl = UrlHelper.AvatarImageUrl(
                     figure: FigureString,
                     direction: Direction,
-                    headOnly: HeadOnly
+                    headOnly: HeadOnly,
+                    name: UserName
                 );
             }
         }
+
+        base.OnPropertyChanged(change);
     }
 }
