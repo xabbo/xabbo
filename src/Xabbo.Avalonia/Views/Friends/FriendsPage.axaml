@@ -72,7 +72,7 @@
                 />
               </StackPanel>
               <Button
-                Classes="follow"
+                Classes="follow modern"
                 Grid.Column="2" Width="24" Height="24"
                 Theme="{StaticResource TransparentButton}"
                 Command="{Binding #friendsPage.((vm:FriendsPageViewModel)DataContext).FollowFriendCmd}"
