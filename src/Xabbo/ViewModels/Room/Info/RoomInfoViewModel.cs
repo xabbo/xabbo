@@ -2,6 +2,7 @@
 using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.Events;
+using ReactiveUI;
 
 namespace Xabbo.ViewModels;
 
@@ -15,6 +16,9 @@ public class RoomInfoViewModel : ViewModelBase
     private long _currentThumbnailId = -1;
     [Reactive] public string? ThumbnailUrl { get; set; }
 
+    private readonly ObservableAsPropertyHelper<bool> _isLoading;
+    public bool IsLoading => _isLoading.Value;
+
     public RoomInfoViewModel(IExtension extension, RoomManager roomManager)
     {
         _roomManager = roomManager;
@@ -24,6 +28,14 @@ public class RoomInfoViewModel : ViewModelBase
         roomManager.Entered += OnEnteredRoom;
         roomManager.RoomDataUpdated += OnRoomDataUpdated;
         roomManager.Left += OnLeftRoom;
+
+        _isLoading =
+            roomManager.WhenAnyValue(
+                x => x.IsInRoom,
+                x => x.Room!.Data,
+                (isInRoom, roomData) => isInRoom && roomData is null
+            )
+            .ToProperty(this, x => x.IsLoading);
     }
 
     private void UpdateThumbnail(long roomId)

@@ -23,13 +23,8 @@
   <controls:Loading
     FadeInDuration="0:0:0"
     FadeOutDuration="0:0:0.5"
+    IsLoading="{Binding IsLoading}"
   >
-    <controls:Loading.IsLoading>
-      <MultiBinding Converter="{x:Static BoolConverters.And}">
-        <Binding Path="Data" Converter="{x:Static ObjectConverters.IsNull}" />
-        <Binding Path="IsInRoom" />
-      </MultiBinding>
-    </controls:Loading.IsLoading>
     <ScrollViewer x:Name="layoutRoot" IsVisible="{Binding IsInRoom}">
       <StackPanel IsVisible="{Binding Data, Converter={x:Static ObjectConverters.IsNotNull}}">
         <Border
