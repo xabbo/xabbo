@@ -444,30 +444,30 @@ public class RoomAvatarsViewModel : ViewModelBase
 
     private void OnAvatarsUpdated(AvatarsEventArgs e)
     {
-        bool shouldRefresh = false;
+        _uiContext.Invoke(() => {
+            bool shouldRefresh = false;
 
-        foreach (var avatar in e.Avatars)
-        {
-            _avatarCache.Lookup(avatar.Index).IfHasValue(vm =>
+            foreach (var avatar in e.Avatars)
             {
-                var update = avatar.CurrentUpdate;
-                if (update is null) return;
-                vm.IsTrading = update.IsTrading;
-                if (vm.RightsLevel != update.RightsLevel)
+                _avatarCache.Lookup(avatar.Index).IfHasValue(vm =>
                 {
-                    vm.RightsLevel = update.RightsLevel;
-                    shouldRefresh = true;
-                }
-            });
-        }
+                    var update = avatar.CurrentUpdate;
+                    if (update is null) return;
+                    vm.IsTrading = update.IsTrading;
+                    if (vm.RightsLevel != update.RightsLevel)
+                    {
+                        vm.RightsLevel = update.RightsLevel;
+                        shouldRefresh = true;
+                    }
+                });
+            }
 
-        if (shouldRefresh)
-        {
-            _uiContext.InvokeAsync(() => {
+            if (shouldRefresh)
+            {
                 _avatarCache.Refresh();
                 RefreshList?.Invoke();
-            });
-        }
+            }
+        });
     }
 
     private void OnLeftRoom()
@@ -509,7 +509,7 @@ public class RoomAvatarsViewModel : ViewModelBase
 
     private void OnAvatarRemoved(AvatarEventArgs e)
     {
-        _uiContext.Invoke(() => _avatarCache.RemoveKey(e.Avatar.Index));
+        _uiContext.Invoke(() => { _avatarCache.RemoveKey(e.Avatar.Index); });
     }
 
     private void OnAvatarIdle(AvatarIdleEventArgs e)
