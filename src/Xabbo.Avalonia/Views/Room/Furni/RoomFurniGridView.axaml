@@ -33,6 +33,7 @@
     </controls:InfoOverlay>
     <TextBox
       Margin="10,0,10,10"
+      Classes="clearButton"
       Watermark="Filter"
       Text="{Binding FilterText}"
     />

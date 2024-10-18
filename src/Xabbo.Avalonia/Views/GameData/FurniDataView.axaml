@@ -11,6 +11,7 @@
   <Grid RowDefinitions="Auto,*">
     <TextBox
       Margin="10,4,10,10"
+      Classes="clearButton"
       Text="{Binding FilterText}"
       Watermark="Filter"
     />

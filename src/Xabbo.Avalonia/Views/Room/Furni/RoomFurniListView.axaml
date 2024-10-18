@@ -23,6 +23,7 @@
     <controls:InfoOverlay Grid.RowSpan="2" IsVisible="{Binding IsEmpty}" Content="{Binding EmptyStatus}" />
     <TextBox
       Margin="10,0,10,10"
+      Classes="clearButton"
       Watermark="Filter"
       Text="{Binding FilterText}"
     />
