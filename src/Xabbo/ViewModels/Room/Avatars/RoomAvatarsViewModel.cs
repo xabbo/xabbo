@@ -54,6 +54,7 @@ public class RoomAvatarsViewModel : ViewModelBase
 
     public ReactiveCommand<Unit, Unit> FindAvatarCmd { get; }
     public ReactiveCommand<Unit, Unit> CopyAvatarToWardrobeCmd { get; }
+    public ReactiveCommand<Unit, Unit> TradeUserCmd { get; }
     public ReactiveCommand<string, Unit> CopyAvatarFieldCmd { get; }
     public ReactiveCommand<string, Task> OpenUserProfileCmd { get; }
 
@@ -184,6 +185,7 @@ public class RoomAvatarsViewModel : ViewModelBase
 
         FindAvatarCmd = ReactiveCommand.Create(FindAvatar, hasSingleContextAvatar);
         CopyAvatarToWardrobeCmd = ReactiveCommand.Create(CopyAvatarsToWardrobe, hasAnyContextUser);
+        TradeUserCmd = ReactiveCommand.Create(TradeUser, hasSingleContextUser);
         CopyAvatarFieldCmd = ReactiveCommand.Create<string>(CopyAvatarField, hasSingleContextUser);
         OpenUserProfileCmd = ReactiveCommand.Create<string, Task>(OpenUserProfile, hasSingleContextUser);
 
@@ -365,6 +367,14 @@ public class RoomAvatarsViewModel : ViewModelBase
             return;
 
         _ext.Send(new AvatarWhisperMsg("(click here to find)", avatar.Index));
+    }
+
+    private void TradeUser()
+    {
+        if (ContextSelection is not [var avatar])
+            return;
+        
+        _ext.Send(new TradeUserMsg(avatar.Index));
     }
 
     private void CopyAvatarField(string field)
