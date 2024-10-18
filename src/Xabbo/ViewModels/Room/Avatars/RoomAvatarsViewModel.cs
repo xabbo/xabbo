@@ -54,7 +54,7 @@ public class RoomAvatarsViewModel : ViewModelBase
 
     public ReactiveCommand<Unit, Unit> FindAvatarCmd { get; }
     public ReactiveCommand<Unit, Unit> CopyAvatarToWardrobeCmd { get; }
-    public ReactiveCommand<int, Unit> TradeUserCmd { get; }
+    public ReactiveCommand<Unit, Unit> TradeUserCmd { get; }
     public ReactiveCommand<string, Unit> CopyAvatarFieldCmd { get; }
     public ReactiveCommand<string, Task> OpenUserProfileCmd { get; }
 
@@ -185,7 +185,7 @@ public class RoomAvatarsViewModel : ViewModelBase
 
         FindAvatarCmd = ReactiveCommand.Create(FindAvatar, hasSingleContextAvatar);
         CopyAvatarToWardrobeCmd = ReactiveCommand.Create(CopyAvatarsToWardrobe, hasAnyContextUser);
-        TradeUserCmd = ReactiveCommand.Create<int>(TradeUser, hasAnyContextUser);
+        TradeUserCmd = ReactiveCommand.Create(TradeUser, hasAnyContextUser);
         CopyAvatarFieldCmd = ReactiveCommand.Create<string>(CopyAvatarField, hasSingleContextUser);
         OpenUserProfileCmd = ReactiveCommand.Create<string, Task>(OpenUserProfile, hasSingleContextUser);
 
@@ -369,16 +369,13 @@ public class RoomAvatarsViewModel : ViewModelBase
         _ext.Send(new AvatarWhisperMsg("(click here to find)", avatar.Index));
     }
 
-    private void TradeUser(int index)
+    private void TradeUser()
     {
         if (ContextSelection is not [var avatar])
             return;
 
-        //_ext.Send(new AvatarWhisperMsg($"Index to trade: {avatar.Index} | Username: {avatar.Name}", avatar.Index));
+        _ext.Send(new AvatarWhisperMsg($"Index to trade: {avatar.Index} | Username: {avatar.Name}", avatar.Index));
         Console.WriteLine($"AVATAR - Index to trade: {avatar.Index} | Username: {avatar.Name}");
-
-        //_ext.Send(new AvatarWhisperMsg($"Index to trade: {index} | Username: {index}", index));
-        Console.WriteLine($"Index to trade: {index} | Username: {index}");
 
         // {out:OpenTrading}{i:60}
         //_ext.Send(new trade("(click here to find)", avatar.Index));
