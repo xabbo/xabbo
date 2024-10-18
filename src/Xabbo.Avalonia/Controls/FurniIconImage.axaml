@@ -1,0 +1,52 @@
+<ResourceDictionary
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:controls="using:Xabbo.Avalonia.Controls"
+  xmlns:services="using:Xabbo.Avalonia.Services"
+  xmlns:img="using:AsyncImageLoader"
+>
+
+  <Design.PreviewWith>
+    <StackPanel Width="400" Spacing="10">
+        <StackPanel Background="{DynamicResource SystemRegionBrush}">
+          <controls:FurniIcon Revision="68441" Identifier="duck" />
+        </StackPanel>
+    </StackPanel>
+  </Design.PreviewWith>
+
+  <ControlTheme x:Key="{x:Type controls:FurniIconImage}" TargetType="controls:FurniIconImage">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <img:AdvancedImage
+          x:Name="PART_IconImage"
+          Classes="spinner"
+          Width="32" Height="32" Stretch="None"
+          HorizontalAlignment="Center" VerticalAlignment="Center"
+          Source="{TemplateBinding IconImageUrl}"
+          Loader="{x:Static services:XabboImageLoader.Instance}"
+        >
+          <img:AdvancedImage.Styles>
+            <Style Selector="img|AdvancedImage">
+              <!--
+                TODO no fade in when loaded from cache
+                (may require modifications to AsyncImageLoader library)
+              -->
+              <Style Selector="^[IsLoading=false]">
+                <Style.Animations>
+                    <Animation Duration="0:0:1" FillMode="Forward">
+                        <KeyFrame Cue="0%">
+                            <Setter Property="Opacity" Value="0.0"/>
+                        </KeyFrame>
+                        <KeyFrame Cue="100%">
+                            <Setter Property="Opacity" Value="1.0"/>
+                        </KeyFrame>
+                    </Animation>
+                </Style.Animations>
+              </Style>
+            </Style>
+          </img:AdvancedImage.Styles>
+        </img:AdvancedImage>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

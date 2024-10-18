@@ -23,6 +23,7 @@
         <ResourceInclude Source="Controls/InfoOverlay.axaml" />
         <ResourceInclude Source="Controls/TimingSlider.axaml" />
         <ResourceInclude Source="Controls/AvatarImage.axaml" />
+        <ResourceInclude Source="Controls/FurniIconImage.axaml" />
       </ResourceDictionary.MergedDictionaries>
 
       <!-- Common resources -->
