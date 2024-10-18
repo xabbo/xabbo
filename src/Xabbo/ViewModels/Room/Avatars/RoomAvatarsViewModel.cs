@@ -185,7 +185,7 @@ public class RoomAvatarsViewModel : ViewModelBase
 
         FindAvatarCmd = ReactiveCommand.Create(FindAvatar, hasSingleContextAvatar);
         CopyAvatarToWardrobeCmd = ReactiveCommand.Create(CopyAvatarsToWardrobe, hasAnyContextUser);
-        TradeUserCmd = ReactiveCommand.Create(TradeUser, hasAnyContextUser);
+        TradeUserCmd = ReactiveCommand.Create(TradeUser, hasSingleContextUser);
         CopyAvatarFieldCmd = ReactiveCommand.Create<string>(CopyAvatarField, hasSingleContextUser);
         OpenUserProfileCmd = ReactiveCommand.Create<string, Task>(OpenUserProfile, hasSingleContextUser);
 

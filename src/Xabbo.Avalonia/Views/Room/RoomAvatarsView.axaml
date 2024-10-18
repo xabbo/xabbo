@@ -78,7 +78,7 @@
               Text="Add to wardrobe"
               Command="{Binding CopyAvatarToWardrobeCmd}"
             />
-              <ui:MenuFlyoutItem
+            <ui:MenuFlyoutItem
               IconSource="{icm:SymbolIconSource Symbol=Handshake}"
               Text="Trade user"
               Command="{Binding TradeUserCmd}"
