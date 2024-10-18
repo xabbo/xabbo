@@ -36,7 +36,7 @@ public class ChatPageViewModel : PageViewModel
     private DateTime _lastDate = DateTime.MinValue;
     private long _lastRoom = -1;
 
-    public Configuration.ChatLogSettings Config => Settings.Chat.Log;
+    public Configuration.ChatLogConfig Config => Settings.Chat.Log;
 
     private long _currentMessageId;
     private readonly SourceCache<ChatLogEntryViewModel, long> _cache = new(x => x.EntryId);

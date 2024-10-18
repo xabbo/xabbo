@@ -2,7 +2,7 @@ using ReactiveUI;
 
 namespace Xabbo.Configuration;
 
-public sealed class ChatLogSettings : ReactiveObject
+public sealed class ChatLogConfig : ReactiveObject
 {
     [Reactive] public bool Normal { get; set; } = true;
     [Reactive] public bool Whispers { get; set; } = true;
