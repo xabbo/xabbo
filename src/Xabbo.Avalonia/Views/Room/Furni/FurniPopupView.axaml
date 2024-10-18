@@ -46,7 +46,7 @@
     <Separator Margin="0,5" />
     <TextBlock IsVisible="{DynamicResource IsModern}">
       <Run FontWeight="Bold">Kind:</Run>
-      <Run FontFamily="{DynamicResource Mono}" Text="{Binding Kind}" />
+      <Run FontFamily="{DynamicResource Mono}" FontSize="14" Text="{Binding Kind}" />
     </TextBlock>
     <TextBlock>
       <Run FontWeight="Bold">Identifier:</Run>
