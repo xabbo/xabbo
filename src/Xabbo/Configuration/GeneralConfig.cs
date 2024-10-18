@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using ReactiveUI;
 
 namespace Xabbo.Configuration;
@@ -12,4 +13,6 @@ public sealed class GeneralConfig : ReactiveObject
 
     [Reactive] public bool ClickToIgnoresFriends { get; set; } = true;
     [Reactive] public int BounceUnbanDelay { get; set; } = 100;
+
+    [JsonIgnore, Reactive] public bool PrivacyMode { get; set; }
 }

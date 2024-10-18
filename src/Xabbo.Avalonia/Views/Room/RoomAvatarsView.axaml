@@ -167,7 +167,11 @@
         </DataGrid.ContextFlyout>
         <DataGrid.Columns>
           <DataGridTextColumn SortMemberPath="Index" Header="index" Binding="{Binding Index, DataType={x:Type vm:AvatarViewModel}}" />
-          <DataGridTextColumn SortMemberPath="Id" Header="id" Binding="{Binding Id, DataType={x:Type vm:AvatarViewModel}}" IsVisible="{DynamicResource IsModern}" />
+          <DataGridTemplateColumn SortMemberPath="Id" Header="id" IsVisible="{DynamicResource IsModern}">
+            <DataTemplate DataType="vm:AvatarViewModel">
+              <TextBlock Name="CellTextBlock" Classes="privacy" Text="{Binding Id}" />
+            </DataTemplate>
+          </DataGridTemplateColumn>
           <DataGridTemplateColumn
             x:DataType="vm:AvatarViewModel"
             Header="name" SortMemberPath="Name"
@@ -190,6 +194,7 @@
                     </Style>
                   </DockPanel.Styles>
                   <TextBlock
+                    Classes="privacy"
                     VerticalAlignment="Center"
                     TextTrimming="CharacterEllipsis"
                     Text="{Binding Name}"

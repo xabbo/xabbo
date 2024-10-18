@@ -101,6 +101,19 @@
       <Setter Property="IsVisible" Value="False" />
     </Style>
 
+    <!-- Privacy mode -->
+    <Style Selector=".isPrivate">
+      <Style Selector="^ :is(TextBlock).privacy">
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="Background" Value="#C8FFFFFF" />
+        <Setter Property="Foreground" Value="Transparent" />
+      </Style>
+      <Style Selector="^ Run.privacy">
+          <Setter Property="Background" Value="#C8FFFFFF" />
+          <Setter Property="Foreground" Value="Transparent" />
+      </Style>
+    </Style>
+
     <Style Selector="SelectableTextBlock">
       <Setter Property="SelectionBrush" Value="Purple" />
     </Style>
@@ -148,6 +161,9 @@
     </Style>
     <Style Selector="TextBlock#CellTextBlock">
       <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+      <Setter Property="Margin" Value="12,0" />
+      <Setter Property="HorizontalAlignment" Value="Left" />
+      <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
 
     <!-- AdvancedImage -->

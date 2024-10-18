@@ -25,8 +25,16 @@
       CanUserResizeColumns="True"
     >
       <DataGrid.Columns>
-        <DataGridTextColumn Header="id" Binding="{Binding Id}" IsVisible="{DynamicResource IsModern}" />
-        <DataGridTextColumn Header="name" Binding="{Binding Name}" />
+        <DataGridTemplateColumn Header="id" IsVisible="{DynamicResource IsModern}">
+          <DataTemplate DataType="vm:VisitorViewModel">
+            <TextBlock Name="CellTextBlock" Classes="privacy" Text="{Binding Id}" />
+          </DataTemplate>
+        </DataGridTemplateColumn>
+        <DataGridTemplateColumn Header="name">
+          <DataTemplate DataType="vm:VisitorViewModel">
+            <TextBlock Name="CellTextBlock" Classes="privacy" Text="{Binding Name}" />
+          </DataTemplate>
+        </DataGridTemplateColumn>
         <DataGridTextColumn Header="last entered" Binding="{Binding Entered}" />
         <DataGridTextColumn Header="left" Binding="{Binding Left}" />
         <DataGridTextColumn Header="visits" Binding="{Binding Visits}" />

@@ -18,7 +18,13 @@
   <UserControl.Resources>
     <sys:Int32 x:Key="IntervalRounding">10</sys:Int32>
   </UserControl.Resources>
-  <StackPanel Margin="10">
+  <StackPanel Margin="10" Spacing="10">
+    <ui:SettingsExpander
+      Header="User interface"
+      IconSource="{icm:SymbolIconSource Symbol=AppGeneric}"
+    >
+      <CheckBox IsChecked="{Binding Config.General.PrivacyMode}" Content="Privacy mode" />
+    </ui:SettingsExpander>
     <!-- Timing (modern) -->
     <ui:SettingsExpander
       Classes="modern"

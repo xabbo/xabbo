@@ -1,4 +1,4 @@
-﻿using Splat;
+using Splat;
 using ReactiveUI;
 using Avalonia;
 using Avalonia.Controls;
@@ -6,6 +6,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 
 using Xabbo.Command;
+using Xabbo.Controllers;
 using Xabbo.Services;
 using Xabbo.Services.Abstractions;
 using Xabbo.Avalonia.Services;
@@ -34,14 +35,14 @@ public partial class App : Application
 
         DataContext = ViewModelLocator.Main;
 
-        // Initialize persistent services
-        // TODO make a better way to initialize these
+        // TODO A better way to initialize persistent background services.
         Locator.Current.GetRequiredService<IHostApplicationLifetime>();
         Locator.Current.GetRequiredService<AppSessionManager>();
         Locator.Current.GetRequiredService<GEarthExtensionLifetime>();
         Locator.Current.GetRequiredService<IGameStateService>();
         Locator.Current.GetRequiredService<IFigureConverterService>();
         Locator.Current.GetRequiredService<CommandManager>();
+        Locator.Current.GetRequiredService<ControllerInitializer>();
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {

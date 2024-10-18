@@ -15,7 +15,7 @@
   <Grid ColumnDefinitions="Auto,*">
     <controls:AvatarImage FigureString="{Binding ModernFigure}" />
     <StackPanel Grid.Column="1">
-      <TextBlock FontWeight="Bold" Text="{Binding Name}" />
+      <TextBlock Classes="privacy" FontWeight="Bold" Text="{Binding Name}" />
       <TextBlock>
         <TextBlock.Text>
           <Binding Path="Motto" Mode="OneWay">

@@ -91,7 +91,11 @@
         </ui:FAMenuFlyout>
       </DataGrid.ContextFlyout>
       <DataGrid.Columns>
-        <DataGridTextColumn Width="120" Header="id" Binding="{Binding Id}" />
+        <DataGridTemplateColumn Width="120" Header="id">
+          <DataTemplate DataType="vm:FurniViewModel">
+            <TextBlock Name="CellTextBlock" Classes="privacy" Text="{Binding Id}" />
+          </DataTemplate>
+        </DataGridTemplateColumn>
         <DataGridTemplateColumn
           x:DataType="vm:FurniViewModel"
           Width="250" Header="name"
@@ -120,8 +124,16 @@
             </Grid>
           </DataTemplate>
         </DataGridTemplateColumn>
-        <DataGridTextColumn IsVisible="{DynamicResource IsModern}" Width="120" Header="owner id" Binding="{Binding OwnerId}" />
-        <DataGridTextColumn IsVisible="{DynamicResource IsModern}" Width="150" Header="owner name" Binding="{Binding Owner}" />
+        <DataGridTemplateColumn Header="owner id" Width="120" IsVisible="{DynamicResource IsModern}" SortMemberPath="OwnerId">
+          <DataTemplate DataType="vm:FurniViewModel">
+            <TextBlock Classes="privacy" Name="CellTextBlock" Text="{Binding OwnerId}" />
+          </DataTemplate>
+        </DataGridTemplateColumn>
+        <DataGridTemplateColumn Header="owner name" Width="150" IsVisible="{DynamicResource IsModern}" SortMemberPath="Owner">
+          <DataTemplate DataType="vm:FurniViewModel">
+            <TextBlock Classes="privacy" Name="CellTextBlock" Text="{Binding Owner}" />
+          </DataTemplate>
+        </DataGridTemplateColumn>
       </DataGrid.Columns>
     </DataGrid>
   </Grid>

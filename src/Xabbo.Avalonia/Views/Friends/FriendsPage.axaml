@@ -63,13 +63,15 @@
               <StackPanel
                 Grid.Column="1" VerticalAlignment="Center" Orientation="Vertical"
               >
-                <TextBlock Text="{Binding Name}" FontWeight="Bold" />
+                <TextBlock
+                  HorizontalAlignment="Left"
+                  Classes="privacy"
+                  FontWeight="Bold"
+                  Text="{Binding Name}"
+                />
                 <TextBlock
                   Text="{Binding Motto, Converter={StaticResource HabboStringConverter}}"
-                  IsVisible="{
-                    Binding Motto,
-                    Converter={x:Static StringConverters.IsNotNullOrEmpty}
-                  }"
+                  IsVisible="{Binding Motto, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                 />
               </StackPanel>
               <Button

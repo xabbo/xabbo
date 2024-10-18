@@ -9,6 +9,7 @@
   mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
   x:Class="Xabbo.Avalonia.Views.MainView"
   x:DataType="vm:MainViewModel"
+  Classes.isPrivate="{Binding Config.General.PrivacyMode}"
 >
   <ui:NavigationView
     Grid.Row="1"

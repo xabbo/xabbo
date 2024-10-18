@@ -58,7 +58,7 @@
             <RowDefinition Height="Auto" />
           </Grid.RowDefinitions>
           <TextBlock Text="{Binding Message, Converter={StaticResource HabboStringConverter}}" TextWrapping="Wrap" />
-          <TextBlock Grid.Row="1" HorizontalAlignment="Right" Text="{Binding SenderName}" />
+          <TextBlock Classes="privacy" Grid.Row="1" HorizontalAlignment="Right" Text="{Binding SenderName}" />
         </Grid>
       </Grid>
     </Border>

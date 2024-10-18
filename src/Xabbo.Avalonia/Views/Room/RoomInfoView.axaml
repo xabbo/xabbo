@@ -75,7 +75,7 @@
               <SelectableTextBlock>
                 <Run FontWeight="Bold" Text="{Binding Data.Name, Mode=OneWay, FallbackValue='Room name', Converter={StaticResource HabboStringConverter}}" />
                 by
-                <Run Text="{Binding Data.OwnerName, Mode=OneWay, FallbackValue='Owner name'}" />
+                <Run Classes="privacy" Text="{Binding Data.OwnerName, Mode=OneWay, FallbackValue='Owner name'}" />
               </SelectableTextBlock>
               <SelectableTextBlock>
                   <TextBox.Text>
@@ -128,11 +128,11 @@
 
             <!-- Room ID -->
             <TextBlock Grid.Row="1" Text="Room ID" />
-            <SelectableTextBlock Grid.Column="1" Grid.Row="1" Text="{Binding Id, Mode=OneWay}" TextWrapping="Wrap" />
+            <SelectableTextBlock Classes="privacy" Grid.Column="1" Grid.Row="1" Text="{Binding Id, Mode=OneWay}" TextWrapping="Wrap" />
 
             <!-- Owner ID -->
             <TextBlock Classes="modern" Grid.Row="3" Text="Owner ID" />
-            <SelectableTextBlock Classes="modern" Grid.Column="1" Grid.Row="3" Text="{Binding OwnerId, Mode=OneWay}" TextWrapping="Wrap" />
+            <SelectableTextBlock Classes="modern privacy" Grid.Column="1" Grid.Row="3" Text="{Binding OwnerId, Mode=OneWay}" TextWrapping="Wrap" />
 
             <!-- Category -->
             <TextBlock Classes="modern" Grid.Row="4" Text="Category" />
