@@ -2,66 +2,8 @@
 using ReactiveUI;
 
 using Xabbo.Core;
-using Xabbo.Core.GameData;
 
 namespace Xabbo.ViewModels;
-
-public abstract class ItemViewModelBase : ViewModelBase
-{
-    protected readonly FurniInfo? _info;
-
-    public IItem Item { get; set; }
-
-    public Id Id => Item.Id;
-    public ItemType Type => Item.Type;
-    public int Kind => _info?.Kind ?? 0;
-    public string Identifier => Item.Identifier ?? _info?.Identifier ?? "?";
-    public string? Variant { get; }
-    public string Name { get; }
-    public string? Description { get; }
-
-    [Reactive] public bool IsHidden { get; set; }
-    [Reactive] public string? IconUrl { get; set; }
-
-    public ItemViewModelBase(IItem item)
-    {
-        Item = item;
-
-        if (Extensions.IsInitialized && item.TryGetInfo(out _info))
-        {
-            // Hard-coded fix for Origins.
-            FurniInfo? iconInfo = _info;
-            if (iconInfo.Identifier == "post.it" &&
-                !Extensions.TryGetInfo(new WallItem { Identifier = "post_it" }, out iconInfo))
-            {
-                iconInfo = _info;
-            }
-
-            if (iconInfo.Revision > 0)
-            {
-                string identifier = iconInfo.Identifier.Replace('*', '_');
-                if (identifier == "poster" && item.TryGetVariant(out string? variant))
-                {
-                    Variant = variant;
-                    identifier += variant;
-                }
-                IconUrl = $"http://images.habbo.com/dcr/hof_furni/{iconInfo.Revision}/{identifier}_icon.png";
-            }
-
-            if (item.TryGetName(out string? name))
-                Name = name;
-            else
-                Name = _info.Identifier;
-
-            if (item.TryGetDescription(out string? desc))
-                Description = desc;
-        }
-        else
-        {
-            Name = item.Identifier ?? "?";
-        }
-    }
-}
 
 public class FurniViewModel(IFurni furni) : ItemViewModelBase(furni)
 {
