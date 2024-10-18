@@ -3,6 +3,8 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:controls="using:Xabbo.Avalonia.Controls"
+  xmlns:behaviors="using:Xabbo.Avalonia.Behaviors"
   xmlns:vm="using:Xabbo.ViewModels"
   x:DataType="vm:ChatPageViewModel"
   mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
@@ -13,37 +15,66 @@
     <vm:ChatPageViewModel />
   </Design.DataContext>
   <Grid RowDefinitions="*,Auto">
-    <ScrollViewer x:Name="ChatScrollViewer" VerticalScrollBarVisibility="Auto">
-      <SelectableTextBlock
-        Margin="10"
-        FontFamily="{StaticResource Mono}"
-        Text="{Binding LogText}"
-        TextWrapping="Wrap"
-      />
-    </ScrollViewer>
-    <WrapPanel
-      Grid.Row="1"
-      HorizontalAlignment="Right"
-    >
-      <CheckBox
-        IsChecked="{Binding Config.Normal}"
-        Content="Normal" />
-      <CheckBox
-        IsChecked="{Binding Config.Whispers}"
-        Content="Whispers" />
-      <CheckBox
-        Classes="modern"
-        IsChecked="{Binding Config.Wired}"
-        Content="Wired" />
-      <CheckBox
-        IsChecked="{Binding Config.Bots}"
-        Content="Bots" />
-      <CheckBox
-        IsChecked="{Binding Config.LogToFile}"
-        Content="Log to file" />
-      <CheckBox
-        IsChecked="{Binding #ChatPageRoot.IsAutoScrollEnabled}"
-        Content="Autoscroll" />
-    </WrapPanel>
+    <ListBox Name="ListBoxMessages" ItemsSource="{Binding Messages}" Selection="{Binding Selection}" Padding="10" SelectionMode="Multiple">
+      <ListBox.DataTemplates>
+        <DataTemplate DataType="vm:ChatLogRoomEntryViewModel">
+          <Grid ColumnDefinitions="*,Auto,*">
+            <Separator Grid.Column="0" />
+            <TextBlock Grid.Column="1" Margin="10,0">
+              <Run Text="{Binding RoomName}" FontWeight="Bold" />
+              <Run Text="by"/>
+              <Run Classes="privacy" Text="{Binding RoomOwner}" />
+            </TextBlock>
+            <Separator Grid.Column="2" />
+          </Grid>
+        </DataTemplate>
+        <DataTemplate DataType="vm:ChatLogAvatarActionViewModel">
+          <Grid ColumnDefinitions="*,Auto,*">
+            <Separator Grid.Column="0" />
+            <TextBlock Grid.Column="1" Margin="10,0">
+              <Run Classes="privacy" Text="{Binding UserName}" />
+              <Run Text="{Binding Action}" />
+            </TextBlock>
+            <Separator Grid.Column="2" />
+          </Grid>
+        </DataTemplate>
+        <DataTemplate DataType="vm:ChatMessageViewModel">
+          <Border>
+            <Grid ColumnDefinitions="Auto,*">
+              <controls:AvatarImage
+                Margin="-10,-10,0,-10"
+                FigureString="{Binding FigureString}"
+                HeadOnly="true"
+              />
+              <TextBlock
+                Grid.Column="1"
+                HorizontalAlignment="Left" VerticalAlignment="Center"
+                TextWrapping="Wrap"
+              >
+                <Run Classes="privacy" FontWeight="Bold" Text="{Binding Name, Mode=OneWay}" /><Run Text=":" />
+                <Run
+                  Classes.whisper="{Binding IsWhisper}"
+                  Classes.privacy="{Binding IsWhisper}"
+                  Text="{Binding Message, Mode=OneWay}"
+                />
+              </TextBlock>
+            </Grid>
+          </Border>
+        </DataTemplate>
+      </ListBox.DataTemplates>
+      <Interaction.Behaviors>
+        <behaviors:AutoScrollBehavior />
+      </Interaction.Behaviors>
+      <ListBox.ItemContainerTheme>
+        <ControlTheme TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}" x:DataType="vm:ChatLogEntryViewModel">
+          <Setter Property="IsHitTestVisible" Value="{Binding IsSelectable}"/>
+        </ControlTheme>
+      </ListBox.ItemContainerTheme>
+      <ListBox.ItemTemplate>
+        <DataTemplate>
+          <ContentControl Content="{Binding}" />
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
   </Grid>
 </UserControl>

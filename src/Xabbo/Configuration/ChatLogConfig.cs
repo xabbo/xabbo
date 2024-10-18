@@ -9,5 +9,8 @@ public sealed class ChatLogSettings : ReactiveObject
     [Reactive] public bool Wired { get; set; } = false;
     [Reactive] public bool Bots { get; set; } = false;
     [Reactive] public bool Pets { get; set; } = false;
+    [Reactive] public bool Trades { get; set; } = true;
+    [Reactive] public bool UserEntry { get; set; } = false;
+
     [Reactive] public bool LogToFile { get; set; } = false;
 }

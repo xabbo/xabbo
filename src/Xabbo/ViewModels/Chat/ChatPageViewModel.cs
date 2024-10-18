@@ -1,6 +1,9 @@
-﻿using System.Text;
+﻿using System.Collections.ObjectModel;
+using System.Reactive.Linq;
+using DynamicData;
 using ReactiveUI;
 using Splat;
+using Avalonia.Controls.Selection;
 using FluentIcons.Common;
 using FluentIcons.Avalonia.Fluent;
 
@@ -22,107 +25,126 @@ public class ChatPageViewModel : PageViewModel
     private readonly IConfigProvider<AppConfig> _settingsProvider;
     private AppConfig Settings => _settingsProvider.Value;
 
+    private readonly IGameStateService _gameState;
+    private readonly IFigureConverterService _figureConverter;
+
     const string LogDirectory = "logs/chat";
     private string? _currentFilePath;
 
     private readonly RoomManager _roomManager;
 
-    private readonly StringBuilder _stringBuffer;
-
     private DateTime _lastDate = DateTime.MinValue;
     private long _lastRoom = -1;
 
-    private StringBuilder _logText = new();
-    public string LogText
-    {
-        get => _logText.ToString();
-        set
-        {
-            _logText = new(value);
-            this.RaisePropertyChanged(nameof(LogText));
-        }
-    }
-
     public Configuration.ChatLogSettings Config => Settings.Chat.Log;
+
+    private long _currentMessageId;
+    private readonly SourceCache<ChatLogEntryViewModel, long> _cache = new(x => x.EntryId);
+
+    private readonly ReadOnlyObservableCollection<ChatLogEntryViewModel> _messages;
+    public ReadOnlyObservableCollection<ChatLogEntryViewModel> Messages => _messages;
+
+    public SelectionModel<ChatLogEntryViewModel> Selection { get; } = new SelectionModel<ChatLogEntryViewModel>()
+    {
+        SingleSelect = false
+    };
+
+    private long NextEntryId() => Interlocked.Increment(ref _currentMessageId);
 
     [DependencyInjectionConstructor]
     public ChatPageViewModel(
         IConfigProvider<AppConfig> settingsProvider,
+        IGameStateService gameState,
+        IFigureConverterService figureConverter,
         RoomManager roomManager)
     {
-        _settingsProvider = settingsProvider;
-        _roomManager = roomManager;
-        _roomManager.AvatarChat += RoomManager_AvatarChat;
-
-        _stringBuffer = new StringBuilder();
-
         Directory.CreateDirectory(LogDirectory);
+
+        _settingsProvider = settingsProvider;
+        _gameState = gameState;
+        _figureConverter = figureConverter;
+        _roomManager = roomManager;
+
+        _roomManager.Entered += OnEnteredRoom;
+        _roomManager.AvatarChat += RoomManager_AvatarChat;
+        _roomManager.AvatarUpdated += RoomManager_AvatarUpdated;
+
+        _cache
+            .Connect()
+            .ObserveOn(RxApp.MainThreadScheduler)
+            .Bind(out _messages)
+            .Subscribe();
     }
 
-    private void Log(string text)
+    private void AppendLog(ChatLogEntryViewModel vm)
     {
-        _logText.Append(text);
-        this.RaisePropertyChanged(nameof(LogText));
+        vm.EntryId = NextEntryId();
+        _cache.AddOrUpdate(vm);
     }
+
+    private void RoomManager_AvatarUpdated(AvatarEventArgs e)
+    {
+        if (e.Avatar.PreviousUpdate is { IsTrading: bool wasTrading } &&
+            e.Avatar.CurrentUpdate is { IsTrading: bool isTrading } &&
+            isTrading != wasTrading)
+        {
+            if (isTrading)
+            {
+                AppendLog(new ChatLogAvatarActionViewModel
+                {
+                    UserName = e.Avatar.Name,
+                    Action = "started trading"
+                });
+            }
+            else
+            {
+                AppendLog(new ChatLogAvatarActionViewModel
+                {
+                    UserName = e.Avatar.Name,
+                    Action = "stopped trading"
+                });
+            }
+        }
+    }
+
+    private void OnEnteredRoom(RoomEventArgs e) => AppendLog(new ChatLogRoomEntryViewModel
+    {
+        RoomName = e.Room.Data?.Name ?? "?",
+        RoomOwner = e.Room.Data?.OwnerName ?? "?"
+    });
 
     private void RoomManager_AvatarChat(AvatarChatEventArgs e)
     {
-        if (!Settings.Chat.Log.Normal && e.Avatar.Type == AvatarType.User && e.ChatType != ChatType.Whisper) return;
-        if (!Settings.Chat.Log.Whispers && e.ChatType == ChatType.Whisper && e.BubbleStyle != 34) return;
-        if (!Settings.Chat.Log.Bots && (e.Avatar.Type == AvatarType.PublicBot || e.Avatar.Type == AvatarType.PrivateBot)) return;
-        if (!Settings.Chat.Log.Pets && (e.Avatar.Type == AvatarType.Pet)) return;
-        if (!Settings.Chat.Log.Wired && e.ChatType == ChatType.Whisper && e.BubbleStyle == 34) return;
+        if (!Settings.Chat.Log.Normal && e is { Avatar.Type: AvatarType.User, ChatType: not ChatType.Whisper }) return;
+        if (!Settings.Chat.Log.Whispers && e is { ChatType: ChatType.Whisper, BubbleStyle: not 34 }) return;
+        if (!Settings.Chat.Log.Bots && e.Avatar.Type is AvatarType.PublicBot or AvatarType.PrivateBot) return;
+        if (!Settings.Chat.Log.Pets && e.Avatar.Type is AvatarType.Pet) return;
+        if (!Settings.Chat.Log.Wired && e is { ChatType: ChatType.Whisper, BubbleStyle: 34 }) return;
 
         IRoom? room = _roomManager.Room;
         if (room is null) return;
 
-        DateTime today = DateTime.Today;
-        if (today != _lastDate)
+        string? figureString = null;
+        if (e.Avatar.Type is not AvatarType.Pet)
         {
-            _lastDate = today;
-            _currentFilePath = Path.Combine(LogDirectory, $"{today:yyyy-MM-dd}.txt");
-
-            Log($"---------- {today:D} ----------\r\n");
-        }
-
-        if (_lastRoom != room.Id)
-        {
-            _lastRoom = room.Id;
-
-            _stringBuffer.AppendLine();
-            _stringBuffer.AppendFormat(
-                "---------- {0} (id:{1}) ----------",
-                H.RenderText(room.Data?.Name ?? "?"),
-                room.Id
-            );
-            _stringBuffer.AppendLine();
-        }
-
-        string message = H.RenderText(e.Message);
-
-        _stringBuffer.AppendFormat(
-            "[{0:HH:mm:ss}] {1}{2}: {3}",
-            DateTime.Now,
-            e.ChatType == ChatType.Whisper ? "* " : "",
-            e.Avatar.Name,
-            message
-        );
-        _stringBuffer.AppendLine();
-
-        string text = _stringBuffer.ToString();
-
-        Log(text);
-
-        if (Settings.Chat.Log.LogToFile && !string.IsNullOrWhiteSpace(_currentFilePath))
-        {
-            try { File.AppendAllText(_currentFilePath, text); }
-            catch (Exception ex)
+            if (_gameState.Session.Is(ClientType.Origins))
             {
-                Settings.Chat.Log.LogToFile = false;
-                Log($"[ERROR] Failed to log to file! {ex}");
+                if (_figureConverter.TryConvertToModern(e.Avatar.Figure, out Figure? figure))
+                    figureString = figure.ToString();
+            }
+            else
+            {
+                figureString = e.Avatar.Figure;
             }
         }
 
-        _stringBuffer.Clear();
+        AppendLog(new ChatMessageViewModel
+        {
+            Type = e.ChatType,
+            BubbleStyle = e.BubbleStyle,
+            Name = e.Avatar.Name,
+            Message = H.RenderText(e.Message),
+            FigureString = figureString,
+        });
     }
 }

@@ -25,6 +25,29 @@
     >
       <CheckBox IsChecked="{Binding Config.General.PrivacyMode}" Content="Privacy mode" />
     </ui:SettingsExpander>
+    <!-- Chat -->
+    <ui:SettingsExpander
+      Header="Chat log"
+      IconSource="{icm:SymbolIconSource Symbol=Chat}"
+    >
+      <ui:SettingsExpanderItem>
+        <StackPanel>
+          <TextBlock Margin="0,0,12,0" VerticalAlignment="Center">Messages</TextBlock>
+          <WrapPanel>
+            <CheckBox IsChecked="{Binding Config.Chat.Log.Normal}" Content="Users" />
+            <CheckBox IsChecked="{Binding Config.Chat.Log.Whispers}" Content="Whispers" />
+            <CheckBox IsChecked="{Binding Config.Chat.Log.Wired}" Content="Wired" />
+            <CheckBox IsChecked="{Binding Config.Chat.Log.Pets}" Content="Pets" />
+            <CheckBox IsChecked="{Binding Config.Chat.Log.Bots}" Content="Bots" />
+            <CheckBox IsChecked="{Binding Config.Chat.Log.Trades}" Content="Trades" />
+            <CheckBox IsChecked="{Binding Config.Chat.Log.UserEntry}" Content="User enters or leaves" />
+          </WrapPanel>
+        </StackPanel>
+      </ui:SettingsExpanderItem>
+      <ui:SettingsExpanderItem>
+        <CheckBox IsChecked="{Binding Config.Chat.Log.LogToFile}" Content="Log to file" />
+      </ui:SettingsExpanderItem>
+    </ui:SettingsExpander>
     <!-- Timing (modern) -->
     <ui:SettingsExpander
       Classes="modern"
