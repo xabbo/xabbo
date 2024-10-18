@@ -82,6 +82,7 @@ public sealed class FriendsPageViewModel : PageViewModel
         RemoveFriendsCmd = ReactiveCommand.CreateFromTask(RemoveSelectedFriendsAsync);
 
         _friendManager.Loaded += OnFriendsLoaded;
+        _friendManager.Cleared += OnFriendsCleared;
         _friendManager.FriendAdded += OnFriendAdded;
         _friendManager.FriendUpdated += OnFriendUpdated;
         _friendManager.FriendRemoved += OnFriendRemoved;
@@ -167,6 +168,7 @@ public sealed class FriendsPageViewModel : PageViewModel
             AddFriend(friend);
         IsLoading = false;
     }
+    private void OnFriendsCleared() => _cache.Clear();
     private void OnFriendAdded(FriendEventArgs args) => AddFriend(args.Friend);
     private void OnFriendUpdated(FriendEventArgs args) => UpdateFriend(args.Friend);
     private void OnFriendRemoved(FriendEventArgs args) => RemoveFriend(args.Friend.Id);
