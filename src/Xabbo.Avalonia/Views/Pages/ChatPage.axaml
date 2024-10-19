@@ -14,8 +14,13 @@
   <Design.DataContext>
     <vm:ChatPageViewModel />
   </Design.DataContext>
-  <Grid RowDefinitions="*,Auto">
-    <ListBox Name="ListBoxMessages" ItemsSource="{Binding Messages}" Selection="{Binding Selection}" Padding="10" SelectionMode="Multiple">
+  <Grid RowDefinitions="Auto,*">
+    <TextBox
+      Margin="10,10,10,0"
+      Watermark="Filter"
+      Text="{Binding FilterText}"
+    />
+    <ListBox Grid.Row="1" Name="ListBoxMessages" ItemsSource="{Binding Messages}" Selection="{Binding Selection}" Padding="10" SelectionMode="Multiple">
       <ListBox.DataTemplates>
         <DataTemplate DataType="vm:ChatLogRoomEntryViewModel">
           <Grid ColumnDefinitions="*,Auto,*">

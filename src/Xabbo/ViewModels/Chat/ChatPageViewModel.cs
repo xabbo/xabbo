@@ -49,7 +49,7 @@ public class ChatPageViewModel : PageViewModel
         SingleSelect = false
     };
 
-    private long NextEntryId() => Interlocked.Increment(ref _currentMessageId);
+    [Reactive] public string? FilterText { get; set; }
 
     [DependencyInjectionConstructor]
     public ChatPageViewModel(
@@ -71,9 +71,36 @@ public class ChatPageViewModel : PageViewModel
 
         _cache
             .Connect()
+            .Filter(this
+                .WhenAnyValue(x => x.FilterText)
+                .Select(CreateFilter)
+            )
+            .SortBy(x => x.EntryId)
             .ObserveOn(RxApp.MainThreadScheduler)
             .Bind(out _messages)
             .Subscribe();
+    }
+
+    private long NextEntryId() => Interlocked.Increment(ref _currentMessageId);
+
+    private static Func<ChatLogEntryViewModel, bool> CreateFilter(string? filterText)
+    {
+        if (string.IsNullOrWhiteSpace(filterText))
+        {
+            return _ => true;
+        }
+        else
+        {
+            return (vm) => vm switch
+            {
+                ChatMessageViewModel chat =>
+                    chat.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase) ||
+                    chat.Message.Contains(filterText, StringComparison.OrdinalIgnoreCase),
+                ChatLogAvatarActionViewModel action =>
+                    action.UserName.Contains(filterText, StringComparison.OrdinalIgnoreCase),
+                _ => false
+            };
+        }
     }
 
     private void AppendLog(ChatLogEntryViewModel vm)
