@@ -74,7 +74,6 @@
       <ListBox.ItemContainerTheme>
         <ControlTheme TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}" x:DataType="vm:ChatLogEntryViewModel">
           <Setter Property="IsHitTestVisible" Value="{Binding IsSelectable}"/>
-          <Setter Property="MinHeight" Value="0" />
           <Setter Property="Padding" Value="0" />
         </ControlTheme>
       </ListBox.ItemContainerTheme>
