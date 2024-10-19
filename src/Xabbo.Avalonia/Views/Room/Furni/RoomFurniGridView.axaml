@@ -37,7 +37,7 @@
       Watermark="Filter"
       Text="{Binding FilterText}"
     />
-    <ScrollViewer Grid.Row="1" Margin="0,-8,0,0" Padding="6">
+    <ScrollViewer Grid.Row="1" Margin="0,-8,0,0" Padding="8">
       <ItemsRepeater x:Name="FurniStacks" ItemsSource="{Binding Stacks}">
         <ItemsRepeater.Layout>
           <UniformGridLayout />
@@ -50,7 +50,7 @@
               Width="60" Height="60"
               CornerRadius="4"
               BorderThickness="1"
-              BorderBrush="{StaticResource AccentControlElevationBorderBrush}"
+              BorderBrush="#FF303030"
             >
               <ToolTip.Tip>
                 <v:FurniPopupView ShowIcon="False" />
@@ -71,6 +71,10 @@
                   </TextBlock.IsVisible>
                 </TextBlock>
                 <controls:FurniIconImage x:Name="FurniIconImage" Icon="{Binding Icon}" />
+                <!--
+                  The opacity binding here prevents some weird visual bug when updating the filter,
+                  do not change it. May have something to do with the ItemsRepeater.
+                -->
                 <ui:InfoBadge
                   Opacity="{Binding ShowCount, Converter={StaticResource BoolToOpacityConverter}, ConverterParameter=1;0}"
                   Margin="4"
