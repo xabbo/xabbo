@@ -45,7 +45,7 @@ public sealed class HabboApi : IHabboApi
             hotel, $"/api/public/marketplace/stats/{typeString}/{identifier}", cancellationToken);
     }
 
-    public Task<Web.Dto.PhotoData> FetchPhotoData(Hotel hotel, string photoId, CancellationToken cancellationToken = default)
+    public Task<Web.Dto.PhotoData> FetchPhotoDataAsync(Hotel hotel, string photoId, CancellationToken cancellationToken = default)
     {
         return GetRequiredDataAsync<Web.Dto.PhotoData>(
             hotel, $"/photodata/public/furni/{photoId}", cancellationToken);

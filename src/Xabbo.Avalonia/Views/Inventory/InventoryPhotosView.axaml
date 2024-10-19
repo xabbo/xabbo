@@ -1,0 +1,52 @@
+<UserControl
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:ui="using:FluentAvalonia.UI.Controls"
+  xmlns:ic="using:FluentIcons.Avalonia.Fluent"
+  xmlns:icm="using:FluentIcons.Avalonia.Fluent.MarkupExtensions"
+  xmlns:img="using:AsyncImageLoader"
+  xmlns:controls="using:Xabbo.Avalonia.Controls"
+  xmlns:services="using:Xabbo.Avalonia.Services"
+  xmlns:vm="using:Xabbo.ViewModels"
+  xmlns:v="using:Xabbo.Avalonia.Views"
+  mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+  x:Class="Xabbo.Avalonia.Views.InventoryPhotosView"
+  x:DataType="vm:InventoryViewModel"
+>
+  <ListBox
+    Classes="flat"
+    Padding="8"
+    ItemsSource="{Binding Photos}"
+    ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+    ScrollViewer.VerticalScrollBarVisibility="Hidden"
+    SelectionMode="Multiple"
+  >
+    <ListBox.Styles>
+      <Style Selector="ListBoxItem">
+        <Setter Property="Padding" Value="0" />
+        <Style Selector="^:not(:selected) > Border">
+          <Setter Property="BorderBrush" Value="Transparent" />
+        </Style>
+      </Style>
+    </ListBox.Styles>
+    <ListBox.ItemsPanel>
+      <ItemsPanelTemplate>
+        <WrapPanel Orientation="Horizontal" />
+      </ItemsPanelTemplate>
+    </ListBox.ItemsPanel>
+    <ListBox.ItemTemplate>
+      <DataTemplate DataType="vm:InventoryPhotoViewModel">
+        <Border BorderThickness="4">
+          <img:AdvancedImage
+            Classes="spinner"
+            CornerRadius="5"
+            Width="320" Height="320"
+            Source="{Binding PhotoUrl^}"
+          />
+        </Border>
+      </DataTemplate>
+    </ListBox.ItemTemplate>
+  </ListBox>
+</UserControl>

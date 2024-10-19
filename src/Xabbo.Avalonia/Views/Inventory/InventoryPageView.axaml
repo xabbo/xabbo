@@ -1,0 +1,54 @@
+<UserControl
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:ui="using:FluentAvalonia.UI.Controls"
+  xmlns:ic="using:FluentIcons.Avalonia.Fluent"
+  xmlns:icm="using:FluentIcons.Avalonia.Fluent.MarkupExtensions"
+  xmlns:img="using:AsyncImageLoader"
+  xmlns:controls="using:Xabbo.Avalonia.Controls"
+  xmlns:services="using:Xabbo.Avalonia.Services"
+  xmlns:vm="using:Xabbo.ViewModels"
+  xmlns:v="using:Xabbo.Avalonia.Views"
+  mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+  x:Class="Xabbo.Avalonia.Views.InventoryPageView"
+  x:DataType="vm:InventoryPageViewModel"
+>
+  <UserControl.Styles>
+    <Style Selector="TabItem">
+      <Setter Property="MinHeight" Value="32" />
+      <Setter Property="Padding" Value="8,0" />
+    </Style>
+    <Style Selector="TabItem:selected /template/ Rectangle#PART_SelectedPipe">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+  </UserControl.Styles>
+  <controls:Loading
+    DataContext="{Binding Inventory}"
+    IsLoading="{Binding IsBusy}"
+    LoadingContent="{Binding StatusText}"
+    ContentFadeOpacity="0.1"
+  >
+    <TabControl x:Name="FurniTabs" Padding="0" TabStripPlacement="Bottom">
+      <TabItem>
+        <TabItem.Header>
+          <StackPanel Orientation="Horizontal" Spacing="4">
+            <ic:SymbolIcon VerticalAlignment="Center" Symbol="Grid" />
+            <TextBlock VerticalAlignment="Center" Text="Grid" />
+          </StackPanel>
+        </TabItem.Header>
+        <v:InventoryStacksView />
+      </TabItem>
+      <TabItem>
+        <TabItem.Header>
+          <StackPanel Orientation="Horizontal" Spacing="4">
+            <ic:SymbolIcon VerticalAlignment="Center" Symbol="Image" />
+            <TextBlock VerticalAlignment="Center" Text="Photos" />
+          </StackPanel>
+        </TabItem.Header>
+        <v:InventoryPhotosView />
+      </TabItem>
+    </TabControl>
+  </controls:Loading>
+</UserControl>

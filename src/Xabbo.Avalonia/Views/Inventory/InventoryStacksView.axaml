@@ -1,0 +1,99 @@
+<UserControl
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:ui="using:FluentAvalonia.UI.Controls"
+  xmlns:ic="using:FluentIcons.Avalonia.Fluent"
+  xmlns:icm="using:FluentIcons.Avalonia.Fluent.MarkupExtensions"
+  xmlns:img="using:AsyncImageLoader"
+  xmlns:controls="using:Xabbo.Avalonia.Controls"
+  xmlns:services="using:Xabbo.Avalonia.Services"
+  xmlns:vm="using:Xabbo.ViewModels"
+  xmlns:v="using:Xabbo.Avalonia.Views"
+  mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+  x:Class="Xabbo.Avalonia.Views.InventoryStacksView"
+  x:DataType="vm:InventoryViewModel"
+>
+  <Grid RowDefinitions="Auto,*,Auto">
+    <TextBox Classes="clearButton" Margin="10" Watermark="Filter" Text="{Binding FilterText}" />
+    <ListBox
+      Grid.Row="1"
+      Classes="flat"
+      Padding="8,0,8,8"
+      Background="Transparent"
+      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+      SelectionMode="Multiple"
+      ItemsSource="{Binding Stacks}"
+      Selection="{Binding Selection}"
+    >
+      <ListBox.ContextFlyout>
+        <ui:FAMenuFlyout>
+          <ui:MenuFlyoutItem
+            IconSource="{icm:SymbolIconSource Symbol=HandLeft, IconVariant=Filled}"
+            Text="Offer" Command="{Binding OfferItemsCmd}"
+          />
+          <ui:MenuFlyoutItem
+            IconSource="{icm:SymbolIconSource Symbol=ArrowDownload, IconVariant=Filled}"
+            Text="Place" Command="{Binding PlaceItemsCmd}"
+          />
+          <ui:MenuFlyoutItem
+            IconSource="{icm:SymbolIconSource Symbol=ArrowSync}"
+            Text="Reload" Command="{Binding LoadCmd}"
+          />
+        </ui:FAMenuFlyout>
+      </ListBox.ContextFlyout>
+      <ListBox.ItemsPanel>
+        <ItemsPanelTemplate>
+          <WrapPanel Orientation="Horizontal" />
+        </ItemsPanelTemplate>
+      </ListBox.ItemsPanel>
+      <ListBox.ItemTemplate>
+        <DataTemplate DataType="vm:InventoryStackViewModel">
+          <Border Width="60" Height="60">
+            <Border.Styles>
+              <Style Selector="ui|InfoBadge.Informational:value /template/ TextBlock#ValueTextBlock">
+                <Setter Property="Margin" Value="4,0" />
+              </Style>
+            </Border.Styles>
+            <ToolTip.Tip>
+              <v:FurniPopupView ShowIcon="False" />
+            </ToolTip.Tip>
+            <Panel>
+              <TextBlock
+                Text="{Binding Name, Converter={StaticResource FirstLetterConverter}}"
+                FontSize="20"
+                Opacity="0.33"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+              >
+                <TextBlock.IsVisible>
+                  <MultiBinding Converter="{x:Static BoolConverters.And}">
+                    <Binding Path="!#IconImage.IsLoading" />
+                    <Binding Path="#IconImage.CurrentImage" Converter="{x:Static ObjectConverters.IsNull}" />
+                  </MultiBinding>
+                </TextBlock.IsVisible>
+              </TextBlock>
+              <controls:FurniIconImage x:Name="IconImage" Icon="{Binding Icon}" />
+              <ui:InfoBadge
+                Margin="4"
+                HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                TextElement.FontSize="10"
+                Classes="Informational"
+                Value="{Binding Count}"
+                IsVisible="{Binding Count, Converter={StaticResource GtConverter}, ConverterParameter={StaticResource PositiveOne}}"
+              />
+            </Panel>
+          </Border>
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+    <DockPanel Grid.Row="2">
+      <TextBlock Margin="10" HorizontalAlignment="Right" VerticalAlignment="Center">
+        <Run Text="{Binding Stacks.Count, Mode=OneWay}" />
+        <Run Text=" furni, " />
+        <Run Text="{Binding ItemCount, Mode=OneWay, Converter={StaticResource QuantityConverter} ConverterParameter='item'}" />
+      </TextBlock>
+    </DockPanel>
+  </Grid>
+</UserControl>

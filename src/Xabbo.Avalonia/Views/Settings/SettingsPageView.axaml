@@ -57,7 +57,7 @@
     >
       <controls:TimingSlider
         Text="User moderation interval"
-        Tip="The time interval between moderating multiple users"
+        Tip="The time interval between moderating users"
         Value="{Binding Config.Timing.Modern.ModerationInterval}"
       />
       <controls:TimingSlider
@@ -67,17 +67,17 @@
       />
       <controls:TimingSlider
         Text="Furni pickup interval"
-        Tip="The time interval between picking up or ejecting multiple furni"
+        Tip="The time interval between picking up or ejecting furni"
         Value="{Binding Config.Timing.Modern.FurniPickupInterval}"
       />
       <controls:TimingSlider
         Text="Furni toggle interval"
-        Tip="The time interval between toggling multiple furni"
+        Tip="The time interval between toggling furni"
         Value="{Binding Config.Timing.Modern.FurniToggleInterval}"
       />
       <controls:TimingSlider
         Text="Furni rotate interval"
-        Tip="The time interval between rotating multiple furni"
+        Tip="The time interval between rotating furni"
         Value="{Binding Config.Timing.Modern.FurniRotateInterval}"
       />
     </ui:SettingsExpander>
@@ -90,18 +90,23 @@
     >
       <controls:TimingSlider
         Text="User moderation interval"
-        Tip="The time interval between moderating multiple users"
+        Tip="The time interval between moderating users"
         Value="{Binding Config.Timing.Origins.ModerationInterval}"
       />
       <controls:TimingSlider
         Text="Furni pickup interval"
-        Tip="The time interval between picking up or ejecting multiple furni"
+        Tip="The time interval between picking up or ejecting furni"
         Value="{Binding Config.Timing.Origins.FurniPickupInterval}"
       />
       <controls:TimingSlider
         Text="Furni toggle interval"
-        Tip="The time interval between toggling multiple furni"
+        Tip="The time interval between toggling furni"
         Value="{Binding Config.Timing.Origins.FurniToggleInterval}"
+      />
+      <controls:TimingSlider
+        Text="Trade offer interval"
+        Tip="The time interval between offering items in a trade"
+        Value="{Binding Config.Timing.Origins.TradeOfferInterval}"
       />
     </ui:SettingsExpander>
   </StackPanel>

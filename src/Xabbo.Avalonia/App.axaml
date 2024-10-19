@@ -56,6 +56,7 @@
       <c:MultiValueConverter x:Key="MultiValueConverter"/>
       <c:BoolToOpacityConverter x:Key="BoolToOpacityConverter"/>
       <c:HumanizerConverter x:Key="HumanizerConverter"/>
+      <c:QuantityConverter x:Key="QuantityConverter"/>
       <c:FirstLetterConverter x:Key="FirstLetterConverter"/>
       <c:WhitespaceNewlineConverter x:Key="WhitespaceNewlineConverter" />
       <c:GtConverter x:Key="GtConverter" />
@@ -116,6 +117,34 @@
       </Style>
     </Style>
 
+    <!-- Flat ListBox selection style -->
+    <Style Selector="ListBox.flat">
+      <Style Selector="^ ListBoxItem">
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="MinWidth" Value="0" />
+        <Setter Property="MinHeight" Value="0" />
+      </Style>
+      <Style Selector="^ ListBoxItem > Border">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="BorderBrush" Value="#FF303030" />
+        <Setter Property="Transitions">
+          <Transitions>
+            <BrushTransition Property="BorderBrush" Duration="0:0:0.1" />
+          </Transitions>
+        </Setter>
+      </Style>
+      <Style Selector="^ ListBoxItem:selected > Border">
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="BorderBrush" Value="{DynamicResource AccentFillColorDefaultBrush}" />
+      </Style>
+      <Style Selector="^ ListBoxItem:selected /template/ Rectangle#SelectionIndicator">
+        <Setter Property="IsVisible" Value="false" />
+      </Style>
+    </Style>
+
     <Style Selector="SelectableTextBlock">
       <Setter Property="SelectionBrush" Value="Purple" />
     </Style>
@@ -135,6 +164,16 @@
 
     <Style Selector=":is(Window)">
       <Setter Property="FontSize" Value="16" />
+    </Style>
+
+    <!-- Larger dialogs -->
+    <Style Selector="ui|ContentDialog:fullsize Border#BackgroundElement">
+      <Setter Property="Margin" Value="80" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="MaxWidth" Value="900" />
+    </Style>
+    <Style Selector="ui|ContentDialog:fullsize /template/ ScrollViewer#ContentScrollViewer /template/ ScrollContentPresenter#PART_ContentPresenter">
+      <Setter Property="CanVerticallyScroll" Value="false" />
     </Style>
 
     <!-- Slimmer tab items -->

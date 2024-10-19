@@ -97,12 +97,14 @@ public static class ViewModelLocator
         Splatr.RegisterLazySingleton<ProfilePageViewModel>();
         Splatr.RegisterLazySingleton<WardrobePageViewModel>();
         Splatr.RegisterLazySingleton<FriendsPageViewModel>();
+        Splatr.RegisterLazySingleton<InventoryPageViewModel>();
         Splatr.RegisterLazySingleton<RoomPageViewModel>();
         Splatr.RegisterLazySingleton<NavigatorPageViewModel>();
         Splatr.RegisterLazySingleton<GameDataPageViewModel>();
         Splatr.RegisterLazySingleton<InfoPageViewModel>();
         Splatr.RegisterLazySingleton<SettingsPageViewModel>();
 
+        Splatr.RegisterLazySingleton<InventoryViewModel>();
         Splatr.RegisterLazySingleton<RoomInfoViewModel>();
         Splatr.RegisterLazySingleton<RoomAvatarsViewModel>();
         Splatr.RegisterLazySingleton<RoomVisitorsViewModel>();
@@ -111,6 +113,8 @@ public static class ViewModelLocator
         Splatr.RegisterLazySingleton<RoomGiftsViewModel>();
 
         Splatr.RegisterLazySingleton<FurniDataViewModel>();
+
+        Splatr.RegisterLazySingleton<OfferItemsViewModel>();
 
         // Logic
         Splatr.RegisterConstant(new GEarthOptions() with

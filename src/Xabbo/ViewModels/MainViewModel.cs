@@ -1,4 +1,4 @@
-using Splat;
+﻿using Splat;
 using Xabbo.Configuration;
 using Xabbo.Services.Abstractions;
 
@@ -28,6 +28,7 @@ public class MainViewModel : ViewModelBase
         IConfigProvider<AppConfig> config,
         GeneralPageViewModel general,
         WardrobePageViewModel wardrobe,
+        InventoryPageViewModel inventory,
         FriendsPageViewModel friends,
         ChatPageViewModel chat,
         RoomPageViewModel room,
@@ -36,7 +37,7 @@ public class MainViewModel : ViewModelBase
         SettingsPageViewModel settings)
     {
         _config = config;
-        Pages = [general, wardrobe, friends, chat, room, gameData];
+        Pages = [general, wardrobe, inventory, friends, chat, room, gameData];
         FooterPages = [info, settings];
         SelectedPage = general;
     }

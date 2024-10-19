@@ -32,6 +32,9 @@
       <DataTemplate DataType="vm:WardrobePageViewModel">
         <v:WardrobePageView />
       </DataTemplate>
+      <DataTemplate DataType="vm:InventoryPageViewModel">
+        <v:InventoryPageView />
+      </DataTemplate>
       <DataTemplate DataType="vm:ChatPageViewModel">
         <v:ChatPage />
       </DataTemplate>

@@ -10,5 +10,6 @@ public class ViewLocator : StrongViewLocator
     public ViewLocator()
     {
         Register<MainViewModel, MainWindow>();
+        Register<OfferItemsViewModel, OfferItemsView>();
     }
 }
