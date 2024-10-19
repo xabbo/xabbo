@@ -9,6 +9,7 @@
   xmlns:ic="using:FluentIcons.Avalonia.Fluent"
   xmlns:img="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
   xmlns:services="using:Xabbo.Avalonia.Services"
+  xmlns:controls="using:Xabbo.Avalonia.Controls"
   xmlns:c="using:Xabbo.Avalonia.Converters"
   RequestedThemeVariant="Dark"
 >
@@ -24,6 +25,7 @@
         <ResourceInclude Source="Controls/TimingSlider.axaml" />
         <ResourceInclude Source="Controls/AvatarImage.axaml" />
         <ResourceInclude Source="Controls/FurniIconImage.axaml" />
+        <ResourceInclude Source="Controls/NumberBox.axaml" />
       </ResourceDictionary.MergedDictionaries>
 
       <!-- Common resources -->
