@@ -47,9 +47,10 @@
           <Border>
             <Grid ColumnDefinitions="Auto,*">
               <controls:AvatarImage
-                Margin="-10,-10,0,-10"
+                Margin="0,-10,0,-10"
                 FigureString="{Binding FigureString}"
                 HeadOnly="true"
+                ClipToBounds="false"
               />
               <TextBlock
                 Grid.Column="1"
@@ -73,6 +74,8 @@
       <ListBox.ItemContainerTheme>
         <ControlTheme TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}" x:DataType="vm:ChatLogEntryViewModel">
           <Setter Property="IsHitTestVisible" Value="{Binding IsSelectable}"/>
+          <Setter Property="MinHeight" Value="0" />
+          <Setter Property="Padding" Value="0" />
         </ControlTheme>
       </ListBox.ItemContainerTheme>
       <ListBox.ItemTemplate>
