@@ -16,7 +16,6 @@
   <ControlTheme x:Key="{x:Type controls:TimingSlider}" TargetType="controls:TimingSlider">
     <ControlTheme.Resources>
       <sys:Int32 x:Key="Rounding">10</sys:Int32>
-      <converters:RoundingConverter x:Key="RoundingConverter" />
     </ControlTheme.Resources>
     <Setter Property="Template">
       <ControlTemplate>
@@ -27,21 +26,23 @@
               ToolTip.Tip="{TemplateBinding Tip}"
             />
             <TextBlock Grid.Column="1">
-              <Run
-                Text="{TemplateBinding Value,
-                  Converter={StaticResource RoundingConverter},
-                  ConverterParameter={StaticResource Rounding}
-                }"
-              />
+              <Run Text="{TemplateBinding Value}" />
               <Run>ms</Run>
             </TextBlock>
           </Grid>
           <Slider
             Minimum="0" Maximum="2000"
-            TickFrequency="100"
+            TickFrequency="10"
+            IsSnapToTickEnabled="true"
             TickPlacement="BottomRight"
             Value="{TemplateBinding Value, Mode=TwoWay}"
-          />
+          >
+            <Slider.Styles>
+              <Style Selector="Slider /template/ TickBar">
+                <Setter Property="TickFrequency" Value="100" />
+              </Style>
+            </Slider.Styles>
+          </Slider>
         </StackPanel>
       </ControlTemplate>
     </Setter>
