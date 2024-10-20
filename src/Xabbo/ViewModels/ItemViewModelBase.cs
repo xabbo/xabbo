@@ -30,7 +30,6 @@ public abstract class ItemViewModelBase : ViewModelBase
 
         if (Extensions.IsInitialized && item.TryGetInfo(out _info))
         {
-
             if (item.TryGetVariant(out string? variant))
                 Variant = variant;
 
@@ -59,5 +58,8 @@ public abstract class ItemViewModelBase : ViewModelBase
         {
             Name = item.Identifier ?? "?";
         }
+
+        if (item is IFloorItem { Data.IsLimitedRare: true } ltd)
+            Name += $" #{ltd.Data.UniqueSerialNumber}";
     }
 }

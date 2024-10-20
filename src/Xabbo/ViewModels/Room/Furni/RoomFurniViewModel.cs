@@ -27,7 +27,7 @@ public partial class RoomFurniViewModel : ViewModelBase
     private readonly ProfileManager _profileManager;
     private readonly RoomManager _roomManager;
 
-    private readonly SourceCache<FurniStackViewModel, StackDescriptor> _furniStackCache = new(x => x.Descriptor);
+    private readonly SourceCache<FurniStackViewModel, ItemDescriptor> _furniStackCache = new(x => x.Descriptor);
     private readonly SourceCache<FurniViewModel, (ItemType, Id)> _furniCache = new(x => (x.Type, x.Id));
 
     private readonly ReadOnlyObservableCollection<FurniViewModel> _furni;
@@ -437,11 +437,11 @@ public partial class RoomFurniViewModel : ViewModelBase
             {
                 foreach (var item in items)
                 {
-                    var key = FurniStackViewModel.GetDescriptor(item);
+                    var key = item.GetDescriptor();
                     cache
                         .Lookup(key)
                         .IfHasValue(vm => vm.Count++)
-                        .Else(() => cache.AddOrUpdate(new FurniStackViewModel(item)));
+                        .Else(() => cache.AddOrUpdate(new FurniStackViewModel(key)));
                 }
             });
         });
@@ -451,7 +451,7 @@ public partial class RoomFurniViewModel : ViewModelBase
     {
         _uiCtx.Invoke(() => {
             _furniCache.RemoveKey((item.Type, item.Id));
-            var desc = FurniStackViewModel.GetDescriptor(item);
+            var desc = item.GetDescriptor();
             _furniStackCache.Lookup(desc).IfHasValue(vm =>
             {
                 vm.Count--;

@@ -23,6 +23,7 @@ public class FurniViewModel(IFurni furni) : ItemViewModelBase(furni)
     public int? Y => (Furni as IFloorItem)?.Y;
     public double? Z => (Furni as IFloorItem)?.Z;
     public int? Dir => (Furni as IFloorItem)?.Direction;
+    public int? LTD => Furni is IFloorItem { Data.IsLimitedRare: true } it ? it.Data.UniqueSerialNumber : null;
 
     // Wall item properties
     public int? WX => (Furni as IWallItem)?.WX;
@@ -44,27 +45,15 @@ public class FurniViewModel(IFurni furni) : ItemViewModelBase(furni)
 
 public class FurniStackViewModel : ItemViewModelBase
 {
-    public static StackDescriptor GetDescriptor(IFurni item)
-    {
-        if (!Extensions.IsInitialized)
-            return new StackDescriptor(item.Type, item.Kind, item.Identifier, "", false, false);
-
-        item.TryGetIdentifier(out string? identifier);
-        string variant = "";
-        if (identifier == "poster" && item is IWallItem wallItem)
-            variant = wallItem.Data;
-        return new StackDescriptor(item.Type, item.Kind, identifier, variant, false, false);
-    }
-
-    public StackDescriptor Descriptor { get; }
+    public ItemDescriptor Descriptor { get; }
     [Reactive] public int Count { get; set; } = 1;
 
     private readonly ObservableAsPropertyHelper<bool> _showCount;
     public bool ShowCount => _showCount.Value;
 
-    public FurniStackViewModel(IFurni item) : base(item)
+    public FurniStackViewModel(ItemDescriptor descriptor) : base(descriptor)
     {
-        Descriptor = GetDescriptor(item);
+        Descriptor = descriptor;
 
         _showCount = this
             .WhenAnyValue(x => x.Count)
