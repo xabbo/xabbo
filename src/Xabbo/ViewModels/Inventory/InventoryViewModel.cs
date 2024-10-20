@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Avalonia.Controls.Selection;
 using DynamicData;
@@ -17,8 +18,9 @@ using Xabbo.Core.Messages.Outgoing;
 using Xabbo.Configuration;
 using Xabbo.Controllers;
 using Xabbo.Services.Abstractions;
-using System.Text.Json;
 using Xabbo.Web.Serialization;
+using Xabbo.Utility;
+using Xabbo.Core.Tasks;
 
 namespace Xabbo.ViewModels;
 
@@ -31,7 +33,9 @@ public sealed partial class InventoryViewModel : ControllerBase
     private readonly IConfigProvider<AppConfig> _config;
     private readonly IDialogService _dialogService;
     private readonly IHabboApi _api;
+    private readonly RoomManager _roomManager;
     private readonly InventoryManager _inventoryManager;
+    private readonly TradeManager _tradeManager;
 
     private readonly SourceCache<InventoryStackViewModel, ItemDescriptor> _cache = new(x => x.Item.GetDescriptor());
 
@@ -49,19 +53,22 @@ public sealed partial class InventoryViewModel : ControllerBase
     public ReactiveCommand<Unit, Task> OfferItemsCmd { get; }
     public ReactiveCommand<Unit, Task> PlaceItemsCmd { get; }
 
-    public InventoryManager Manager => _inventoryManager;
-
     public SelectionModel<InventoryStackViewModel> Selection { get; } = new SelectionModel<InventoryStackViewModel>() { SingleSelect = false };
 
     private readonly ObservableAsPropertyHelper<bool> _isBusy;
     public bool IsBusy => _isBusy.Value;
 
+    private readonly ObservableAsPropertyHelper<string?> _emptyText;
+    public string? EmptyText => _emptyText.Value;
+
+    private readonly ObservableAsPropertyHelper<string> _statusText;
+    public string StatusText => _statusText.Value;
+
     [Reactive] public State Status { get; set; } = State.None;
     [Reactive] public int Progress { get; set; }
     [Reactive] public int MaxProgress { get; set; }
 
-    private readonly ObservableAsPropertyHelper<string> _statusText;
-    public string StatusText => _statusText.Value;
+    [Reactive] public bool HasLoaded { get; set; }
 
     public InventoryViewModel(
         IExtension extension,
@@ -69,7 +76,9 @@ public sealed partial class InventoryViewModel : ControllerBase
         IConfigProvider<AppConfig> config,
         IDialogService dialogService,
         IHabboApi api,
-        InventoryManager inventoryManager
+        RoomManager roomManager,
+        InventoryManager inventoryManager,
+        TradeManager tradeManager
     )
         : base(extension)
     {
@@ -77,7 +86,9 @@ public sealed partial class InventoryViewModel : ControllerBase
         _config = config;
         _dialogService = dialogService;
         _api = api;
+        _roomManager = roomManager;
         _inventoryManager = inventoryManager;
+        _tradeManager = tradeManager;
 
         _cache
             .Connect()
@@ -104,6 +115,17 @@ public sealed partial class InventoryViewModel : ControllerBase
             .ObserveOn(RxApp.MainThreadScheduler)
             .ToProperty(this, x => x.IsBusy);
 
+        _emptyText =
+            Observable.CombineLatest(
+                this.WhenAnyValue(x => x.HasLoaded),
+                _cache.CountChanged,
+                _roomManager.WhenAnyValue(x => x.IsInRoom),
+                (hasLoaded, count, isInRoom) => hasLoaded && count == 0
+                    ? "No items"
+                    : (isInRoom ? null : "Enter a room to load inventory")
+            )
+            .ToProperty(this, x => x.EmptyText);
+
         _statusText =
             Observable.CombineLatest(
                 this.WhenAnyValue(
@@ -121,16 +143,44 @@ public sealed partial class InventoryViewModel : ControllerBase
                 {
                     State.Loading => manager.max > 0
                         ? $"Loading...\n{manager.current} / {manager.max}"
-                        : $"Loading...\n{manager.current}",
+                        : $"Loading...\n{manager.current} / ?",
                     State.Offering => $"Offering items...\n{self.progress} / {self.maxProgress}",
+                    State.Placing => $"Placing items...\n{self.progress} / {self.maxProgress}",
                     _ => ""
                 }
             )
             .ToProperty(this, x => x.StatusText);
 
-        LoadCmd = ReactiveCommand.Create<Task>(LoadInventoryAsync);
-        OfferItemsCmd = ReactiveCommand.Create<Task>(OfferItemsAsync);
-        PlaceItemsCmd = ReactiveCommand.Create<Task>(PlaceItemsAsync);
+        LoadCmd = ReactiveCommand.Create<Task>(
+            LoadInventoryAsync,
+            Observable.CombineLatest(
+                _roomManager.WhenAnyValue(x => x.IsInRoom),
+                this.WhenAnyValue(x => x.IsBusy),
+                (isInRoom, isBusy) => isInRoom && !isBusy
+            )
+            .ObserveOn(RxApp.MainThreadScheduler)
+        );
+
+        OfferItemsCmd = ReactiveCommand.Create<Task>(
+            OfferItemsAsync,
+            Observable.CombineLatest(
+                this.WhenAnyValue(x => x.IsBusy),
+                _tradeManager.WhenAnyValue(x => x.IsTrading),
+                (isBusy, isTrading) => !isBusy && isTrading
+            )
+            .ObserveOn(RxApp.MainThreadScheduler)
+        );
+
+        PlaceItemsCmd = ReactiveCommand.Create<Task>(
+            PlaceItemsAsync,
+            Observable.CombineLatest(
+                this.WhenAnyValue(x => x.IsBusy),
+                _roomManager.WhenAnyValue(x => x.IsInRoom),
+                _tradeManager.WhenAnyValue(x => x.IsTrading),
+                (isBusy, isInRoom, isTrading) => !isBusy && isInRoom && !isTrading
+            )
+            .ObserveOn(RxApp.MainThreadScheduler)
+        );
 
         _inventoryManager.Loaded += OnInventoryLoaded;
         _inventoryManager.Cleared += OnInventoryCleared;
@@ -238,9 +288,64 @@ public sealed partial class InventoryViewModel : ControllerBase
         }
     }
 
-    private Task PlaceItemsAsync()
+    private Task PlaceItemsAsync() => PlaceItemsAsync(Selection.SelectedItems);
+
+    private async Task PlaceItemsAsync(IEnumerable<InventoryStackViewModel?> stacks)
     {
-        return Task.CompletedTask;
+        if (!_roomManager.EnsureInRoom(out var room))
+            return;
+
+        try
+        {
+            var items = stacks
+                .Where(x => x is { Type: ItemType.Floor })
+                .SelectMany(x => x!)
+                .ToArray();
+
+            _logger.LogDebug("Placing {Count} items.", items.Length);
+
+            Progress = 1;
+            MaxProgress = items.Length;
+            Status = State.Placing;
+
+            for (int i = 0; i < items.Length; i++)
+            {
+                _logger.LogTrace("Placing item {Current}/{Max}.", i+1, items.Length);
+                var item = items[i];
+                Progress = i+1;
+                if (!item.TryGetSize(out var size))
+                {
+                    _logger.LogWarning("Failed to get size for {Item}.", item);
+                    continue;
+                }
+                Point? freeTile = room.FindPlaceablePoint(size);
+                if (freeTile is null)
+                {
+                    _logger.LogWarning("Failed to find placeable location for {Item}.", item);
+                    continue;
+                }
+
+                _logger.LogTrace("Placing {Item} at {Point}.", item, freeTile.Value);
+                var interval = Task.Delay(_config.Value.Timing.GetTiming(Session).FurniPlaceInterval);
+                var result = await new PlaceFloorItemTask(Ext, item.ItemId, freeTile.Value, 0).ExecuteAsync(3000);
+                if (result is PlaceFloorItemTask.Result.Error)
+                    _logger.LogWarning("Failed to place {Item}.", item);
+                await interval;
+            }
+        }
+        catch (TimeoutException)
+        {
+            _logger.LogWarning("Operation timed out.");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("Failed to place furni: {Message}", ex.Message);
+        }
+        finally
+        {
+            Status = State.None;
+            Progress = MaxProgress = 0;
+        }
     }
 
     private async Task OfferItemsAsync(IEnumerable<OfferItemViewModel> offers)
@@ -343,6 +448,12 @@ public sealed partial class InventoryViewModel : ControllerBase
 
     public async Task LoadInventoryAsync()
     {
+        if (!_roomManager.IsInRoom)
+        {
+            await _dialogService.ShowAsync("Warning", "You must be in a room to load your inventory.");
+            return;
+        }
+
         try
         {
             Status = State.Loading;
@@ -350,7 +461,7 @@ public sealed partial class InventoryViewModel : ControllerBase
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.Message);
+            await _dialogService.ShowAsync("Failed to load inventory", ex.Message);
         }
         finally
         {

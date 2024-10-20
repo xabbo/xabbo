@@ -28,6 +28,7 @@
       </ResourceDictionary.MergedDictionaries>
 
       <!-- Common resources -->
+      <sys:Int32 x:Key="Zero">0</sys:Int32>
       <sys:Int32 x:Key="PositiveOne">1</sys:Int32>
       <sys:Int32 x:Key="NegativeOne">-1</sys:Int32>
 

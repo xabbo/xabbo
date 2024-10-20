@@ -30,25 +30,36 @@
     LoadingContent="{Binding StatusText}"
     ContentFadeOpacity="0.1"
   >
-    <TabControl x:Name="FurniTabs" Padding="0" TabStripPlacement="Bottom">
-      <TabItem>
-        <TabItem.Header>
-          <StackPanel Orientation="Horizontal" Spacing="4">
-            <ic:SymbolIcon VerticalAlignment="Center" Symbol="Grid" />
-            <TextBlock VerticalAlignment="Center" Text="Grid" />
-          </StackPanel>
-        </TabItem.Header>
-        <v:InventoryStacksView />
-      </TabItem>
-      <TabItem>
-        <TabItem.Header>
-          <StackPanel Orientation="Horizontal" Spacing="4">
-            <ic:SymbolIcon VerticalAlignment="Center" Symbol="Image" />
-            <TextBlock VerticalAlignment="Center" Text="Photos" />
-          </StackPanel>
-        </TabItem.Header>
-        <v:InventoryPhotosView />
-      </TabItem>
-    </TabControl>
+    <Panel>
+      <TabControl Padding="0" TabStripPlacement="Bottom">
+        <TabItem>
+          <TabItem.Header>
+            <StackPanel Orientation="Horizontal" Spacing="4">
+              <ic:SymbolIcon VerticalAlignment="Center" Symbol="Grid" />
+              <TextBlock VerticalAlignment="Center" Text="Items" />
+            </StackPanel>
+          </TabItem.Header>
+          <v:InventoryStacksView />
+        </TabItem>
+        <TabItem Classes="modern">
+          <TabItem.Header>
+            <StackPanel Orientation="Horizontal" Spacing="4">
+              <ic:SymbolIcon VerticalAlignment="Center" Symbol="Image" />
+              <TextBlock VerticalAlignment="Center" Text="Photos" />
+            </StackPanel>
+          </TabItem.Header>
+          <v:InventoryPhotosView />
+        </TabItem>
+      </TabControl>
+      <controls:InfoOverlay
+        IsVisible="{Binding !IsBusy}"
+        ShowContent="{Binding ItemCount, Converter={StaticResource EqConverter}, ConverterParameter={StaticResource Zero}}"
+        Text="{Binding EmptyText}"
+      >
+        <Button Padding="5" HorizontalAlignment="Center" VerticalAlignment="Center" Command="{Binding LoadCmd}">
+          <ic:SymbolIcon HorizontalAlignment="Center" VerticalAlignment="Center" Symbol="ArrowSync" />
+        </Button>
+      </controls:InfoOverlay>
+    </Panel>
   </controls:Loading>
 </UserControl>

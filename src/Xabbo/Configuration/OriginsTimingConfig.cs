@@ -7,6 +7,7 @@ public sealed class OriginsTimingConfig : TimingConfigBase
     public OriginsTimingConfig()
     {
         ModerationInterval = 750;
-        FurniPickupInterval = 560;
+        FurniPlaceInterval = 550;
+        FurniPickupInterval = 550;
     }
 }
