@@ -79,8 +79,8 @@ public partial class FlattenRoomComponent(IExtension extension, RoomManager room
 
         e.Packet.Position = 0;
         FloorPlan floorPlan = e.Packet.Read<FloorPlan>();
-        for (int y = 0; y < floorPlan.Length; y++)
-            for (int x = 0; x < floorPlan.Width; x++)
+        for (int y = 0; y < floorPlan.Size.Y; y++)
+            for (int x = 0; x < floorPlan.Size.X; x++)
                 if (floorPlan.GetHeight(x, y) >= 0)
                     floorPlan.SetHeight(x, y, 0);
 
@@ -93,7 +93,7 @@ public partial class FlattenRoomComponent(IExtension extension, RoomManager room
             {
                 if (_heightmap[x, y].IsFree)
                 {
-                    double height = _heightmap[x, y].Height - GetOffset(x, y);
+                    float height = _heightmap[x, y].Height - GetOffset(x, y);
                     if (height >= 0)
                         _heightmap[x, y].Height = height;
                 }
