@@ -110,7 +110,21 @@ public partial class RoomFurniController : ControllerBase
             if (filter is not null)
                 furni = furni.Where(filter);
 
-            var toProcess = furni.ToArray();
+            var toProcess = furni
+                .OrderBy(x => x.Type)
+                .ThenBy(x => x switch
+                {
+                    IFloorItem it => it.Y,
+                    IWallItem it => it.WX * 16 - it.WY * 16 + it.LX,
+                    _ => 0,
+                })
+                .ThenBy(x => x switch
+                {
+                    IFloorItem it => it.X,
+                    IWallItem it => it.WX * 16 + it.WY * 16 - it.LY,
+                    _ => 0
+                })
+                .ToArray();
 
             CurrentProgress = 0;
             TotalProgress = toProcess.Length;
