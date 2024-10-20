@@ -16,15 +16,34 @@
     <Setter Property="Template">
       <ControlTemplate>
         <StackPanel
-          Orientation="Horizontal"
           HorizontalAlignment="Center"
           VerticalAlignment="Center"
           TextElement.FontSize="18"
-          Spacing="4"
           Opacity="0.5"
+          Spacing="10"
         >
-          <ic:SymbolIcon Symbol="Info" FontSize="24" VerticalAlignment="Center" />
-          <ContentPresenter Content="{TemplateBinding Content}" />
+          <StackPanel IsVisible="{TemplateBinding ShowMessage}" HorizontalAlignment="Center" Orientation="Horizontal" Spacing="4">
+            <StackPanel.IsVisible>
+              <MultiBinding Converter="{x:Static BoolConverters.And}">
+                <TemplateBinding Property="ShowMessage" />
+                <TemplateBinding Property="Text" Converter="{x:Static StringConverters.IsNotNullOrEmpty}" />
+              </MultiBinding>
+            </StackPanel.IsVisible>
+            <ic:SymbolIcon Symbol="Info" FontSize="24" VerticalAlignment="Center" />
+            <TextBlock Text="{TemplateBinding Text}" />
+          </StackPanel>
+          <ContentPresenter
+            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+            Content="{TemplateBinding Content}"
+          >
+            <ContentPresenter.IsVisible>
+              <MultiBinding Converter="{x:Static BoolConverters.And}">
+                <TemplateBinding Property="ShowContent" />
+                <TemplateBinding Property="Content" Converter="{x:Static ObjectConverters.IsNotNull}" />
+              </MultiBinding>
+            </ContentPresenter.IsVisible>
+          </ContentPresenter>
         </StackPanel>
       </ControlTemplate>
     </Setter>

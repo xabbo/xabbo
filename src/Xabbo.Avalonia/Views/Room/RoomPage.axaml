@@ -108,6 +108,6 @@
         <v:RoomFurniView DataContext="{Binding Furni}" />
       </TabItem>
     </TabControl>
-    <controls:InfoOverlay IsVisible="{Binding !RoomManager.IsInRoom}" Content="Enter a room" />
+    <controls:InfoOverlay IsVisible="{Binding !RoomManager.IsInRoom}" Text="Enter a room" />
   </Panel>
 </UserControl>

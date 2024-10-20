@@ -20,7 +20,7 @@
     </Style>
   </UserControl.Styles>
   <Grid RowDefinitions="Auto,*">
-    <controls:InfoOverlay Grid.RowSpan="2" IsVisible="{Binding IsEmpty}" Content="{Binding EmptyStatus}" />
+    <controls:InfoOverlay Grid.RowSpan="2" IsVisible="{Binding IsEmpty}" Text="{Binding EmptyStatus}" />
     <TextBox
       Margin="10,0,10,10"
       Classes="clearButton"

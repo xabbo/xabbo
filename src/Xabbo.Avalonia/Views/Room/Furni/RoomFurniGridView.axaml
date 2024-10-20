@@ -23,7 +23,7 @@
     </Style>
   </UserControl.Styles>
   <Grid RowDefinitions="Auto,*">
-    <controls:InfoOverlay Grid.RowSpan="2" Content="{Binding EmptyStatusGrid}">
+    <controls:InfoOverlay Grid.RowSpan="2" Text="{Binding EmptyStatusGrid}">
       <controls:InfoOverlay.IsVisible>
         <MultiBinding Converter="{x:Static BoolConverters.Or}">
           <Binding Path="IsEmpty" />

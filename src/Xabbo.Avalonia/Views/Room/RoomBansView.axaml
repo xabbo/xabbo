@@ -26,7 +26,7 @@
             <DataGridTextColumn Header="name" Binding="{Binding Name}" />
           </DataGrid.Columns>
         </DataGrid>
-        <controls:InfoOverlay Content="No bans to show">
+        <controls:InfoOverlay Text="No bans to show">
           <controls:InfoOverlay.Styles>
             <Style Selector="controls|InfoOverlay">
               <Setter Property="Opacity" Value="0" />
