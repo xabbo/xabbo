@@ -21,26 +21,31 @@
       Text="{Binding FilterText}"
     />
     <ListBox Grid.Row="1" Name="ListBoxMessages" ItemsSource="{Binding Messages}" Selection="{Binding Selection}" Padding="10" SelectionMode="Multiple">
+      <ListBox.Styles>
+        <Style Selector="ListBoxItem:selected /template/ Rectangle#SelectionIndicator">
+          <Setter Property="IsVisible" Value="false" />
+        </Style>
+      </ListBox.Styles>
       <ListBox.DataTemplates>
         <DataTemplate DataType="vm:ChatLogRoomEntryViewModel">
-          <Grid ColumnDefinitions="*,Auto,*">
-            <Separator Grid.Column="0" />
+          <Grid Margin="10,0" ColumnDefinitions="*,Auto,*">
+            <Separator Margin="0" Grid.Column="0" />
             <TextBlock Grid.Column="1" Margin="10,0">
               <Run Text="{Binding RoomName}" FontWeight="Bold" />
               <Run Text="by"/>
               <Run Classes="privacy" Text="{Binding RoomOwner}" />
             </TextBlock>
-            <Separator Grid.Column="2" />
+            <Separator Margin="0" Grid.Column="2" />
           </Grid>
         </DataTemplate>
         <DataTemplate DataType="vm:ChatLogAvatarActionViewModel">
-          <Grid ColumnDefinitions="*,Auto,*">
-            <Separator Grid.Column="0" />
+          <Grid Margin="10,0" ColumnDefinitions="*,Auto,*">
+            <Separator Margin="0" Grid.Column="0" />
             <TextBlock Grid.Column="1" Margin="10,0">
               <Run Classes="privacy" Text="{Binding UserName}" />
               <Run Text="{Binding Action}" />
             </TextBlock>
-            <Separator Grid.Column="2" />
+            <Separator Margin="0" Grid.Column="2" />
           </Grid>
         </DataTemplate>
         <DataTemplate DataType="vm:ChatMessageViewModel">
@@ -73,7 +78,6 @@
       </Interaction.Behaviors>
       <ListBox.ItemContainerTheme>
         <ControlTheme TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}" x:DataType="vm:ChatLogEntryViewModel">
-          <Setter Property="IsHitTestVisible" Value="{Binding IsSelectable}"/>
           <Setter Property="Padding" Value="0" />
         </ControlTheme>
       </ListBox.ItemContainerTheme>
