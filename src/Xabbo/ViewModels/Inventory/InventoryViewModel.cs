@@ -120,9 +120,15 @@ public sealed partial class InventoryViewModel : ControllerBase
                 this.WhenAnyValue(x => x.HasLoaded),
                 _cache.CountChanged,
                 _roomManager.WhenAnyValue(x => x.IsInRoom),
-                (hasLoaded, count, isInRoom) => hasLoaded && count == 0
-                    ? "No items"
-                    : (isInRoom ? null : "Enter a room to load inventory")
+                (hasLoaded, count, isInRoom) => {
+                    if (count > 0)
+                        return null;
+                    if (hasLoaded)
+                        return "No items";
+                    if (!isInRoom)
+                        return "Enter a room to load inventory";
+                    return null;
+                }
             )
             .ToProperty(this, x => x.EmptyText);
 
@@ -240,6 +246,7 @@ public sealed partial class InventoryViewModel : ControllerBase
         });
 
         ItemCount = inventory.Count;
+        HasLoaded = true;
     }
 
     private static (IInventoryItem Item, string? PhotoId) TryExtractPhotoId(IInventoryItem item)
@@ -259,6 +266,7 @@ public sealed partial class InventoryViewModel : ControllerBase
     {
         _cache.Clear();
         _photoCache.Clear();
+        HasLoaded = false;
     }
 
     private async Task OfferItemsAsync()
