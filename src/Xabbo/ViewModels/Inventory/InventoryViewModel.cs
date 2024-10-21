@@ -90,6 +90,8 @@ public sealed partial class InventoryViewModel : ControllerBase
         _roomManager = roomManager;
         _inventoryManager = inventoryManager;
         _tradeManager = tradeManager;
+        _tradeManager.Updated += OnTradeUpdated;
+        _tradeManager.Closed += OnTradeClosed;
 
         var comparer = SortExpressionComparer<InventoryStackViewModel>.Ascending(x => x.Name);
 
@@ -247,6 +249,29 @@ public sealed partial class InventoryViewModel : ControllerBase
         HasLoaded = true;
     }
 
+    private void OnTradeUpdated(TradeUpdatedEventArgs e)
+    {
+        foreach (var group in e.SelfOffer.GroupBy(x => x.GetDescriptor()))
+        {
+            _cache
+                .Lookup(group.Key)
+                .IfHasValue(vm => {
+                    vm.OfferCount = group.Count();
+                })
+                .Else(() => {
+                    _logger.LogWarning("Failed to find item {Descriptor} to update offer count.", group.Key);
+                });
+        }
+    }
+
+    private void OnTradeClosed(TradeClosedEventArgs args)
+    {
+        _cache.Edit(cache => {
+            foreach (var (k, vm) in cache.KeyValues)
+                vm.OfferCount = 0;
+        });
+    }
+
     private static (IInventoryItem Item, string? PhotoId) TryExtractPhotoId(IInventoryItem item)
     {
         string? photoId = null;
@@ -273,7 +298,8 @@ public sealed partial class InventoryViewModel : ControllerBase
         viewModel.Items = Selection.SelectedItems
             .Where(stack => stack is not null)
             .Select(stack => new OfferItemViewModel(stack!.Item) {
-                Amount = stack.Count,
+                Amount = stack.OfferCount > 0 ? stack.OfferCount : stack.Count,
+                MinAmount = stack.OfferCount,
                 MaxAmount = stack.Count,
             }).ToList();
 
@@ -356,14 +382,30 @@ public sealed partial class InventoryViewModel : ControllerBase
 
     private async Task OfferItemsAsync(IEnumerable<OfferItemViewModel> offers)
     {
+        if (!_tradeManager.IsTrading)
+        {
+            await _dialogService.ShowAsync("Warning", "You are not currently in a trade.");
+            return;
+        }
+
+        HashSet<Id> offered = [];
+        if (_tradeManager.SelfOffer is { } selfOffer)
+        {
+            foreach (var item in selfOffer)
+                offered.Add(item.ItemId);
+        }
+
         List<IInventoryItem> toOffer = [];
         foreach (var offer in offers)
         {
-            var maybeStack = _cache.Lookup((ItemDescriptor)offer.Item);
-            if (!maybeStack.HasValue)
-                return;
-            var stack = maybeStack.Value;
-            toOffer.Add(stack.Take(offer.Amount));
+            _cache
+                .Lookup((ItemDescriptor)offer.Item)
+                .IfHasValue(stack => {
+                    int addAmount = offer.Amount - offer.MinAmount;
+                    toOffer.Add(stack
+                        .Where(x => offered.Add(x.ItemId))
+                        .Take(addAmount));
+                });
         }
 
         try

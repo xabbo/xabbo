@@ -47,7 +47,7 @@
           <DataTemplate DataType="vm:OfferItemViewModel">
             <NumericUpDown
               ClipValueToMinMax="true"
-              FormatString="0" Value="{Binding Amount}" Minimum="0" Maximum="{Binding MaxAmount}">
+              FormatString="0" Value="{Binding Amount}" Minimum="{Binding MinAmount}" Maximum="{Binding MaxAmount}">
               <Interaction.Behaviors>
                 <behaviors:NonEmptyNumericUpDownBehavior />
               </Interaction.Behaviors>

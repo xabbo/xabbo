@@ -83,6 +83,14 @@
                 Value="{Binding Count}"
                 IsVisible="{Binding Count, Converter={StaticResource GtConverter}, ConverterParameter={StaticResource PositiveOne}}"
               />
+              <!-- Trade offer count -->
+              <ui:InfoBadge
+                Margin="4"
+                HorizontalAlignment="Right" VerticalAlignment="Top"
+                TextElement.FontSize="10"
+                Value="{Binding OfferCount}"
+                IsVisible="{Binding OfferCount, Converter={StaticResource GtConverter}, ConverterParameter={StaticResource Zero}}"
+              />
             </Panel>
           </Border>
         </DataTemplate>

@@ -20,6 +20,8 @@ public sealed class InventoryStackViewModel(IItem item, IEnumerable<IInventoryIt
 
     public int Count => IsStickyNote ? _items.Sum(x => int.TryParse(x.Data.Value, out int count) ? count : 0) : _items.Count;
 
+    [Reactive] public int OfferCount { get; set; }
+
     bool ICollection<IInventoryItem>.IsReadOnly => false;
 
     public bool IsStickyNote { get; }
