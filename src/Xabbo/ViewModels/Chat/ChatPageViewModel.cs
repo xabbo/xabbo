@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Reactive.Linq;
 using DynamicData;
 using DynamicData.Binding;
@@ -29,15 +29,10 @@ public class ChatPageViewModel : PageViewModel
     private readonly IGameStateService _gameState;
     private readonly IFigureConverterService _figureConverter;
 
-    const string LogDirectory = "logs/chat";
-    private string? _currentFilePath;
-
     private readonly RoomManager _roomManager;
+    private readonly ProfileManager _profileManager;
 
-    private DateTime _lastDate = DateTime.MinValue;
-    private long _lastRoom = -1;
-
-    public Configuration.ChatLogConfig Config => Settings.Chat.Log;
+    public ChatLogConfig Config => Settings.Chat.Log;
 
     private long _currentMessageId;
     private readonly SourceCache<ChatLogEntryViewModel, long> _cache = new(x => x.EntryId);
@@ -57,16 +52,18 @@ public class ChatPageViewModel : PageViewModel
         IConfigProvider<AppConfig> settingsProvider,
         IGameStateService gameState,
         IFigureConverterService figureConverter,
-        RoomManager roomManager)
+        RoomManager roomManager,
+        ProfileManager profileManager)
     {
-        Directory.CreateDirectory(LogDirectory);
-
         _settingsProvider = settingsProvider;
         _gameState = gameState;
         _figureConverter = figureConverter;
         _roomManager = roomManager;
+        _profileManager = profileManager;
 
         _roomManager.Entered += OnEnteredRoom;
+        _roomManager.AvatarAdded += OnAvatarAdded;
+        _roomManager.AvatarRemoved += OnAvatarRemoved;
         _roomManager.AvatarChat += RoomManager_AvatarChat;
         _roomManager.AvatarUpdated += RoomManager_AvatarUpdated;
 
@@ -109,9 +106,34 @@ public class ChatPageViewModel : PageViewModel
         _cache.AddOrUpdate(vm);
     }
 
+    private void OnAvatarAdded(AvatarEventArgs e)
+    {
+        if (_roomManager.IsLoadingRoom || !Config.UserEntry || e.Avatar.Type is not AvatarType.User)
+            return;
+
+        AppendLog(new ChatLogAvatarActionViewModel
+        {
+            UserName = e.Avatar.Name,
+            Action = "entered the room"
+        });
+    }
+
+    private void OnAvatarRemoved(AvatarEventArgs e)
+    {
+        if (_roomManager.IsLoadingRoom || !Config.UserEntry || e.Avatar.Type is not AvatarType.User)
+            return;
+
+        AppendLog(new ChatLogAvatarActionViewModel
+        {
+            UserName = e.Avatar.Name.Equals(_profileManager.UserData?.Name) ? "You" : e.Avatar.Name,
+            Action = "left the room"
+        });
+    }
+
     private void RoomManager_AvatarUpdated(AvatarEventArgs e)
     {
-        if (e.Avatar.PreviousUpdate is { IsTrading: bool wasTrading } &&
+        if (Config.Trades &&
+            e.Avatar.PreviousUpdate is { IsTrading: bool wasTrading } &&
             e.Avatar.CurrentUpdate is { IsTrading: bool isTrading } &&
             isTrading != wasTrading)
         {
