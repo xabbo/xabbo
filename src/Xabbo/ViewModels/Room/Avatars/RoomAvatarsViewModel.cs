@@ -35,6 +35,7 @@ public class RoomAvatarsViewModel : ViewModelBase
     private readonly RoomModerationController _moderation;
     private readonly ProfileManager _profileManager;
     private readonly RoomManager _roomManager;
+    private readonly TradeManager _tradeManager;
 
     private readonly SourceCache<AvatarViewModel, int> _avatarCache = new(x => x.Index);
 
@@ -83,7 +84,8 @@ public class RoomAvatarsViewModel : ViewModelBase
         RoomModerationController moderation,
         WardrobePageViewModel wardrobe,
         ProfileManager profileManager,
-        RoomManager roomManager)
+        RoomManager roomManager,
+        TradeManager tradeManager)
     {
         _ext = ext;
         _config = config;
@@ -97,6 +99,7 @@ public class RoomAvatarsViewModel : ViewModelBase
         _moderation = moderation;
         _profileManager = profileManager;
         _roomManager = roomManager;
+        _tradeManager = tradeManager;
 
         _selectedUsers = this
             .WhenAnyValue(
@@ -174,13 +177,30 @@ public class RoomAvatarsViewModel : ViewModelBase
             .WhenAnyValue(x => x.ContextSelection)
             .Select(x => x?.Any(avatar =>
                 avatar.Type is AvatarType.User &&
-                avatar.Id != _profileManager.UserData?.Id
+                avatar.Id != _profileManager.UserData?.Id &&
+                avatar.Name != _profileManager.UserData?.Name
             ) == true)
+            .ObserveOn(RxApp.MainThreadScheduler);
+
+        var hasSingleNonSelfUser = this
+            .WhenAnyValue(x => x.ContextSelection)
+            .Select(x =>
+                x is [ { Avatar.Type: AvatarType.User } user ] &&
+                user.Id != _profileManager.UserData?.Id &&
+                user.Name != _profileManager.UserData?.Name
+            )
             .ObserveOn(RxApp.MainThreadScheduler);
 
         FindAvatarCmd = ReactiveCommand.Create(FindAvatar, hasSingleContextAvatar);
         CopyAvatarToWardrobeCmd = ReactiveCommand.Create(CopyAvatarsToWardrobe, hasAnyContextUser);
-        TradeUserCmd = ReactiveCommand.Create(TradeUser, hasSingleContextUser);
+        TradeUserCmd = ReactiveCommand.Create(TradeUser,
+            Observable.CombineLatest(
+                hasSingleNonSelfUser,
+                _tradeManager.WhenAnyValue(x => x.IsTrading),
+                (hasUser, isTrading) => hasUser && !isTrading
+            )
+            .ObserveOn(RxApp.MainThreadScheduler)
+        );
         CopyAvatarFieldCmd = ReactiveCommand.Create<string>(CopyAvatarField, hasSingleContextUser);
         OpenUserProfileCmd = ReactiveCommand.Create<string, Task>(OpenUserProfile, hasSingleContextUser);
 
