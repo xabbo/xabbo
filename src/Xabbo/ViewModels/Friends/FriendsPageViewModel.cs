@@ -2,6 +2,7 @@
 using System.Reactive;
 using System.Reactive.Linq;
 using DynamicData;
+using DynamicData.Binding;
 using DynamicData.Kernel;
 using ReactiveUI;
 using Avalonia.Controls.Selection;
@@ -62,21 +63,16 @@ public sealed class FriendsPageViewModel : PageViewModel
 
         _cache
             .Connect()
-            .Filter(friend => {
-                if (ShowOnlineOnly && !friend.IsOnline) return false;
-                if (!string.IsNullOrWhiteSpace(FilterText) &&
-                    !friend.Name.Contains(FilterText, StringComparison.CurrentCultureIgnoreCase))
-                    return false;
-                return true;
-            })
-            .SortBy(x => x.Name)
+            .Filter(
+                this.WhenAnyValue(
+                    x => x.FilterText,
+                    x => x.ShowOnlineOnly,
+                    CreateFilter
+                )
+            )
             .ObserveOn(RxApp.MainThreadScheduler)
-            .Bind(out _friends)
+            .SortAndBind(out _friends, SortExpressionComparer<FriendViewModel>.Ascending(x => x.Name))
             .Subscribe();
-
-        this
-            .WhenAnyValue(x => x.FilterText, x => x.ShowOnlineOnly)
-            .Subscribe(_ => _cache.Refresh());
 
         FollowFriendCmd = ReactiveCommand.Create<FriendViewModel>(FollowFriend);
         RemoveFriendsCmd = ReactiveCommand.CreateFromTask(RemoveSelectedFriendsAsync);
@@ -87,6 +83,12 @@ public sealed class FriendsPageViewModel : PageViewModel
         _friendManager.FriendUpdated += OnFriendUpdated;
         _friendManager.FriendRemoved += OnFriendRemoved;
     }
+
+    static Func<FriendViewModel, bool> CreateFilter(string? filterText, bool onlineOnly) => (vm) => {
+        return
+            (!onlineOnly || vm.IsOnline) &&
+            (string.IsNullOrWhiteSpace(filterText) || vm.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase));
+    };
 
     private void OnFigureConverterAvailable()
     {

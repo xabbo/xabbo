@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using ReactiveUI;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
 using Xabbo.Extension;
@@ -8,7 +9,7 @@ using Xabbo.Services.Abstractions;
 
 namespace Xabbo.Services;
 
-public class GameStateService : IGameStateService
+public class GameStateService : ReactiveObject, IGameStateService
 {
     private readonly ILogger Log;
     private readonly IExtension _ext;
@@ -16,7 +17,8 @@ public class GameStateService : IGameStateService
     public event Action<ConnectedEventArgs>? Connected;
     public event Action? Disconnected;
 
-    public Session Session { get; private set; } = Session.None;
+    [Reactive] public bool IsConnected { get; private set; }
+    [Reactive] public Session Session { get; private set; } = Session.None;
 
     public IGameDataManager GameData { get; }
 

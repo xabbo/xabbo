@@ -68,7 +68,7 @@ public class RoomBansViewModel : ViewModelBase
 
         _banCache
             .Connect()
-            .Filter(FilterBans)
+            .Filter(this.WhenAnyValue(x => x.FilterText).Select(CreateFilter))
             .ObserveOn(RxApp.MainThreadScheduler)
             .Bind(out _bans)
             .Subscribe();
@@ -125,9 +125,12 @@ public class RoomBansViewModel : ViewModelBase
         _ext.Intercept<UserUnbannedMsg>(unbanned => _banCache.RemoveKey(unbanned.UserId));
     }
 
-    private bool FilterBans(RoomBanViewModel ban)
+    private Func<RoomBanViewModel, bool> CreateFilter(string? filterText)
     {
-        return true;
+        if (string.IsNullOrWhiteSpace(filterText))
+            return static (vm) => true;
+
+        return (vm) => vm.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase);
     }
 
     private void OnLeftRoom()

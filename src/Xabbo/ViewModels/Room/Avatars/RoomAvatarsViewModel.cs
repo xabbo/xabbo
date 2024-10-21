@@ -139,26 +139,21 @@ public class RoomAvatarsViewModel : ViewModelBase
 
         _avatarCache
             .Connect()
-            .Filter(FilterAvatar)
-            .Sort(AvatarViewModelGroupComparer.Default)
-            .ObserveOn(RxApp.MainThreadScheduler)
-            .Bind(out _avatars)
-            .Subscribe();
-
-        _config
-            .WhenAnyValue(
-                x => x.Value.Room.Users.ShowPets,
-                x => x.Value.Room.Users.ShowBots
+            .Filter(
+                Observable.CombineLatest(
+                    this.WhenAnyValue(x => x.FilterText),
+                    _config.WhenAnyValue(
+                        x => x.Value.Room.Users.ShowPets,
+                        x => x.Value.Room.Users.ShowBots,
+                        (showPets, showBots) => (showPets, showBots)
+                    ),
+                    (filterText, config) => (filterText, config)
+                )
+                .Select(x => CreateFilter(x.filterText, x.config.showPets, x.config.showBots))
             )
             .ObserveOn(RxApp.MainThreadScheduler)
-            .Subscribe(x => {
-                _avatarCache.Refresh();
-                RefreshList?.Invoke();
-            });
-
-        this.WhenAnyValue(x => x.FilterText)
-            .ObserveOn(RxApp.MainThreadScheduler)
-            .Subscribe(_ => _avatarCache.Refresh());
+            .SortAndBind(out _avatars, AvatarViewModelGroupComparer.Default)
+            .Subscribe();
 
         var hasSingleContextAvatar = this
             .WhenAnyValue(x => x.ContextSelection)
@@ -373,7 +368,7 @@ public class RoomAvatarsViewModel : ViewModelBase
     {
         if (ContextSelection is not [var avatar])
             return;
-        
+
         _ext.Send(new TradeUserMsg(avatar.Index));
     }
 
@@ -430,16 +425,20 @@ public class RoomAvatarsViewModel : ViewModelBase
         }
     }
 
-    private bool FilterAvatar(AvatarViewModel avatar)
+    static Func<AvatarViewModel, bool> CreateFilter(string? filterText, bool showPets, bool showBots)
     {
-        if (!Config.ShowPets && avatar.Type == AvatarType.Pet)
-            return false;
-        if (!Config.ShowBots && avatar.Type is AvatarType.PublicBot or AvatarType.PrivateBot)
-            return false;
-        if (!string.IsNullOrWhiteSpace(FilterText) && !avatar.Name.Contains(FilterText, StringComparison.CurrentCultureIgnoreCase))
-            return false;
-
-        return true;
+        return (avatar) => {
+            if (!showPets && avatar.Type == AvatarType.Pet)
+                return false;
+            if (!showBots && avatar.Type is AvatarType.PublicBot or AvatarType.PrivateBot)
+                return false;
+            if (!string.IsNullOrWhiteSpace(filterText) &&
+                !avatar.Name.Contains(filterText, StringComparison.CurrentCultureIgnoreCase))
+            {
+                return false;
+            }
+            return true;
+        };
     }
 
     private void OnAvatarsUpdated(AvatarsEventArgs e)

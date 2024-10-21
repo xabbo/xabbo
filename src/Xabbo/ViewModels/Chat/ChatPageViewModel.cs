@@ -1,6 +1,7 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.Reactive.Linq;
 using DynamicData;
+using DynamicData.Binding;
 using ReactiveUI;
 using Splat;
 using Avalonia.Controls.Selection;
@@ -75,9 +76,8 @@ public class ChatPageViewModel : PageViewModel
                 .WhenAnyValue(x => x.FilterText)
                 .Select(CreateFilter)
             )
-            .SortBy(x => x.EntryId)
             .ObserveOn(RxApp.MainThreadScheduler)
-            .Bind(out _messages)
+            .SortAndBind(out _messages, SortExpressionComparer<ChatLogEntryViewModel>.Ascending(x => x.EntryId))
             .Subscribe();
     }
 

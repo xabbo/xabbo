@@ -5,6 +5,7 @@ using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Avalonia.Controls.Selection;
 using DynamicData;
+using DynamicData.Binding;
 using DynamicData.Kernel;
 using HanumanInstitute.MvvmDialogs;
 using ReactiveUI;
@@ -90,14 +91,15 @@ public sealed partial class InventoryViewModel : ControllerBase
         _inventoryManager = inventoryManager;
         _tradeManager = tradeManager;
 
+        var comparer = SortExpressionComparer<InventoryStackViewModel>.Ascending(x => x.Name);
+
         _cache
             .Connect()
             .Filter(this
                 .WhenAnyValue(x => x.FilterText)
                 .Select(CreateFilter))
-            .SortBy(x => x.Name)
             .ObserveOn(RxApp.MainThreadScheduler)
-            .Bind(out _stacks)
+            .SortAndBind(out _stacks, comparer)
             .Subscribe();
 
         _photoCache
@@ -105,10 +107,6 @@ public sealed partial class InventoryViewModel : ControllerBase
             .ObserveOn(RxApp.MainThreadScheduler)
             .Bind(out _photos)
             .Subscribe();
-
-        this.WhenAnyValue(x => x.FilterText)
-            .ObserveOn(RxApp.MainThreadScheduler)
-            .Subscribe(x => _cache.Refresh());
 
         _isBusy = this
             .WhenAnyValue(x => x.Status, status => status is not State.None)

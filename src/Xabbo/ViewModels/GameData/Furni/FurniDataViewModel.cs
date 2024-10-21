@@ -39,14 +39,10 @@ public class FurniDataViewModel : ViewModelBase
 
         _furniCache
             .Connect()
-            .Filter(Filter)
+            .Filter(this.WhenAnyValue(x => x.FilterText).Select(CreateFilter))
             .ObserveOn(RxApp.MainThreadScheduler)
             .Bind(out _furni)
             .Subscribe();
-
-        this.WhenAnyValue(x => x.FilterText)
-            .ObserveOn(RxApp.MainThreadScheduler)
-            .Subscribe(_ => _furniCache.Refresh());
 
         _extension.Connected += OnGameConnected;
         _extension.Disconnected += OnGameDisconnected;
@@ -95,34 +91,23 @@ public class FurniDataViewModel : ViewModelBase
         }
     }
 
-    private void OnGameDisconnected()
+    private void OnGameDisconnected() => _furniCache.Clear();
+
+    private Func<FurniInfoViewModel, bool> CreateFilter(string? filterText)
     {
-        _uiContext.Invoke(() => _furniCache.Clear());
-    }
+        if (string.IsNullOrWhiteSpace(filterText))
+            return static (vm) => true;
 
-    private void RefreshList()
-    {
-        if (!_uiContext.IsSynchronized)
-        {
-            _uiContext.InvokeAsync(() => RefreshList());
-            return;
-        }
+        return (vm) => {
+            if (string.IsNullOrWhiteSpace(filterText)) return true;
 
-        _furniCache.Refresh();
-    }
-
-    private bool Filter(object o)
-    {
-        if (o is not FurniInfoViewModel info) return false;
-
-        if (string.IsNullOrWhiteSpace(FilterText)) return true;
-
-        return
-            string.IsNullOrWhiteSpace(FilterText) ||
-            info.Name.Contains(FilterText, StringComparison.OrdinalIgnoreCase) ||
-            info.Identifier.Contains(FilterText, StringComparison.OrdinalIgnoreCase) ||
-            info.Line.Contains(FilterText, StringComparison.OrdinalIgnoreCase) ||
-            info.Category.Contains(FilterText, StringComparison.OrdinalIgnoreCase) ||
-            (int.TryParse(FilterText, out int i) && info.Kind == i);
+            return
+                string.IsNullOrWhiteSpace(filterText) ||
+                vm.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase) ||
+                vm.Identifier.Contains(filterText, StringComparison.OrdinalIgnoreCase) ||
+                vm.Line.Contains(filterText, StringComparison.OrdinalIgnoreCase) ||
+                vm.Category.Contains(filterText, StringComparison.OrdinalIgnoreCase) ||
+                (int.TryParse(filterText, out int i) && vm.Kind == i);
+        };
     }
 }

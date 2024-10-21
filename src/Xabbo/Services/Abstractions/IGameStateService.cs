@@ -8,6 +8,7 @@ public interface IGameStateService
     event Action<ConnectedEventArgs>? Connected;
     event Action? Disconnected;
 
+    bool IsConnected { get; }
     Session Session { get; }
 
     IGameDataManager GameData { get; }

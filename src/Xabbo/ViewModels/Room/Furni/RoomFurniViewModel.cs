@@ -4,6 +4,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Text.RegularExpressions;
 using DynamicData;
+using DynamicData.Binding;
 using DynamicData.Kernel;
 using ReactiveUI;
 
@@ -19,7 +20,7 @@ namespace Xabbo.ViewModels;
 public partial class RoomFurniViewModel : ViewModelBase
 {
     [GeneratedRegex(@"^(?<name>.*?)(\bwhere:(?<expression>.*))?$")]
-    private partial Regex RegexExpression();
+    private static partial Regex RegexExpression();
 
     private readonly RoomFurniController _furniController;
     private readonly IUiContext _uiCtx;
@@ -41,20 +42,20 @@ public partial class RoomFurniViewModel : ViewModelBase
     [Reactive] public string FilterText { get; set; } = "";
     [Reactive] public bool ShowGrid { get; set; }
 
-    private string? _nameFilter;
-    private Func<FurniViewModel, bool>? _queryFilter;
+    private readonly ObservableAsPropertyHelper<Func<FurniViewModel, bool>?> _nameFilter;
+    public Func<FurniViewModel, bool>? NameFilter => _nameFilter.Value;
 
-    private readonly ObservableAsPropertyHelper<bool> _isEmpty;
-    public bool IsEmpty => _isEmpty.Value;
+    private readonly ObservableAsPropertyHelper<Func<FurniViewModel, bool>?> _queryFilter;
+    public Func<FurniViewModel, bool>? QueryFilter => _queryFilter.Value;
 
-    private readonly ObservableAsPropertyHelper<string> _emptyStatus;
-    public string EmptyStatus => _emptyStatus.Value;
+    private readonly ObservableAsPropertyHelper<string?> _queryFilterError;
+    public string? QueryFilterError => _queryFilterError.Value;
 
-    private readonly ObservableAsPropertyHelper<string> _emptyStatusGrid;
-    public string EmptyStatusGrid => _emptyStatusGrid.Value;
+    private readonly ObservableAsPropertyHelper<string?> _emptyStatus;
+    public string? EmptyStatus => _emptyStatus.Value;
 
-    private readonly ObservableAsPropertyHelper<bool> _isQuery;
-    public bool IsQuery => _isQuery.Value;
+    private readonly ObservableAsPropertyHelper<string?> _emptyStatusGrid;
+    public string? EmptyStatusGrid => _emptyStatusGrid.Value;
 
     [Reactive] public IList<FurniViewModel>? ContextSelection { get; set; }
 
@@ -106,64 +107,55 @@ public partial class RoomFurniViewModel : ViewModelBase
         _roomManager.WallItemWiredMovement += OnWallItemWiredMovement;
         _roomManager.WallItemRemoved += OnWallItemRemoved;
 
+        var nameAndQueryFilter = this.WhenAnyValue(
+            x => x.FilterText,
+            filterText => {
+                string? nameFilterText = null, queryFilterText = null;
+                if (!string.IsNullOrWhiteSpace(filterText))
+                {
+                    var match = RegexExpression().Match(filterText);
+                    if (match.Success)
+                        (nameFilterText, queryFilterText) = (match.Groups["name"].Value, match.Groups["expression"].Value);
+                }
+                return (nameFilterText, queryFilterText);
+            }
+        );
+
+        _nameFilter = nameAndQueryFilter
+            .Select(x => CreateNameFilter(x.nameFilterText))
+            .ToProperty(this, x => x.NameFilter);
+
+
+        var queryFilterAndError = nameAndQueryFilter
+            .Select(x => CreateQueryFilter(x.queryFilterText));
+
+        _queryFilter = queryFilterAndError
+            .Select(x => x.Filter)
+            .ToProperty(this, x => x.QueryFilter);
+
+        _queryFilterError = queryFilterAndError
+            .Select(x => x.Error)
+            .ToProperty(this, x => x.QueryFilterError);
+
         _furniCache
             .Connect()
-            .Filter(FilterFurni)
-            .SortBy(x => x.Name)
+            .Filter(
+                this.WhenAnyValue(
+                    x => x.NameFilter,
+                    x => x.QueryFilter,
+                    CombineFilters
+                )
+            )
             .ObserveOn(RxApp.MainThreadScheduler)
-            .Bind(out _furni)
+            .SortAndBind(out _furni, SortExpressionComparer<FurniViewModel>.Ascending(x => x.Name))
             .Subscribe();
 
         _furniStackCache
             .Connect()
-            .Filter(FilterFurniStack)
-            .SortBy(x => x.Name)
+            .Filter(this.WhenAnyValue(x => x.FilterText).Select(CreateStackFilter))
             .ObserveOn(RxApp.MainThreadScheduler)
-            .Bind(out _furniStacks)
+            .SortAndBind(out _furniStacks, SortExpressionComparer<FurniStackViewModel>.Ascending(x => x.Name))
             .Subscribe();
-
-        this.WhenAnyValue(
-                x => x.FilterText
-            )
-            .ObserveOn(RxApp.MainThreadScheduler)
-            .Subscribe((filterText) =>
-            {
-                var match = RegexExpression().Match(filterText);
-                if (match.Success)
-                {
-                    _nameFilter = match.Groups["name"].Value.Trim();
-                    if (match.Groups["expression"].Success)
-                    {
-                        try
-                        {
-                            _queryFilter = DynamicExpressionParser.ParseLambda<FurniViewModel, bool>(
-                                new ParsingConfig(),
-                                false,
-                                match.Groups["expression"].Value
-                            ).Compile();
-                        }
-                        catch
-                        {
-                            _queryFilter = (vm) => false;
-                        }
-                    }
-                    else
-                    {
-                        _queryFilter = null;
-                    }
-                }
-                _furniCache.Refresh();
-                _furniStackCache.Refresh();
-            });
-
-        _isEmpty =
-            Observable.CombineLatest(
-                roomManager.WhenAnyValue(x => x.IsInRoom),
-                _furni.WhenAnyValue(x => x.Count),
-                (isInRoom, count) => isInRoom && count == 0
-            )
-            .ObserveOn(RxApp.MainThreadScheduler)
-            .ToProperty(this, x => x.IsEmpty);
 
         _isBusy =
             _furniController.WhenAnyValue(
@@ -172,13 +164,6 @@ public partial class RoomFurniViewModel : ViewModelBase
             )
             .ObserveOn(RxApp.MainThreadScheduler)
             .ToProperty(this, x => x.IsBusy);
-
-        _isQuery =
-            this.WhenAnyValue(
-               x => x.FilterText,
-               filterText => filterText.Contains("where:")
-            )
-            .ToProperty(this, x => x.IsQuery);
 
         _statusText =
             _furniController.WhenAnyValue(
@@ -202,23 +187,26 @@ public partial class RoomFurniViewModel : ViewModelBase
             Observable.CombineLatest(
                 _furniCache.CountChanged,
                 _furni.WhenAnyValue(x => x.Count),
-                (actualCount, filteredCount) => actualCount == 0
-                    ? "No furni in room"
-                    : "No furni matches"
+                this.WhenAnyValue(x => x.QueryFilterError),
+                (actualCount, filteredCount, queryFilterError) => {
+                    if (filteredCount > 0)
+                        return null;
+                    if (!string.IsNullOrWhiteSpace(queryFilterError))
+                        return queryFilterError;
+                    return actualCount == 0 ? "No furni in room" : "No furni matches";
+                }
             )
             .ObserveOn(RxApp.MainThreadScheduler)
             .ToProperty(this, x => x.EmptyStatus);
 
         _emptyStatusGrid =
             Observable.CombineLatest(
-                this.WhenAnyValue(
-                    x => x.FilterText,
-                    filterText => filterText.Contains("where:")
-                ),
-                _furniCache.CountChanged,
-                _furni.WhenAnyValue(x => x.Count),
-                (isQuery, actualCount, filteredCount)
-                    => actualCount == 0
+                this.WhenAnyValue(x => x.QueryFilter).Select(x => x is not null),
+                _furniStackCache.CountChanged,
+                _furniStacks.WhenAnyValue(x => x.Count),
+                (isQuery, actualCount, filteredCount) =>
+                    filteredCount > 0 ? null :
+                    actualCount == 0
                     ? "No furni in room"
                     : (isQuery ? "Grid view does not support query filters" : "No furni matches")
             )
@@ -399,19 +387,46 @@ public partial class RoomFurniViewModel : ViewModelBase
             .IfHasValue(vm => vm.IsHidden = e.Furni.IsHidden);
     }
 
-    private bool FilterFurni(FurniViewModel vm)
+    static Func<FurniViewModel, bool> CreateNameFilter(string? nameFilter)
     {
-        return
-            (
-                string.IsNullOrWhiteSpace(_nameFilter)
-                || vm.Name.Contains(_nameFilter, StringComparison.CurrentCultureIgnoreCase)
-            )
-            && _queryFilter?.Invoke(vm) != false;
+        if (string.IsNullOrWhiteSpace(nameFilter))
+            return static (vm) => true;
+
+        return (vm) =>
+            string.IsNullOrWhiteSpace(nameFilter) ||
+            vm.Name.Contains(nameFilter, StringComparison.OrdinalIgnoreCase);
     }
 
-    private bool FilterFurniStack(FurniStackViewModel vm)
+    static (Func<FurniViewModel, bool>? Filter, string? Error) CreateQueryFilter(string? expression)
     {
-        return vm.Name.Contains(FilterText, StringComparison.CurrentCultureIgnoreCase);
+        if (string.IsNullOrWhiteSpace(expression))
+            return (null, null);
+
+        try
+        {
+            return (
+                DynamicExpressionParser.
+                ParseLambda<FurniViewModel, bool>(
+                    new ParsingConfig(), false, expression).Compile(),
+                null
+            );
+        }
+        catch (Exception ex)
+        {
+            return ((vm) => false, ex.Message);
+        }
+    }
+
+    static Func<FurniViewModel, bool> CombineFilters(Func<FurniViewModel, bool>? a, Func<FurniViewModel, bool>? b)
+    {
+        return (vm) => a?.Invoke(vm) != false && b?.Invoke(vm) != false;
+    }
+
+    static Func<FurniStackViewModel, bool> CreateStackFilter(string? filterText)
+    {
+        return (vm) =>
+            string.IsNullOrWhiteSpace(filterText) ||
+            vm.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase);
     }
 
     private void ClearItems()
@@ -468,7 +483,7 @@ public partial class RoomFurniViewModel : ViewModelBase
     private void UpdateFurni(IFurni furni) => _furniCache.Lookup((furni.Type, furni.Id))
         .IfHasValue(vm => {
             vm.Item = furni;
-            if (_queryFilter is not null)
+            if (QueryFilter is not null)
                 _furniCache.Refresh();
         });
 

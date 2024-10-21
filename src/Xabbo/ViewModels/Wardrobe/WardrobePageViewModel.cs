@@ -54,15 +54,10 @@ public sealed class WardrobePageViewModel : PageViewModel
 
         _cache
             .Connect()
-            .Filter(FilterOutfits)
+            .Filter(_gameState.WhenAnyValue(x => x.Session, CreateFilter))
             .ObserveOn(RxApp.MainThreadScheduler)
             .Bind(out _outfits)
             .Subscribe();
-
-        _ext
-            .WhenAnyValue(x => x.Session)
-            .ObserveOn(RxApp.MainThreadScheduler)
-            .Subscribe(_ => _cache.Refresh());
 
         foreach (var model in _repository.Load())
         {
@@ -77,8 +72,12 @@ public sealed class WardrobePageViewModel : PageViewModel
         figureConverter.Available += OnFigureConverterAvailable;
     }
 
-    private bool FilterOutfits(OutfitViewModel model)
-        => model.IsOrigins == _ext.Session.Is(ClientType.Origins);
+    private Func<OutfitViewModel, bool> CreateFilter(Session session) => (vm) => session.Client.Type switch
+    {
+        ClientType.Origins => vm.IsOrigins,
+        ClientType.Flash or ClientType.Unity => !vm.IsOrigins,
+        _ => false
+    };
 
     public void AddFigure(Gender gender, string figure)
     {

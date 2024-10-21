@@ -20,7 +20,7 @@
     </Style>
   </UserControl.Styles>
   <Grid RowDefinitions="Auto,*">
-    <controls:InfoOverlay Grid.RowSpan="2" IsVisible="{Binding IsEmpty}" Text="{Binding EmptyStatus}" />
+    <controls:InfoOverlay Grid.RowSpan="2" Text="{Binding EmptyStatus}" />
     <TextBox
       Margin="10,0,10,10"
       Classes="clearButton"
@@ -91,7 +91,7 @@
         </ui:FAMenuFlyout>
       </DataGrid.ContextFlyout>
       <DataGrid.Columns>
-        <DataGridTemplateColumn Width="120" Header="id">
+        <DataGridTemplateColumn Width="120" Header="id" SortMemberPath="Id">
           <DataTemplate DataType="vm:FurniViewModel">
             <TextBlock Name="CellTextBlock" Classes="privacy" Text="{Binding Id}" />
           </DataTemplate>

@@ -1,9 +1,11 @@
-﻿using System.Collections.Concurrent;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
+using System.Reactive;
 using System.Reactive.Linq;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using DynamicData;
 using DynamicData.Binding;
+using DynamicData.Kernel;
 using ReactiveUI;
 
 using Xabbo.Extension;
@@ -17,11 +19,10 @@ namespace Xabbo.ViewModels;
 public class RoomVisitorsViewModel : ViewModelBase
 {
     private readonly IExtension _ext;
+    private readonly ILogger _logger;
     private readonly IUiContext _context;
     private readonly ProfileManager _profileManager;
     private readonly RoomManager _roomManager;
-
-    private readonly ConcurrentDictionary<string, VisitorViewModel> _visitorMap = new();
 
     private readonly ReadOnlyObservableCollection<VisitorViewModel> _visitors;
     public ReadOnlyObservableCollection<VisitorViewModel> Visitors => _visitors;
@@ -29,41 +30,41 @@ public class RoomVisitorsViewModel : ViewModelBase
     private readonly SourceCache<VisitorViewModel, string> _visitorCache = new(x => x.Name);
 
     [Reactive] public bool IsAvailable { get; set; }
-    [Reactive] public string FilterText { get; set; } = ""; // RefreshList on set
+    [Reactive] public string FilterText { get; set; } = "";
 
     public RoomVisitorsViewModel(
         IHostApplicationLifetime lifetime,
+        ILoggerFactory loggerFactory,
         IUiContext context,
         IExtension extension,
         ProfileManager profileManager, RoomManager roomManager)
     {
+        _logger = loggerFactory.CreateLogger<RoomVisitorsViewModel>();
         _context = context;
         _ext = extension;
         _profileManager = profileManager;
         _roomManager = roomManager ?? throw new ArgumentNullException(nameof(roomManager));
 
-        _visitorCache.Connect()
-            .Filter(Filter)
-            .Sort(SortExpressionComparer<VisitorViewModel>
-                .Descending(x => x.Entered ?? DateTime.MinValue)
-                .ThenByDescending(x => x.Index))
-            .ObserveOn(RxApp.MainThreadScheduler)
-            .Bind(out _visitors)
-            .Subscribe();
+        var propertyChanges = _visitorCache.Connect()
+            .WhenPropertyChanged(x => x.Index)
+            .Throttle(TimeSpan.FromMilliseconds(250))
+            .Select(_ => Unit.Default);
 
-        this.WhenAnyValue(x => x.FilterText)
+        _visitorCache.Connect()
+            .Filter(this.WhenAnyValue(x => x.FilterText, CreateFilter))
             .ObserveOn(RxApp.MainThreadScheduler)
-            .Subscribe(x => _visitorCache.Refresh());
+            .SortAndBind(out _visitors, SortExpressionComparer<VisitorViewModel>.Descending(x => x.Index))
+            .Subscribe();
 
         lifetime.ApplicationStarted.Register(() => Task.Run(InitializeAsync));
     }
 
-    private bool Filter(VisitorViewModel visitor)
+    private Func<VisitorViewModel, bool> CreateFilter(string filterText)
     {
-        if (string.IsNullOrWhiteSpace(FilterText))
-            return true;
+        if (string.IsNullOrWhiteSpace(filterText))
+            return static (vm) => true;
 
-        return visitor.Name.Contains(FilterText, StringComparison.CurrentCultureIgnoreCase);
+        return (vm) => vm.Name.Contains(filterText, StringComparison.CurrentCultureIgnoreCase);
     }
 
     public async Task InitializeAsync()
@@ -83,62 +84,7 @@ public class RoomVisitorsViewModel : ViewModelBase
         IsAvailable = true;
     }
 
-    private void RefreshList()
-    {
-        _context.Invoke(() => {
-            _visitorCache.Refresh();
-        });
-    }
-
-    private void AddVisitors(IEnumerable<VisitorViewModel> newVisitors)
-    {
-        if (!_context.IsSynchronized)
-        {
-            _context.InvokeAsync(() => AddVisitors(newVisitors));
-            return;
-        }
-
-        foreach (var visitor in newVisitors)
-            _visitorCache.AddOrUpdate(visitor);
-    }
-
-    private void ClearVisitors()
-    {
-        if (!_context.IsSynchronized)
-        {
-            _context.InvokeAsync(() => ClearVisitors());
-            return;
-        }
-
-        _visitorCache.Clear();
-        _visitorMap.Clear();
-    }
-
-#if ENABLE_LOGGING
-    private void Log(string text)
-    {
-        if (!IsLogging || !roomManager.IsInRoom)
-            return;
-
-        DateTime today = DateTime.Today;
-        if (today != lastDate || currentFilePath == null)
-        {
-            lastDate = today;
-            currentFilePath = Path.Combine(LOG_DIRECTORY, $"{today:yyyy-MM-dd}.txt");
-        }
-
-        if (lastRoomId != roomManager.Id)
-        {
-            lastRoomId = roomManager.Id;
-
-            string roomName = $"(roomid:{roomManager.Id})";
-            if (roomManager.Data != null) roomName = $"{H.ReplaceSpecialCharacters(roomManager.Data.Name)} {roomName}";
-            text = $"\r\n---------- {roomName} ----------\r\n\r\n" + text;
-        }
-
-        File.AppendAllText(currentFilePath, text, Encoding.UTF8);
-    }
-#endif
+    private void ClearVisitors() => _visitorCache.Clear();
 
     private void OnGameDisconnected() => ClearVisitors();
 
@@ -149,73 +95,46 @@ public class RoomVisitorsViewModel : ViewModelBase
         if (!_roomManager.IsLoadingRoom && !_roomManager.IsInRoom)
             return;
 
-        bool needsRefresh = false;
         var newLogs = new List<VisitorViewModel>();
+        var now = DateTime.Now;
 
-        foreach (var user in e.Avatars.OfType<IUser>())
-        {
-            if (_visitorMap.TryGetValue(user.Name, out VisitorViewModel? visitorLog))
+        _visitorCache.Edit(cache => {
+            foreach (var user in e.Avatars.OfType<IUser>())
             {
-                /* User already exists in the dictionary,
-                 * so they have re-entered the room */
-                visitorLog.Visits++;
-                visitorLog.Index = user.Index;
-                visitorLog.Entered = DateTime.Now;
-                visitorLog.Left = null;
-                needsRefresh = true;
-
-#if ENABLE_LOGGING
-                Log($"[{DateTime.UtcNow:O}]  In: {user.Name}\r\n");
-#endif
+                cache
+                    .Lookup(user.Name)
+                    .IfHasValue(vm => {
+                        vm.Visits++;
+                        vm.Index = user.Index;
+                        vm.Entered = now;
+                    })
+                    .Else(() => {
+                        var visitorLog = new VisitorViewModel(user.Index, user.Id, user.Name);
+                        if (_roomManager.IsLoadingRoom)
+                        {
+                            if (user.Name == _profileManager.UserData?.Name)
+                                visitorLog.Entered = now;
+                        }
+                        else
+                        {
+                            visitorLog.Entered = now;
+                        }
+                        cache.AddOrUpdate(visitorLog);
+                    });
             }
-            else
-            {
-                visitorLog = new VisitorViewModel(user.Index, user.Id, user.Name);
-                if (_visitorMap.TryAdd(user.Name, visitorLog))
-                {
-                    /* Avatars received when first loading the room were already in the room,
-                     * so we don't know when they entered, but we can see what order they
-                     * entered the room by their avatar index */
-                    if (_roomManager.IsLoadingRoom)
-                    {
-                        // Only set entry time for self
-                        if (user.Id == _profileManager.UserData?.Id)
-                            visitorLog.Entered = DateTime.Now;
-                    }
-                    else
-                    {
-                        visitorLog.Entered = DateTime.Now;
-
-#if ENABLE_LOGGING
-                        Log($"[{DateTime.UtcNow:O}]  In: {user.Name}\r\n");
-#endif
-                    }
-
-                    newLogs.Add(visitorLog);
-                }
-            }
-        }
-
-        if (newLogs.Count > 0)
-            _context.InvokeAsync(() => newLogs.ForEach(x => _visitorCache.AddOrUpdate(x)));
-        /* The list gets refreshed when adding new items, only refresh the list
-         * if no new items were added and we need to re-order some items */
-        if (newLogs.Count == 0 && needsRefresh)
-            RefreshList();
+            cache.Refresh();
+        });
     }
-
 
     private void OnAvatarsRemoved(AvatarEventArgs e)
     {
-        if (_visitorMap.TryGetValue(e.Avatar.Name, out VisitorViewModel? visitor))
-        {
-            visitor.Left = DateTime.Now;
-#if ENABLE_LOGGING
-            if (e.Avatar.Id != profileManager.UserData?.Id)
-            {
-                Log($"[{DateTime.UtcNow:O}] Out: {e.Avatar.Name}\r\n");
-            }
-#endif
-        }
+        if (e.Avatar.Type is not AvatarType.User)
+            return;
+
+        _visitorCache
+            .Lookup(e.Avatar.Name)
+            .IfHasValue(vm => {
+                vm.Left = DateTime.Now;
+            });
     }
 }

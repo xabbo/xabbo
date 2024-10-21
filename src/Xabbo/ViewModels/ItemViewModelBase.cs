@@ -11,7 +11,7 @@ public abstract class ItemViewModelBase : ViewModelBase
 
     public IItem Item { get; set; }
 
-    public Id Id => Item.Id;
+    public long Id => Item.Id;
     public ItemType Type => Item.Type;
     public int Kind => _info?.Kind ?? 0;
     public string Identifier => Item.Identifier ?? _info?.Identifier ?? "?";
