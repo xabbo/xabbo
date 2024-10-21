@@ -22,16 +22,20 @@
           Opacity="0.5"
           Spacing="10"
         >
-          <StackPanel IsVisible="{TemplateBinding ShowMessage}" HorizontalAlignment="Center" Orientation="Horizontal" Spacing="4">
-            <StackPanel.IsVisible>
+          <Grid
+            Margin="40,0"
+            HorizontalAlignment="Center"
+            ColumnDefinitions="Auto,*"
+          >
+            <Grid.IsVisible>
               <MultiBinding Converter="{x:Static BoolConverters.And}">
                 <TemplateBinding Property="ShowMessage" />
                 <TemplateBinding Property="Text" Converter="{x:Static StringConverters.IsNotNullOrEmpty}" />
               </MultiBinding>
-            </StackPanel.IsVisible>
-            <ic:SymbolIcon Symbol="Info" FontSize="24" VerticalAlignment="Center" />
-            <TextBlock Text="{TemplateBinding Text}" />
-          </StackPanel>
+            </Grid.IsVisible>
+            <ic:SymbolIcon Grid.Column="0" Margin="0,0,10,0" Symbol="Info" FontSize="24" VerticalAlignment="Center" />
+            <TextBlock Grid.Column="1" Text="{TemplateBinding Text}" TextWrapping="Wrap" />
+          </Grid>
           <ContentPresenter
             HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
             VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
