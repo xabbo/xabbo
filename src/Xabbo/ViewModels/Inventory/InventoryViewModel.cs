@@ -330,7 +330,6 @@ public sealed partial class InventoryViewModel : ControllerBase
         try
         {
             var items = stacks
-                .Where(x => x is { Type: ItemType.Floor })
                 .SelectMany(x => x!)
                 .ToArray();
 
@@ -340,29 +339,63 @@ public sealed partial class InventoryViewModel : ControllerBase
             MaxProgress = items.Length;
             Status = State.Placing;
 
+            List<WallLocation> wallTiles = [];
+            for (int y = 0; y < room.FloorPlan.Size.Y - 1; y++)
+            {
+                for (int x = 0; x < room.FloorPlan.Size.X - 1; x++)
+                {
+                    if (room.FloorPlan[x, y] >= 0)
+                        continue;
+
+                    if (room.FloorPlan[x+1, y] >= 0)
+                        wallTiles.Add(new WallLocation((x, y), Point.Zero, 'l'));
+
+                    if (room.FloorPlan[x, y+1] >= 0)
+                        wallTiles.Add(new WallLocation((x, y), Point.Zero, 'r'));
+                }
+            }
+
             for (int i = 0; i < items.Length; i++)
             {
                 _logger.LogTrace("Placing item {Current}/{Max}.", i+1, items.Length);
                 var item = items[i];
                 Progress = i+1;
-                if (!item.TryGetSize(out var size))
-                {
-                    _logger.LogWarning("Failed to get size for {Item}.", item);
-                    continue;
-                }
-                Point? freeTile = room.FindPlaceablePoint(size);
-                if (freeTile is null)
-                {
-                    _logger.LogWarning("Failed to find placeable location for {Item}.", item);
-                    continue;
-                }
 
-                _logger.LogTrace("Placing {Item} at {Point}.", item, freeTile.Value);
-                var interval = Task.Delay(_config.Value.Timing.GetTiming(Session).FurniPlaceInterval);
-                var result = await new PlaceFloorItemTask(Ext, item.ItemId, freeTile.Value, 0).ExecuteAsync(3000);
-                if (result is PlaceFloorItemTask.Result.Error)
-                    _logger.LogWarning("Failed to place {Item}.", item);
-                await interval;
+                if (item.Type is ItemType.Floor)
+                {
+                    if (!item.TryGetSize(out var size))
+                    {
+                        _logger.LogWarning("Failed to get size for {Item}.", item);
+                        continue;
+                    }
+                    Point? freeTile = room.FindPlaceablePoint(size);
+                    if (freeTile is null)
+                    {
+                        _logger.LogWarning("Failed to find placeable location for {Item}.", item);
+                        continue;
+                    }
+
+                    _logger.LogTrace("Placing {Item} at {Point}.", item, freeTile.Value);
+                    var interval = Task.Delay(_config.Value.Timing.GetTiming(Session).FurniPlaceInterval);
+                    var result = await new PlaceFloorItemTask(Ext, item.ItemId, freeTile.Value, 0).ExecuteAsync(3000);
+                    if (result is PlaceFloorItemTask.Result.Error)
+                        _logger.LogWarning("Failed to place {Item}.", item);
+                    await interval;
+                }
+                else
+                {
+                    if (wallTiles.Count == 0)
+                        continue;
+                    WallLocation location = wallTiles[Random.Shared.Next(0, wallTiles.Count)];
+                    location += (
+                        Random.Shared.Next(room.FloorPlan.Scale),
+                        room.FloorPlan.Scale + Random.Shared.Next(room.FloorPlan.Scale * 2)
+                    );
+                    _logger.LogTrace("Placing {Item} at {Location}.", item, location);
+                    var interval = Task.Delay(_config.Value.Timing.GetTiming(Session).FurniPlaceInterval);
+                    var result = await new PlaceWallItemTask(Ext, item.ItemId, location).ExecuteAsync(3000);
+                    await interval;
+                }
             }
         }
         catch (TimeoutException)
