@@ -3,6 +3,7 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:ic="using:FluentIcons.Avalonia.Fluent"
   xmlns:controls="using:Xabbo.Avalonia.Controls"
   xmlns:behaviors="using:Xabbo.Avalonia.Behaviors"
   xmlns:vm="using:Xabbo.ViewModels"
@@ -21,6 +22,10 @@
       Text="{Binding FilterText}"
     />
     <ListBox Grid.Row="1" Name="ListBoxMessages" ItemsSource="{Binding Messages}" Selection="{Binding Selection}" Padding="10" SelectionMode="Multiple">
+      <Interaction.Behaviors>
+        <behaviors:AutoScrollBehavior />
+        <behaviors:ScrollToBottom />
+      </Interaction.Behaviors>
       <ListBox.Styles>
         <Style Selector="ListBoxItem:selected /template/ Rectangle#SelectionIndicator">
           <Setter Property="IsVisible" Value="false" />
@@ -73,9 +78,6 @@
           </Border>
         </DataTemplate>
       </ListBox.DataTemplates>
-      <Interaction.Behaviors>
-        <behaviors:AutoScrollBehavior />
-      </Interaction.Behaviors>
       <ListBox.ItemContainerTheme>
         <ControlTheme TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}" x:DataType="vm:ChatLogEntryViewModel">
           <Setter Property="Padding" Value="0" />
@@ -88,5 +90,41 @@
         </DataTemplate>
       </ListBox.ItemTemplate>
     </ListBox>
+    <Button
+      Grid.Row="1"
+      Margin="20"
+      HorizontalAlignment="Right"
+      VerticalAlignment="Bottom"
+      Width="50" Height="50"
+      CornerRadius="50"
+      Classes.hide="{Binding #ListBoxMessages.(behaviors:ScrollToBottom.IsScrolledToBottom), Mode=OneWay}"
+      Command="{Binding #ListBoxMessages.(behaviors:ScrollToBottom.Command), Mode=OneWay}"
+    >
+      <Button.Styles>
+        <Style Selector="Button">
+          <Setter Property="Transitions">
+            <Transitions>
+              <DoubleTransition Property="Opacity" Duration="0:0:1" />
+            </Transitions>
+          </Setter>
+          <Setter Property="Opacity" Value="1" />
+          <Setter Property="IsHitTestVisible" Value="true" />
+          <Style Selector="^.hide">
+            <Setter Property="Transitions">
+              <Transitions>
+                <DoubleTransition Property="Opacity" Duration="0:0:0.1" />
+              </Transitions>
+            </Setter>
+            <Setter Property="Opacity" Value="0" />
+            <Setter Property="IsHitTestVisible" Value="false" />
+          </Style>
+        </Style>
+      </Button.Styles>
+      <ic:SymbolIcon
+        Symbol="ArrowDown"
+        HorizontalAlignment="Center"
+        VerticalAlignment="Center"
+      />
+    </Button>
   </Grid>
 </UserControl>
