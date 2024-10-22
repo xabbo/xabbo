@@ -401,10 +401,12 @@ public sealed partial class InventoryViewModel : ControllerBase
         catch (TimeoutException)
         {
             _logger.LogWarning("Operation timed out.");
+            await _dialogService.ShowAsync("Timed out", "Try increasing the furni placement interval in settings.");
         }
         catch (Exception ex)
         {
             _logger.LogError("Failed to place furni: {Message}", ex.Message);
+            await _dialogService.ShowAsync("Error", $"Failed to place furni: {ex.Message}.");
         }
         finally
         {
