@@ -17,6 +17,11 @@
     <EnableConfigurationBindingGenerator>true</EnableConfigurationBindingGenerator>
   </PropertyGroup>
 
+  <PropertyGroup Label="Rename paths">
+    <AppOutputBase>$(MSBuildProjectDirectory)\</AppOutputBase>
+    <PathMap>$(AppOutputBase)=Xabbo\</PathMap>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="DynamicData" Version="9.0.4" />
     <PackageReference Include="HanumanInstitute.MvvmDialogs" Version="2.1.0" />
