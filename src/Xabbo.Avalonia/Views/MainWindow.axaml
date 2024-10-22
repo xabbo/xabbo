@@ -8,6 +8,7 @@
   xmlns:ic="using:FluentIcons.Avalonia.Fluent"
   xmlns:wnd="using:FluentAvalonia.UI.Windowing"
   xmlns:ui="using:FluentAvalonia.UI.Controls"
+  xmlns:props="using:Xabbo.Avalonia.Properties"
   mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
   x:Name="Root"
   x:Class="Xabbo.Avalonia.Views.MainWindow"
@@ -22,6 +23,8 @@
   Classes.isorigins="{DynamicResource IsOrigins}"
   Classes.ismodern="{DynamicResource IsModern}"
   Classes.ready="{DynamicResource IsReady}"
+  Classes.isError="{DynamicResource IsError}"
+  Classes.isConnecting="{DynamicResource IsConnecting}"
 >
   <Design.DataContext>
     <vm:MainViewModel />
@@ -68,6 +71,35 @@
         <Setter Property="Opacity" Value="0" />
       </Style>
     </Style>
+    <Style Selector="Grid#OverlayContent">
+      <Setter Property="props:GridSetter.RowDefinitions">
+        <RowDefinitions>
+          <RowDefinition Height="*" />
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="*" />
+        </RowDefinitions>
+      </Setter>
+    </Style>
+    <Style Selector="Border#ErrorDetails">
+      <Setter Property="IsVisible" Value="false" />
+    </Style>
+    <Style Selector=".isError">
+      <Style Selector="^ Grid#OverlayContent">
+        <Setter Property="props:GridSetter.RowDefinitions">
+          <RowDefinitions>
+            <RowDefinition Height="0" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+          </RowDefinitions>
+        </Setter>
+      </Style>
+      <Style Selector="^ Border#ErrorDetails">
+        <Setter Property="IsVisible" Value="true" />
+      </Style>
+      <Style Selector="^ ui|ProgressRing#OverlayProgressRing">
+        <Setter Property="IsVisible" Value="false" />
+      </Style>
+    </Style>
   </wnd:AppWindow.Styles>
   <Grid RowDefinitions="32,*">
     <Grid Name="TitleBarHost" ColumnDefinitions="48,*,Auto,0" ZIndex="1000">
@@ -98,32 +130,49 @@
       Background="{DynamicResource SolidBackgroundFillColorBase}"
       Classes="overlay"
     >
-      <Grid.Styles>
-      </Grid.Styles>
-      <StackPanel
-        HorizontalAlignment="Center"
-        VerticalAlignment="Center"
-      >
-        <Grid>
-          <Image
-            x:Name="OverlayImage"
-            Source="avares://Xabbo.Avalonia/Assets/xabbo-skull-128.png"
-            Width="64" Height="64"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-          />
-          <ui:ProgressRing Classes="overlayContent" Width="128" Height="128" />
-        </Grid>
-        <Grid Classes="overlayContent">
+      <Grid x:Name="OverlayContent" Margin="20" Classes="overlayContent">
+        <StackPanel Margin="0,0,0,10" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
+          <Panel>
+            <ui:ProgressRing
+              x:Name="OverlayProgressRing"
+              Classes="overlayContent"
+              Margin="-20"
+              Width="200" Height="200"
+            />
+            <Image
+              x:Name="OverlayImage"
+              Source="avares://Xabbo.Avalonia/Assets/xabbo-skull-128.png"
+              Width="128" Height="128"
+              HorizontalAlignment="Center"
+              VerticalAlignment="Center"
+            />
+          </Panel>
           <TextBlock
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
             TextAlignment="Center"
             Text="{DynamicResource AppStatus}"
             FontSize="18"
+            TextWrapping="Wrap"
           />
-        </Grid>
-      </StackPanel>
+        </StackPanel>
+        <Border
+          x:Name="ErrorDetails"
+          Grid.Row="2"
+          Background="{DynamicResource CardBackgroundFillColorDefault}"
+          BorderThickness="1" CornerRadius="4"
+          BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+        >
+          <ScrollViewer Padding="10">
+            <SelectableTextBlock
+              Text="{DynamicResource AppError}"
+              FontFamily="{DynamicResource Mono}"
+              FontSize="14"
+              TextWrapping="Wrap"
+            />
+          </ScrollViewer>
+        </Border>
+      </Grid>
     </Grid>
   </Grid>
 

@@ -37,8 +37,7 @@ public partial class App : Application
 
         // TODO A better way to initialize persistent background services.
         Locator.Current.GetRequiredService<IHostApplicationLifetime>();
-        Locator.Current.GetRequiredService<AppSessionManager>();
-        Locator.Current.GetRequiredService<GEarthExtensionLifetime>();
+        Locator.Current.GetRequiredService<IApplicationManager>();
         Locator.Current.GetRequiredService<IGameStateService>();
         Locator.Current.GetRequiredService<IFigureConverterService>();
         Locator.Current.GetRequiredService<CommandManager>();

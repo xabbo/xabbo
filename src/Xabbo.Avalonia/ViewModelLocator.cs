@@ -76,7 +76,7 @@ public static class ViewModelLocator
             });
         }
 
-        Splatr.RegisterLazySingleton<IApplicationManager, AvaloniaAppManager>();
+        Splatr.RegisterLazySingleton<IApplicationManager, XabboAppManager>();
         Splatr.RegisterLazySingleton<IUiContext, AvaloniaUiContext>();
         Splatr.RegisterLazySingleton<IClipboardService, ClipboardService>();
         Splatr.RegisterLazySingleton<ILauncherService, LauncherService>();
@@ -86,7 +86,6 @@ public static class ViewModelLocator
                 dialogFactory: new DialogFactory().AddFluent(FluentMessageBoxType.ContentDialog)),
             viewModelFactory: x => Locator.Current.GetService(x)));
 
-        Splatr.RegisterLazySingleton<AppSessionManager>();
         Splatr.RegisterLazySingleton<GlobalExceptionHandler>();
 
         // ViewModels
@@ -125,8 +124,8 @@ public static class ViewModelLocator
         });
         Splatr.RegisterLazySingleton<GEarthExtension>();
         container.Register<IExtension>(() => Locator.Current.GetService<GEarthExtension>());
+        container.Register<IRemoteExtension>(() => Locator.Current.GetService<GEarthExtension>());
         container.Register<IInterceptor>(() => Locator.Current.GetService<GEarthExtension>());
-        Splatr.RegisterLazySingleton<GEarthExtensionLifetime>();
 
         // Xabbo services
         Splatr.RegisterLazySingleton<IGameStateService, GameStateService>();

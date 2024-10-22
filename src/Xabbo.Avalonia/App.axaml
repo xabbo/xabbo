@@ -43,6 +43,7 @@
       <x:Boolean x:Key="IsConnected">False</x:Boolean>
       <x:Boolean x:Key="IsOrigins">False</x:Boolean>
       <x:Boolean x:Key="IsModern">False</x:Boolean>
+      <x:Boolean x:Key="IsError">False</x:Boolean>
       <x:String x:Key="AppStatus">Waiting for connection...</x:String>
 
       <Color x:Key="RadioButtonCheckGlyphFill">#5000AA</Color>
@@ -70,7 +71,6 @@
 
   <Application.Styles>
     <sty:FluentAvaloniaTheme  />
-    <StyleInclude Source="avares://FluentAvalonia.ProgressRing/Styling/Controls/ProgressRing.axaml" />
     <StyleInclude Source="avares://AsyncImageLoader.Avalonia/AdvancedImage.axaml" />
     <Style Selector="img|AdvancedImage">
       <Setter Property="Template">

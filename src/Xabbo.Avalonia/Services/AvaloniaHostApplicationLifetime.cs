@@ -9,8 +9,9 @@ using IHostApplicationLifetime = Microsoft.Extensions.Hosting.IHostApplicationLi
 
 public sealed class AvaloniaHostApplicationLifetime : IHostApplicationLifetime
 {
-    private readonly ILogger Log;
-    private readonly IApplicationLifetime _lifetime;
+    private readonly ILogger _logger;
+    private readonly IControlledApplicationLifetime _appLifetime;
+
     private readonly CancellationTokenSource
         _started = new(),
         _stopping = new(),
@@ -22,53 +23,52 @@ public sealed class AvaloniaHostApplicationLifetime : IHostApplicationLifetime
 
     public AvaloniaHostApplicationLifetime(
         ILoggerFactory loggerFactory,
-        IApplicationLifetime lifetime)
+        IApplicationLifetime appLifetime)
     {
-        Log = loggerFactory.CreateLogger<AvaloniaHostApplicationLifetime>();
+        _logger = loggerFactory.CreateLogger<AvaloniaHostApplicationLifetime>();
 
-        _lifetime = lifetime;
+        if (appLifetime is not IControlledApplicationLifetime controlledLifetime)
+            throw new NotSupportedException("Application lifetime is not controlled.");
 
-        if (lifetime is IControlledApplicationLifetime controlledLifetime)
-        {
-            controlledLifetime.Startup += OnStartup;
-            controlledLifetime.Exit += OnExit;
-        }
-        else
-        {
-            throw new Exception("Application lifetime is not controlled.");
-        }
+        _appLifetime = controlledLifetime;
+        _appLifetime.Startup += OnStartup;
+        _appLifetime.Exit += OnExit;
     }
 
     private void OnStartup(object? sender, ControlledApplicationLifetimeStartupEventArgs e)
     {
-        Log.LogInformation("Starting application...");
+        _logger.LogInformation("Starting application...");
+
         _started.Cancel();
-        Log.LogInformation("Application started.");
+
+        _logger.LogInformation("Application started.");
     }
 
     private void OnExit(object? sender, ControlledApplicationLifetimeExitEventArgs e)
     {
-        Log.LogInformation("OnExit");
+        _logger.LogInformation("OnExit");
     }
 
     public void StopApplication()
     {
+        if (_stopping.IsCancellationRequested)
+            return;
+
         try
         {
-            if (_lifetime is not IControlledApplicationLifetime controlledLifetime)
-                throw new Exception("Lifetime is not controlled.");
-
-            Log.LogInformation("Shutting down...");
+            _logger.LogInformation("Shutting down...");
             _stopping.Cancel();
-            controlledLifetime.Shutdown();
+
+            _appLifetime.Shutdown();
+
             // TODO: application exits before we get here.
             // Exit event is also not invoked for some reason.
             _stopped.Cancel();
-            Log.LogInformation("Shutdown complete.");
+            _logger.LogInformation("Shutdown complete.");
         }
         catch (Exception ex)
         {
-            Log.LogError(ex, "Error shutting down.");
+            _logger.LogError(ex, "Error shutting down.");
         }
     }
 }
