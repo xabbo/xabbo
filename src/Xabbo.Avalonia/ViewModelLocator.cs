@@ -133,6 +133,9 @@ public static class ViewModelLocator
         Splatr.RegisterLazySingleton<IWardrobeRepository, JsonWardrobeRepository>();
         Splatr.RegisterLazySingleton<IHabboApi, HabboApi>();
 
+        Splatr.RegisterLazySingleton<FurniPlacementController>();
+        Splatr.RegisterLazySingleton<IPlacementFactory, PlacementFactory>();
+
         // Xabbo core components
         Splatr.RegisterLazySingleton<ProfileManager>();
         Splatr.RegisterLazySingleton<InventoryManager>();

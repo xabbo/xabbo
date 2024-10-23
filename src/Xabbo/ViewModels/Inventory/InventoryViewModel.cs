@@ -21,19 +21,21 @@ using Xabbo.Controllers;
 using Xabbo.Services.Abstractions;
 using Xabbo.Web.Serialization;
 using Xabbo.Utility;
-using Xabbo.Core.Tasks;
 
 namespace Xabbo.ViewModels;
 
 [Intercept]
 public sealed partial class InventoryViewModel : ControllerBase
 {
-    public enum State { None, Loading, Placing, Offering }
+    public enum State { None, Loading, AwaitingCornerSelection, AutoPlacing, ManualPlacing, Offering }
 
     private readonly ILogger _logger;
     private readonly IConfigProvider<AppConfig> _config;
     private readonly IDialogService _dialogService;
     private readonly IHabboApi _api;
+    private readonly IOperationManager _operations;
+    private readonly FurniPlacementController _placement;
+    private readonly IPlacementFactory _placementFactory;
     private readonly RoomManager _roomManager;
     private readonly InventoryManager _inventoryManager;
     private readonly TradeManager _tradeManager;
@@ -52,7 +54,7 @@ public sealed partial class InventoryViewModel : ControllerBase
 
     public ReactiveCommand<Unit, Task> LoadCmd { get; }
     public ReactiveCommand<Unit, Task> OfferItemsCmd { get; }
-    public ReactiveCommand<Unit, Task> PlaceItemsCmd { get; }
+    public ReactiveCommand<string, Task> PlaceItemsCmd { get; }
 
     public SelectionModel<InventoryStackViewModel> Selection { get; } = new SelectionModel<InventoryStackViewModel>() { SingleSelect = false };
 
@@ -71,12 +73,17 @@ public sealed partial class InventoryViewModel : ControllerBase
 
     [Reactive] public bool HasLoaded { get; set; }
 
+    public ReactiveCommand<Unit, Unit> CancelCmd { get; }
+
     public InventoryViewModel(
         IExtension extension,
         ILoggerFactory loggerFactory,
         IConfigProvider<AppConfig> config,
         IDialogService dialogService,
         IHabboApi api,
+        IOperationManager operations,
+        FurniPlacementController placement,
+        IPlacementFactory placementFactory,
         RoomManager roomManager,
         InventoryManager inventoryManager,
         TradeManager tradeManager
@@ -87,6 +94,9 @@ public sealed partial class InventoryViewModel : ControllerBase
         _config = config;
         _dialogService = dialogService;
         _api = api;
+        _operations = operations;
+        _placement = placement;
+        _placementFactory = placementFactory;
         _roomManager = roomManager;
         _inventoryManager = inventoryManager;
         _tradeManager = tradeManager;
@@ -145,13 +155,27 @@ public sealed partial class InventoryViewModel : ControllerBase
                     x => x.MaxProgress,
                     (current, max) => (current, max)
                 ),
-                (self, manager) => self.status switch
+                _placement.WhenAnyValue(
+                    x => x.Progress,
+                    x => x.MaxProgress,
+                    x => x.Status,
+                    (progress, maxProgress, status) => (progress, maxProgress, status)
+                ),
+                (self, manager, placer) => self.status switch
                 {
                     State.Loading => manager.max > 0
                         ? $"Loading...\n{manager.current} / {manager.max}"
                         : $"Loading...\n{manager.current} / ?",
                     State.Offering => $"Offering items...\n{self.progress} / {self.maxProgress}",
-                    State.Placing => $"Placing items...\n{self.progress} / {self.maxProgress}",
+                    State.AwaitingCornerSelection =>
+                        $"Click the 2 corner tiles of the area where you want to place the items"
+                        + $"\n{self.progress} / {self.maxProgress}",
+                    State.ManualPlacing => $"{(
+                        placer.status is FurniPlacementController.State.PlacingFloorItems
+                        ? "Placing floor items"
+                        : "Placing wall items"
+                    )}Click tiles to place items...\n{placer.progress} / {placer.maxProgress}",
+                    State.AutoPlacing => $"Placing items...\n{placer.progress} / {placer.maxProgress}",
                     _ => ""
                 }
             )
@@ -177,7 +201,7 @@ public sealed partial class InventoryViewModel : ControllerBase
             .ObserveOn(RxApp.MainThreadScheduler)
         );
 
-        PlaceItemsCmd = ReactiveCommand.Create<Task>(
+        PlaceItemsCmd = ReactiveCommand.Create<string, Task>(
             PlaceItemsAsync,
             Observable.CombineLatest(
                 this.WhenAnyValue(x => x.IsBusy),
@@ -188,10 +212,16 @@ public sealed partial class InventoryViewModel : ControllerBase
             .ObserveOn(RxApp.MainThreadScheduler)
         );
 
+        CancelCmd = ReactiveCommand.Create(OnCancel);
+
         _inventoryManager.Loaded += OnInventoryLoaded;
         _inventoryManager.Cleared += OnInventoryCleared;
         _inventoryManager.ItemAdded += OnItemAdded;
         _inventoryManager.ItemRemoved += OnItemRemoved;
+    }
+
+    private void OnCancel()
+    {
     }
 
     private Func<InventoryStackViewModel, bool> CreateFilter(string? filterText)
@@ -320,98 +350,92 @@ public sealed partial class InventoryViewModel : ControllerBase
         }
     }
 
-    private Task PlaceItemsAsync() => PlaceItemsAsync(Selection.SelectedItems);
+    private Task PlaceItemsAsync(string mode) => PlaceItemsAsync(mode, Selection.SelectedItems);
 
-    private async Task PlaceItemsAsync(IEnumerable<InventoryStackViewModel?> stacks)
+    private async Task<Area> SelectAreaAsync(CancellationToken cancellationToken)
     {
-        if (!_roomManager.EnsureInRoom(out var room))
-            return;
+        Progress = 0;
+        MaxProgress = 2;
+        Status = State.AwaitingCornerSelection;
 
+        Point[] corners = new Point[2];
+        for (int i = 0; i < 2; i++)
+        {
+            Progress = i+1;
+            corners[i] = (await ReceiveAsync<WalkMsg>(timeout: -1, block: true, cancellationToken: cancellationToken)).Point;
+        }
+
+        return new Area(corners[0], corners[1]);
+    }
+
+    private async Task PlaceItemsAsync(string mode, IReadOnlyList<InventoryStackViewModel?> selectedItems)
+    {
         try
         {
-            var items = stacks
+            var cts = new CancellationTokenSource();
+            var cancellationToken = cts.Token;
+
+            var items = selectedItems
+                .Where(x => x is not null)
                 .SelectMany(x => x!)
                 .ToArray();
 
-            _logger.LogDebug("Placing {Count} items.", items.Length);
+            if (items.Length == 0)
+                return;
 
-            Progress = 1;
-            MaxProgress = items.Length;
-            Status = State.Placing;
+            if (!_roomManager.EnsureInRoom(out var room))
+                throw new Exception("Room state is not being tracked.");
 
-            List<WallLocation> wallTiles = [];
-            for (int y = 0; y < room.FloorPlan.Size.Y - 1; y++)
+            var errorHandling = FurniPlacementController.ErrorHandling.Abort;
+
+            IFloorItemPlacement floorPlacement;
+            IWallItemPlacement wallPlacement;
+
+            switch (mode)
             {
-                for (int x = 0; x < room.FloorPlan.Size.X - 1; x++)
-                {
-                    if (room.FloorPlan[x, y] >= 0)
-                        continue;
-
-                    if (room.FloorPlan[x+1, y] >= 0)
-                        wallTiles.Add(new WallLocation((x, y), Point.Zero, 'l'));
-
-                    if (room.FloorPlan[x, y+1] >= 0)
-                        wallTiles.Add(new WallLocation((x, y), Point.Zero, 'r'));
-                }
+                case "anywhere":
+                    wallPlacement = _placementFactory.CreateRandomWallPlacement(room.FloorPlan.Area);
+                    floorPlacement = _placementFactory.CreateAreaFloorPlacement(room.FloorPlan.Area);
+                    Status = State.AutoPlacing;
+                    break;
+                case "area":
+                    Area placementArea = await SelectAreaAsync(cancellationToken);
+                    wallPlacement = _placementFactory.CreateRandomWallPlacement(placementArea);
+                    floorPlacement = _placementFactory.CreateAreaFloorPlacement(placementArea);
+                    Status = State.AutoPlacing;
+                    break;
+                case "manual":
+                    floorPlacement = _placementFactory.CreateManualFloorPlacement();
+                    wallPlacement = _placementFactory.CreateManualWallPlacement();
+                    Status = State.ManualPlacing;
+                    break;
+                default:
+                    throw new Exception($"Unknown placement mode: '{mode}'.");
             }
 
-            for (int i = 0; i < items.Length; i++)
+            using (floorPlacement)
+            using (wallPlacement)
             {
-                _logger.LogTrace("Placing item {Current}/{Max}.", i+1, items.Length);
-                var item = items[i];
-                Progress = i+1;
-
-                if (item.Type is ItemType.Floor)
-                {
-                    if (!item.TryGetSize(out var size))
-                    {
-                        _logger.LogWarning("Failed to get size for {Item}.", item);
-                        continue;
-                    }
-                    Point? freeTile = room.FindPlaceablePoint(size);
-                    if (freeTile is null)
-                    {
-                        _logger.LogWarning("Failed to find placeable location for {Item}.", item);
-                        continue;
-                    }
-
-                    _logger.LogTrace("Placing {Item} at {Point}.", item, freeTile.Value);
-                    var interval = Task.Delay(_config.Value.Timing.GetTiming(Session).FurniPlaceInterval);
-                    var result = await new PlaceFloorItemTask(Ext, item.ItemId, freeTile.Value, 0).ExecuteAsync(3000);
-                    if (result is PlaceFloorItemTask.Result.Error)
-                        _logger.LogWarning("Failed to place {Item}.", item);
-                    await interval;
-                }
-                else
-                {
-                    if (wallTiles.Count == 0)
-                        continue;
-                    WallLocation location = wallTiles[Random.Shared.Next(0, wallTiles.Count)];
-                    location += (
-                        Random.Shared.Next(room.FloorPlan.Scale),
-                        room.FloorPlan.Scale + Random.Shared.Next(room.FloorPlan.Scale * 2)
-                    );
-                    _logger.LogTrace("Placing {Item} at {Location}.", item, location);
-                    var interval = Task.Delay(_config.Value.Timing.GetTiming(Session).FurniPlaceInterval);
-                    var result = await new PlaceWallItemTask(Ext, item.ItemId, location).ExecuteAsync(3000);
-                    await interval;
-                }
+                await _operations.RunAsync("Place furni",
+                    (ct) => _placement.PlaceItemsAsync(
+                        items, floorPlacement, wallPlacement, errorHandling, ct),
+                    cancellationToken
+                );
             }
         }
         catch (TimeoutException)
         {
-            _logger.LogWarning("Operation timed out.");
+            Status = State.None;
             await _dialogService.ShowAsync("Timed out", "Try increasing the furni placement interval in settings.");
         }
         catch (Exception ex)
         {
-            _logger.LogError("Failed to place furni: {Message}", ex.Message);
-            await _dialogService.ShowAsync("Error", $"Failed to place furni: {ex.Message}.");
+            Status = State.None;
+            await _dialogService.ShowAsync("Error", ex.Message);
         }
         finally
         {
             Status = State.None;
-            Progress = MaxProgress = 0;
         }
     }
 
@@ -445,21 +469,39 @@ public sealed partial class InventoryViewModel : ControllerBase
 
         try
         {
-            Progress = 0;
-            MaxProgress = toOffer.Count;
-            Status = State.Offering;
-
-            if (Session.Is(ClientType.Origins))
-                await OfferItemsOriginsAsync(toOffer);
-            else
-                await OfferItemsModernAsync(toOffer);
+            await OfferItemsAsync(toOffer);
         }
-        finally
+        catch (TimeoutException)
         {
-            Status = State.None;
-            Progress = 0;
-            MaxProgress = 0;
+            await _dialogService.ShowAsync("Timed out", "Try increasing the offer interval in settings.");
         }
+        catch (Exception ex)
+        {
+            await _dialogService.ShowAsync("Error", ex.Message);
+        }
+    }
+
+    private async Task OfferItemsAsync(List<IInventoryItem> items)
+    {
+        await _operations.RunAsync("Offer items", async (ct) => {
+            try
+            {
+                Progress = 0;
+                MaxProgress = items.Count;
+                Status = State.Offering;
+
+                if (Session.Is(ClientType.Origins))
+                    await OfferItemsOriginsAsync(items);
+                else
+                    await OfferItemsModernAsync(items);
+            }
+            finally
+            {
+                Status = State.None;
+                Progress = 0;
+                MaxProgress = 0;
+            }
+        });
     }
 
     private async Task OfferItemsOriginsAsync(List<IInventoryItem> items)

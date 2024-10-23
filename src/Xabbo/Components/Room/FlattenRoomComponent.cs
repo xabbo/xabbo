@@ -87,9 +87,9 @@ public partial class FlattenRoomComponent(IExtension extension, RoomManager room
         e.Packet.ReplaceAt(5, floorPlan.ToString());
 
         // Modify the heightmap
-        for (int y = 0; y < _heightmap.Length; y++)
+        for (int y = 0; y < _heightmap.Size.Y; y++)
         {
-            for (int x = 0; x < _heightmap.Width; x++)
+            for (int x = 0; x < _heightmap.Size.X; x++)
             {
                 if (_heightmap[x, y].IsFree)
                 {

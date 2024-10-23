@@ -33,10 +33,23 @@
             IconSource="{icm:SymbolIconSource Symbol=HandLeft, IconVariant=Filled}"
             Text="Offer" Command="{Binding OfferItemsCmd}"
           />
-          <ui:MenuFlyoutItem
+          <ui:MenuFlyoutSubItem
             IconSource="{icm:SymbolIconSource Symbol=ArrowDownload, IconVariant=Filled}"
-            Text="Place" Command="{Binding PlaceItemsCmd}"
-          />
+            Text="Place"
+          >
+            <ui:MenuFlyoutItem
+              IconSource="{icm:SymbolIconSource Symbol=GridDots, IconVariant=Filled}"
+              Text="Anywhere" Command="{Binding PlaceItemsCmd}" CommandParameter="anywhere"
+            />
+            <ui:MenuFlyoutItem
+              IconSource="{icm:SymbolIconSource Symbol=SelectObject, IconVariant=Filled}"
+              Text="In selected area" Command="{Binding PlaceItemsCmd}" CommandParameter="area"
+            />
+            <ui:MenuFlyoutItem
+              IconSource="{icm:SymbolIconSource Symbol=CursorClick, IconVariant=Filled}"
+              Text="On selected tiles" Command="{Binding PlaceItemsCmd}" CommandParameter="manual"
+            />
+          </ui:MenuFlyoutSubItem>
           <ui:MenuFlyoutItem
             IconSource="{icm:SymbolIconSource Symbol=ArrowSync}"
             Text="Reload" Command="{Binding LoadCmd}"
