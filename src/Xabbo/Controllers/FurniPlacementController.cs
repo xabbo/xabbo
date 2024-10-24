@@ -144,6 +144,13 @@ public partial class FurniPlacementController(
         ErrorHandling errorHandling, CancellationToken cancellationToken
     )
     {
+        int direction = 0;
+        if (item.TryGetInfo(out var info))
+            direction = info.DefaultDirection;
+
+        if (direction == 2 || direction == 6)
+            size = size.Flip();
+
         Point location = await floorItemPlacement.FindLocationAsync(room, size, cancellationToken)
             ?? throw new Exception("Failed to find a valid floor tile.");
 
