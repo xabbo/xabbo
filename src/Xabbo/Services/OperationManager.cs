@@ -35,6 +35,32 @@ public class OperationManager(IHostApplicationLifetime lifetime, XabbotComponent
         }
     }
 
+    public async Task<T> RunAsync<T>(string operationName, Func<CancellationToken, Task<T>> task, CancellationToken cancellationToken = default)
+    {
+        lock (_sync)
+        {
+            if (_cts is not null)
+                throw new OperationInProgressException(_currentOperationName);
+
+            _cts = CancellationTokenSource.CreateLinkedTokenSource(_lifetime.ApplicationStopping, cancellationToken);
+            _currentOperationName = operationName;
+        }
+
+        try
+        {
+            return await task(_cts.Token);
+        }
+        finally
+        {
+            lock (_sync)
+            {
+                IsCancelling = false;
+                _cts.Dispose();
+                _cts = null;
+            }
+        }
+    }
+
     public async Task RunAsync(string operationName, Func<CancellationToken, Task> task, CancellationToken cancellationToken = default)
     {
         lock (_sync)
