@@ -60,6 +60,9 @@ public sealed partial class InventoryViewModel : ControllerBase
     private readonly ObservableAsPropertyHelper<string?> _emptyText;
     public string? EmptyText => _emptyText.Value;
 
+    private readonly ObservableAsPropertyHelper<string?> _emptyPhotoStatus;
+    public string? EmptyPhotoStatus => _emptyPhotoStatus.Value;
+
     private readonly ObservableAsPropertyHelper<string> _statusText;
     public string StatusText => _statusText.Value;
 
@@ -140,6 +143,16 @@ public sealed partial class InventoryViewModel : ControllerBase
                 }
             )
             .ToProperty(this, x => x.EmptyText);
+
+        _emptyPhotoStatus =
+            Observable.CombineLatest(
+                this.WhenAnyValue(x => x.HasLoaded),
+                _photoCache.CountChanged,
+                (hasLoaded, count) =>
+                    (hasLoaded && count == 0) ? "No photos in inventory" : ""
+            )
+            .ToProperty(this, x => x.EmptyPhotoStatus);
+
 
         _statusText =
             Observable.CombineLatest(

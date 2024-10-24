@@ -15,38 +15,41 @@
   x:Class="Xabbo.Avalonia.Views.InventoryPhotosView"
   x:DataType="vm:InventoryViewModel"
 >
-  <ListBox
-    Classes="flat"
-    Padding="8"
-    ItemsSource="{Binding Photos}"
-    ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-    ScrollViewer.VerticalScrollBarVisibility="Hidden"
-    SelectionMode="Multiple"
-  >
-    <ListBox.Styles>
-      <Style Selector="ListBoxItem">
-        <Setter Property="Padding" Value="0" />
-        <Style Selector="^:not(:selected) > Border">
-          <Setter Property="BorderBrush" Value="Transparent" />
+  <Panel>
+    <ListBox
+      Classes="flat"
+      Padding="8"
+      ItemsSource="{Binding Photos}"
+      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+      ScrollViewer.VerticalScrollBarVisibility="Hidden"
+      SelectionMode="Multiple"
+    >
+      <ListBox.Styles>
+        <Style Selector="ListBoxItem">
+          <Setter Property="Padding" Value="0" />
+          <Style Selector="^:not(:selected) > Border">
+            <Setter Property="BorderBrush" Value="Transparent" />
+          </Style>
         </Style>
-      </Style>
-    </ListBox.Styles>
-    <ListBox.ItemsPanel>
-      <ItemsPanelTemplate>
-        <WrapPanel Orientation="Horizontal" />
-      </ItemsPanelTemplate>
-    </ListBox.ItemsPanel>
-    <ListBox.ItemTemplate>
-      <DataTemplate DataType="vm:InventoryPhotoViewModel">
-        <Border BorderThickness="4">
-          <img:AdvancedImage
-            Classes="spinner"
-            CornerRadius="5"
-            Width="320" Height="320"
-            Source="{Binding PhotoUrl^}"
-          />
-        </Border>
-      </DataTemplate>
-    </ListBox.ItemTemplate>
-  </ListBox>
+      </ListBox.Styles>
+      <ListBox.ItemsPanel>
+        <ItemsPanelTemplate>
+          <WrapPanel Orientation="Horizontal" />
+        </ItemsPanelTemplate>
+      </ListBox.ItemsPanel>
+      <ListBox.ItemTemplate>
+        <DataTemplate DataType="vm:InventoryPhotoViewModel">
+          <Border BorderThickness="4">
+            <img:AdvancedImage
+              Classes="spinner"
+              CornerRadius="5"
+              Width="320" Height="320"
+              Source="{Binding PhotoUrl^}"
+            />
+          </Border>
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+    <controls:InfoOverlay Text="{Binding EmptyPhotoStatus}" />
+  </Panel>
 </UserControl>
