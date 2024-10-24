@@ -20,10 +20,17 @@
       Classes="flat"
       Padding="8"
       ItemsSource="{Binding Photos}"
-      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-      ScrollViewer.VerticalScrollBarVisibility="Hidden"
+      Selection="{Binding PhotoSelection}"
       SelectionMode="Multiple"
     >
+      <ListBox.ContextFlyout>
+        <ui:FAMenuFlyout>
+          <ui:MenuFlyoutItem
+            IconSource="{icm:SymbolIconSource Symbol=HandLeft, IconVariant=Filled}"
+            Text="Offer" Command="{Binding OfferPhotosCmd}"
+          />
+        </ui:FAMenuFlyout>
+      </ListBox.ContextFlyout>
       <ListBox.Styles>
         <Style Selector="ListBoxItem">
           <Setter Property="Padding" Value="0" />
@@ -38,7 +45,7 @@
         </ItemsPanelTemplate>
       </ListBox.ItemsPanel>
       <ListBox.ItemTemplate>
-        <DataTemplate DataType="vm:InventoryPhotoViewModel">
+        <DataTemplate DataType="vm:PhotoViewModel">
           <Border BorderThickness="4">
             <img:AdvancedImage
               Classes="spinner"

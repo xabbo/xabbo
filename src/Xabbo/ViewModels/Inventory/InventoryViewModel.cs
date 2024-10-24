@@ -46,13 +46,14 @@ public sealed partial class InventoryViewModel : ControllerBase
     public ReadOnlyObservableCollection<InventoryStackViewModel> Stacks => _stacks;
     [Reactive] public int ItemCount { get; set; }
 
-    private readonly SourceCache<InventoryPhotoViewModel, Id> _photoCache = new(x => x.Item.Id);
-    private readonly ReadOnlyObservableCollection<InventoryPhotoViewModel> _photos;
-    public ReadOnlyObservableCollection<InventoryPhotoViewModel> Photos => _photos;
+    private readonly SourceCache<PhotoViewModel, Id> _photoCache = new(x => x.Item.Id);
+    private readonly ReadOnlyObservableCollection<PhotoViewModel> _photos;
+    public ReadOnlyObservableCollection<PhotoViewModel> Photos => _photos;
 
     [Reactive] public string FilterText { get; set; } = "";
 
-    public SelectionModel<InventoryStackViewModel> Selection { get; } = new SelectionModel<InventoryStackViewModel>() { SingleSelect = false };
+    public SelectionModel<InventoryStackViewModel> Selection { get; } = new() { SingleSelect = false };
+    public SelectionModel<PhotoViewModel> PhotoSelection { get; } = new() { SingleSelect = false };
 
     private readonly ObservableAsPropertyHelper<bool> _isBusy;
     public bool IsBusy => _isBusy.Value;
@@ -74,6 +75,7 @@ public sealed partial class InventoryViewModel : ControllerBase
 
     public ReactiveCommand<Unit, Task> LoadCmd { get; }
     public ReactiveCommand<Unit, Task> OfferItemsCmd { get; }
+    public ReactiveCommand<Unit, Task> OfferPhotosCmd { get; }
     public ReactiveCommand<string, Task> PlaceItemsCmd { get; }
     public ReactiveCommand<Unit, Unit> CancelCmd { get; }
 
@@ -213,6 +215,17 @@ public sealed partial class InventoryViewModel : ControllerBase
             .ObserveOn(RxApp.MainThreadScheduler)
         );
 
+        OfferPhotosCmd = ReactiveCommand.Create<Task>(
+            OfferPhotosAsync,
+            Observable.CombineLatest(
+                this.WhenAnyValue(x => x.IsBusy),
+                _tradeManager.WhenAnyValue(x => x.IsTrading),
+                PhotoSelection.WhenValueChanged(x => x.SelectedItems),
+                (isBusy, isTrading, selection) => !isBusy && isTrading && selection?.Count > 0
+            )
+            .ObserveOn(RxApp.MainThreadScheduler)
+        );
+
         PlaceItemsCmd = ReactiveCommand.Create<string, Task>(
             PlaceItemsAsync,
             Observable.CombineLatest(
@@ -281,7 +294,7 @@ public sealed partial class InventoryViewModel : ControllerBase
                     .OfKind("external_image_wallitem_poster_small")
                     .Select(TryExtractPhotoId)
                     .Where(it => !string.IsNullOrWhiteSpace(it.PhotoId))
-                    .Select(it => new InventoryPhotoViewModel(
+                    .Select(it => new PhotoViewModel(
                         it.Item,
                         new(() => FetchPhotoUrlAsync(currentHotel, it.PhotoId!))
                     ))
@@ -362,6 +375,16 @@ public sealed partial class InventoryViewModel : ControllerBase
             await OfferItemsAsync(viewModel.Items);
         }
     }
+
+    private async Task OfferPhotosAsync()
+    {
+        await OfferItemsAsync(
+            PhotoSelection.SelectedItems
+            .Select(x => x?.Item)
+            .OfType<IInventoryItem>()
+        );
+    }
+
 
     private Task PlaceItemsAsync(string mode) => PlaceItemsAsync(mode, Selection.SelectedItems);
 
@@ -480,9 +503,34 @@ public sealed partial class InventoryViewModel : ControllerBase
                 });
         }
 
+        await OfferItemsAsync(toOffer);
+    }
+
+    private async Task OfferItemsAsync(IEnumerable<IInventoryItem> items)
+    {
+        var array = items.ToArray();
+
         try
         {
-            await OfferItemsAsync(toOffer);
+            await _operations.RunAsync("Offer items", async (ct) => {
+                try
+                {
+                    Progress = 0;
+                    MaxProgress = array.Length;
+                    Status = State.Offering;
+
+                    if (Session.Is(ClientType.Origins))
+                        await OfferItemsOriginsAsync(array);
+                    else
+                        await OfferItemsModernAsync(array);
+                }
+                finally
+                {
+                    Status = State.None;
+                    Progress = 0;
+                    MaxProgress = 0;
+                }
+            });
         }
         catch (TimeoutException)
         {
@@ -494,32 +542,9 @@ public sealed partial class InventoryViewModel : ControllerBase
         }
     }
 
-    private async Task OfferItemsAsync(List<IInventoryItem> items)
+    private async Task OfferItemsOriginsAsync(IInventoryItem[] items)
     {
-        await _operations.RunAsync("Offer items", async (ct) => {
-            try
-            {
-                Progress = 0;
-                MaxProgress = items.Count;
-                Status = State.Offering;
-
-                if (Session.Is(ClientType.Origins))
-                    await OfferItemsOriginsAsync(items);
-                else
-                    await OfferItemsModernAsync(items);
-            }
-            finally
-            {
-                Status = State.None;
-                Progress = 0;
-                MaxProgress = 0;
-            }
-        });
-    }
-
-    private async Task OfferItemsOriginsAsync(List<IInventoryItem> items)
-    {
-        for (int i = 0; i < items.Count; i++)
+        for (int i = 0; i < items.Length; i++)
         {
             Progress = i;
             if (i > 0)
@@ -528,7 +553,7 @@ public sealed partial class InventoryViewModel : ControllerBase
         }
     }
 
-    private Task OfferItemsModernAsync(List<IInventoryItem> items)
+    private Task OfferItemsModernAsync(IInventoryItem[] items)
     {
         Send(new OfferTradeItemsMsg(items));
         return Task.CompletedTask;
