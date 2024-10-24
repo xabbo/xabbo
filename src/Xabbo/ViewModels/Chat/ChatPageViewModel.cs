@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Reactive;
 using System.Reactive.Linq;
 using DynamicData;
 using DynamicData.Binding;
@@ -26,6 +27,7 @@ public class ChatPageViewModel : PageViewModel
     private readonly IConfigProvider<AppConfig> _settingsProvider;
     private AppConfig Settings => _settingsProvider.Value;
 
+    private readonly IClipboardService _clipboard;
     private readonly IGameStateService _gameState;
     private readonly IFigureConverterService _figureConverter;
 
@@ -40,6 +42,8 @@ public class ChatPageViewModel : PageViewModel
     private readonly ReadOnlyObservableCollection<ChatLogEntryViewModel> _messages;
     public ReadOnlyObservableCollection<ChatLogEntryViewModel> Messages => _messages;
 
+    public ReactiveCommand<Unit, Unit> CopySelectedEntriesCmd { get; }
+
     public SelectionModel<ChatLogEntryViewModel> Selection { get; } = new SelectionModel<ChatLogEntryViewModel>()
     {
         SingleSelect = false
@@ -50,12 +54,14 @@ public class ChatPageViewModel : PageViewModel
     [DependencyInjectionConstructor]
     public ChatPageViewModel(
         IConfigProvider<AppConfig> settingsProvider,
+        IClipboardService clipboard,
         IGameStateService gameState,
         IFigureConverterService figureConverter,
         RoomManager roomManager,
         ProfileManager profileManager)
     {
         _settingsProvider = settingsProvider;
+        _clipboard = clipboard;
         _gameState = gameState;
         _figureConverter = figureConverter;
         _roomManager = roomManager;
@@ -76,6 +82,13 @@ public class ChatPageViewModel : PageViewModel
             .ObserveOn(RxApp.MainThreadScheduler)
             .SortAndBind(out _messages, SortExpressionComparer<ChatLogEntryViewModel>.Ascending(x => x.EntryId))
             .Subscribe();
+
+        CopySelectedEntriesCmd = ReactiveCommand.Create(CopySelectedEntries);
+    }
+
+    private void CopySelectedEntries()
+    {
+        _clipboard.SetText(string.Join("\n", Selection.SelectedItems));
     }
 
     private long NextEntryId() => Interlocked.Increment(ref _currentMessageId);

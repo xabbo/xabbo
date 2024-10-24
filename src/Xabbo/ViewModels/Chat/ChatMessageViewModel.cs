@@ -13,4 +13,6 @@ public class ChatMessageViewModel : ChatLogEntryViewModel
     public bool IsTalk => Type is ChatType.Talk;
     public bool IsShout => Type is ChatType.Shout;
     public bool IsWhisper => Type is ChatType.Whisper;
+
+    public override string ToString() => $"{Name}: {H.RenderText(Message)}";
 }

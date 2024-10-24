@@ -31,6 +31,9 @@
           <Setter Property="IsVisible" Value="false" />
         </Style>
       </ListBox.Styles>
+      <ListBox.KeyBindings>
+        <KeyBinding Gesture="Ctrl+C" Command="{Binding CopySelectedEntriesCmd}" />
+      </ListBox.KeyBindings>
       <ListBox.DataTemplates>
         <DataTemplate DataType="vm:ChatLogRoomEntryViewModel">
           <Grid Margin="10,0" ColumnDefinitions="*,Auto,*">
