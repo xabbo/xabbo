@@ -259,6 +259,23 @@ public sealed partial class InventoryViewModel : ControllerBase
         };
     }
 
+    private void AddPhotos(IEnumerable<IInventoryItem> items)
+    {
+        _photoCache.Edit(cache => {
+            cache.AddOrUpdate(
+                items
+                    .OfType<IInventoryItem>()
+                    .OfKind("external_image_wallitem_poster_small")
+                    .Select(TryExtractPhotoId)
+                    .Where(it => !string.IsNullOrWhiteSpace(it.PhotoId))
+                    .Select(it => new PhotoViewModel(
+                        it.Item,
+                        new(() => FetchPhotoUrlAsync(Session.Hotel, it.PhotoId!))
+                    ))
+            );
+        });
+    }
+
     private void OnInventoryLoaded()
     {
         if (_inventoryManager.Inventory is not { } inventory)
@@ -284,22 +301,8 @@ public sealed partial class InventoryViewModel : ControllerBase
             );
         });
 
-        Hotel currentHotel = Session.Hotel;
-
-        _photoCache.Edit(cache => {
-            cache.Clear();
-            cache.AddOrUpdate(
-                inventory
-                    .OfType<IInventoryItem>()
-                    .OfKind("external_image_wallitem_poster_small")
-                    .Select(TryExtractPhotoId)
-                    .Where(it => !string.IsNullOrWhiteSpace(it.PhotoId))
-                    .Select(it => new PhotoViewModel(
-                        it.Item,
-                        new(() => FetchPhotoUrlAsync(currentHotel, it.PhotoId!))
-                    ))
-            );
-        });
+        _photoCache.Clear();
+        AddPhotos(inventory);
 
         ItemCount = inventory.Count;
         HasLoaded = true;
@@ -346,6 +349,7 @@ public sealed partial class InventoryViewModel : ControllerBase
         _cache.Clear();
         _photoCache.Clear();
         HasLoaded = false;
+        ItemCount = 0;
     }
 
     private async Task OfferItemsAsync()
@@ -394,14 +398,15 @@ public sealed partial class InventoryViewModel : ControllerBase
         MaxProgress = 2;
         Status = State.AwaitingCornerSelection;
 
-        Point[] corners = new Point[2];
-        for (int i = 0; i < 2; i++)
-        {
-            Progress = i+1;
-            corners[i] = (await ReceiveAsync<WalkMsg>(timeout: -1, block: true, cancellationToken: cancellationToken)).Point;
-        }
-
-        return new Area(corners[0], corners[1]);
+        return await _operations.RunAsync("Select area", async (ct) => {
+            Point[] corners = new Point[2];
+            for (int i = 0; i < 2; i++)
+            {
+                Progress = i+1;
+                corners[i] = (await ReceiveAsync<WalkMsg>(timeout: -1, block: true, cancellationToken: ct)).Point;
+            }
+            return new Area(corners[0], corners[1]);
+        }, cancellationToken);
     }
 
     private async Task PlaceItemsAsync(string mode, IReadOnlyList<InventoryStackViewModel?> selectedItems)
@@ -576,6 +581,8 @@ public sealed partial class InventoryViewModel : ControllerBase
                 });
         });
 
+        AddPhotos([e.Item]);
+
         ItemCount = _inventoryManager.Inventory?.Count ?? 0;
     }
 
@@ -606,6 +613,8 @@ public sealed partial class InventoryViewModel : ControllerBase
                 });
         });
 
+        _photoCache.RemoveKey(e.Item.ItemId);
+
         ItemCount = _inventoryManager.Inventory?.Count ?? 0;
     }
 
@@ -620,7 +629,7 @@ public sealed partial class InventoryViewModel : ControllerBase
         try
         {
             Status = State.Loading;
-            var items = await _inventoryManager.LoadInventoryAsync(timeout: 120000, forceReload: true);
+            await _inventoryManager.LoadInventoryAsync(timeout: 120000, forceReload: true);
         }
         catch (Exception ex)
         {
