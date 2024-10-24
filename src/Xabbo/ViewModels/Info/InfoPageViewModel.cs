@@ -1,6 +1,9 @@
 using System.Reflection;
 using FluentIcons.Common;
 using FluentIcons.Avalonia.Fluent;
+
+using Xabbo.Utility;
+
 using IconSource = FluentAvalonia.UI.Controls.IconSource;
 
 namespace Xabbo.ViewModels;
@@ -18,29 +21,10 @@ public sealed class InfoPageViewModel : PageViewModel
 
     public InfoPageViewModel()
     {
-        Version = GetVersionString(Assembly.GetEntryAssembly());
-        XabboCommonVersion = GetVersionString(typeof(Xabbo.Client).Assembly);
-        XabboGEarthVersion = GetVersionString(typeof(Xabbo.GEarth.GEarthExtension).Assembly);
-        XabboMessagesVersion = GetVersionString(typeof(Xabbo.Messages.Flash.Out).Assembly);
-        XabboCoreVersion = GetVersionString(typeof(Xabbo.Core.H).Assembly);
-    }
-
-    static string GetVersionString(Assembly? assembly)
-    {
-        string? version = assembly?
-            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
-            ?? assembly?.GetName().Version?.ToString(3);
-
-        if (version is null)
-            return "unknown version";
-
-        if (!version.StartsWith('v'))
-            version = "v" + version;
-
-        int index = version.IndexOf('+');
-        if (index > 0)
-            version = version[..index];
-
-        return version;
+        Version = Assembly.GetEntryAssembly().GetVersionString();
+        XabboCommonVersion = typeof(Xabbo.Client).Assembly.GetVersionString();
+        XabboGEarthVersion = typeof(Xabbo.GEarth.GEarthExtension).Assembly.GetVersionString();
+        XabboMessagesVersion = typeof(Xabbo.Messages.Flash.Out).Assembly.GetVersionString();
+        XabboCoreVersion = typeof(Xabbo.Core.H).Assembly.GetVersionString();
     }
 }

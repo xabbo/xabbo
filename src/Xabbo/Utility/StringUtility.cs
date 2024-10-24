@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace Xabbo.Utility;
 
@@ -33,5 +34,24 @@ public static class StringUtility
         }
 
         return new Regex(pattern, options);
+    }
+
+    public static string GetVersionString(this Assembly? assembly)
+    {
+        string? version = assembly?
+            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
+            ?? assembly?.GetName().Version?.ToString(3);
+
+        if (version is null)
+            return "unknown version";
+
+        if (!version.StartsWith('v'))
+            version = "v" + version;
+
+        int index = version.IndexOf('+');
+        if (index > 0)
+            version = version[..index];
+
+        return version;
     }
 }

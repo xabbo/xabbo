@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -18,6 +19,7 @@ using Xabbo.Core.Game;
 using Xabbo.Core.GameData;
 using Xabbo.Services.Abstractions;
 using Xabbo.ViewModels;
+using Xabbo.Utility;
 using Xabbo.Avalonia.Views;
 
 using IApplicationLifetime = Avalonia.Controls.ApplicationLifetimes.IApplicationLifetime;
@@ -131,7 +133,10 @@ public sealed class XabboAppManager : IApplicationManager
                 ex = iex.InnerException ?? ex;
             }
 
-            List<string?> errorDetails = [];
+            List<string?> errorDetails = [
+                $"xabbo {Assembly.GetEntryAssembly().GetVersionString()}",
+                ""
+            ];
 
             if (_lastSession != Session.None)
             {

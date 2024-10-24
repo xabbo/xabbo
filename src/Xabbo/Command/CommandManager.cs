@@ -187,6 +187,12 @@ public partial class CommandManager
         if (split.Length == 0) return;
 
         var (command, args) = (split[0].ToLower(), split[1..]);
+
+        #if DEBUG
+        if (command == "throw")
+            throw new InvalidOperationException("Test exception.");
+        #endif
+
         if (!_bindings.TryGetValue(command, out CommandBinding? binding)) return;
 
         if (binding.Module is { IsAvailable: false })
