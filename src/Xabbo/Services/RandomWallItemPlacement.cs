@@ -43,8 +43,8 @@ public sealed class RandomWallItemPlacement(Area area) : IWallItemPlacement
 
         WallLocation location = _wallTiles[Random.Shared.Next(0, _wallTiles.Count)];
         location += (
-            Random.Shared.Next(room.FloorPlan.Scale),
-            room.FloorPlan.Scale + Random.Shared.Next(room.FloorPlan.Scale * 2)
+            Random.Shared.Next(room.FloorPlan.Scale / 2),
+            room.FloorPlan.Scale + Random.Shared.Next(room.FloorPlan.Scale)
         );
 
         return Task.FromResult<WallLocation?>(location);
