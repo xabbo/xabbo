@@ -9,6 +9,7 @@ using DynamicData.Binding;
 using DynamicData.Kernel;
 using HanumanInstitute.MvvmDialogs;
 using ReactiveUI;
+using Humanizer;
 
 using Xabbo.Extension;
 using Xabbo.Core;
@@ -54,6 +55,9 @@ public sealed partial class InventoryViewModel : ControllerBase
 
     public SelectionModel<InventoryStackViewModel> Selection { get; } = new() { SingleSelect = false };
     public SelectionModel<PhotoViewModel> PhotoSelection { get; } = new() { SingleSelect = false };
+
+    private readonly ObservableAsPropertyHelper<string> _itemCountText;
+    public string ItemCountText => _itemCountText.Value;
 
     private readonly ObservableAsPropertyHelper<bool> _isBusy;
     public bool IsBusy => _isBusy.Value;
@@ -194,6 +198,14 @@ public sealed partial class InventoryViewModel : ControllerBase
                 }
             )
             .ToProperty(this, x => x.StatusText);
+
+        _itemCountText =
+            Observable.CombineLatest(
+                _cache.CountChanged,
+                this.WhenAnyValue(x => x.ItemCount),
+                (stackCount, itemCount) => $"{stackCount} furni, {"item".ToQuantity(itemCount)}"
+            )
+            .ToProperty(this, x => x.ItemCountText);
 
         LoadCmd = ReactiveCommand.Create<Task>(
             LoadInventoryAsync,

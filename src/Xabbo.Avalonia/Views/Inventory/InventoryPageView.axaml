@@ -32,7 +32,7 @@
     CancelCommand="{Binding CancelCmd}"
   >
     <Panel>
-      <TabControl Padding="0" TabStripPlacement="Bottom">
+      <controls:StatusTabControl Status="{Binding ItemCountText}" Padding="0" TabStripPlacement="Bottom">
         <TabItem>
           <TabItem.Header>
             <StackPanel Orientation="Horizontal" Spacing="4">
@@ -51,7 +51,7 @@
           </TabItem.Header>
           <v:InventoryPhotosView />
         </TabItem>
-      </TabControl>
+      </controls:StatusTabControl>
       <controls:InfoOverlay
         IsVisible="{Binding !IsBusy}"
         ShowContent="{Binding ItemCount, Converter={StaticResource EqConverter}, ConverterParameter={StaticResource Zero}}"

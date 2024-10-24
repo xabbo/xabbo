@@ -15,7 +15,7 @@
   x:Class="Xabbo.Avalonia.Views.InventoryStacksView"
   x:DataType="vm:InventoryViewModel"
 >
-  <Grid RowDefinitions="Auto,*,Auto">
+  <Grid RowDefinitions="Auto,*">
     <TextBox Classes="clearButton" Margin="10" Watermark="Filter" Text="{Binding FilterText}" />
     <ListBox
       Grid.Row="1"
@@ -109,12 +109,5 @@
         </DataTemplate>
       </ListBox.ItemTemplate>
     </ListBox>
-    <DockPanel Grid.Row="2">
-      <TextBlock Margin="10" HorizontalAlignment="Right" VerticalAlignment="Center">
-        <Run Text="{Binding Stacks.Count, Mode=OneWay}" />
-        <Run Text=" furni, " />
-        <Run Text="{Binding ItemCount, Mode=OneWay, Converter={StaticResource QuantityConverter} ConverterParameter='item'}" />
-      </TextBlock>
-    </DockPanel>
   </Grid>
 </UserControl>

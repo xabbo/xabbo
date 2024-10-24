@@ -22,6 +22,7 @@
       <ResourceDictionary.MergedDictionaries>
         <ResourceInclude Source="Controls/Loading.axaml" />
         <ResourceInclude Source="Controls/InfoOverlay.axaml" />
+        <ResourceInclude Source="Controls/StatusTabControl.axaml" />
         <ResourceInclude Source="Controls/TimingSlider.axaml" />
         <ResourceInclude Source="Controls/AvatarImage.axaml" />
         <ResourceInclude Source="Controls/FurniIconImage.axaml" />
