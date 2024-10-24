@@ -52,10 +52,6 @@ public sealed partial class InventoryViewModel : ControllerBase
 
     [Reactive] public string FilterText { get; set; } = "";
 
-    public ReactiveCommand<Unit, Task> LoadCmd { get; }
-    public ReactiveCommand<Unit, Task> OfferItemsCmd { get; }
-    public ReactiveCommand<string, Task> PlaceItemsCmd { get; }
-
     public SelectionModel<InventoryStackViewModel> Selection { get; } = new SelectionModel<InventoryStackViewModel>() { SingleSelect = false };
 
     private readonly ObservableAsPropertyHelper<bool> _isBusy;
@@ -73,6 +69,9 @@ public sealed partial class InventoryViewModel : ControllerBase
 
     [Reactive] public bool HasLoaded { get; set; }
 
+    public ReactiveCommand<Unit, Task> LoadCmd { get; }
+    public ReactiveCommand<Unit, Task> OfferItemsCmd { get; }
+    public ReactiveCommand<string, Task> PlaceItemsCmd { get; }
     public ReactiveCommand<Unit, Unit> CancelCmd { get; }
 
     public InventoryViewModel(
@@ -222,6 +221,7 @@ public sealed partial class InventoryViewModel : ControllerBase
 
     private void OnCancel()
     {
+        _operations.TryCancelOperation(out _);
     }
 
     private Func<InventoryStackViewModel, bool> CreateFilter(string? filterText)

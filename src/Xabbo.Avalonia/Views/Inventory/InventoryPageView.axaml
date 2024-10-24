@@ -29,6 +29,7 @@
     IsLoading="{Binding IsBusy}"
     LoadingContent="{Binding StatusText}"
     ContentFadeOpacity="0.1"
+    CancelCommand="{Binding CancelCmd}"
   >
     <Panel>
       <TabControl Padding="0" TabStripPlacement="Bottom">
