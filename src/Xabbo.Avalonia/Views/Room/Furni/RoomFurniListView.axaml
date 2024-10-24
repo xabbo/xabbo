@@ -21,12 +21,27 @@
   </UserControl.Styles>
   <Grid RowDefinitions="Auto,*">
     <controls:InfoOverlay Grid.RowSpan="2" Text="{Binding EmptyStatus}" />
-    <TextBox
-      Margin="10,0,10,10"
-      Classes="clearButton"
-      Watermark="Filter"
-      Text="{Binding FilterText}"
-    />
+    <DockPanel>
+      <Button
+        DockPanel.Dock="Right"
+        Margin="0,0,10,10"
+        Padding="5"
+        Command="{Binding SelectFilterAreaCmd}"
+        Classes.accent="{Binding FilterArea, Converter={x:Static ObjectConverters.IsNotNull}}"
+      >
+        <ic:SymbolIcon
+          Symbol="SelectObject"
+          HorizontalAlignment="Center"
+          VerticalAlignment="Center"
+        />
+      </Button>
+      <TextBox
+        Margin="10,0,10,10"
+        Classes="clearButton"
+        Watermark="Filter"
+        Text="{Binding FilterText}"
+      />
+    </DockPanel>
     <DataGrid
       Grid.Row="1"
       x:Name="DataGridFurni"

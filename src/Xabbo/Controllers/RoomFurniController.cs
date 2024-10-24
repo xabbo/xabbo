@@ -10,7 +10,7 @@ namespace Xabbo.Controllers;
 [Intercept]
 public partial class RoomFurniController : ControllerBase
 {
-    public enum Operation { None, Pickup, Eject, Toggle, Rotate, Move }
+    public enum Operation { None, Pickup, Eject, Toggle, Rotate, Move, SelectArea }
 
     private readonly IConfigProvider<AppConfig> _config;
     private readonly IOperationManager _operationManager;
@@ -40,11 +40,12 @@ public partial class RoomFurniController : ControllerBase
         roomManager.Left += OnLeftRoom;
     }
 
-    public Task PickupFurniAsync(IEnumerable<IFurni> furni) => PickupOrEjectFurniAsync(furni, false);
-    public Task EjectFurniAsync(IEnumerable<IFurni> furni) => PickupOrEjectFurniAsync(furni, true);
+    private void OnLeftRoom() => CancelCurrentOperation();
+
     public void CancelCurrentOperation() => _cts?.Cancel();
 
-    private void OnLeftRoom() => CancelCurrentOperation();
+    public Task PickupFurniAsync(IEnumerable<IFurni> furni) => PickupOrEjectFurniAsync(furni, false);
+    public Task EjectFurniAsync(IEnumerable<IFurni> furni) => PickupOrEjectFurniAsync(furni, true);
 
     public Task ToggleFurniAsync(IEnumerable<IFurni> furni) => ProcessFurniAsync(
         Operation.Toggle,
@@ -139,6 +140,44 @@ public partial class RoomFurniController : ControllerBase
                     await action(toProcess[i], ct);
                 }
             }, _cts.Token);
+        }
+        finally
+        {
+            _cts?.Dispose();
+            _cts = null;
+            CurrentOperation = Operation.None;
+            _workingSemaphore.Release();
+        }
+    }
+
+    public async Task<Area?> SelectAreaAsync()
+    {
+        if (!_workingSemaphore.Wait(0))
+            throw new Exception("An operation is currently in progress.");
+
+        try
+        {
+            _cts = new CancellationTokenSource();
+
+            CurrentProgress = 0;
+            TotalProgress = 2;
+            CurrentOperation = Operation.SelectArea;
+
+            Area? area = null;
+
+            await _operationManager.RunAsync("Select area", async (ct) => {
+                CurrentProgress = 1;
+                Point a = (await Ext.ReceiveAsync<WalkMsg>(timeout: -1, block: true, cancellationToken: ct)).Point;
+                CurrentProgress = 2;
+                Point b = (await Ext.ReceiveAsync<WalkMsg>(timeout: -1, block: true, cancellationToken: ct)).Point;
+                area = (a, b);
+            }, _cts.Token);
+
+            return area;
+        }
+        catch (OperationCanceledException)
+        {
+            return null;
         }
         finally
         {

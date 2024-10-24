@@ -40,6 +40,8 @@ public partial class RoomFurniViewModel : ViewModelBase
     public RoomGiftsViewModel GiftsViewModel { get; }
 
     [Reactive] public string FilterText { get; set; } = "";
+    [Reactive] public Area? FilterArea { get; set; }
+
     [Reactive] public bool ShowGrid { get; set; }
 
     private readonly ObservableAsPropertyHelper<Func<FurniViewModel, bool>?> _nameFilter;
@@ -66,6 +68,7 @@ public partial class RoomFurniViewModel : ViewModelBase
     public ReactiveCommand<Unit, Task> ToggleCmd { get; }
     public ReactiveCommand<Directions, Task> RotateCmd { get; }
     public ReactiveCommand<Unit, Task> MoveCmd { get; }
+    public ReactiveCommand<Unit, Task> SelectFilterAreaCmd { get; }
     public ReactiveCommand<Unit, Unit> CancelCmd { get; }
 
     private readonly ObservableAsPropertyHelper<bool> _isBusy;
@@ -109,7 +112,8 @@ public partial class RoomFurniViewModel : ViewModelBase
 
         var nameAndQueryFilter = this.WhenAnyValue(
             x => x.FilterText,
-            filterText => {
+            x => x.FilterArea,
+            (filterText, filterArea) => {
                 string? nameFilterText = null, queryFilterText = null;
                 if (!string.IsNullOrWhiteSpace(filterText))
                 {
@@ -117,7 +121,7 @@ public partial class RoomFurniViewModel : ViewModelBase
                     if (match.Success)
                         (nameFilterText, queryFilterText) = (match.Groups["name"].Value, match.Groups["expression"].Value);
                 }
-                return (nameFilterText, queryFilterText);
+                return (nameFilterText, queryFilterText, filterArea);
             }
         );
 
@@ -125,9 +129,8 @@ public partial class RoomFurniViewModel : ViewModelBase
             .Select(x => CreateNameFilter(x.nameFilterText))
             .ToProperty(this, x => x.NameFilter);
 
-
         var queryFilterAndError = nameAndQueryFilter
-            .Select(x => CreateQueryFilter(x.queryFilterText));
+            .Select(x => CreateQueryFilter(x.queryFilterText, x.filterArea));
 
         _queryFilter = queryFilterAndError
             .Select(x => x.Filter)
@@ -170,15 +173,7 @@ public partial class RoomFurniViewModel : ViewModelBase
                 x => x.CurrentOperation,
                 x => x.CurrentProgress,
                 x => x.TotalProgress,
-                (op, current, total) => $"{op switch {
-                    RoomFurniController.Operation.Eject => "Ejecting",
-                    RoomFurniController.Operation.Pickup => "Picking up",
-                    RoomFurniController.Operation.Toggle => "Toggling",
-                    RoomFurniController.Operation.Rotate => "Rotating",
-                    RoomFurniController.Operation.Move => "Click tiles to move",
-                    _ => "Processing"
-                }} furni..."
-                + $"\n{current}/{total}"
+                CreateStatusText
             )
             .ObserveOn(RxApp.MainThreadScheduler)
             .ToProperty(this, x => x.StatusText);
@@ -319,7 +314,44 @@ public partial class RoomFurniViewModel : ViewModelBase
             .ObserveOn(RxApp.MainThreadScheduler)
         );
 
+        SelectFilterAreaCmd = ReactiveCommand.Create<Task>(
+            SelectFilterAreaAsync,
+            this.WhenAnyValue(
+                x => x.IsBusy,
+                isBusy => !isBusy
+            )
+            .ObserveOn(RxApp.MainThreadScheduler)
+        );
+
         CancelCmd = ReactiveCommand.Create(_furniController.CancelCurrentOperation);
+    }
+
+    private static string CreateStatusText(RoomFurniController.Operation op, int current, int total)
+    {
+        if (op is RoomFurniController.Operation.SelectArea)
+            return $"Click the two corner tiles of the area to filter...\n{current}/{total}";
+
+        return $"{op switch {
+            RoomFurniController.Operation.Eject => "Ejecting",
+            RoomFurniController.Operation.Pickup => "Picking up",
+            RoomFurniController.Operation.Toggle => "Toggling",
+            RoomFurniController.Operation.Rotate => "Rotating",
+            RoomFurniController.Operation.Move => "Click tiles to move",
+            _ => "Processing"
+        }} furni..."
+        + $"\n{current}/{total}";
+    }
+
+    private async Task SelectFilterAreaAsync()
+    {
+        try
+        {
+            if (FilterArea.HasValue)
+                FilterArea = null;
+            else
+                FilterArea = await _furniController.SelectAreaAsync();
+        }
+        catch { }
     }
 
     private Task ToggleAsync() => ContextSelection is { } selection
@@ -397,19 +429,35 @@ public partial class RoomFurniViewModel : ViewModelBase
             vm.Name.Contains(nameFilter, StringComparison.OrdinalIgnoreCase);
     }
 
-    static (Func<FurniViewModel, bool>? Filter, string? Error) CreateQueryFilter(string? expression)
+    static (Func<FurniViewModel, bool>? Filter, string? Error) CreateQueryFilter(string? expression, Area? filterArea)
     {
-        if (string.IsNullOrWhiteSpace(expression))
+        if (string.IsNullOrWhiteSpace(expression) && !filterArea.HasValue)
             return (null, null);
 
         try
         {
-            return (
-                DynamicExpressionParser.
-                ParseLambda<FurniViewModel, bool>(
-                    new ParsingConfig(), false, expression).Compile(),
-                null
-            );
+
+            Func<FurniViewModel, bool>? expressionFilter = null;
+            if (!string.IsNullOrWhiteSpace(expression))
+            {
+                expressionFilter = DynamicExpressionParser
+                    .ParseLambda<FurniViewModel, bool>(new ParsingConfig(), false, expression)
+                    .Compile();
+            }
+
+            if (filterArea is { } area)
+            {
+                return ((FurniViewModel vm) =>
+                    vm.Item is IFloorItem floorItem
+                    && area.Contains(floorItem)
+                    && expressionFilter?.Invoke(vm) != false,
+                    null
+                );
+            }
+            else
+            {
+                return (expressionFilter, null);
+            }
         }
         catch (Exception ex)
         {
