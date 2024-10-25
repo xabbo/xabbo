@@ -44,6 +44,10 @@ public sealed class XabboAppManager : IApplicationManager
 
     private DisconnectReason _currentDisconnectReason = DisconnectReason.Unknown;
 
+    private readonly CancellationTokenSource _extensionStopTokenSource;
+    private readonly TaskCompletionSource _tcsApplicationError = new();
+    private readonly SemaphoreSlim _errorSemaphore = new(1, 1);
+
     private Session _lastSession = Session.None;
 
     private bool _isRunning = false;
@@ -77,17 +81,99 @@ public sealed class XabboAppManager : IApplicationManager
         _extension.Connected += OnConnected;
         _extension.Disconnected += OnDisconnected;
 
-        _hostLifetime.ApplicationStarted.Register(OnApplicationStarted);
+        _extensionStopTokenSource = CancellationTokenSource.CreateLinkedTokenSource(_hostLifetime.ApplicationStopping);
 
         _extension.Activated += OnActivated;
+
+        _hostLifetime.ApplicationStarted.Register(OnApplicationStarted);
     }
 
     private void OnApplicationStarted() => Task.Run(async () => {
-        try { await RunExtensionAsync(); }
-        catch (Exception ex) { _logger.LogCritical(ex, "Error in extension runner."); }
+        try
+        {
+            await RunExtensionAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogCritical(ex, "Error in extension runner.");
+        }
     });
 
     private void OnActivated() => BringToFront();
+
+    private void HandleApplicationException(Exception ex)
+    {
+        _logger.LogError(ex, "Application exception occurred.");
+
+        if (!_errorSemaphore.Wait(0))
+            return;
+
+        string errorMessage = ex.Message;
+
+        Header header = Header.Unknown;
+        string? messageName = null;
+
+        if (ex is UnhandledInterceptException iex)
+        {
+            header = iex.Header;
+            string direction = iex.Header.Direction switch
+            {
+                Direction.In => "incoming",
+                Direction.Out => "outgoing",
+                _ => "unknown"
+            };
+            string headerText = $"{direction} header {iex.Header.Value}";
+            string handlerText = headerText;
+            if (_extension.Messages.TryGetNames(iex.Header, out var names) &&
+                names.GetName(_lastSession.Client.Type) is string name)
+            {
+                messageName = name;
+                handlerText = $"{direction} message '{messageName}'";
+            }
+
+            errorMessage = $"An error occurred in handler for {handlerText}.";
+            ex = iex.InnerException ?? ex;
+        }
+
+        List<string?> errorDetails = [
+            $"xabbo {Assembly.GetEntryAssembly().GetVersionString()}",
+            ""
+        ];
+
+        if (_lastSession != Session.None)
+        {
+            errorDetails.AddRange([
+                $"Session details:",
+                $"  Hotel: {_lastSession.Hotel.Name}",
+                $"  Client type: {_lastSession.Client.Type}",
+                $"  Client identifier: {_lastSession.Client.Identifier}",
+                $"  Client version: {_lastSession.Client.Version}",
+                ""
+            ]);
+        }
+
+        if (header != Header.Unknown)
+        {
+            errorDetails.AddRange([
+                "Message details:",
+                $"  Direction: {header.Direction}",
+                $"  Header value: {header.Value}"
+            ]);
+            if (!string.IsNullOrWhiteSpace(messageName))
+                errorDetails.Add($"  Name: {messageName}");
+            errorDetails.Add("");
+        }
+
+        errorDetails.AddRange([ex.Message, ex.StackTrace]);
+
+        _uiContext.Invoke(() => {
+            _application.Resources["AppStatus"] = "An error occurred.";
+            _application.Resources["AppError"] = string.Join("\n", errorDetails);
+            _application.Resources["IsError"] = true;
+            _application.Resources["IsConnecting"] = false;
+            _application.Resources["IsConnected"] = false;
+        });
+    }
 
     public async Task RunExtensionAsync()
     {
@@ -98,79 +184,14 @@ public sealed class XabboAppManager : IApplicationManager
             _logger.LogInformation("Connecting to G-Earth.");
 
             _isRunning = true;
-            await _extension.RunAsync(_hostLifetime.ApplicationStopping);
+            await await Task.WhenAny(_extension.RunAsync(_hostLifetime.ApplicationStopping), _tcsApplicationError.Task);
         }
+        catch (OperationCanceledException) { }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Exception occurred in G-Earth extension.");
-
             error = true;
 
-            string errorMessage = ex.Message;
-
-            Header header = Header.Unknown;
-            string? messageName = null;
-
-            if (ex is UnhandledInterceptException iex)
-            {
-                header = iex.Header;
-                string direction = iex.Header.Direction switch
-                {
-                    Direction.In => "incoming",
-                    Direction.Out => "outgoing",
-                    _ => "unknown"
-                };
-                string headerText = $"{direction} header {iex.Header.Value}";
-                string handlerText = headerText;
-                if (_extension.Messages.TryGetNames(iex.Header, out var names) &&
-                    names.GetName(_lastSession.Client.Type) is string name)
-                {
-                    messageName = name;
-                    handlerText = $"{direction} message '{messageName}'";
-                }
-
-                errorMessage = $"An error occurred in handler for {handlerText}.";
-                ex = iex.InnerException ?? ex;
-            }
-
-            List<string?> errorDetails = [
-                $"xabbo {Assembly.GetEntryAssembly().GetVersionString()}",
-                ""
-            ];
-
-            if (_lastSession != Session.None)
-            {
-                errorDetails.AddRange([
-                    $"Session details:",
-                    $"  Hotel: {_lastSession.Hotel.Name}",
-                    $"  Client type: {_lastSession.Client.Type}",
-                    $"  Client identifier: {_lastSession.Client.Identifier}",
-                    $"  Client version: {_lastSession.Client.Version}",
-                    ""
-                ]);
-            }
-
-            if (header != Header.Unknown)
-            {
-                errorDetails.AddRange([
-                    "Message details:",
-                    $"  Direction: {header.Direction}",
-                    $"  Header value: {header.Value}"
-                ]);
-                if (!string.IsNullOrWhiteSpace(messageName))
-                    errorDetails.Add($"  Name: {messageName}");
-                errorDetails.Add("");
-            }
-
-            errorDetails.AddRange([ex.Message, ex.StackTrace]);
-
-            _uiContext.Invoke(() => {
-                _application.Resources["AppStatus"] = errorMessage;
-                _application.Resources["AppError"] = string.Join("\n", errorDetails);
-                _application.Resources["IsError"] = true;
-                _application.Resources["IsConnecting"] = false;
-                _application.Resources["IsConnected"] = false;
-            });
+            HandleApplicationException(ex);
         }
         finally
         {
@@ -287,7 +308,11 @@ public sealed class XabboAppManager : IApplicationManager
                 _application.Resources["IsReady"] = true;
             });
         }
-        catch { }
+        catch (OperationCanceledException) { }
+        catch (Exception ex)
+        {
+            _tcsApplicationError.TrySetException(ex);
+        }
     }
 
     void HandleDisconnectReason(DisconnectReasonMsg msg)
