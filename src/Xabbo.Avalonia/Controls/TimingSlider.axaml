@@ -14,32 +14,39 @@
   </Design.PreviewWith>
 
   <ControlTheme x:Key="{x:Type controls:TimingSlider}" TargetType="controls:TimingSlider">
-    <ControlTheme.Resources>
-      <sys:Int32 x:Key="Rounding">10</sys:Int32>
-    </ControlTheme.Resources>
     <Setter Property="Template">
       <ControlTemplate>
         <StackPanel>
           <Grid ColumnDefinitions="*,Auto">
-            <TextBlock
-              Text="{TemplateBinding Text}"
+            <StackPanel
               ToolTip.Tip="{TemplateBinding Tip}"
-            />
+            >
+              <TextBlock Text="{TemplateBinding Text}" TextWrapping="Wrap" />
+              <TextBlock
+                IsVisible="{TemplateBinding Description, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                Text="{TemplateBinding Description}"
+                TextWrapping="Wrap"
+                FontSize="14"
+              />
+            </StackPanel>
             <TextBlock Grid.Column="1">
               <Run Text="{TemplateBinding Value}" />
               <Run>ms</Run>
             </TextBlock>
           </Grid>
           <Slider
-            Minimum="0" Maximum="2000"
-            TickFrequency="10"
+            Minimum="{TemplateBinding Minimum}" Maximum="{TemplateBinding Maximum}"
+            TickFrequency="{TemplateBinding TickFrequency}"
             IsSnapToTickEnabled="true"
             TickPlacement="BottomRight"
             Value="{TemplateBinding Value, Mode=TwoWay}"
           >
             <Slider.Styles>
               <Style Selector="Slider /template/ TickBar">
-                <Setter Property="TickFrequency" Value="100" />
+                <Setter
+                  Property="TickFrequency"
+                  Value="{Binding $parent[controls:TimingSlider].VisualTickFrequency}"
+                />
               </Style>
             </Slider.Styles>
           </Slider>
