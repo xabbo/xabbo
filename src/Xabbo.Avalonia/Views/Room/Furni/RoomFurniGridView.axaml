@@ -4,6 +4,7 @@
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:sys="clr-namespace:System;assembly=mscorlib"
+  xmlns:ic="using:FluentIcons.Avalonia.Fluent"
   xmlns:ui="using:FluentAvalonia.UI.Controls"
   xmlns:img="using:AsyncImageLoader"
   xmlns:controls="using:Xabbo.Avalonia.Controls"
@@ -21,15 +22,55 @@
     <Style Selector="Border.Btn:pointerover">
       <Setter Property="Background" Value="{DynamicResource ListViewItemBackgroundPointerOver}" />
     </Style>
+    <Style Selector="SplitButton:checked /template/ Button#PART_PrimaryButton">
+      <Setter Property="IsHitTestVisible" Value="false" />
+    </Style>
   </UserControl.Styles>
   <Grid RowDefinitions="Auto,*">
     <controls:InfoOverlay Grid.RowSpan="2" Text="{Binding EmptyStatusGrid}" />
-    <TextBox
-      Margin="10,0,10,10"
-      Classes="clearButton"
-      Watermark="Filter"
-      Text="{Binding FilterText}"
-    />
+    <DockPanel>
+      <controls:BoundToggleSplitButton
+        DockPanel.Dock="Right"
+        Margin="0,0,10,10"
+        Padding="5"
+        IsChecked="{Binding IsAutoRefreshEnabled, Mode=OneWay}"
+        IsEnabled="{Binding IsDynamicFilterEnabled}"
+        Command="{Binding RefreshCmd}"
+      >
+        <SplitButton.Flyout>
+          <ui:FAMenuFlyout Placement="Bottom">
+            <ui:ToggleMenuFlyoutItem
+              Text="Auto-refresh"
+              IsChecked="{Binding IsAutoRefreshEnabled}"
+            />
+          </ui:FAMenuFlyout>
+        </SplitButton.Flyout>
+        <ic:SymbolIcon
+          Symbol="ArrowSync"
+          HorizontalAlignment="Center"
+          VerticalAlignment="Center"
+        />
+      </controls:BoundToggleSplitButton>
+      <Button
+        DockPanel.Dock="Right"
+        Margin="0,0,10,10"
+        Padding="5"
+        Command="{Binding SelectFilterAreaCmd}"
+        Classes.accent="{Binding FilterArea, Converter={x:Static ObjectConverters.IsNotNull}}"
+      >
+        <ic:SymbolIcon
+          Symbol="SelectObject"
+          HorizontalAlignment="Center"
+          VerticalAlignment="Center"
+        />
+      </Button>
+      <TextBox
+        Margin="10,0,10,10"
+        Classes="clearButton"
+        Watermark="Filter"
+        Text="{Binding FilterText}"
+      />
+    </DockPanel>
     <ScrollViewer Grid.Row="1" Margin="0,-8,0,0" Padding="8">
       <ItemsRepeater x:Name="FurniStacks" ItemsSource="{Binding Stacks}">
         <ItemsRepeater.Layout>
@@ -73,7 +114,7 @@
                   Margin="4"
                   HorizontalAlignment="Right" VerticalAlignment="Bottom"
                   Classes="Informational"
-                  Value="{Binding Count}"
+                  Value="{Binding FilteredCount}"
                 />
               </Panel>
             </Border>

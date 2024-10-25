@@ -1,3 +1,4 @@
+using ReactiveUI;
 using Xabbo.Abstractions;
 using Xabbo.Core;
 using Xabbo.Core.GameData;
@@ -9,7 +10,7 @@ public abstract class ItemViewModelBase : ViewModelBase
 {
     protected readonly FurniInfo? _info;
 
-    public IItem Item { get; set; }
+    public IItem Item { get; private set; }
 
     public long Id => Item.Id;
     public ItemType Type => Item.Type;
@@ -61,5 +62,11 @@ public abstract class ItemViewModelBase : ViewModelBase
 
         if (item is IFloorItem { Data.IsLimitedRare: true } ltd)
             Name += $" #{ltd.Data.UniqueSerialNumber}";
+    }
+
+    public void UpdateItem(IItem item)
+    {
+        Item = item;
+        this.RaisePropertyChanged(nameof(Item));
     }
 }

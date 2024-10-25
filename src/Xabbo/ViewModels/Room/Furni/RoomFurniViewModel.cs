@@ -2,12 +2,14 @@
 using System.Linq.Dynamic.Core;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Text.RegularExpressions;
 using DynamicData;
 using DynamicData.Binding;
 using DynamicData.Kernel;
 using ReactiveUI;
 
+using Xabbo.Configuration;
 using Xabbo.Controllers;
 using Xabbo.Core;
 using Xabbo.Core.Events;
@@ -19,9 +21,10 @@ namespace Xabbo.ViewModels;
 
 public partial class RoomFurniViewModel : ViewModelBase
 {
-    [GeneratedRegex(@"^(?<name>.*?)(\bwhere:(?<expression>.*))?$")]
+    [GeneratedRegex(@"^(?<name>.*?)\s*(\bwhere:(?<expression>.*))?$")]
     private static partial Regex RegexExpression();
 
+    private readonly IConfigProvider<AppConfig> _config;
     private readonly RoomFurniController _furniController;
     private readonly IUiContext _uiCtx;
     private readonly IExtension _ext;
@@ -41,6 +44,11 @@ public partial class RoomFurniViewModel : ViewModelBase
 
     [Reactive] public string FilterText { get; set; } = "";
     [Reactive] public Area? FilterArea { get; set; }
+    [Reactive] public bool IsAutoRefreshEnabled { get; set; } = true;
+    private readonly Subject<Unit> _manualRefreshSubject = new();
+
+    private readonly ObservableAsPropertyHelper<bool> _isDynamicFilterEnabled;
+    public bool IsDynamicFilterEnabled => _isDynamicFilterEnabled.Value;
 
     [Reactive] public bool ShowGrid { get; set; }
 
@@ -69,6 +77,7 @@ public partial class RoomFurniViewModel : ViewModelBase
     public ReactiveCommand<Directions, Task> RotateCmd { get; }
     public ReactiveCommand<Unit, Task> MoveCmd { get; }
     public ReactiveCommand<Unit, Task> SelectFilterAreaCmd { get; }
+    public ReactiveCommand<Unit, Unit> RefreshCmd { get; }
     public ReactiveCommand<Unit, Unit> CancelCmd { get; }
 
     private readonly ObservableAsPropertyHelper<bool> _isBusy;
@@ -78,6 +87,7 @@ public partial class RoomFurniViewModel : ViewModelBase
     public string StatusText => _statusText.Value;
 
     public RoomFurniViewModel(
+        IConfigProvider<AppConfig> config,
         RoomFurniController furniController,
         IUiContext uiContext,
         IExtension extension,
@@ -85,6 +95,7 @@ public partial class RoomFurniViewModel : ViewModelBase
         RoomManager roomManager,
         RoomGiftsViewModel gifts)
     {
+        _config = config;
         _furniController = furniController;
         _uiCtx = uiContext;
         _ext = extension;
@@ -119,7 +130,9 @@ public partial class RoomFurniViewModel : ViewModelBase
                 {
                     var match = RegexExpression().Match(filterText);
                     if (match.Success)
-                        (nameFilterText, queryFilterText) = (match.Groups["name"].Value, match.Groups["expression"].Value);
+                        (nameFilterText, queryFilterText) = (match.Groups["name"].Value.Trim(), match.Groups["expression"].Value.Trim());
+                    else
+                        nameFilterText = filterText.Trim();
                 }
                 return (nameFilterText, queryFilterText, filterArea);
             }
@@ -140,14 +153,44 @@ public partial class RoomFurniViewModel : ViewModelBase
             .Select(x => x.Error)
             .ToProperty(this, x => x.QueryFilterError);
 
+        _isDynamicFilterEnabled =
+            this.WhenAnyValue(
+                x => x.QueryFilter,
+                x => x.FilterArea,
+                (queryFilter, filterArea) => queryFilter is not null || filterArea.HasValue
+            )
+            .ToProperty(this, x => x.IsDynamicFilterEnabled);
+
+        var combinedFilters = this.WhenAnyValue(
+            x => x.NameFilter,
+            x => x.QueryFilter,
+            CombineFilters
+        );
+
+        var filterRefresh = Observable.CombineLatest(
+                this.WhenAnyValue(x => x.IsAutoRefreshEnabled),
+                _config.WhenAnyValue(x => x.Value.View.Furni.RefreshIntervalMs),
+                (isAutoRefreshEnabled, autoRefreshInterval) => (isAutoRefreshEnabled, autoRefreshInterval)
+            )
+            .Select(x =>
+                x.isAutoRefreshEnabled
+                ? _furniCache
+                    .Connect()
+                    .WhenAnyPropertyChanged(
+                        nameof(FurniViewModel.Item),
+                        nameof(FurniViewModel.Hidden)
+                    )
+                    .Sample(TimeSpan.FromMilliseconds(x.autoRefreshInterval))
+                    .Select(_ => Unit.Default)
+                : _manualRefreshSubject
+            )
+            .Switch();
+
         _furniCache
             .Connect()
             .Filter(
-                this.WhenAnyValue(
-                    x => x.NameFilter,
-                    x => x.QueryFilter,
-                    CombineFilters
-                )
+                combinedFilters,
+                reapplyFilter: filterRefresh
             )
             .ObserveOn(RxApp.MainThreadScheduler)
             .SortAndBind(out _furni, SortExpressionComparer<FurniViewModel>.Ascending(x => x.Name))
@@ -155,7 +198,17 @@ public partial class RoomFurniViewModel : ViewModelBase
 
         _furniStackCache
             .Connect()
-            .Filter(this.WhenAnyValue(x => x.FilterText).Select(CreateStackFilter))
+            .Filter(
+                combinedFilters.Select(CreateStackFilter),
+                reapplyFilter: Observable.CombineLatest(
+                    filterRefresh,
+                    _furniStackCache.Connect()
+                        .WhenPropertyChanged(x => x.Count)
+                        .Throttle(TimeSpan.FromMilliseconds(10))
+                        .Select(_ => Unit.Default),
+                    (_, _) => Unit.Default
+                )
+            )
             .ObserveOn(RxApp.MainThreadScheduler)
             .SortAndBind(out _furniStacks, SortExpressionComparer<FurniStackViewModel>.Ascending(x => x.Name))
             .Subscribe();
@@ -196,14 +249,10 @@ public partial class RoomFurniViewModel : ViewModelBase
 
         _emptyStatusGrid =
             Observable.CombineLatest(
-                this.WhenAnyValue(x => x.QueryFilter).Select(x => x is not null),
                 _furniStackCache.CountChanged,
                 _furniStacks.WhenAnyValue(x => x.Count),
-                (isQuery, actualCount, filteredCount) =>
-                    filteredCount > 0 ? null :
-                    actualCount == 0
-                    ? "No furni in room"
-                    : (isQuery ? "Grid view does not support query filters" : "No furni matches")
+                (actualCount, filteredCount) =>
+                    filteredCount > 0 ? null : (actualCount == 0 ? "No furni in room" : "No furni matches")
             )
             .ObserveOn(RxApp.MainThreadScheduler)
             .ToProperty(this, x => x.EmptyStatusGrid);
@@ -322,6 +371,8 @@ public partial class RoomFurniViewModel : ViewModelBase
             )
             .ObserveOn(RxApp.MainThreadScheduler)
         );
+
+        RefreshCmd = ReactiveCommand.Create(() => _manualRefreshSubject.OnNext(Unit.Default));
 
         CancelCmd = ReactiveCommand.Create(_furniController.CancelCurrentOperation);
     }
@@ -470,11 +521,13 @@ public partial class RoomFurniViewModel : ViewModelBase
         return (vm) => a?.Invoke(vm) != false && b?.Invoke(vm) != false;
     }
 
-    static Func<FurniStackViewModel, bool> CreateStackFilter(string? filterText)
+    static Func<FurniStackViewModel, bool> CreateStackFilter(Func<FurniViewModel, bool> filter)
     {
         return (vm) =>
-            string.IsNullOrWhiteSpace(filterText) ||
-            vm.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase);
+        {
+            vm.FilteredCount = vm.Count(filter);
+            return vm.FilteredCount > 0;
+        };
     }
 
     private void ClearItems()
@@ -487,53 +540,68 @@ public partial class RoomFurniViewModel : ViewModelBase
 
     private void AddItems(IEnumerable<IFurni> items)
     {
-        _uiCtx.Invoke(() =>
-        {
+        // _uiCtx.Invoke(() =>
+        // {
             _furniCache.Edit(cache =>
             {
-                foreach (var item in items)
+                _furniStackCache.Edit(stackCache =>
                 {
-                    cache.AddOrUpdate(new FurniViewModel(item));
-                }
+                    foreach (var group in items.GroupBy(x => x.GetDescriptor()))
+                    {
+                        FurniStackViewModel? stack = null;
+
+                        stackCache
+                            .Lookup(group.Key)
+                            .IfHasValue(x => {
+                                stack = x;
+                            })
+                            .Else(() => {
+                                stack = new FurniStackViewModel(group.Key);
+                                stackCache.AddOrUpdate(stack);
+                            });
+
+                        foreach (var item in group)
+                        {
+                            cache
+                                .Lookup((item.Type, item.Id))
+                                .IfHasValue(vm => {
+                                    stack?.Add(vm);
+                                })
+                                .Else(() => {
+                                    var furniViewModel = new FurniViewModel(item);
+                                    cache.AddOrUpdate(furniViewModel);
+                                    stack?.Add(furniViewModel);
+                                });
+                        }
+                    }
+                });
             });
-            _furniStackCache.Edit(cache =>
-            {
-                foreach (var item in items)
-                {
-                    var key = item.GetDescriptor();
-                    cache
-                        .Lookup(key)
-                        .IfHasValue(vm => vm.Count++)
-                        .Else(() => cache.AddOrUpdate(new FurniStackViewModel(key)));
-                }
-            });
-        });
+        // });
     }
 
     private void RemoveItem(IFurni item)
     {
-        _uiCtx.Invoke(() => {
-            _furniCache.RemoveKey((item.Type, item.Id));
-            var desc = item.GetDescriptor();
-            _furniStackCache.Lookup(desc).IfHasValue(vm =>
-            {
-                vm.Count--;
-                if (vm.Count == 0)
-                {
-                    _furniStackCache.RemoveKey(desc);
-                }
+        _furniCache.Edit(furniCache => {
+            _furniStackCache.Edit(furniStackCache => {
+                    furniCache.Lookup((item.Type, item.Id))
+                        .IfHasValue(furniViewModel => {
+                            furniCache.Remove(furniViewModel);
+                            furniStackCache.Lookup(furniViewModel.Item.GetDescriptor())
+                                .IfHasValue(stackViewModel => {
+                                    stackViewModel.Remove(furniViewModel);
+                                    if (stackViewModel.Count == 0)
+                                        furniStackCache.Remove(stackViewModel);
+                                });
+                        });
             });
         });
     }
 
     private void OnLeftRoom() => ClearItems();
 
-    private void UpdateFurni(IFurni furni) => _furniCache.Lookup((furni.Type, furni.Id))
-        .IfHasValue(vm => {
-            vm.Item = furni;
-            if (QueryFilter is not null)
-                _furniCache.Refresh();
-        });
+    private void UpdateFurni(IFurni furni) => _furniCache
+        .Lookup((furni.Type, furni.Id))
+        .IfHasValue(vm => vm.UpdateItem(furni));
 
     private void OnFloorItemsLoaded(FloorItemsEventArgs e) => AddItems(e.Items);
     private void OnFloorItemAdded(FloorItemEventArgs e) => AddItems([e.Item]);

@@ -11,4 +11,6 @@ public sealed partial class AppConfig : ReactiveObject
     [Reactive] public ChatConfig Chat { get; set; } = new();
 
     [Reactive] public TimingConfigs Timing { get; set; } = new();
+
+    [Reactive] public ViewConfig View { get; set; } = new();
 }

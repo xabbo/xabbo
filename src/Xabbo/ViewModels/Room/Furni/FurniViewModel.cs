@@ -1,7 +1,4 @@
-﻿using System.Reactive.Linq;
-using ReactiveUI;
-
-using Xabbo.Core;
+﻿using Xabbo.Core;
 
 namespace Xabbo.ViewModels;
 
@@ -41,24 +38,4 @@ public class FurniViewModel(IFurni furni) : ItemViewModelBase(furni)
     };
 
     [Reactive] public int Count { get; set; }
-}
-
-public class FurniStackViewModel : ItemViewModelBase
-{
-    public ItemDescriptor Descriptor { get; }
-    [Reactive] public int Count { get; set; } = 1;
-
-    private readonly ObservableAsPropertyHelper<bool> _showCount;
-    public bool ShowCount => _showCount.Value;
-
-    public FurniStackViewModel(ItemDescriptor descriptor) : base(descriptor)
-    {
-        Descriptor = descriptor;
-
-        _showCount = this
-            .WhenAnyValue(x => x.Count)
-            .Select(x => x > 1)
-            .ObserveOn(RxApp.MainThreadScheduler)
-            .ToProperty(this, x => x.ShowCount);
-    }
 }

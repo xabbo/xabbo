@@ -116,8 +116,18 @@
         />
         <controls:TimingSlider
           Text="Trade offer interval"
-          Tip="The time interval between offering items in a trade"
+          Description="The time interval between offering items in a trade"
           Value="{Binding Config.Timing.Origins.TradeOfferInterval}"
+        />
+      </ui:SettingsExpander>
+      <ui:SettingsExpander
+        Header="Room furni view"
+        IconSource="{icm:SymbolIconSource Symbol=Couch}"
+      >
+        <controls:TimingSlider
+          Text="Dynamic filter refresh interval"
+          Description="The time interval between filter refreshes while a dynamic filter is active. Lower values are more responsive but may cause issues when many furni are updating frequently."
+          Value="{Binding Config.View.Furni.RefreshIntervalMs}"
         />
       </ui:SettingsExpander>
     </StackPanel>
