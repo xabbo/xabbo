@@ -192,7 +192,7 @@ public sealed partial class InventoryViewModel : ControllerBase
                         placer.status is FurniPlacementController.State.PlacingFloorItems
                         ? "Placing floor items"
                         : "Placing wall items"
-                    )}Click tiles to place items...\n{placer.progress} / {placer.maxProgress}",
+                    )}\nClick tiles to place items...\n{placer.progress} / {placer.maxProgress}",
                     State.AutoPlacing => $"Placing items...\n{placer.progress} / {placer.maxProgress}",
                     _ => ""
                 }
