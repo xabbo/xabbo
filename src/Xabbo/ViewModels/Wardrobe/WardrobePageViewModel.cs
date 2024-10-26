@@ -5,12 +5,15 @@ using DynamicData;
 using ReactiveUI;
 using Avalonia.Controls.Selection;
 using FluentAvalonia.UI.Controls;
+using HanumanInstitute.MvvmDialogs;
 
 using Xabbo.Extension;
+using Xabbo.Messages.Flash;
 using Xabbo.Core;
 using Xabbo.Core.Messages.Outgoing;
 using Xabbo.Services.Abstractions;
 using Xabbo.Models;
+using Xabbo.Utility;
 
 using Symbol = FluentIcons.Common.Symbol;
 using SymbolIconSource = FluentIcons.Avalonia.Fluent.SymbolIconSource;
@@ -23,6 +26,7 @@ public sealed class WardrobePageViewModel : PageViewModel
     public override IconSource? Icon => new SymbolIconSource { Symbol = Symbol.Backpack };
 
     private readonly IExtension _ext;
+    private readonly IDialogService _dialog;
     private readonly IWardrobeRepository _repository;
     private readonly IFigureConverterService _figureConverter;
     private readonly IGameStateService _gameState;
@@ -35,16 +39,19 @@ public sealed class WardrobePageViewModel : PageViewModel
     public SelectionModel<OutfitViewModel> Selection { get; } = new() { SingleSelect = false };
 
     public ReactiveCommand<Unit, Unit> AddCurrentFigureCmd { get; }
+    public ReactiveCommand<Unit, Task> ImportWardrobeCmd { get; }
     public ReactiveCommand<Unit, Unit> RemoveOutfitsCmd { get; }
     public ReactiveCommand<OutfitViewModel, Unit> WearFigureCmd { get; }
 
     public WardrobePageViewModel(
         IExtension extension,
+        IDialogService dialog,
         IWardrobeRepository repository,
         IFigureConverterService figureConverter,
         IGameStateService gameState)
     {
         _ext = extension;
+        _dialog = dialog;
         _repository = repository;
         _figureConverter = figureConverter;
         _gameState = gameState;
@@ -68,6 +75,13 @@ public sealed class WardrobePageViewModel : PageViewModel
         AddCurrentFigureCmd = ReactiveCommand.Create(AddCurrentFigure);
         RemoveOutfitsCmd = ReactiveCommand.Create(RemoveOutfits);
         WearFigureCmd = ReactiveCommand.Create<OutfitViewModel>(WearFigure);
+        ImportWardrobeCmd = ReactiveCommand.Create(
+            ImportWardrobeAsync,
+            _gameState
+                .WhenAnyValue(x => x.Session)
+                .Select(session => session.Is(ClientType.Modern))
+                .ObserveOn(RxApp.MainThreadScheduler)
+        );
 
         figureConverter.Available += OnFigureConverterAvailable;
     }
@@ -110,6 +124,31 @@ public sealed class WardrobePageViewModel : PageViewModel
             Gender: H.ToGender(model.Gender),
             Figure: model.Figure
         ));
+    }
+
+    private async Task ImportWardrobeAsync()
+    {
+        if (!_ext.Session.Is(ClientType.Modern))
+            return;
+
+        try
+        {
+            _ext.Send(Out.GetWardrobe);
+            var packet = await _ext.ReceiveAsync(In.Wardrobe, 3000);
+            int state = packet.Read<int>();
+            int n = packet.Read<Length>();
+            for (int i = 0; i < n; i++)
+            {
+                int slot = packet.Read<int>();
+                string figureString = packet.Read<string>();
+                Gender gender = H.ToGender(packet.Read<string>());
+                AddFigure(gender, figureString);
+            }
+        }
+        catch
+        {
+            await _dialog.ShowAsync("Error", "Failed to retrieve wardrobe.");
+        }
     }
 
     private void RemoveOutfits()
