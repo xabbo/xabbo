@@ -643,8 +643,10 @@ public sealed partial class InventoryViewModel : ControllerBase
         try
         {
             Status = State.Loading;
-            await _inventoryManager.LoadInventoryAsync(timeout: 120000, forceReload: true);
+            await _operations.RunAsync("Load inventory",
+                (ct) => _inventoryManager.LoadInventoryAsync(timeout: 120000, forceReload: true, cancellationToken: ct));
         }
+        catch (OperationCanceledException) { }
         catch (Exception ex)
         {
             await _dialogService.ShowAsync("Failed to load inventory", ex.Message);
