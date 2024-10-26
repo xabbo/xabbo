@@ -3,7 +3,9 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:ui="using:FluentAvalonia.UI.Controls"
   xmlns:ic="using:FluentIcons.Avalonia.Fluent"
+  xmlns:icm="using:FluentIcons.Avalonia.Fluent.MarkupExtensions"
   xmlns:img="using:AsyncImageLoader"
   xmlns:services="using:Xabbo.Avalonia.Services"
   xmlns:v="using:Xabbo.Avalonia.Views"
@@ -35,6 +37,18 @@
         Selection="{Binding Selection}"
         SelectionMode="Multiple"
       >
+        <ListBox.KeyBindings>
+          <KeyBinding Gesture="Delete" Command="{Binding RemoveFriendsCmd}" />
+        </ListBox.KeyBindings>
+        <ListBox.ContextFlyout>
+          <ui:FAMenuFlyout>
+            <ui:MenuFlyoutItem
+              Command="{Binding RemoveFriendsCmd}"
+              IconSource="{icm:SymbolIconSource Symbol=PersonDelete}"
+              Text="Remove"
+            />
+          </ui:FAMenuFlyout>
+        </ListBox.ContextFlyout>
         <ListBox.ItemTemplate>
           <DataTemplate x:DataType="vm:FriendViewModel">
             <Grid x:Name="root"
@@ -90,11 +104,6 @@
           </DataTemplate>
         </ListBox.ItemTemplate>
       </ListBox>
-      <Grid Grid.Row="2" ColumnDefinitions="Auto,*">
-        <StackPanel Grid.Column="1" Margin="10" HorizontalAlignment="Right">
-          <Button Command="{Binding RemoveFriendsCmd}">Remove</Button>
-        </StackPanel>
-      </Grid>
     </Grid>
   </controls:Loading>
 </UserControl>

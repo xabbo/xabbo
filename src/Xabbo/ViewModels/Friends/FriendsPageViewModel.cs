@@ -75,7 +75,13 @@ public sealed class FriendsPageViewModel : PageViewModel
             .Subscribe();
 
         FollowFriendCmd = ReactiveCommand.Create<FriendViewModel>(FollowFriend);
-        RemoveFriendsCmd = ReactiveCommand.CreateFromTask(RemoveSelectedFriendsAsync);
+        RemoveFriendsCmd = ReactiveCommand.CreateFromTask(
+            RemoveSelectedFriendsAsync,
+            Selection
+                .WhenPropertyChanged(x => x.SelectedItems)
+                .Select(count => count.Value?.Count > 0)
+                .ObserveOn(RxApp.MainThreadScheduler)
+        );
 
         _friendManager.Loaded += OnFriendsLoaded;
         _friendManager.Cleared += OnFriendsCleared;
