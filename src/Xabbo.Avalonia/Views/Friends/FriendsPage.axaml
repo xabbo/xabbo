@@ -19,12 +19,15 @@
   </Design.DataContext>
   <controls:Loading IsLoading="{Binding IsLoading}">
     <Grid RowDefinitions="Auto,*,Auto">
-      <TextBox
-        Margin="10,10,10,0"
-        Classes="clearButton"
-        Watermark="Filter"
-        Text="{Binding FilterText}"
-      />
+      <DockPanel>
+        <CheckBox DockPanel.Dock="Right" Margin="0,0,5,0" VerticalAlignment="Bottom" IsChecked="{Binding ShowOnlineOnly}" Content="Online" />
+        <TextBox
+          Margin="10,10,10,0"
+          Classes="clearButton"
+          Watermark="Filter"
+          Text="{Binding FilterText}"
+        />
+      </DockPanel>
       <ListBox
         Grid.Row="1"
         Padding="10"
@@ -88,7 +91,6 @@
         </ListBox.ItemTemplate>
       </ListBox>
       <Grid Grid.Row="2" ColumnDefinitions="Auto,*">
-        <CheckBox Margin="10,5" VerticalAlignment="Bottom" IsChecked="{Binding ShowOnlineOnly}" Content="Online" />
         <StackPanel Grid.Column="1" Margin="10" HorizontalAlignment="Right">
           <Button Command="{Binding RemoveFriendsCmd}">Remove</Button>
         </StackPanel>
