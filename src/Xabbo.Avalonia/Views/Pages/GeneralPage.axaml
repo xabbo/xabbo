@@ -220,6 +220,10 @@
             Classes="modern"
             IsChecked="{Binding Overlay.Enabled}"
           />
+          <CheckBox
+            Content="Hide all avatars"
+            IsChecked="{Binding Avatars.HideAvatars}"
+          />
         </StackPanel>
       </Expander>
 

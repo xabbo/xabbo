@@ -1,4 +1,5 @@
-﻿using Splat;
+﻿using System.Reactive.Linq;
+using Splat;
 using ReactiveUI;
 using HanumanInstitute.MvvmDialogs;
 using FluentIcons.Common;
@@ -9,7 +10,7 @@ using Xabbo.Extension;
 using Xabbo.Components;
 using Xabbo.Configuration;
 using Xabbo.Services.Abstractions;
-using System.Reactive.Linq;
+using Xabbo.Controllers;
 
 namespace Xabbo.ViewModels;
 
@@ -50,6 +51,7 @@ public class GeneralPageViewModel : PageViewModel
     [Reactive] public bool IsFlashWindowExpanded { get; set; } = true;
     [Reactive] public bool IsMiscExpanded { get; set; } = true;
 
+    [DependencyInjectionProperty] public RoomAvatarsController? Avatars { get; set; }
     [DependencyInjectionProperty] public ChatComponent? ChatComponent { get; set; }
     [DependencyInjectionProperty] public FurniActionsComponent? Furni { get; set; }
     [DependencyInjectionProperty] public AntiHandItemComponent? HandItem { get; set; }
