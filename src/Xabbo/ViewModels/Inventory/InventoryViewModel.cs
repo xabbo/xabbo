@@ -401,7 +401,6 @@ public sealed partial class InventoryViewModel : ControllerBase
         );
     }
 
-
     private Task PlaceItemsAsync(string mode) => PlaceItemsAsync(mode, Selection.SelectedItems);
 
     private async Task<Area> SelectAreaAsync(CancellationToken cancellationToken)
@@ -460,6 +459,7 @@ public sealed partial class InventoryViewModel : ControllerBase
                 case "manual":
                     floorPlacement = _placementFactory.CreateManualFloorPlacement();
                     wallPlacement = _placementFactory.CreateManualWallPlacement();
+                    errorHandling = FurniPlacementController.ErrorHandling.Retry;
                     Status = State.ManualPlacing;
                     break;
                 default:

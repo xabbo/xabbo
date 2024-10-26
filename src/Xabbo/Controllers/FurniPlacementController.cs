@@ -78,7 +78,7 @@ public partial class FurniPlacementController(
                         }
 
                         if (placementFailures >= 3)
-                            throw new Exception("Failed to place an item 3 times.");
+                            throw new Exception("Failed to place an item too many times.");
 
                         Progress = i+1;
 
