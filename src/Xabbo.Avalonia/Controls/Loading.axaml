@@ -80,6 +80,7 @@
           <Grid x:Name="PART_Overlay" IsHitTestVisible="{TemplateBinding IsLoading}">
             <StackPanel
               x:Name="PART_LoadingContent"
+              Margin="20"
               Spacing="10"
               HorizontalAlignment="Center"
               VerticalAlignment="Center"
@@ -95,6 +96,7 @@
                 <ContentPresenter.Styles>
                   <Style Selector="TextBlock">
                     <Setter Property="TextAlignment" Value="Center" />
+                    <Setter Property="TextWrapping" Value="Wrap" />
                   </Style>
                 </ContentPresenter.Styles>
               </ContentPresenter>
