@@ -3,6 +3,9 @@ using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.Tasks;
 using Xabbo.Core.Messages.Outgoing;
+using Humanizer;
+
+using In = Xabbo.Messages.Flash.In;
 
 namespace Xabbo.Command.Modules;
 
@@ -11,49 +14,16 @@ public sealed class RoomCommands(RoomManager roomManager) : CommandModule
 {
     private readonly RoomManager _roomMgr = roomManager;
 
-    [Command("go", SupportedClients = ClientType.Flash)]
-    // [RequiredIn(nameof(In.Navigator2SearchResultBlocks))]
-    // [RequiredOut(
-    //     nameof(Out.FlatOpc),
-    //     nameof(Out.Navigator2Search)
-    // )]
-    public async Task GoCommandHandler(CommandArgs args)
-    {
-        string searchText = string.Join(" ", args);
-        if (string.IsNullOrWhiteSpace(searchText)) return;
-
-        await Task.Yield();
-
-        try
-        {
-            var results = await new SearchNavigatorTask(Ext, "query", searchText).ExecuteAsync(10000, CancellationToken.None);
-            var room = results.GetRooms().FirstOrDefault();
-            if (room == null)
-            {
-                ShowMessage("/go: No rooms found!");
-            }
-            else
-            {
-                Ext.Send(Out.GetGuestRoom, room.Id, 0, 1);
-            }
-        }
-        catch (OperationCanceledException)
-        {
-            ShowMessage("/go: Operation timed out!");
-        }
-    }
-
-    [Command("goto", SupportedClients = ClientType.Flash)]
-    // [RequiredOut(nameof(Out.FlatOpc))]
+    [Command("goto")]
     public Task GotoCommandHandler(CommandArgs args)
     {
-        if (args.Length >= 1 && !long.TryParse(args[0], out long roomId))
+        if (args.Length >= 1 && Id.TryParse(args[0], out Id roomId))
         {
             string password = "";
-            if (args.Length > 1)
+            if (args.Length >= 2)
                 password = string.Join(" ", args.Skip(1));
 
-            Ext.Send(Out.OpenFlatConnection, (Id)roomId, password, (Id)(-1));
+            Task.Run(() => new EnterRoomTask(Ext, roomId, password).ExecuteAsync(3000));
         }
         else
         {
@@ -64,44 +34,45 @@ public sealed class RoomCommands(RoomManager roomManager) : CommandModule
     }
 
     [Command("exit")]
-    //[RequiredOut(nameof(Out.FlatOpc))]
     public Task ExitCommandHandler(CommandArgs args)
     {
         Ext.Send(Out.Quit);
-        // Ext.Send(Out.OpenFlatConnection, (Id)0, "", (Id)(-1));
         return Task.CompletedTask;
     }
 
-    [Command("reload", SupportedClients = ClientType.Flash)]
-    // [RequiredIn(nameof(In.RoomForward))]
-    public Task ReloadCommandHandler(CommandArgs args)
+    [Command("reload")]
+    public Task ReloadCommandHandler(CommandArgs _)
     {
         if (_roomMgr.EnsureInRoom(out var room))
-            Ext.Send(In.RoomForward, room.Id);
+        {
+            if (Session.Is(ClientType.Modern))
+                Ext.Send(In.RoomForward, room.Id);
+            else
+                Ext.Send(Out.OpenFlatConnection, room.Id, "", (Id)(-1));
+        }
 
         return Task.CompletedTask;
     }
 
     [Command("entry", SupportedClients = ClientType.Flash)]
-    // RequiredOut(nameof(Out.GetRoomEntryData))]
-    public Task TriggerEntryWiredCommandHandler(CommandArgs args)
+    public Task TriggerEntryWiredCommandHandler(CommandArgs _)
     {
-        // TODO: Send(Out.GetRoomEntryData);
+        Ext.Send(Out.GetRoomEntryTile);
         return Task.CompletedTask;
     }
 
-    public async Task UpdateRoomSettingsAsync(Action<RoomSettings> update)
+    public async Task<bool> UpdateRoomSettingsAsync(Action<RoomSettings> update)
     {
         if (!_roomMgr.EnsureInRoom(out var room))
         {
             ShowMessage("Room state is not being tracked, please re-enter the room.");
-            return;
+            return false;
         }
 
         if (!_roomMgr.IsOwner)
         {
             ShowMessage("You must be the owner of the room to change room settings.");
-            return;
+            return false;
         }
 
         var settings = await Ext.RequestAsync(new GetRoomSettingsMsg(room.Id));
@@ -116,12 +87,12 @@ public sealed class RoomCommands(RoomManager roomManager) : CommandModule
 
         var packet = await receiver;
         if (Ext.Messages.Is(packet.Header, In.RoomSettingsSaveError))
-            throw new Exception("Failed to update room settings.");
+            throw new Exception("Server responded with an error when attempting to update room settings.");
+
+        return true;
     }
 
     [Command("lock", SupportedClients = ClientType.Flash)]
-    // [RequiredIn(nameof(In.RoomSettingsData))]
-    // [RequiredOut(nameof(Out.GetRoomSettings), nameof(Out.SaveRoomSettings))]
     public async Task LockRoomAsync(CommandArgs args)
     {
         string? password = null;
@@ -130,7 +101,7 @@ public sealed class RoomCommands(RoomManager roomManager) : CommandModule
             password = string.Join(' ', args);
         }
 
-        await UpdateRoomSettingsAsync(s =>
+        if (await UpdateRoomSettingsAsync(s =>
         {
             if (string.IsNullOrWhiteSpace(password))
             {
@@ -141,22 +112,39 @@ public sealed class RoomCommands(RoomManager roomManager) : CommandModule
                 s.Password = password;
                 s.Access = RoomAccess.Password;
             }
-        });
-
+        }))
+        {
+            ShowMessage(string.IsNullOrWhiteSpace(password) ? "Room has been locked." : "Room password has been set.");
+        }
     }
 
     [Command("open", SupportedClients = ClientType.Flash)]
-    // [RequiredIn(nameof(In.RoomSettingsData))]
-    // [RequiredOut(nameof(Out.GetRoomSettings), nameof(Out.SaveRoomSettings))]
-    public async Task OpenRoomAsync(CommandArgs args)
+    public async Task OpenRoomAsync(CommandArgs _)
     {
-        await UpdateRoomSettingsAsync(s => s.Access = RoomAccess.Open);
-        ShowMessage("Room has been opened.");
+        if (await UpdateRoomSettingsAsync(s => s.Access = RoomAccess.Open))
+            ShowMessage("Room has been opened.");
+    }
+
+    [Command("trading", SupportedClients = ClientType.Flash)]
+    public async Task SetTradingAsync(CommandArgs args)
+    {
+        if (args is [ "on" or "off" or "rights", .. ])
+        {
+            var trading = args[0] switch
+            {
+                "on" => TradePermissions.Allowed,
+                "rights" => TradePermissions.RightsHolders,
+                _ => TradePermissions.NotAllowed
+            };
+
+            if (await UpdateRoomSettingsAsync(s => s.Trading = trading))
+            {
+                ShowMessage($"Trading permissions have been updated to: {trading.Humanize()}.");
+            }
+        }
     }
 
     [Command("access", "ra", Usage = "<open/hide/lock> [password]", SupportedClients = ClientType.Flash)]
-    // [RequiredIn(nameof(In.RoomSettingsData))]
-    // [RequiredOut(nameof(Out.GetRoomSettings), nameof(Out.SaveRoomSettings))]
     public async Task SetRoomAccessAsync(CommandArgs args)
     {
         if (args.Length < 1)
