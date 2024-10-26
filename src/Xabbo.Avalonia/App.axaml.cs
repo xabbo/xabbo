@@ -27,6 +27,8 @@ public partial class App : Application
             base.OnFrameworkInitializationCompleted();
             return;
         }
+
+        Resources["IsDebug"] = true;
 #endif
 
         var container = Locator.CurrentMutable;

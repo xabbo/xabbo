@@ -20,12 +20,6 @@
   </UserControl.Resources>
   <ScrollViewer>
     <StackPanel Margin="10" Spacing="10">
-      <ui:SettingsExpander
-        Header="User interface"
-        IconSource="{icm:SymbolIconSource Symbol=AppGeneric}"
-      >
-        <CheckBox IsChecked="{Binding Config.General.PrivacyMode}" Content="Privacy mode" />
-      </ui:SettingsExpander>
       <!-- Chat -->
       <ui:SettingsExpander
         Header="Chat log"
@@ -129,6 +123,13 @@
           Description="The time interval between filter refreshes while a dynamic filter is active. Lower values are more responsive but may cause issues when many furni are updating frequently."
           Value="{Binding Config.View.Furni.RefreshIntervalMs}"
         />
+      </ui:SettingsExpander>
+      <ui:SettingsExpander
+        Header="Debug"
+        IsVisible="{DynamicResource IsDebug}"
+        IconSource="{icm:SymbolIconSource Symbol=Bug}"
+      >
+        <CheckBox IsChecked="{Binding Config.General.PrivacyMode}" Content="Privacy mode" />
       </ui:SettingsExpander>
     </StackPanel>
   </ScrollViewer>
