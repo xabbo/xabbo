@@ -125,6 +125,11 @@ public partial class RoomFurniController : ControllerBase
                     IWallItem it => it.WX * 16 + it.WY * 16 - it.LY,
                     _ => 0
                 })
+                .ThenByDescending(x => x switch
+                {
+                    IFloorItem it => it.Z,
+                    _ => 0
+                })
                 .ToArray();
 
             CurrentProgress = 0;
