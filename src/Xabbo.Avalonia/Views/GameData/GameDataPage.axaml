@@ -23,7 +23,7 @@
     <TabItem>
       <TabItem.Header>
         <StackPanel Orientation="Horizontal" Spacing="4">
-          <ic:SymbolIcon VerticalAlignment="Center" Symbol="Text" />
+          <ic:SymbolIcon VerticalAlignment="Center" Symbol="Textbox" />
           <TextBlock VerticalAlignment="Center" Text="Texts" />
         </StackPanel>
       </TabItem.Header>
