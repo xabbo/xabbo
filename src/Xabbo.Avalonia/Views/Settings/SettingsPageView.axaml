@@ -39,9 +39,6 @@
             </WrapPanel>
           </StackPanel>
         </ui:SettingsExpanderItem>
-        <ui:SettingsExpanderItem>
-          <CheckBox IsChecked="{Binding Config.Chat.Log.LogToFile}" Content="Log to file" />
-        </ui:SettingsExpanderItem>
       </ui:SettingsExpander>
       <!-- Timing (modern) -->
       <ui:SettingsExpander
