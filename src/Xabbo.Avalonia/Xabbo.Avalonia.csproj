@@ -66,4 +66,8 @@
   <ItemGroup>
     <None Update="appsettings.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
+
+  <ItemGroup Condition="'$(Configuration)'=='DEBUG'">
+    <None Update="appsettings.development.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>

@@ -24,7 +24,6 @@ using Xabbo.Avalonia.Views;
 
 using IHostApplicationLifetime = Microsoft.Extensions.Hosting.IHostApplicationLifetime;
 using Splatr = Splat.SplatRegistrations;
-using System.ComponentModel;
 
 namespace Xabbo.Avalonia;
 
@@ -48,7 +47,10 @@ public static class ViewModelLocator
     static void RegisterConfiguration()
     {
         var configRoot = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json")
+            .AddJsonFile("appsettings.json", optional: true)
+#if DEBUG
+            .AddJsonFile("appsettings.development.json", optional: true)
+#endif
             .Build();
         Splatr.RegisterConstant<IConfiguration>(configRoot);
     }
