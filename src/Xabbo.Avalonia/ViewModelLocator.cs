@@ -112,6 +112,8 @@ public static class ViewModelLocator
         Splatr.RegisterLazySingleton<RoomGiftsViewModel>();
 
         Splatr.RegisterLazySingleton<FurniDataViewModel>();
+        Splatr.RegisterLazySingleton<ExternalTextsViewModel>();
+        Splatr.RegisterLazySingleton<ExternalVariablesViewModel>();
 
         Splatr.RegisterLazySingleton<OfferItemsViewModel>();
 

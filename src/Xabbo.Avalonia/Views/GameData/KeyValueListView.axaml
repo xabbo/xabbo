@@ -1,0 +1,25 @@
+<UserControl
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:vm="using:Xabbo.ViewModels"
+  mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+  x:Class="Xabbo.Avalonia.Views.KeyValueListView"
+  x:DataType="vm:KeyValuesViewModel"
+>
+  <DockPanel>
+    <TextBox DockPanel.Dock="Top" Margin="10" Classes="clearButton" Watermark="Filter" Text="{Binding FilterText}" />
+    <DataGrid
+      ItemsSource="{Binding Entries}"
+      CanUserReorderColumns="True"
+      CanUserResizeColumns="True"
+      CanUserSortColumns="True"
+    >
+      <DataGrid.Columns>
+        <DataGridTextColumn Width="300" Header="key" Binding="{Binding Key}" />
+        <DataGridTextColumn Width="300" Header="value" Binding="{Binding Value}" />
+      </DataGrid.Columns>
+    </DataGrid>
+  </DockPanel>
+</UserControl>

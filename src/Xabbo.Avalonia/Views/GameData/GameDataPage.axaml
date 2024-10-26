@@ -18,7 +18,25 @@
           <TextBlock VerticalAlignment="Center" Text="Furni" />
         </StackPanel>
       </TabItem.Header>
-      <v:FurniDataView DataContext="{Binding FurniData}" />
+      <v:FurniDataView Margin="0,-6,0,0" DataContext="{Binding FurniData}" />
+    </TabItem>
+    <TabItem>
+      <TabItem.Header>
+        <StackPanel Orientation="Horizontal" Spacing="4">
+          <ic:SymbolIcon VerticalAlignment="Center" Symbol="Text" />
+          <TextBlock VerticalAlignment="Center" Text="Texts" />
+        </StackPanel>
+      </TabItem.Header>
+      <v:KeyValueListView Margin="0,-6,0,0" DataContext="{Binding Texts}" />
+    </TabItem>
+    <TabItem>
+      <TabItem.Header>
+        <StackPanel Orientation="Horizontal" Spacing="4">
+          <ic:SymbolIcon VerticalAlignment="Center" Symbol="BracesVariable" />
+          <TextBlock VerticalAlignment="Center" Text="Variables" />
+        </StackPanel>
+      </TabItem.Header>
+      <v:KeyValueListView Margin="0,-6,0,0" DataContext="{Binding Variables}" />
     </TabItem>
   </TabControl>
 </UserControl>
