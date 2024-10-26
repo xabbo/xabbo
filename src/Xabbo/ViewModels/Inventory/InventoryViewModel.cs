@@ -477,6 +477,7 @@ public sealed partial class InventoryViewModel : ControllerBase
                 );
             }
         }
+        catch (OperationCanceledException) { }
         catch (Exception ex)
         {
             Status = State.None;
