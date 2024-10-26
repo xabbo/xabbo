@@ -3,6 +3,7 @@ using Xabbo.Configuration;
 using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.Tasks;
+using Xabbo.Exceptions;
 using Xabbo.Extension;
 using Xabbo.Services.Abstractions;
 
@@ -152,7 +153,7 @@ public partial class FurniPlacementController(
             size = size.Flip();
 
         Point location = await floorItemPlacement.FindLocationAsync(room, size, cancellationToken)
-            ?? throw new Exception("Failed to find a valid floor tile.");
+            ?? throw new PlacementNotFoundException();
 
         _logger.LogTrace("Placing {Item} at {Point}.", item, location);
         var interval = Task.Delay(_config.Value.Timing.GetTiming(Session).FurniPlaceInterval, cancellationToken);
@@ -174,7 +175,7 @@ public partial class FurniPlacementController(
         ErrorHandling errorHandling, CancellationToken cancellationToken)
     {
         WallLocation location = await wallItemPlacement.FindLocationAsync(room, cancellationToken)
-            ?? throw new Exception("Failed to find a valid wall location.");
+            ?? throw new PlacementNotFoundException();
 
         _logger.LogTrace("Placing {Item} at {Location}.", item, location);
         var interval = Task.Delay(_config.Value.Timing.GetTiming(Session).FurniPlaceInterval, cancellationToken);

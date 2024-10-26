@@ -22,6 +22,7 @@ using Xabbo.Controllers;
 using Xabbo.Services.Abstractions;
 using Xabbo.Web.Serialization;
 using Xabbo.Utility;
+using Xabbo.Exceptions;
 
 namespace Xabbo.ViewModels;
 
@@ -476,15 +477,15 @@ public sealed partial class InventoryViewModel : ControllerBase
                 );
             }
         }
-        catch (TimeoutException)
-        {
-            Status = State.None;
-            await _dialogService.ShowAsync("Timed out", "Try increasing the furni placement interval in settings.");
-        }
         catch (Exception ex)
         {
             Status = State.None;
-            await _dialogService.ShowAsync("Error", ex.Message);
+            if (ex is TimeoutException)
+                await _dialogService.ShowAsync("Timed out", "Try increasing the furni placement interval in settings.");
+            else if (ex is PlacementNotFoundException)
+                await _dialogService.ShowAsync("No placement location", "Could not find a valid placement location.");
+            else
+                await _dialogService.ShowAsync("Error", ex.Message);
         }
         finally
         {
