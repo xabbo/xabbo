@@ -10,6 +10,6 @@ public sealed class OriginsTimingConfig : TimingConfigBase
         FurniPlaceInterval = 550;
         FurniPickupInterval = 550;
         FurniToggleInterval = 500;
-        FurniRotateInterval = 500;
+        FurniMoveInterval = 500;
     }
 }

@@ -57,7 +57,7 @@ public partial class RoomFurniController : ControllerBase
     public Task RotateFurniAsync(IEnumerable<IFurni> furni, Directions direction) => ProcessFurniAsync(
         Operation.Rotate,
         furni,
-        x => x.FurniRotateInterval,
+        x => x.FurniMoveInterval,
         f => Send(new MoveFloorItemMsg(f.Id, ((IFloorItem)f).Location, (int)direction)),
         filter: f => f is IFloorItem floorItem && floorItem.Direction != (int)direction
     );

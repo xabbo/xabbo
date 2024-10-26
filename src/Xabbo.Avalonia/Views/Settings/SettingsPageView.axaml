@@ -73,9 +73,9 @@
           Value="{Binding Config.Timing.Modern.FurniToggleInterval}"
         />
         <controls:TimingSlider
-          Text="Furni rotate interval"
-          Tip="The time interval between rotating furni"
-          Value="{Binding Config.Timing.Modern.FurniRotateInterval}"
+          Text="Furni move interval"
+          Tip="The time interval between moving or rotating furni"
+          Value="{Binding Config.Timing.Modern.FurniMoveInterval}"
         />
       </ui:SettingsExpander>
       <!-- Timing (Origins) -->
@@ -106,8 +106,13 @@
           Value="{Binding Config.Timing.Origins.FurniToggleInterval}"
         />
         <controls:TimingSlider
+          Text="Furni move interval"
+          Tip="The time interval between moving or rotating furni"
+          Value="{Binding Config.Timing.Origins.FurniMoveInterval}"
+        />
+        <controls:TimingSlider
           Text="Trade offer interval"
-          Description="The time interval between offering items in a trade"
+          Tip="The time interval between offering items in a trade"
           Value="{Binding Config.Timing.Origins.TradeOfferInterval}"
         />
       </ui:SettingsExpander>
