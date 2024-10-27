@@ -4,7 +4,7 @@ assembly-informational-format: '{InformationalVersion}'
 mode: ContinuousDelivery
 branches:
   develop:
-    tag: beta
+    label: beta
 ignore:
   sha: []
 merge-message-formats: {}
