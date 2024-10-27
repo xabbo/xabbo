@@ -5,6 +5,3 @@ mode: ContinuousDelivery
 branches:
   develop:
     label: beta
-ignore:
-  sha: []
-merge-message-formats: {}
