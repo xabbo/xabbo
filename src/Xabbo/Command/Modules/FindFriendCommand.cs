@@ -10,6 +10,7 @@ namespace Xabbo.Command.Modules;
 [CommandModule(SupportedClients = ClientType.Modern)]
 public sealed class FindFriendCommand(FriendManager friendManager) : CommandModule
 {
+    private readonly SemaphoreSlim _waiting = new(5);
     private readonly SemaphoreSlim _throttle = new(1, 1);
     private readonly FriendManager _friendManager = friendManager;
 
@@ -36,47 +37,57 @@ public sealed class FindFriendCommand(FriendManager friendManager) : CommandModu
             return;
         }
 
-        await _throttle.WaitAsync();
-        var throttleInterval = Task.Delay(5000);
+        if (!_waiting.Wait(0))
+        {
+            ShowMessage("Too many requests, slow down.");
+            return;
+        }
+
         try
         {
-            Task<IPacket> receiver = Ext.ReceiveAsync([In.RoomForward, In.FollowFriendFailed], 2000, true);
-            Ext.Send(Out.FollowFriend, friend.Id);
-            var packet = await receiver;
+            await _throttle.WaitAsync();
+            var throttleInterval = Task.Delay(5500);
+            try
+            {
+                Task<IPacket> receiver = Ext.ReceiveAsync([In.RoomForward, In.FollowFriendFailed], 2000, true);
+                Ext.Send(Out.FollowFriend, friend.Id);
+                var packet = await receiver;
 
-            if (Ext.Messages.Is(packet.Header, In.RoomForward))
-            {
-                int roomId = packet.Read<int>();
-                var roomData = await Ext.RequestAsync(new GetRoomDataMsg(roomId));
-                ShowMessage($"{friend.Name} is in room '{roomData.Name}' by {roomData.OwnerName} (id:{roomData.Id}){(roomData.IsInvisible ? "*" : "")}");
-            }
-            else
-            {
-                var error = (FollowFriendError)packet.Read<int>();
-                switch (error)
+                if (Ext.Messages.Is(packet.Header, In.RoomForward))
                 {
-                    case FollowFriendError.NotFriend:
-                        ShowMessage($"{friend.Name} is not in your friend list");
-                        break;
-                    case FollowFriendError.Offline:
-                        ShowMessage($"{friend.Name} is offline");
-                        break;
-                    case FollowFriendError.NotInRoom:
-                        ShowMessage($"{friend.Name} is not in a room");
-                        break;
-                    case FollowFriendError.CannotFollow:
-                        ShowMessage($"{friend.Name} has follow disabled");
-                        break;
-                    default:
-                        ShowMessage($"Unknown error {error}");
-                        break;
+                    int roomId = packet.Read<int>();
+                    var roomData = await Ext.RequestAsync(new GetRoomDataMsg(roomId));
+                    ShowMessage($"{friend.Name} is in room '{roomData.Name}' by {roomData.OwnerName} (id:{roomData.Id}){(roomData.IsInvisible ? "*" : "")}");
+                }
+                else
+                {
+                    var error = (FollowFriendError)packet.Read<int>();
+                    switch (error)
+                    {
+                        case FollowFriendError.NotFriend:
+                            ShowMessage($"{friend.Name} is not in your friend list");
+                            break;
+                        case FollowFriendError.Offline:
+                            ShowMessage($"{friend.Name} is offline");
+                            break;
+                        case FollowFriendError.NotInRoom:
+                            ShowMessage($"{friend.Name} is not in a room");
+                            break;
+                        case FollowFriendError.CannotFollow:
+                            ShowMessage($"{friend.Name} has follow disabled");
+                            break;
+                        default:
+                            ShowMessage($"Unknown error {error}");
+                            break;
+                    }
                 }
             }
+            finally
+            {
+                await throttleInterval;
+                _throttle.Release();
+            }
         }
-        finally
-        {
-            await throttleInterval;
-            _throttle.Release();
-        }
+        finally { _waiting.Release(); }
     }
 }
