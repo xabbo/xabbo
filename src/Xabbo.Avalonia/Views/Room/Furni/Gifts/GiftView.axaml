@@ -99,7 +99,7 @@
             VerticalAlignment="Center"
           />
           <StackPanel Grid.Column="1" VerticalAlignment="Center">
-            <TextBlock Text="{Binding ItemName}" FontWeight="Bold" />
+            <TextBlock FontWeight="Bold" TextWrapping="Wrap" Text="{Binding ItemName}" />
             <TextBlock IsVisible="{Binding !IsTrophy}" Text="{Binding ExtraParameter}">
               <TextBlock.IsVisible>
                 <MultiBinding Converter="{x:Static BoolConverters.And}">
@@ -108,8 +108,18 @@
                 </MultiBinding>
               </TextBlock.IsVisible>
             </TextBlock>
-            <TextBlock IsVisible="{Binding TrophyMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" Text="{Binding TrophyMessage}" />
-            <TextBlock IsVisible="{Binding TrophyDate, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" Text="{Binding TrophyDate}" FontWeight="Bold" HorizontalAlignment="Right" />
+            <TextBlock
+              IsVisible="{Binding TrophyMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+              TextWrapping="Wrap"
+              Text="{Binding TrophyMessage}"
+            />
+            <TextBlock
+              HorizontalAlignment="Right"
+              IsVisible="{Binding TrophyDate, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+              FontWeight="Bold"
+              TextWrapping="Wrap"
+              Text="{Binding TrophyDate}"
+            />
           </StackPanel>
         </Grid>
       </Grid>
