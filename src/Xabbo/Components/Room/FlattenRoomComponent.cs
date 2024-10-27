@@ -1,4 +1,5 @@
-﻿using Xabbo.Messages.Flash;
+﻿using Xabbo.Messages;
+using Xabbo.Messages.Flash;
 using Xabbo.Extension;
 using Xabbo.Core;
 using Xabbo.Core.Game;
@@ -180,15 +181,14 @@ public partial class FlattenRoomComponent(IExtension extension, RoomManager room
         e.Packet.Write(floorItems);
     }
 
-    [InterceptIn(nameof(In.ObjectAdd))]
-    private void HandleObjectAdd(Intercept e)
+    [Intercept]
+    private void HandleObjectAdd(Intercept e, FloorItemAddedMsg msg)
     {
         if (!_isActivated) return;
 
-        var floorItem = e.Packet.Read<FloorItem>();
-        floorItem.Location = AdjustTile(floorItem.Location);
+        msg.Item.Location = AdjustTile(msg.Item.Location);
         e.Packet.Clear();
-        e.Packet.Write(floorItem);
+        e.Packet.Write(msg);
     }
 
     [InterceptIn(nameof(In.ObjectUpdate))]
