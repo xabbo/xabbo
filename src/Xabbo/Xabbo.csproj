@@ -17,7 +17,7 @@
     <EnableConfigurationBindingGenerator>true</EnableConfigurationBindingGenerator>
   </PropertyGroup>
 
-  <PropertyGroup Label="Rename paths">
+  <PropertyGroup Label="Rename paths" Condition="'$(Configuration)'=='Release'">
     <AppOutputBase>$(MSBuildProjectDirectory)\</AppOutputBase>
     <PathMap>$(AppOutputBase)=Xabbo\</PathMap>
   </PropertyGroup>
