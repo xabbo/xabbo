@@ -39,7 +39,7 @@
         <DataTemplate DataType="vm:ChatLogRoomEntryViewModel">
           <Grid Margin="10,0" ColumnDefinitions="*,Auto,*">
             <Separator Margin="0" Grid.Column="0" />
-            <TextBlock Grid.Column="1" Margin="10,0">
+            <TextBlock Grid.Column="1" Margin="10,0" MaxWidth="{Binding $parent[Grid].Bounds.Width}" TextWrapping="Wrap">
               <Run Text="{Binding RoomName, Converter={StaticResource HabboStringConverter}, Mode=OneWay}" FontWeight="Bold" />
               <Run Text="by"/>
               <Run Classes="privacy" Text="{Binding RoomOwner}" />
@@ -50,7 +50,7 @@
         <DataTemplate DataType="vm:ChatLogAvatarActionViewModel">
           <Grid Margin="10,0" ColumnDefinitions="*,Auto,*">
             <Separator Margin="0" Grid.Column="0" />
-            <TextBlock Grid.Column="1" Margin="10,0">
+            <TextBlock Grid.Column="1" Margin="10,0" MaxWidth="{Binding $parent[Grid].Bounds.Width}" TextWrapping="Wrap">
               <Run Classes="privacy" Text="{Binding UserName}" />
               <Run Text="{Binding Action}" />
             </TextBlock>
