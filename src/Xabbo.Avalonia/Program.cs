@@ -2,6 +2,8 @@
 using ReactiveUI;
 using Avalonia;
 using Avalonia.ReactiveUI;
+using Avalonia.Media.Fonts;
+using Avalonia.Media;
 
 namespace Xabbo.Avalonia;
 
@@ -19,7 +21,15 @@ internal sealed class Program
     public static AppBuilder BuildAvaloniaApp() => AppBuilder
         .Configure<App>()
         .UsePlatformDetect()
-        .WithInterFont()
-        // .LogToTrace()
+        .ConfigureFonts(fm => {
+            fm.AddFontCollection(new EmbeddedFontCollection(
+                new Uri("fonts:"),
+                new Uri("avares://Xabbo.Avalonia/Assets/Fonts")));
+        })
+        .With(new FontManagerOptions
+        {
+            DefaultFamilyName = "fonts:#IBM Plex Sans",
+            FontFallbacks = [ new FontFallback { FontFamily = "fonts:#Noto Emoji" } ]
+        })
         .UseReactiveUI();
 }

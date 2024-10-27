@@ -36,8 +36,8 @@
       <sys:Double x:Key="ControlContentThemeFontSize">16</sys:Double>
       <sys:Double x:Key="TabItemHeaderFontSize">30</sys:Double>
 
-      <FontFamily x:Key="Sans">avares://Xabbo.Avalonia/Assets/Fonts#IBM Plex Sans</FontFamily>
-      <FontFamily x:Key="Mono">avares://Xabbo.Avalonia/Assets/Fonts#IBM Plex Mono</FontFamily>
+      <FontFamily x:Key="Sans">fonts:#IBM Plex Sans</FontFamily>
+      <FontFamily x:Key="Mono">fonts:#IBM Plex Mono</FontFamily>
 
       <!-- Session -->
       <x:Boolean x:Key="IsConnecting">True</x:Boolean>
@@ -161,7 +161,6 @@
 
     <Style Selector=":is(Window), :is(Popup), :is(ToolTip)">
       <Setter Property="TextElement.FontSize" Value="14" />
-      <Setter Property="TextElement.FontFamily" Value="{StaticResource Sans}" />
     </Style>
 
     <Style Selector=":is(Window)">
