@@ -1,0 +1,38 @@
+{
+  "title": "xabbo",
+  "description": "enhanced habbo",
+  "authors": [
+    {
+      "name": "b7",
+      "discord": "xb7c"
+    }
+  ],
+  "version": "{Version}",
+  "categories": ["Usability"],
+
+  "source": "https://github.com/xabbo/xabbo",
+  "readme": "https://github.com/xabbo/xabbo/blob/main/README.md",
+
+  "stable": true,
+
+  "framework": {
+    "name": "Xabbo",
+    "version": "{FrameworkVersion}"
+  },
+
+  "language": "C#",
+  "commands": {
+    "default": ["cmd", "/C", "xabbo.exe", "-c", "{cookie}", "-p", "{port}", "-f", "{filename}"],
+    "linux": ["./xabbo-linux-x64", "-c", "{cookie}", "-p", "{port}", "-f", "{filename}"],
+    "mac": ["./xabbo-osx", "-c", "{cookie}", "-p", "{port}", "-f", "{filename}"]
+  },
+
+  "compatibility": {
+    "systems": ["Windows", "Linux", "Mac"],
+    "clients": ["Flash", "Origins"]
+  },
+
+  "submissionDate": "04-09-2021 07:23:00",
+  "updateDate": "{UpdateDate}",
+  "isOutdated": false
+}
