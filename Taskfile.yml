@@ -17,3 +17,8 @@ tasks:
     desc: Builds and runs the application
     cmds:
       - dotnet run --project src/Xabbo.Avalonia
+  pack:
+    desc: Packages the extension
+    cmds:
+      - bash ./.scripts/pack.sh
+
