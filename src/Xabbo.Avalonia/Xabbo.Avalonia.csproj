@@ -1,8 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <RootNamespace>Xabbo.Avalonia</RootNamespace>
     <AssemblyName>Xabbo.Avalonia</AssemblyName>
     <OutputType>WinExe</OutputType>
+    <ApplicationIcon>Assets/Icon/app.ico</ApplicationIcon>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
