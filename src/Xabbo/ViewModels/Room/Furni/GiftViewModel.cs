@@ -29,6 +29,7 @@ public sealed partial class GiftViewModel : ViewModelBase
     [Reactive] public string? TrophyMessage { get; set; }
     [Reactive] public string? TrophyDate { get; set; }
 
+    [Reactive] public bool CanPeek { get; set; }
     [Reactive] public bool IsPeeking { get; set; }
 
     public GiftViewModel()
@@ -67,6 +68,10 @@ public sealed partial class GiftViewModel : ViewModelBase
                     TrophyDate = match.Groups["date"].Value;
                 }
             }
+        }
+        else if (item.Data is LegacyData legacy)
+        {
+            Message = legacy.Value;
         }
     }
 

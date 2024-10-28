@@ -92,7 +92,6 @@ public sealed class RoomGiftsViewModel : ViewModelBase
         });
     }
 
-
     private void PeekAll()
     {
         foreach (var (_, vm) in _cache.KeyValues)
@@ -118,12 +117,12 @@ public sealed class RoomGiftsViewModel : ViewModelBase
 
         foreach (var item in floorItems.OfCategory(FurniCategory.Gift))
         {
-            if (item.Data is not MapData map) continue;
-
             GiftViewModel gift = new GiftViewModel(item);
 
             if (gift.ProductCode is not null)
             {
+                gift.CanPeek = true;
+
                 if (furniData.TryGetInfo(gift.ProductCode, out FurniInfo? furniInfo))
                 {
                     gift.ItemName = furniInfo.Name;

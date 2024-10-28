@@ -81,8 +81,18 @@
           Command="{Binding PeekCmd}"
           ToolTip.Tip="Peek"
           IsVisible="{Binding !IsPeeking}"
+          IsEnabled="{Binding CanPeek}"
         >
-          <ic:SymbolIcon Symbol="Eye" />
+          <ic:SymbolIcon>
+            <ic:SymbolIcon.Styles>
+              <Style Selector="ic|SymbolIcon">
+                <Setter Property="Symbol" Value="Eye" />
+                <Style Selector="^:disabled">
+                  <Setter Property="Symbol" Value="EyeOff" />
+                </Style>
+              </Style>
+            </ic:SymbolIcon.Styles>
+          </ic:SymbolIcon>
         </Button>
         <Grid
           x:Name="GiftContents"
