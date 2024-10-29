@@ -1,7 +1,7 @@
 # xabbo extension
 A multi feature extension for G-Earth.
 
-<img src="https://github.com/user-attachments/assets/11225be4-a8db-4422-8fec-68583d39f320" width="500">
+<img src="https://raw.githubusercontent.com/xabbo/xabbo/refs/heads/main/ext/screenshot.png" width="500">
 
 ## Run the latest release
 
