@@ -38,14 +38,14 @@ public class LightingComponent : Component
         _roomManager.Entered += OnEnteredRoom;
         _roomManager.Left += OnLeftRoom;
         _roomManager.FloorItemAdded += OnFloorItemAdded;
-        _roomManager.FloorItemUpdated += OnFloorItemUpdated;
+        _roomManager.FloorItemDataUpdated += OnFloorItemDataUpdated;
 
-        this.ObservableForProperty(x => x.TonerColor)
+        this.WhenAnyValue(x => x.IsTonerActive)
+            .Subscribe(EnableToner);
+
+        this.WhenAnyValue(x => x.TonerColor)
             .Sample(TimeSpan.FromMilliseconds(500))
-            .Subscribe(x => UpdateToner(x.Value));
-
-        this.ObservableForProperty(x => x.IsTonerActive)
-            .Subscribe(x => EnableToner(x.Value));
+            .Subscribe(UpdateToner);
     }
 
     private void OnGameDataLoaded() => FindToner();
@@ -127,14 +127,9 @@ public class LightingComponent : Component
         }
     }
 
-    private void OnFloorItemUpdated(FloorItemUpdatedEventArgs e)
+    private void OnFloorItemDataUpdated(FloorItemDataUpdatedEventArgs e)
     {
-        if (!_roomManager.EnsureInRoom(out var room))
-            return;
-
-        if (e.Item.Id != _currentBgTonerId)
-            return;
-
-        SetToner(e.Item);
+        if (e.Item.Id == _currentBgTonerId)
+            SetToner(e.Item);
     }
 }
