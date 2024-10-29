@@ -198,8 +198,8 @@ public sealed class FriendsPageViewModel : PageViewModel
 
         var result = await _dialogService.ShowContentDialogAsync(_dialogService.CreateViewModel<MainViewModel>(), new ContentDialogSettings
         {
-            Title = $"Delete {"friend".ToQuantity(friendsToRemove.Count)}",
-            Content = $"Are you sure you wish to delete {
+            Title = $"Remove {"friend".ToQuantity(friendsToRemove.Count)}",
+            Content = $"Are you sure you wish to remove {
                 friendsToRemove.Select(x => x.Name).Humanize(5, "more friends")
             }?",
             PrimaryButtonText = "Yes",
