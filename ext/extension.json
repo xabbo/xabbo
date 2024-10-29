@@ -1,6 +1,6 @@
 {
   "title": "xabbo",
-  "description": "enhanced habbo",
+  "description": "enhanced habbo\n\nrequires the .NET 8 Runtime",
   "authors": [
     {
       "name": "b7",
