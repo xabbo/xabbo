@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Reactive;
 using System.Reactive.Linq;
 using DynamicData;
+using DynamicData.Binding;
 using ReactiveUI;
 using Avalonia.Controls.Selection;
 using FluentAvalonia.UI.Controls;
@@ -38,6 +39,9 @@ public sealed class WardrobePageViewModel : PageViewModel
 
     public SelectionModel<OutfitViewModel> Selection { get; } = new() { SingleSelect = false };
 
+    private readonly ObservableAsPropertyHelper<string?> _emptyStatus;
+    public string? EmptyStatus => _emptyStatus.Value;
+
     public ReactiveCommand<Unit, Unit> AddCurrentFigureCmd { get; }
     public ReactiveCommand<Unit, Task> ImportWardrobeCmd { get; }
     public ReactiveCommand<Unit, Unit> RemoveOutfitsCmd { get; }
@@ -65,6 +69,11 @@ public sealed class WardrobePageViewModel : PageViewModel
             .ObserveOn(RxApp.MainThreadScheduler)
             .Bind(out _outfits)
             .Subscribe();
+
+        _emptyStatus = _outfits.WhenAnyValue(x => x.Count)
+            .Select(count => count == 0 ? "No outfits, right click to add yours" : null)
+            .ObserveOn(RxApp.MainThreadScheduler)
+            .ToProperty(this, x => x.EmptyStatus);
 
         foreach (var model in _repository.Load())
         {

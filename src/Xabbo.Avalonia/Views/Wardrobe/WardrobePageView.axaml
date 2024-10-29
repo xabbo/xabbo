@@ -18,99 +18,102 @@
   x:DataType="vm:WardrobePageViewModel"
   x:Name="WardrobePageViewRoot"
 >
-  <ListBox
-    Padding="10"
-    ItemsSource="{Binding Outfits}"
-    Selection="{Binding Selection}"
-    SelectionMode="Multiple"
-  >
-    <ListBox.ContextFlyout>
-      <ui:FAMenuFlyout>
-        <ui:MenuFlyoutItem
-          IconSource="{icm:SymbolIconSource Symbol=ArrowImport}"
-          Text="Import in-game wardrobe"
-          Command="{Binding ImportWardrobeCmd}"
-        />
-        <ui:MenuFlyoutItem
-          IconSource="{icm:SymbolIconSource Symbol=BackpackAdd}"
-          Text="Add current figure"
-          Command="{Binding AddCurrentFigureCmd}"
-        />
-      </ui:FAMenuFlyout>
-    </ListBox.ContextFlyout>
-    <ListBox.Styles>
-      <Style Selector="ListBoxItem">
-        <Setter Property="Padding" Value="0" />
-      </Style>
-      <Style Selector="ListBoxItem:selected /template/ Rectangle#SelectionIndicator">
-        <Setter Property="IsVisible" Value="false" />
-      </Style>
-    </ListBox.Styles>
-    <ListBox.KeyBindings>
-      <KeyBinding Gesture="Delete" Command="{Binding RemoveOutfitsCmd}" />
-    </ListBox.KeyBindings>
-    <ListBox.ItemsPanel>
-      <ItemsPanelTemplate>
-        <WrapPanel />
-      </ItemsPanelTemplate>
-    </ListBox.ItemsPanel>
-    <ListBox.ItemTemplate>
-      <DataTemplate x:DataType="vm:OutfitViewModel">
-        <Panel Background="Transparent">
-          <Panel.Styles>
-            <Style Selector="Panel > Button">
-              <Setter Property="IsVisible" Value="False" />
-            </Style>
-            <Style Selector="Panel:pointerover > Button">
-              <Setter Property="IsVisible" Value="True" />
-            </Style>
-          </Panel.Styles>
-          <Interactivity:Interaction.Behaviors>
-            <Interactions:EventTriggerBehavior EventName="DoubleTapped">
-              <!--Interactions:InvokeCommandAction
-                Command="{Binding #WardrobePageViewRoot.((vm:WardrobePageViewModel)DataContext).WearFigureCmd}"
-                CommandParameter="{Binding}"
-              /-->
-            </Interactions:EventTriggerBehavior>
-          </Interactivity:Interaction.Behaviors>
-          <controls:AvatarImage
-            Margin="0,0,0,24"
-            Direction="{Binding Direction}"
-            FigureString="{Binding ModernFigure}"
+  <Panel>
+    <controls:InfoOverlay Text="{Binding EmptyStatus}" />
+    <ListBox
+      Padding="10"
+      ItemsSource="{Binding Outfits}"
+      Selection="{Binding Selection}"
+      SelectionMode="Multiple"
+    >
+      <ListBox.ContextFlyout>
+        <ui:FAMenuFlyout>
+          <ui:MenuFlyoutItem
+            IconSource="{icm:SymbolIconSource Symbol=ArrowImport}"
+            Text="Import in-game wardrobe"
+            Command="{Binding ImportWardrobeCmd}"
           />
-          <Button
-            Margin="4" Padding="0"
-            HorizontalAlignment="Left" VerticalAlignment="Bottom"
-            Opacity="0.5"
-            Theme="{StaticResource TransparentButton}"
-            Command="{Binding RotateCmd}"
-            CommandParameter="{StaticResource PositiveOne}"
-          >
-            <ic:SymbolIcon HorizontalAlignment="Center" VerticalAlignment="Center" Symbol="ArrowClockwise" />
-          </Button>
-          <Button
-            Margin="4" Padding="0"
-            HorizontalAlignment="Center" VerticalAlignment="Bottom"
-            Opacity="0.5"
-            Theme="{StaticResource TransparentButton}"
-            Command="{Binding #WardrobePageViewRoot.((vm:WardrobePageViewModel)DataContext).WearFigureCmd}"
-            CommandParameter="{Binding}"
-            ToolTip.Tip="Wear figure"
-          >
-            <ic:SymbolIcon HorizontalAlignment="Center" VerticalAlignment="Center" Symbol="PersonArrowLeft" />
-          </Button>
-          <Button
-            Margin="4" Padding="0"
-            HorizontalAlignment="Right" VerticalAlignment="Bottom"
-            Opacity="0.5"
-            Theme="{StaticResource TransparentButton}"
-            Command="{Binding RotateCmd}"
-            CommandParameter="{StaticResource NegativeOne}"
-          >
-            <ic:SymbolIcon HorizontalAlignment="Center" VerticalAlignment="Center" Symbol="ArrowCounterclockwise" />
-          </Button>
-        </Panel>
-      </DataTemplate>
-    </ListBox.ItemTemplate>
-  </ListBox>
+          <ui:MenuFlyoutItem
+            IconSource="{icm:SymbolIconSource Symbol=BackpackAdd}"
+            Text="Add current figure"
+            Command="{Binding AddCurrentFigureCmd}"
+          />
+        </ui:FAMenuFlyout>
+      </ListBox.ContextFlyout>
+      <ListBox.Styles>
+        <Style Selector="ListBoxItem">
+          <Setter Property="Padding" Value="0" />
+        </Style>
+        <Style Selector="ListBoxItem:selected /template/ Rectangle#SelectionIndicator">
+          <Setter Property="IsVisible" Value="false" />
+        </Style>
+      </ListBox.Styles>
+      <ListBox.KeyBindings>
+        <KeyBinding Gesture="Delete" Command="{Binding RemoveOutfitsCmd}" />
+      </ListBox.KeyBindings>
+      <ListBox.ItemsPanel>
+        <ItemsPanelTemplate>
+          <WrapPanel />
+        </ItemsPanelTemplate>
+      </ListBox.ItemsPanel>
+      <ListBox.ItemTemplate>
+        <DataTemplate x:DataType="vm:OutfitViewModel">
+          <Panel Background="Transparent">
+            <Panel.Styles>
+              <Style Selector="Panel > Button">
+                <Setter Property="IsVisible" Value="False" />
+              </Style>
+              <Style Selector="Panel:pointerover > Button">
+                <Setter Property="IsVisible" Value="True" />
+              </Style>
+            </Panel.Styles>
+            <Interactivity:Interaction.Behaviors>
+              <Interactions:EventTriggerBehavior EventName="DoubleTapped">
+                <!--Interactions:InvokeCommandAction
+                  Command="{Binding #WardrobePageViewRoot.((vm:WardrobePageViewModel)DataContext).WearFigureCmd}"
+                  CommandParameter="{Binding}"
+                /-->
+              </Interactions:EventTriggerBehavior>
+            </Interactivity:Interaction.Behaviors>
+            <controls:AvatarImage
+              Margin="0,0,0,24"
+              Direction="{Binding Direction}"
+              FigureString="{Binding ModernFigure}"
+            />
+            <Button
+              Margin="4" Padding="0"
+              HorizontalAlignment="Left" VerticalAlignment="Bottom"
+              Opacity="0.5"
+              Theme="{StaticResource TransparentButton}"
+              Command="{Binding RotateCmd}"
+              CommandParameter="{StaticResource PositiveOne}"
+            >
+              <ic:SymbolIcon HorizontalAlignment="Center" VerticalAlignment="Center" Symbol="ArrowClockwise" />
+            </Button>
+            <Button
+              Margin="4" Padding="0"
+              HorizontalAlignment="Center" VerticalAlignment="Bottom"
+              Opacity="0.5"
+              Theme="{StaticResource TransparentButton}"
+              Command="{Binding #WardrobePageViewRoot.((vm:WardrobePageViewModel)DataContext).WearFigureCmd}"
+              CommandParameter="{Binding}"
+              ToolTip.Tip="Wear figure"
+            >
+              <ic:SymbolIcon HorizontalAlignment="Center" VerticalAlignment="Center" Symbol="PersonArrowLeft" />
+            </Button>
+            <Button
+              Margin="4" Padding="0"
+              HorizontalAlignment="Right" VerticalAlignment="Bottom"
+              Opacity="0.5"
+              Theme="{StaticResource TransparentButton}"
+              Command="{Binding RotateCmd}"
+              CommandParameter="{StaticResource NegativeOne}"
+            >
+              <ic:SymbolIcon HorizontalAlignment="Center" VerticalAlignment="Center" Symbol="ArrowCounterclockwise" />
+            </Button>
+          </Panel>
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+  </Panel>
 </UserControl>
