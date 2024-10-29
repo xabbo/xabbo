@@ -26,9 +26,9 @@ Requires the [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0
 ```sh
 # Clone the 'dev' branch from the repository
 git clone https://github.com/xabbo/xabbo -b dev
-# Change into the 'xabbo' rirectory
+# Change into the 'xabbo' directory
 cd xabbo
-# Ferch the submodules (xabbo common, gearth, messages & care)
+# Fetch the submodules (xabbo common, gearth, messages & core)
 git submodule update --init
 # Run the Avalonia application
 dotnet run --project src/Xabbo.Avalonia
