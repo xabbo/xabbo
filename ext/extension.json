@@ -23,8 +23,8 @@
   "language": "C#",
   "commands": {
     "default": ["cmd", "/C", "xabbo.exe", "-c", "{cookie}", "-p", "{port}", "-f", "{filename}", ">", "NUL", "2>&1"],
-    "linux": ["./xabbo-linux-x64", "-c", "{cookie}", "-p", "{port}", "-f", "{filename}", ">", "/dev/null"],
-    "mac": ["./xabbo-osx", "-c", "{cookie}", "-p", "{port}", "-f", "{filename}", ">", "/dev/null"]
+    "linux": ["./xabbo-linux-x64", "-c", "{cookie}", "-p", "{port}", "-f", "{filename}", ">&", "/dev/null"],
+    "mac": ["./xabbo-osx", "-c", "{cookie}", "-p", "{port}", "-f", "{filename}", ">&", "/dev/null"]
   },
 
   "compatibility": {
