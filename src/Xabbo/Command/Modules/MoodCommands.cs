@@ -90,7 +90,11 @@ public sealed class MoodCommands : CommandModule
 
         if (args.Length > 0)
         {
-            if (!int.TryParse(args[0], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out int color))
+            string colorHex = args[0];
+            if (colorHex.StartsWith('#'))
+                colorHex = colorHex[1..];
+
+            if (!int.TryParse(colorHex, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out int color))
                 return Task.CompletedTask;
 
             var (h, s, l) = RgbToHsl(
