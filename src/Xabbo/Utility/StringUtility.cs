@@ -36,7 +36,7 @@ public static class StringUtility
         return new Regex(pattern, options);
     }
 
-    public static string GetVersionString(this Assembly? assembly)
+    public static string GetVersionString(this Assembly? assembly, bool includePrefix = true)
     {
         string? version = assembly?
             .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
@@ -45,7 +45,9 @@ public static class StringUtility
         if (version is null)
             return "unknown version";
 
-        if (!version.StartsWith('v'))
+        if (version.StartsWith('v') && !includePrefix)
+            version = version[1..];
+        else if (!version.StartsWith('v') && includePrefix)
             version = "v" + version;
 
         int index = version.IndexOf('+');

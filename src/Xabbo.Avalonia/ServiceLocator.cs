@@ -24,6 +24,8 @@ using Xabbo.Avalonia.Views;
 
 using IHostApplicationLifetime = Microsoft.Extensions.Hosting.IHostApplicationLifetime;
 using Splatr = Splat.SplatRegistrations;
+using System.Reflection;
+using Xabbo.Utility;
 
 namespace Xabbo.Avalonia;
 
@@ -82,7 +84,8 @@ public static class ViewModelLocator
         {
             Name = "xabbo",
             Description = "enhanced habbo",
-            Author = "b7"
+            Author = "b7",
+            Version = Assembly.GetEntryAssembly().GetVersionString(false)
         });
         Splatr.RegisterLazySingleton<GEarthExtension>();
 
