@@ -15,7 +15,7 @@ Note that this is not the *.NET Desktop Runtime* which is only available for Win
 built with the cross-platform [Avalonia](https://avaloniaui.net) UI. However, the desktop runtime
 will work since it also includes the .NET runtime.
 
-# Features
+## Features
 
 For details on the features provided by xabbo, see the [wiki](https://github.com/xabbo/xabbo/wiki).
 
