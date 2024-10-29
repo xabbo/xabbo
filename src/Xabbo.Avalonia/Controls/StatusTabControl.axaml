@@ -33,7 +33,7 @@
             <DockPanel DockPanel.Dock="{TemplateBinding TabStripPlacement}">
               <TextBlock
                 DockPanel.Dock="Right"
-                Margin="5"
+                Margin="10,5"
                 IsVisible="{Binding Status, RelativeSource={RelativeSource TemplatedParent}, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                 Text="{TemplateBinding Status}"
               />
