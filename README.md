@@ -14,7 +14,7 @@ Requires the [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0
 
 ```sh
 # Clone the 'dev' branch from the repository
-git clone https://github.com/xabbo/xabbo -b rev
+git clone https://github.com/xabbo/xabbo -b dev
 # Change into the 'xabbo' rirectory
 cd xabbo
 # Ferch the submodules (xabbo common, gearth, messages & care)
