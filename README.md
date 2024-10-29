@@ -17,7 +17,7 @@ will work since it also includes the .NET runtime.
 
 # Features
 
-For an overview of the features, see the [wiki](https://github.com/xabbo/xabbo/wiki).
+For details on the features provided by xabbo, see the [wiki](https://github.com/xabbo/xabbo/wiki).
 
 ## Run the latest development source
 
