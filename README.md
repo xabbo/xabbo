@@ -3,6 +3,26 @@ A multi feature extension for G-Earth.
 
 <img src="https://github.com/user-attachments/assets/11225be4-a8db-4422-8fec-68583d39f320" width="500">
 
+## Run the latest release
+
+Running the extension requires the
+[.NET 8 Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) to be installed.
+
+## Run the latest development source
+
+Requires the [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0).
+
+```sh
+# Clone the 'dev' branch from the repository
+git clone https://github.com/xabbo/xabbo -b rev
+# Change into the 'xabbo' rirectory
+cd xabbo
+# Ferch the submodules (xabbo common, gearth, messages & care)
+git submodule update --init
+# Run the Avalonia application
+dotnet run --project src/Xabbo.Avalonia
+```
+
 # Features
 
 ## General
