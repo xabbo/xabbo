@@ -1,5 +1,5 @@
 # xabbo extension
-A multi feature extension for G-Earth.
+A cross-platform, multi-feature extension for G-Earth compatible with Flash and Origins.
 
 <img src="https://raw.githubusercontent.com/xabbo/xabbo/refs/heads/main/ext/screenshot.png" width="500">
 
