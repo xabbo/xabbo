@@ -1,8 +1,10 @@
-﻿using Xabbo.Extension;
+﻿using System.Reactive.Linq;
+using ReactiveUI;
+
+using Xabbo.Extension;
 using Xabbo.Core;
 using Xabbo.Core.Game;
 using Xabbo.Core.Events;
-using ReactiveUI;
 
 namespace Xabbo.ViewModels;
 
@@ -13,8 +15,8 @@ public class RoomInfoViewModel : ViewModelBase
     [Reactive] public bool IsInRoom { get; set; }
     [Reactive] public IRoomData? Data { get; set; }
 
-    private long _currentThumbnailId = -1;
-    [Reactive] public string? ThumbnailUrl { get; set; }
+    private readonly ObservableAsPropertyHelper<string?> _thumbnailUrl;
+     public string? ThumbnailUrl => _thumbnailUrl.Value;
 
     private readonly ObservableAsPropertyHelper<bool> _isLoading;
     public bool IsLoading => _isLoading.Value;
@@ -36,26 +38,21 @@ public class RoomInfoViewModel : ViewModelBase
                 (isInRoom, roomData) => isInRoom && roomData is null
             )
             .ToProperty(this, x => x.IsLoading);
-    }
 
-    private void UpdateThumbnail(long roomId)
-    {
-        if (_currentThumbnailId == roomId)
-            return;
-
-        _currentThumbnailId = roomId;
-        ThumbnailUrl = roomId > 0 ? $"https://habbo-stories-content.s3.amazonaws.com/navigator-thumbnail/hhus/{roomId}.png" : null;
+        _thumbnailUrl =
+            Observable.CombineLatest(
+                _roomManager.WhenAnyValue(x => x.Room),
+                extension.WhenAnyValue(x => x.Session),
+                (room, session) => room is not null && session.Is(ClientType.Modern)
+                    ? $"https://habbo-stories-content.s3.amazonaws.com/navigator-thumbnail/hh{session.Hotel.Identifier}/{room.Id}.png"
+                    : null
+            )
+            .ToProperty(this, x => x.ThumbnailUrl);
     }
 
     private void OnEnteredRoom(RoomEventArgs e)
     {
         Data = e.Room.Data;
-
-        if (Data is not null)
-        {
-            UpdateThumbnail(Data.Id);
-        }
-
         IsInRoom = true;
     }
 
@@ -63,13 +60,10 @@ public class RoomInfoViewModel : ViewModelBase
     {
         Data = e.Data;
         IsInRoom = true;
-
-        UpdateThumbnail(e.Data.Id);
     }
 
     private void OnLeftRoom()
     {
-        UpdateThumbnail(0);
         IsInRoom = false;
         Data = null;
     }
