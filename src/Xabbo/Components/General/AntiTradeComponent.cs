@@ -21,6 +21,8 @@ public partial class AntiTradeComponent : Component
     private readonly ProfileManager _profileManager;
     private readonly TradeManager _tradeManager;
 
+    private TradePermissions _lastTradePermissions = (TradePermissions)(-1);
+
     private bool Enabled
     {
         get => Config.General.AntiTrade;
@@ -40,14 +42,15 @@ public partial class AntiTradeComponent : Component
         _roomManager = roomManager;
         _tradeManager = tradeManager;
 
-        _roomManager.Entered += OnRoomEntered;
-        _roomManager.RoomDataUpdated += OnRoomDataUpdated;
-
         config
             .WhenAnyValue(config => config.Value.General.AntiTrade)
             .Subscribe(value => OnIsActiveChanged(value));
 
         Task initialization = Task.Run(InitializeAsync);
+
+        _roomManager.Entered += OnRoomEntered;
+        _roomManager.RoomDataUpdated += OnRoomDataUpdated;
+        _tradeManager.Opened += OnTradeOpened;
     }
 
     private async Task InitializeAsync()
@@ -57,36 +60,30 @@ public partial class AntiTradeComponent : Component
         IsAvailable = true;
     }
 
-    private bool CanTrade()
+    private bool CanTrade(IRoomData? roomData)
     {
-        IRoomData? roomData = _roomManager.Room?.Data;
-        if (roomData is null) return false;
-
         return (
-            roomData.Trading is TradePermissions.Allowed ||
-            (roomData.Trading is TradePermissions.RightsHolders && _roomManager.HasRights)
+            !_tradeManager.IsTrading &&
+            roomData is not null &&
+            (roomData.Trading is TradePermissions.Allowed ||
+            (roomData.Trading is TradePermissions.RightsHolders && _roomManager.HasRights))
         );
     }
 
-    private void TradeSelf(IRoom? room)
+    private void TradeSelf()
     {
-        if (Session.Is(ClientType.Origins))
-            return;
-
-        if (room is null || !room.TryGetUserById(_profileManager.UserData?.Id ?? -1, out IUser? self))
-            return;
-
-        if (CanTrade())
+        if (!Session.Is(ClientType.Origins) &&
+            _profileManager.UserData is { Id: Id selfId } &&
+            _roomManager.EnsureInRoom(out var room) &&
+            room.TryGetUserById(selfId, out IUser? self) &&
+            CanTrade(room.Data))
+        {
             Ext.Send(new TradeUserMsg(self.Index));
+        }
     }
 
     protected void OnIsActiveChanged(bool isActive)
     {
-        UserData? userData = _profileManager.UserData;
-        IRoom? room = _roomManager.Room;
-
-        if (userData is null || room is null) return;
-
         if (isActive)
         {
             if (_tradeManager.IsTrading)
@@ -95,14 +92,14 @@ public partial class AntiTradeComponent : Component
             }
             else
             {
-                TradeSelf(room);
+                TradeSelf();
             }
         }
         else
         {
             if (_tradeManager.IsTrading &&
                 _tradeManager.Partner is not null &&
-                _tradeManager.Partner.Id == userData.Id)
+                _tradeManager.Partner.Id == _profileManager.UserData?.Id)
             {
                 Ext.Send(new CloseTradeMsg());
             }
@@ -111,25 +108,33 @@ public partial class AntiTradeComponent : Component
 
     private void OnRoomEntered(RoomEventArgs e)
     {
-        if (!Enabled) return;
-
-        TradeSelf(e.Room);
+        _lastTradePermissions = e.Room.Data?.Trading ?? TradePermissions.None;
+        if (Enabled) TradeSelf();
     }
 
     private void OnRoomDataUpdated(RoomDataEventArgs e)
     {
-        if (Enabled && !_tradeManager.IsTrading && e.Data.Trading is not TradePermissions.NotAllowed)
-            TradeSelf(_roomManager.Room);
+        if (_lastTradePermissions != e.Data.Trading)
+        {
+            _lastTradePermissions = e.Data.Trading;
+            if (Enabled) TradeSelf();
+        }
+    }
+
+    private void OnTradeOpened(TradeOpenedEventArgs args)
+    {
+        if (Enabled &&
+            Config.General.AntiTradeCloseTrade &&
+            args.Self.Id != args.Partner.Id)
+        {
+            Ext.Send(new CloseTradeMsg());
+        }
     }
 
     [Intercept]
     void HandleTradeOpened(Intercept<TradeOpenedMsg> e)
     {
-        if (Enabled)
-        {
-            e.Block();
-            Ext.Send(new CloseTradeMsg());
-        }
+        if (Enabled) e.Block();
     }
 
     [Intercept]
