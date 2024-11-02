@@ -18,7 +18,7 @@ public class LauncherService(Lazy<MainWindow> mainWindow) : ILauncherService
 
         sb.Append(url);
 
-        bool first = false;
+        bool first = true;
         if (query is not null)
         {
             foreach (var (key, values) in query)
@@ -27,6 +27,8 @@ public class LauncherService(Lazy<MainWindow> mainWindow) : ILauncherService
                 {
                     if (!first)
                         sb.Append('&');
+                    else
+                        sb.Append('?');
                     first = false;
                     sb.Append(key);
                     sb.Append('=');
