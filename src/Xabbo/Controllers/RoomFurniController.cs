@@ -14,6 +14,9 @@ public partial class RoomFurniController : ControllerBase
 
     private readonly IConfigProvider<AppConfig> _config;
     private readonly IOperationManager _operationManager;
+    private readonly ProfileManager _profileManager;
+    private readonly RoomManager _roomManager;
+
     private readonly SemaphoreSlim _workingSemaphore = new(1, 1);
     private CancellationTokenSource? _cts;
 
@@ -30,14 +33,30 @@ public partial class RoomFurniController : ControllerBase
         IExtension extension,
         IConfigProvider<AppConfig> config,
         IOperationManager operationManager,
+        ProfileManager profileManager,
         RoomManager roomManager
     )
         : base(extension)
     {
         _config = config;
         _operationManager = operationManager;
+        _profileManager = profileManager;
+        _roomManager = roomManager;
 
         roomManager.Left += OnLeftRoom;
+    }
+
+    private bool CanEject(IFurni furni) =>
+        _roomManager.IsOwner &&
+        _profileManager.UserData is { Id: Id selfId } &&
+        furni.OwnerId != selfId;
+
+    private bool CanPickup(IFurni furni)
+    {
+        if (Ext.Session.Is(ClientType.Modern))
+            return _profileManager.UserData is { Id: Id selfId } && furni.OwnerId == selfId;
+        else
+            return _roomManager.IsOwner;
     }
 
     private void OnLeftRoom() => CancelCurrentOperation();
@@ -77,7 +96,8 @@ public partial class RoomFurniController : ControllerBase
         eject ? Operation.Eject : Operation.Pickup,
         furni,
         x => x.FurniPickupInterval,
-        f => Send(new PickupFurniMsg(f))
+        f => Send(new PickupFurniMsg(f)),
+        filter: eject ? CanEject : CanPickup
     );
 
     private Task ProcessFurniAsync(Operation operation,
