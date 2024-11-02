@@ -14,6 +14,22 @@ public sealed class RoomCommands(RoomManager roomManager) : CommandModule
 {
     private readonly RoomManager _roomMgr = roomManager;
 
+    [Command("clear", SupportedClients = ClientType.Modern)]
+    public Task ClearCommandHandler(CommandArgs _)
+    {
+        if (_roomMgr.EnsureInRoom(out var room))
+            Ext.Send(In.RoomEntryInfo, room.Id, _roomMgr.IsOwner);
+        return Task.CompletedTask;
+    }
+
+    [Command("refresh", SupportedClients = ClientType.Modern)]
+    public Task RefreshCommandHandler(CommandArgs _)
+    {
+        if (_roomMgr.IsInRoom)
+            Ext.Send(Out.GetHeightMap);
+        return Task.CompletedTask;
+    }
+
     [Command("goto")]
     public Task GotoCommandHandler(CommandArgs args)
     {
@@ -51,13 +67,6 @@ public sealed class RoomCommands(RoomManager roomManager) : CommandModule
                 Ext.Send(Out.OpenFlatConnection, room.Id, "", (Id)(-1));
         }
 
-        return Task.CompletedTask;
-    }
-
-    [Command("entry", SupportedClients = ClientType.Flash)]
-    public Task TriggerEntryWiredCommandHandler(CommandArgs _)
-    {
-        Ext.Send(Out.GetRoomEntryTile);
         return Task.CompletedTask;
     }
 
