@@ -96,6 +96,14 @@
       </Style>
     </Style>
 
+    <Style Selector="Button.link">
+      <Setter Property="Padding" Value="2,0" />
+      <Setter Property="Theme" Value="{StaticResource TransparentButton}" />
+      <Setter Property="Foreground" Value="#ceb4ff" />
+      <Setter Property="FontWeight" Value="Bold" />
+      <Setter Property="Cursor" Value="Hand" />
+    </Style>
+
     <!-- Hide modern components on origins sessions -->
     <Style Selector=".isorigins :is(Control).modern">
       <Setter Property="IsVisible" Value="False" />

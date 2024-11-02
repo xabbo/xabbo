@@ -168,10 +168,11 @@ public sealed class XabboAppManager : IApplicationManager
 
         _uiContext.Invoke(() => {
             _application.Resources["AppStatus"] = "An error occurred.";
-            _application.Resources["AppError"] = string.Join("\n", errorDetails);
             _application.Resources["IsError"] = true;
             _application.Resources["IsConnecting"] = false;
             _application.Resources["IsConnected"] = false;
+
+            _mainViewModel.AppError = string.Join("\n", errorDetails);
         });
     }
 

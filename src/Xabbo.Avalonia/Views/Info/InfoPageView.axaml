@@ -12,13 +12,6 @@
   <ScrollViewer>
     <Grid Margin="20">
       <Grid.Styles>
-        <Style Selector="Button.link">
-          <Setter Property="Padding" Value="2,0" />
-          <Setter Property="Theme" Value="{StaticResource TransparentButton}" />
-          <Setter Property="Foreground" Value="#ceb4ff" />
-          <Setter Property="FontWeight" Value="Bold" />
-          <Setter Property="Cursor" Value="Hand" />
-        </Style>
         <Style Selector="TextBlock">
           <Setter Property="FontSize" Value="18" />
           <Setter Property="TextAlignment" Value="Center" />
